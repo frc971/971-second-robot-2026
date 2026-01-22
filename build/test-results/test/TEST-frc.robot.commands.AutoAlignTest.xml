@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="frc.robot.commands.AutoAlignTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-01-18T23:15:28" hostname="Boruis-MacBook-Pro.local" time="4.18">
+<testsuite name="frc.robot.commands.AutoAlignTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-01-22T04:07:41" hostname="Boruis-MacBook-Pro.local" time="3.699">
   <properties/>
-  <testcase name="testComplexSequence()" classname="frc.robot.commands.AutoAlignTest" time="3.874"/>
-  <testcase name="testTranslateAndRotate()" classname="frc.robot.commands.AutoAlignTest" time="0.086"/>
-  <testcase name="testRotate()" classname="frc.robot.commands.AutoAlignTest" time="0.105"/>
-  <testcase name="testTranslate()" classname="frc.robot.commands.AutoAlignTest" time="0.115"/>
+  <testcase name="testComplexSequence()" classname="frc.robot.commands.AutoAlignTest" time="3.386"/>
+  <testcase name="testTranslateAndRotate()" classname="frc.robot.commands.AutoAlignTest" time="0.084"/>
+  <testcase name="testRotate()" classname="frc.robot.commands.AutoAlignTest" time="0.115"/>
+  <testcase name="testTranslate()" classname="frc.robot.commands.AutoAlignTest" time="0.113"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

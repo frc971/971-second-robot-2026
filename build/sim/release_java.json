@@ -1,21 +1,21 @@
 [
   {
     "type": "java",
-    "name": "jar (in project 971-shooter-robot-2025)",
+    "name": "jar (in project 971-first-robot-2026)",
     "extensions": [
       {
         "name": "Sim GUI",
-        "libName": "/Users/bsu3.ender/coding/971-shooter-robot-2025/build/jni/release/libhalsim_gui.dylib",
+        "libName": "/Users/bsu3.ender/coding/971-first-robot-2026/build/jni/release/libhalsim_gui.dylib",
         "defaultEnabled": true
       },
       {
         "name": "Use Real DriverStation",
-        "libName": "/Users/bsu3.ender/coding/971-shooter-robot-2025/build/jni/release/libhalsim_ds_socket.dylib",
+        "libName": "/Users/bsu3.ender/coding/971-first-robot-2026/build/jni/release/libhalsim_ds_socket.dylib",
         "defaultEnabled": false
       }
     ],
     "environment": {},
-    "libraryDir": "/Users/bsu3.ender/coding/971-shooter-robot-2025/build/jni/release",
+    "libraryDir": "/Users/bsu3.ender/coding/971-first-robot-2026/build/jni/release",
     "mainClassName": "frc.robot.Main"
   }
 ]
