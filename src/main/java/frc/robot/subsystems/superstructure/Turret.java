@@ -14,8 +14,8 @@ import frc.robot.lib.superstructure.*;
 // TODO: change the constants...
 
 public class Turret extends AngularSubsystem {
-  public static final Angle UPPER_LIMIT = Degrees.of(180);
-  public static final Angle LOWER_LIMIT = Degrees.of(-180);
+  public static final Angle UPPER_LIMIT = Degrees.of(90);
+  public static final Angle LOWER_LIMIT = Degrees.of(-45);
   public static final boolean ENABLE_WRAP = false;
 
   public Turret() {
@@ -26,12 +26,12 @@ public class Turret extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.0; // Static friction compensation
-    tc.Slot0.kV = 0.0; // Velocity feedforward
+    tc.Slot0.kS = 0.39; // Static friction compensation
+    tc.Slot0.kV = 6.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 0.0; // Proportional gain
+    tc.Slot0.kP = 3.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
@@ -39,7 +39,7 @@ public class Turret extends AngularSubsystem {
 
     // Motion Magic profile constraints
     tc.MotionMagic.MotionMagicCruiseVelocity = 0.9;
-    tc.MotionMagic.MotionMagicAcceleration = 4.6;
+    tc.MotionMagic.MotionMagicAcceleration = 20.0;
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -47,22 +47,20 @@ public class Turret extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
-    tc.CurrentLimits.StatorCurrentLimit = 60.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
+    tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
     tc.Feedback.SensorToMechanismRatio = 63.0 / 1.0; // Motor to output gear ratio
 
     tc.ClosedLoopGeneral.ContinuousWrap = ENABLE_WRAP;
-    MotorConfig motorConfig =
-        MotorConfig.builder()
-            .NAME("Turret")
-            .ID(30)
-            .BUS(new CANBus("Drivetrain Bus"))
-            .LOG_UNIT(Degrees)
-            .TALONFX_CONFIG(tc)
-            .build();
 
-    return motorConfig;
+    return MotorConfig.builder()
+        .NAME("Turret")
+        .ID(30)
+        .BUS(new CANBus("Drivetrain Bus"))
+        .LOG_UNIT(Degrees)
+        .TALONFX_CONFIG(tc)
+        .build();
   }
 
   // Countinuous Wrap stuff:
@@ -86,6 +84,6 @@ public class Turret extends AngularSubsystem {
             || goalPosition.in(Degrees) > UPPER_LIMIT.in(Degrees))) return;
 
     this.goalPosition = (ENABLE_WRAP) ? limitAngle(goalPosition) : goalPosition;
-    io.setPosition(this.goalPosition);
+    super.setPosition(goalPosition);
   }
 }

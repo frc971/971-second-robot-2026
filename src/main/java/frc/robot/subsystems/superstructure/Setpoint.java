@@ -3,12 +3,13 @@ package frc.robot.subsystems.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import java.util.Optional;
 import lombok.Getter;
 
 public class Setpoint {
-  @Getter private Optional<Angle> flywheel = Optional.empty();
+  @Getter private Optional<AngularVelocity> flywheel = Optional.empty();
   @Getter private Optional<Angle> hood = Optional.empty();
   @Getter private Optional<Angle> turret = Optional.empty();
   @Getter private Optional<Voltage> indexer = Optional.empty();
@@ -16,8 +17,8 @@ public class Setpoint {
 
   public Setpoint() {}
 
-  public Setpoint withFlywheelDegrees(double degrees) {
-    this.flywheel = Optional.of(Degrees.of(degrees));
+  public Setpoint withFlywheelRPS(double rps) {
+    this.flywheel = Optional.of(RotationsPerSecond.of(rps));
     return this;
   }
 

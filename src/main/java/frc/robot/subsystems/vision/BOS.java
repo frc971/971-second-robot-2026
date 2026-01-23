@@ -24,11 +24,11 @@ public class BOS {
 
     topics[0] =
         table
-            .getDoubleArrayTopic("BackLeft/PoseEstimate/TagEstimation")
+            .getDoubleArrayTopic("PoseEstimate/FrontLeft/TagEstimation")
             .subscribe(blank, PubSubOption.keepDuplicates(true));
     topics[1] =
         table
-            .getDoubleArrayTopic("BackRight/PoseEstimate/TagEstimation")
+            .getDoubleArrayTopic("PoseEstimate/FrontRight/TagEstimation")
             .subscribe(blank, PubSubOption.keepDuplicates(true));
   }
 

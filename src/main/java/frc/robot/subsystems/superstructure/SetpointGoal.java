@@ -1,31 +1,30 @@
 package frc.robot.subsystems.superstructure;
 
+import lombok.Getter;
+
 // TODO: edit the uhh degrees and voltage setpoints
 
 public enum SetpointGoal {
   RESET(
       new Setpoint()
-          .withFlywheelDegrees(0.0)
-          .withHoodDegrees(0.0)
-          .withTurretDegrees(0.0)
+          .withFlywheelRPS(0.0)
+          .withHoodDegrees(-18.5)
+          .withTurretDegrees(90.0)
           .withIndexerVolts(0.0)
           .withGroundRollersVolts(0.0)),
   NEUTRAL(
       new Setpoint()
-          .withFlywheelDegrees(0.0)
-          .withHoodDegrees(10.0)
+          .withFlywheelRPS(0.0)
+          .withHoodDegrees(-18.0)
           .withTurretDegrees(0.0)
-          .withIndexerVolts(0.0)),
+          .withIndexerVolts(0.0)
+          .withGroundRollersVolts(0.0)),
   INDEX(new Setpoint().withIndexerVolts(10)),
-  INTAKE(new Setpoint().withGroundRollersVolts(6.7));
+  INTAKE(new Setpoint().withGroundRollersVolts(11.0));
 
-  private final Setpoint setpoint;
+  @Getter private final Setpoint setpoint;
 
   SetpointGoal(Setpoint setpoint) {
     this.setpoint = setpoint;
-  }
-
-  public Setpoint getSetpoint() {
-    return setpoint;
   }
 }

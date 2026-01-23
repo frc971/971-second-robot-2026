@@ -8,7 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Controller;
+import frc.robot.subsystems.Controllers;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -57,7 +57,7 @@ public class Manual {
 
     JOYSTICK_VALUES
         .setValues(
-            Controller.XBOX.getLeftY(), Controller.XBOX.getLeftX(), Controller.XBOX.getRightX())
+            Controllers.XBOX.getLeftY(), Controllers.XBOX.getLeftX(), Controllers.XBOX.getRightX())
         .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
         .scale(
             -MAX_SPEED, // Negative max speed and angular rate since
@@ -73,9 +73,9 @@ public class Manual {
             .withVelocityY(JOYSTICK_VALUES.getY())
             .withRotationalRate(JOYSTICK_VALUES.getRot()));
 
-    Logger.recordOutput("Drive/Manual/Joystick/X", Controller.XBOX.getLeftY());
-    Logger.recordOutput("Drive/Manual/Joystick/Y", Controller.XBOX.getLeftX());
-    Logger.recordOutput("Drive/Manual/Joystick/Rot", Controller.XBOX.getRightX());
+    Logger.recordOutput("Drive/Manual/Joystick/X", Controllers.XBOX.getLeftY());
+    Logger.recordOutput("Drive/Manual/Joystick/Y", Controllers.XBOX.getLeftX());
+    Logger.recordOutput("Drive/Manual/Joystick/Rot", Controllers.XBOX.getRightX());
   }
 
   public JoystickValues getValues() {

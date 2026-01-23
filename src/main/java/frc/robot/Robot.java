@@ -28,9 +28,9 @@ public class Robot extends LoggedRobot {
   private final BOS bos;
 
   public Robot() {
-    Logger.recordMetadata("ProjectName", "971 Shooter Bot 2025");
-    Logger.recordMetadata("TeamNumber", "8971");
-    Logger.recordMetadata("RobotName", "971 Shooter Bot");
+    Logger.recordMetadata("ProjectName", "971 First Bot 2026");
+    Logger.recordMetadata("TeamNumber", "971");
+    Logger.recordMetadata("RobotName", "971 Robot");
 
     switch (Constants.MODE) {
       case REAL -> {

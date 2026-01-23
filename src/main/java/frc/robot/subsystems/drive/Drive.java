@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Controller;
+import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -19,9 +19,10 @@ public class Drive {
   private static final double ROTATION_DEADBAND = 0.2;
 
   public enum Mode {
+    FREEZE(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
     MANUAL(Manual.Goal.ACTIVE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
     THETA_LOCK(Manual.Goal.NONE, ThetaLock.Goal.ACTIVE, AutoAlign.Goal.NONE),
-    AUTO_ALIGN(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.ACTIVE);
+    AUTO_ALIGN(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.CLIMB);
 
     public final Manual.Goal manualGoal;
     public final ThetaLock.Goal thetaLockGoal;
@@ -69,17 +70,15 @@ public class Drive {
   }
 
   private void updateMode() {
-    // auto align
-    if (Controller.AUTO_ALIGN.getAsBoolean()) {
-      mode = Mode.AUTO_ALIGN;
+    if (superstructure.freezeDriving()) {
+      mode = Mode.FREEZE;
       return;
-    } else if (mode != Mode.THETA_LOCK) {
-      mode = Mode.MANUAL;
     }
 
-    if ((mode == Mode.AUTO_ALIGN) && autoAlign.isAligned()) {
+    if (Controllers.XBOX.leftBumper().getAsBoolean()) {
+      mode = Mode.AUTO_ALIGN;
+    } else {
       mode = Mode.MANUAL;
-      return;
     }
   }
 }

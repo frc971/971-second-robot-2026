@@ -30,22 +30,22 @@ public class Flywheel extends AngularSubsystem {
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
-    tc.Slot0.kS = 0.0;
-    tc.Slot0.kV = 0.0;
+    tc.Slot0.kS = 0.3;
+    tc.Slot0.kV = 0.46;
     tc.Slot0.kA = 0.0;
     tc.Slot0.kG = 0.0;
 
-    tc.Slot0.kP = 0.0;
+    tc.Slot0.kP = 1.0;
     tc.Slot0.kI = 0.0;
     tc.Slot0.kD = 0.0;
 
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
-    tc.MotionMagic.MotionMagicCruiseVelocity = 250.0; // TODO: make this reasonable
-    tc.MotionMagic.MotionMagicAcceleration = 22.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0; // TODO: make this reasonable
+    tc.MotionMagic.MotionMagicAcceleration = 0.0;
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
-    tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    tc.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -55,23 +55,19 @@ public class Flywheel extends AngularSubsystem {
 
     tc.Feedback.SensorToMechanismRatio = 44.0 / 12.0; // Motor to output gear ratio
 
-    MotorConfig motorConfig =
-        MotorConfig.builder()
-            .NAME("Flywheel Lead")
-            .ID(8)
-            .BUS(new CANBus("Turret"))
-            .TALONFX_CONFIG(tc)
-            .build();
-    return motorConfig;
+    return MotorConfig.builder()
+        .NAME("Flywheel Lead")
+        .ID(8)
+        .BUS(new CANBus("Turret"))
+        .TALONFX_CONFIG(tc)
+        .build();
   }
 
   public static MotorConfig getFollowerConfig() {
-    MotorConfig motorConfig =
-        getMotorConfig().toBuilder()
-            .NAME("Flywheel Follower")
-            .ID(16)
-            .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
-            .build();
-    return motorConfig;
+    return getMotorConfig().toBuilder()
+        .NAME("Flywheel Follower")
+        .ID(16)
+        .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
+        .build();
   }
 }

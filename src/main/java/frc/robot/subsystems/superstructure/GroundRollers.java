@@ -22,14 +22,11 @@ public class GroundRollers extends MotorSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
-    MotorConfig motorConfig =
-        MotorConfig.builder()
-            .NAME("Ground Rollers")
-            .ID(15)
-            .BUS(new CANBus("Drivetrain Bus"))
-            .TALONFX_CONFIG(tc)
-            .build();
-
-    return motorConfig;
+    return MotorConfig.builder()
+        .NAME("Ground Rollers")
+        .ID(15)
+        .BUS(new CANBus("Drivetrain Bus"))
+        .TALONFX_CONFIG(tc)
+        .build();
   }
 }

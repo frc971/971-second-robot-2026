@@ -6,6 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import java.util.Optional;
 import lombok.Getter;
@@ -23,8 +25,11 @@ import org.littletonrobotics.junction.Logger;
 public class AutoAlign {
   public enum Goal {
     NONE,
-    ACTIVE
+    CLIMB
   }
+
+  // Todo: Change coordinates to more precies cooridnates from robot testing
+  private final Pose2d CLIMBING_TARGET_POSE = new Pose2d(1, 4, new Rotation2d(Math.PI));
 
   @Getter @Setter private Goal goal = Goal.NONE;
   private Goal previousGoal = Goal.NONE;
@@ -88,7 +93,10 @@ public class AutoAlign {
 
     Optional<Pose2d> targetPose =
         switch (goal) {
-          case ACTIVE -> Optional.of(new Pose2d());
+          case CLIMB -> DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+              ? Optional.of(FlippingUtil.flipFieldPose(CLIMBING_TARGET_POSE))
+              : Optional.of(CLIMBING_TARGET_POSE);
           default -> Optional.empty();
         };
 

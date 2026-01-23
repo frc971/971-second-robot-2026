@@ -1,0 +1,305 @@
+package frc.robot.subsystems.superstructure;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
+import com.pathplanner.lib.util.FlippingUtil;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.lib.shooter.*;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import lombok.Getter;
+import lombok.Setter;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
+public class ShooterHandler {
+  public static final double X_DISTANCE_FROM_CENTER = 3.6448975;
+  public static final double HEIGHT = 1.4370877;
+
+  public static final ObjectState TARGET_BLUE =
+      new ObjectState(
+          new Translation3d(
+              (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
+              (FlippingUtil.fieldSizeY / 2),
+              HEIGHT),
+          new Translation3d());
+
+  public static final ObjectState TARGET_RED =
+      new ObjectState(
+          new Translation3d(
+              (FlippingUtil.fieldSizeX / 2) + X_DISTANCE_FROM_CENTER,
+              (FlippingUtil.fieldSizeY / 2),
+              HEIGHT),
+          new Translation3d());
+
+  // config + physics model
+  private final ShooterConfig config;
+  private final ShooterPhysics physics;
+  private ObjectState projectileState;
+  private ObjectState targetState;
+
+  // state machine
+  public enum State {
+    NOT_READY,
+    AIMING,
+    FIRING
+  }
+
+  public enum Goal {
+    NONE,
+    SHOOT
+  }
+
+  @AutoLogOutput @Getter private ShooterHandler.State shooterState;
+  @AutoLogOutput @Getter @Setter private ShooterHandler.Goal shooterGoal;
+
+  private LaunchSolution launchSolution = null;
+
+  // needs access DriveTrain (for robotState)
+  private final CommandSwerveDrivetrain drivetrain;
+  private final Turret turret;
+  private final Hood hood;
+  private final Flywheel flywheel;
+  private final Indexer indexer;
+
+  public ShooterHandler(
+      Turret turret,
+      Hood hood,
+      Flywheel flywheel,
+      Indexer indexer,
+      CommandSwerveDrivetrain drivetrain,
+      ShooterConfig config) {
+    this.drivetrain = drivetrain;
+    this.turret = turret;
+    this.flywheel = flywheel;
+    this.hood = hood;
+    this.indexer = indexer;
+    this.config = config;
+    this.physics = new ShooterPhysics(this.config);
+
+    this.shooterState = State.NOT_READY;
+    this.targetState = TARGET_BLUE;
+  }
+
+  public void periodic() {
+    targetState =
+        DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Blue)
+            ? TARGET_BLUE
+            : TARGET_RED;
+    projectileState = getProjectileState();
+
+    // calculate physics
+    launchSolution = physics.alexSolve(projectileState, targetState);
+
+    logStates();
+
+    if (shooterGoal == Goal.NONE) {
+      shooterState = State.NOT_READY;
+      return;
+    }
+
+    if (!satisfiesConstraints()) {
+      shooterState = State.NOT_READY;
+    }
+
+    // state transitions
+    switch (shooterState) {
+      case NOT_READY -> {
+        if (satisfiesConstraints()) {
+          shooterState = State.AIMING;
+        }
+      }
+      case AIMING -> {
+        if (launchSolution != null && canTransitionToReady()) {
+          shooterState = State.FIRING;
+        }
+      }
+      case FIRING -> {
+        if (canTransitionToNotReady()) {
+          shooterState = State.AIMING;
+        }
+      }
+    }
+
+    // set output
+    if (shooterState != State.NOT_READY) {
+      flywheel.setVelocity(getFlywheelAngularVelocity());
+      hood.setPosition(launchSolution.hoodAngle());
+      turret.setPosition(getRelativeTurretAngle());
+    }
+
+    if (shooterState == State.FIRING) {
+      indexer.setVoltage(SetpointGoal.INDEX.getSetpoint().getIndexer().get());
+    } else {
+      indexer.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getIndexer().get());
+    }
+  }
+
+  public AngularVelocity getFlywheelAngularVelocity() {
+    double omega =
+        launchSolution.linearFlywheelVelocity().in(MetersPerSecond)
+            / config.FLYWHEEL_RADIUS().in(Meters);
+
+    return RadiansPerSecond.of(omega);
+  }
+
+  public Angle getRelativeTurretAngle() {
+    Angle absolute = Degrees.of(launchSolution.turretRotation.getDegrees());
+    Angle relative =
+        absolute.minus(Degrees.of(drivetrain.getState().Pose.getRotation().getDegrees()));
+
+    return Radians.of(MathUtil.angleModulus(relative.in(Radians)));
+  }
+
+  private void logStates() {
+    if (launchSolution != null) {
+      Logger.recordOutput(
+          "ShooterHandler/LaunchGoals/Flywheel (mps)",
+          launchSolution.linearFlywheelVelocity().in(MetersPerSecond));
+      Logger.recordOutput(
+          "ShooterHandler/LaunchGoals/Turret (deg)",
+          Radians.of(launchSolution.turretRotation.getRadians()).in(Degrees));
+      Logger.recordOutput(
+          "ShooterHandler/LaunchGoals/Turret Rel (deg)", getRelativeTurretAngle().in(Degrees));
+      Logger.recordOutput(
+          "ShooterHandler/LaunchGoals/Hood (deg)", launchSolution.hoodAngle().in(Degrees));
+      Translation2d distance2d = targetState.minus(projectileState).xyPosition();
+      Logger.recordOutput("ShooterHandler/Distance/2D", distance2d);
+      Logger.recordOutput("ShooterHandler/Distance/1D", distance2d.getNorm());
+
+      Logger.recordOutput(
+          "ShooterHandler/Error/Flywheel (rps)",
+          flywheelAngularVelocityAbsDiff().in(RotationsPerSecond));
+      Logger.recordOutput("ShooterHandler/Error/Turret (deg)", turretRotationAbsDiff().in(Degrees));
+      Logger.recordOutput("ShooterHandler/Error/Hood (deg)", hoodAngleAbsDiff().in(Degrees));
+    }
+
+    if (projectileState != null) {
+      Logger.recordOutput("ShooterHandler/Projectile Position", projectileState.position());
+      Logger.recordOutput("ShooterHandler/Projectile Velocity", projectileState.velocity());
+      Logger.recordOutput("ShooterHandler/Target Position", targetState.position());
+      Logger.recordOutput(
+          "ShooterHandler/Target Velocity", new Pose3d(targetState.velocity(), new Rotation3d()));
+    }
+  }
+
+  @AutoLogOutput
+  private boolean canTransitionToReady() {
+    return flywheelAngularVelocityAbsDiff().lt(config.AIMING_FLYWHEEL_THRESHOLD())
+        && turretRotationAbsDiff().lt(config.AIMING_ROTATION_THRESHOLD())
+        && hoodAngleAbsDiff().lt(config.AIMING_HOOD_ANGLE_THRESHOLD());
+  }
+
+  @AutoLogOutput
+  private boolean canTransitionToNotReady() {
+    return flywheelAngularVelocityAbsDiff().gt(config.SHOOTING_FLYWHEEL_ABORT())
+        || turretRotationAbsDiff().gt(config.SHOOTING_ROTATION_THRESHOLD())
+        || hoodAngleAbsDiff().gt(config.SHOOTING_HOOD_ANGLE_THRESHOLD());
+  }
+
+  // --- Threshold helper functions ---
+  private AngularVelocity flywheelAngularVelocityAbsDiff() {
+    AngularVelocity diff = getFlywheelAngularVelocity().minus(flywheel.getVelocity());
+    double absoluteOmega = Math.abs(diff.in(RadiansPerSecond));
+    return Radians.per(Seconds).of(absoluteOmega);
+  }
+
+  private Angle turretRotationAbsDiff() {
+    return Radians.of(
+        launchSolution.turretRotation.getMeasure().minus(getTurretAbsRotation()).abs(Radians));
+  }
+
+  private Angle hoodAngleAbsDiff() {
+    Angle diff = launchSolution.hoodAngle().minus(hood.getPosition());
+    double absoluteOmega = diff.in(Radians);
+    return Radians.of(absoluteOmega);
+  }
+
+  private Angle getTurretAbsRotation() {
+    return turret.getPosition().plus(drivetrain.getState().Pose.getRotation().getMeasure());
+  }
+
+  // Check if within hardware (+ other) constraints for shooting
+  // determines if shot is even remotely possible
+  @AutoLogOutput
+  public boolean satisfiesConstraints() {
+    // --- HIGH PRIORITY CONSTRAINTS ---
+    LinearVelocity speed = launchSolution.linearFlywheelVelocity();
+    if (speed.lt(config.MIN_FLYWHEEL_SPEED()) || speed.gt(config.MAX_FLYWHEEL_SPEED())) {
+      DataLogManager.log("WARNING: Calculated flywheel speed is out constraints");
+      return false;
+    }
+
+    Angle angle = launchSolution.hoodAngle();
+    if (angle.lt(config.MIN_HOOD_ANGLE()) || angle.gt(config.MAX_HOOD_ANGLE())) {
+      DataLogManager.log("WARNING: Calculated hood angle is out of constraints");
+      return false;
+    }
+
+    // --- LOW PRIORITY CONSTRAINTS ---
+    Distance targetDistance =
+        Meters.of(targetState.position().minus(projectileState.position()).getNorm());
+    if (targetDistance.lt(config.MIN_SHOT_DISTANCE())
+        || targetDistance.gt(config.MAX_SHOT_DISTANCE())) {
+      DataLogManager.log("WARNING: Target distance is outside shot distance constraints");
+      return false;
+    }
+
+    // TODO: add more constraints to check against (such as time)
+    return true;
+  }
+
+  private ObjectState getProjectileState() {
+    // This code is hella chopped but works maybe??
+    SwerveDriveState drivetrainState = drivetrain.getState();
+
+    double radiusToBall = config.RADIUS_TO_BALL().in(Meters);
+    double robotOmega = drivetrainState.Speeds.omegaRadiansPerSecond;
+
+    double turretAngle = getTurretAbsRotation().in(Radians);
+    double turretOmega = turret.getVelocity().in(RadiansPerSecond);
+
+    Translation2d turretCenterToBall = new Translation2d(radiusToBall, new Rotation2d(turretAngle));
+
+    Translation2d robotCenterToTurret =
+        config.TURRET_OFFSET().toTranslation2d().rotateBy(drivetrainState.Pose.getRotation());
+
+    Vector<N3> W_robot = new Translation3d(0, 0, robotOmega).toVector();
+    Vector<N3> W_turret = new Translation3d(0, 0, turretOmega).toVector();
+
+    Vector<N3> v_robotRot =
+        Vector.cross(W_robot, new Translation3d(robotCenterToTurret).toVector());
+    Vector<N3> v_turRot = Vector.cross(W_turret, new Translation3d(turretCenterToBall).toVector());
+
+    Translation3d projPoseOffset =
+        new Translation3d(robotCenterToTurret)
+            .plus(new Translation3d(turretCenterToBall))
+            .plus(new Translation3d(0.0, 0.0, config.TURRET_OFFSET().getZ()));
+
+    Translation3d projVelOffset = new Translation3d(v_robotRot.plus(v_turRot));
+
+    ObjectState robotState = new ObjectState(drivetrainState);
+
+    return robotState.plus(projPoseOffset, projVelOffset);
+  }
+}

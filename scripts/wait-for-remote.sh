@@ -3,7 +3,7 @@
 
 set -eu
 
-target="${1:-10.89.71.2}"
+target="${1:-10.99.72.2}"
 interval="${2:-1}"
 
 echo "Waiting for remote $target at interval $interval seconds..."

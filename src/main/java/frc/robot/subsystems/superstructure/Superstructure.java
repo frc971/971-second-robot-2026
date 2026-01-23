@@ -1,16 +1,14 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.lib.shooter.ShooterConfig;
-import frc.robot.lib.shooter.ShooterHandler;
-import frc.robot.subsystems.Controller;
+import frc.robot.subsystems.Controllers;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
-
-// import frc.robot.subsystems.buttonboard.ButtonBoard;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -29,14 +27,13 @@ public class Superstructure {
   private final ShooterHandler shooterHandler;
   private final ShooterTuner shooterTuner;
 
-  private enum State {
-    IDLE,
+  private enum Goal {
     MANUAL,
-    SHOOTING,
-    TUNING
+    SHOOT,
+    TUNER
   }
 
-  @AutoLogOutput @Getter private State state;
+  @AutoLogOutput @Getter private Goal goal;
 
   public Superstructure(RobotContainer robotContainer) {
     flywheel = new Flywheel();
@@ -44,54 +41,48 @@ public class Superstructure {
     indexer = new Indexer();
     turret = new Turret();
     groundRollers = new GroundRollers();
-    shooterHandler = new ShooterHandler(robotContainer, ShooterConfig.testConfig());
+    shooterHandler =
+        new ShooterHandler(
+            turret,
+            hood,
+            flywheel,
+            indexer,
+            robotContainer.drivetrain,
+            RobotBase.isReal() ? ShooterConfig.actualConfig() : ShooterConfig.testConfig());
     shooterTuner = new ShooterTuner(flywheel, hood, turret);
 
-    // Default states
     setGoal(SetpointGoal.NEUTRAL);
-    this.state = State.IDLE;
+    this.goal = Goal.TUNER;
   }
 
   public void periodic() {
-
     if (DriverStation.isTeleop()) {
       setGoal(SetpointGoal.NEUTRAL);
 
-      if (Controller.GROUND_ROLLERS.getAsBoolean()) {
-        setGoal(SetpointGoal.INTAKE);
+      if (Controllers.XBOX.a().getAsBoolean()) setGoal(SetpointGoal.INTAKE);
+
+      if (Controllers.XBOX.button(8).getAsBoolean()) goal = Goal.MANUAL;
+      if (Controllers.XBOX.x().getAsBoolean()) goal = Goal.SHOOT;
+      if (Controllers.XBOX.y().getAsBoolean()) goal = Goal.TUNER;
+    }
+
+    switch (goal) {
+      case MANUAL -> {
+        shooterTuner.setGoal(ShooterTuner.Goal.NONE);
+        shooterHandler.setShooterGoal(ShooterHandler.Goal.NONE);
+
+        setGoal(SetpointGoal.RESET);
       }
+      case SHOOT -> {
+        shooterTuner.setGoal(ShooterTuner.Goal.NONE);
+        shooterHandler.setShooterGoal(ShooterHandler.Goal.SHOOT);
+      }
+      case TUNER -> {
+        shooterTuner.setGoal(ShooterTuner.Goal.ACTIVE);
+        shooterHandler.setShooterGoal(ShooterHandler.Goal.NONE);
 
-      // TODO: check for switching states
-      switch (state) {
-        case IDLE -> {
-          if (Controller.SHOOT_BUTTON.getAsBoolean()) {
-            state = State.SHOOTING;
-          }
-        }
-
-        case MANUAL -> {
-          shooterTuner.setGoal(ShooterTuner.Goal.NONE);
-          // TODO: add setpoints for Troy
-        }
-
-        case SHOOTING -> {
-          shooterTuner.setGoal(ShooterTuner.Goal.NONE);
-          if (Controller.SHOOT_BUTTON.getAsBoolean() || !shooterHandler.satisfiesConstraints()) {
-            state = State.IDLE;
-          }
-          if (shooterHandler.ready()) {
-            setGoal(SetpointGoal.INDEX);
-          }
-
-          flywheel.setVelocity(shooterHandler.getFlywheelAngularVelocity());
-          hood.setPosition(shooterHandler.getLaunchSolution().hoodAngle());
-          turret.setPosition(shooterHandler.getRelativeTurretAngle());
-        }
-
-        case TUNING -> {
-          shooterTuner.setGoal(ShooterTuner.Goal.ACTIVE);
-        }
-        default -> {}
+        setGoal(SetpointGoal.INDEX);
+        setGoal(SetpointGoal.INTAKE);
       }
     }
 
@@ -107,7 +98,7 @@ public class Superstructure {
   }
 
   public void setGoal(Setpoint setpoint) {
-    if (setpoint.getFlywheel().isPresent()) flywheel.setPosition(setpoint.getFlywheel().get());
+    if (setpoint.getFlywheel().isPresent()) flywheel.setVelocity(setpoint.getFlywheel().get());
     if (setpoint.getHood().isPresent()) hood.setPosition(setpoint.getHood().get());
     if (setpoint.getTurret().isPresent()) turret.setPosition(setpoint.getTurret().get());
     if (setpoint.getIndexer().isPresent()) indexer.setVoltage(setpoint.getIndexer().get());
@@ -120,12 +111,15 @@ public class Superstructure {
   }
 
   public void resetPositions() {
-    flywheel.resetPosition(SetpointGoal.RESET.getSetpoint().getFlywheel().get());
     hood.resetPosition(SetpointGoal.RESET.getSetpoint().getHood().get());
     turret.resetPosition(SetpointGoal.RESET.getSetpoint().getTurret().get());
   }
 
   public Command neutral() {
     return Commands.run(() -> setGoal(SetpointGoal.NEUTRAL));
+  }
+
+  public boolean freezeDriving() {
+    return goal == Goal.TUNER && shooterTuner.freezeDriving();
   }
 }

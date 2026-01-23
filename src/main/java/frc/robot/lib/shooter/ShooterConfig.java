@@ -26,27 +26,22 @@ public class ShooterConfig {
    * This assumes that targetpose is predetermined
    * and that multiple target poses --> multiple config files
    */
-  @Builder.Default
-  ObjectState TARGET_POSE = new ObjectState(new Translation3d(7, 5, 2), new Translation3d());
-
   @Builder.Default ShotTable SHOT_TABLE = new ShotTable();
 
   @Builder.Default Time TIME_DELAY = Time.ofBaseUnits(0, Seconds);
 
   // low-priority constraints
-  @Builder.Default Distance MIN_SHOT_DISTANCE = Distance.ofBaseUnits(1, Meters);
-  @Builder.Default Distance MAX_SHOT_DISTANCE = Distance.ofBaseUnits(1000, Meters);
+  @Builder.Default Distance MIN_SHOT_DISTANCE = Meters.of(1);
+  @Builder.Default Distance MAX_SHOT_DISTANCE = Meters.of(1000);
 
   // high-priority constraints
-  @Builder.Default
-  LinearVelocity MIN_FLYWHEEL_SPEED = LinearVelocity.ofBaseUnits(0, MetersPerSecond);
+  @Builder.Default LinearVelocity MIN_FLYWHEEL_SPEED = MetersPerSecond.of(0);
 
-  @Builder.Default
-  LinearVelocity MAX_FLYWHEEL_SPEED = LinearVelocity.ofBaseUnits(1000, MetersPerSecond);
+  @Builder.Default LinearVelocity MAX_FLYWHEEL_SPEED = MetersPerSecond.of(1000);
 
-  @Builder.Default Angle MIN_HOOD_ANGLE = Angle.ofBaseUnits(0, Degrees);
+  @Builder.Default Angle MIN_HOOD_ANGLE = Degrees.of(0);
 
-  @Builder.Default Angle MAX_HOOD_ANGLE = Angle.ofBaseUnits(360, Degrees);
+  @Builder.Default Angle MAX_HOOD_ANGLE = Degrees.of(30);
 
   // flywheel conversion factors
   // NOTE: needs to be *effective* radius so that math works properly
@@ -113,5 +108,19 @@ public class ShooterConfig {
     table.put(Meters.of(3.0), Degrees.of(36.8586755743), MetersPerSecond.of(16.6385620582));
 
     return ShooterConfig.builder().SHOT_TABLE(table).build();
+  }
+
+  public static ShooterConfig actualConfig() {
+    ShotTable table = new ShotTable();
+
+    // Need data here to not crash robot
+    table.put(Meters.of(0.5), Degrees.of(37.8668349861), MetersPerSecond.of(1.23134170253));
+    table.put(Meters.of(1.0), Degrees.of(25.9925402176), MetersPerSecond.of(2.9919493835));
+    table.put(Meters.of(1.5), Degrees.of(15.8687578859), MetersPerSecond.of(3.8321560354));
+
+    return ShooterConfig.builder()
+        .TURRET_OFFSET(new Translation3d(0.0215805258, 0.0, 0.0))
+        .SHOT_TABLE(table)
+        .build();
   }
 }

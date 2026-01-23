@@ -18,6 +18,16 @@ public class MotorSubsystem {
 
   private final String name;
 
+  protected enum Mode {
+    VOLTAGE,
+    VELOCITY,
+    POSITION,
+    NONE
+  }
+
+  @AutoLogOutput(key = "{name}/Control Mode")
+  protected Mode controlMode = Mode.NONE;
+
   @Getter
   @AutoLogOutput(key = "{name}/Goal Voltage")
   protected Voltage goalVoltage;
@@ -43,6 +53,13 @@ public class MotorSubsystem {
   }
 
   public void periodic() {
+    switch (controlMode) {
+      case VOLTAGE -> io.setVoltage(goalVoltage);
+      case VELOCITY -> io.setVelocity(goalVelocity);
+      case POSITION -> io.setPosition(goalPosition);
+      case NONE -> {}
+    }
+
     io.periodic();
 
     if (goalPosition != null)
@@ -56,22 +73,22 @@ public class MotorSubsystem {
 
   public void setVoltage(Voltage goalVoltage) {
     this.goalVoltage = goalVoltage;
-    io.setVoltage(goalVoltage);
+    this.controlMode = Mode.VOLTAGE;
   }
 
   public void setPosition(Angle goalPosition) {
     this.goalPosition = goalPosition;
-    io.setPosition(goalPosition);
+    this.controlMode = Mode.POSITION;
   }
 
   public void setPosition(Distance goalPosition) {
     this.goalPosition = Rotations.of(goalPosition.in(Meters));
-    io.setPosition(goalPosition);
+    this.controlMode = Mode.POSITION;
   }
 
   public void setVelocity(AngularVelocity goalVelocity) {
     this.goalVelocity = goalVelocity;
-    io.setVelocity(goalVelocity);
+    this.controlMode = Mode.VELOCITY;
   }
 
   public Angle getPosition() {

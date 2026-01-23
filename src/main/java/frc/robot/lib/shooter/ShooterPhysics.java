@@ -70,7 +70,7 @@ public class ShooterPhysics {
 
     // only use speed in XY plane (2D speed), ignore vertical direction
     // this is because LUT table only stores XY (1D) distance between target & robot
-    double guessSpeed = initGuess.flywheelSpeed().in(MetersPerSecond);
+    double guessSpeed = initGuess.linearFlywheelVelocity().in(MetersPerSecond);
 
     // get distance between target and projectile launch position
     Translation3d distance = target.minus(proj).position();

@@ -41,7 +41,7 @@ public class LaunchSolution {
     return new Translation3d(x, y, z);
   }
 
-  public LinearVelocity flywheelSpeed() {
+  public LinearVelocity linearFlywheelVelocity() {
     return this.shooterData.flywheelSpeed();
   }
 

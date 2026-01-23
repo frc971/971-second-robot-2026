@@ -17,22 +17,20 @@ public class Indexer extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
     tc.CurrentLimits.SupplyCurrentLimit = 25.0;
     tc.CurrentLimits.StatorCurrentLimit = 50.0;
-    MotorConfig motorConfig =
-        MotorConfig.builder()
-            .NAME("Indexer")
-            .ID(7)
-            .BUS(new CANBus("Drivetrain Bus"))
-            .TALONFX_CONFIG(tc)
-            .build();
 
     tc.Feedback.SensorToMechanismRatio = 1.0; // Motor to output gear ratio (small rollers)
 
-    return motorConfig;
+    return MotorConfig.builder()
+        .NAME("Indexer")
+        .ID(7)
+        .BUS(new CANBus("Drivetrain Bus"))
+        .TALONFX_CONFIG(tc)
+        .build();
   }
 }
