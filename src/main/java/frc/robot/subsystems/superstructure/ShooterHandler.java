@@ -1,12 +1,6 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.pathplanner.lib.util.FlippingUtil;
@@ -18,15 +12,14 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.lib.shooter.*;
+import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.superstructure.Setpoint.Side;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -77,18 +70,21 @@ public class ShooterHandler {
 
   // needs access DriveTrain (for robotState)
   private final CommandSwerveDrivetrain drivetrain;
-  private final Turret turret;
-  private final Hood hood;
-  private final Flywheel flywheel;
-  private final Indexer indexer;
+  private final AngularSubsystem turret;
+  private final AngularSubsystem hood;
+  private final AngularSubsystem flywheel;
+  private final MotorSubsystem indexer;
+
+  private final Side side;
 
   public ShooterHandler(
-      Turret turret,
-      Hood hood,
-      Flywheel flywheel,
-      Indexer indexer,
+      AngularSubsystem turret,
+      AngularSubsystem hood,
+      AngularSubsystem flywheel,
+      MotorSubsystem indexer,
       CommandSwerveDrivetrain drivetrain,
-      ShooterConfig config) {
+      ShooterConfig config,
+      Side side) {
     this.drivetrain = drivetrain;
     this.turret = turret;
     this.flywheel = flywheel;
@@ -98,6 +94,8 @@ public class ShooterHandler {
     this.physics = new ShooterPhysics(this.config);
 
     this.shooterState = State.NOT_READY;
+    this.shooterGoal = Goal.NONE;
+    this.side = side;
     this.targetState = TARGET_BLUE;
   }
 
@@ -149,9 +147,9 @@ public class ShooterHandler {
     }
 
     if (shooterState == State.FIRING) {
-      indexer.setVoltage(SetpointGoal.INDEX.getSetpoint().getIndexer().get());
+      indexer.setVoltage(SetpointGoal.INDEX.getSetpoint().getSide(side).getIndexer().get());
     } else {
-      indexer.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getIndexer().get());
+      indexer.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getSide(side).getIndexer().get());
     }
   }
 

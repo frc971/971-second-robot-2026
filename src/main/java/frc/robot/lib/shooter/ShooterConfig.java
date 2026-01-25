@@ -91,6 +91,7 @@ public class ShooterConfig {
     return ShooterConfig.builder().build(); // All other fields use defaults
   }
 
+  // TODO: move these configs to year specific places, and also add configs for each turret
   // Used by ShooterPhysicsTest
   // Do NOT edit
   public static ShooterConfig testConfig() {

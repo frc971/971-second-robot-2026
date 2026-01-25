@@ -1,7 +1,5 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -12,9 +10,9 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.lib.superstructure.*;
 
 // TODO: change the constants!!
+public class FlywheelLeft extends AngularSubsystem {
 
-public class Flywheel extends AngularSubsystem {
-  public Flywheel() {
+  public FlywheelLeft() {
     super(getIO());
   }
 
@@ -56,7 +54,7 @@ public class Flywheel extends AngularSubsystem {
     tc.Feedback.SensorToMechanismRatio = 44.0 / 12.0; // Motor to output gear ratio
 
     return MotorConfig.builder()
-        .NAME("Flywheel Lead")
+        .NAME("Flywheel Left Lead")
         .ID(8)
         .BUS(new CANBus("Turret"))
         .TALONFX_CONFIG(tc)
@@ -65,7 +63,7 @@ public class Flywheel extends AngularSubsystem {
 
   public static MotorConfig getFollowerConfig() {
     return getMotorConfig().toBuilder()
-        .NAME("Flywheel Follower")
+        .NAME("Flywheel Left Follower")
         .ID(16)
         .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
         .build();

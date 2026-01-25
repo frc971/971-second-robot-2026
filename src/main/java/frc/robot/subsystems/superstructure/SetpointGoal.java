@@ -2,27 +2,48 @@ package frc.robot.subsystems.superstructure;
 
 import lombok.Getter;
 
-// TODO: edit the uhh degrees and voltage setpoints
-
+@Getter
 public enum SetpointGoal {
   RESET(
-      new Setpoint()
-          .withFlywheelRPS(0.0)
-          .withHoodDegrees(-18.5)
-          .withTurretDegrees(90.0)
-          .withIndexerVolts(0.0)
+      Setpoint.builder()
+          .left(
+              Setpoint.SideConstants.builder()
+                  .withFlywheelRPS(0.0)
+                  .withHoodDegrees(-18.5)
+                  .withTurretDegrees(90.0)
+                  .withIndexerVolts(0.0))
+          .right(
+              Setpoint.SideConstants.builder()
+                  .withFlywheelRPS(0.0)
+                  .withHoodDegrees(-18.5)
+                  .withTurretDegrees(90.0)
+                  .withIndexerVolts(0.0))
+          .withGroundPivotDegrees(0.0)
           .withGroundRollersVolts(0.0)),
-  NEUTRAL(
-      new Setpoint()
-          .withFlywheelRPS(0.0)
-          .withHoodDegrees(-18.0)
-          .withTurretDegrees(0.0)
-          .withIndexerVolts(0.0)
-          .withGroundRollersVolts(0.0)),
-  INDEX(new Setpoint().withIndexerVolts(10)),
-  INTAKE(new Setpoint().withGroundRollersVolts(11.0));
 
-  @Getter private final Setpoint setpoint;
+  NEUTRAL(
+      Setpoint.builder()
+          .left(
+              Setpoint.SideConstants.builder()
+                  .withFlywheelRPS(0.0)
+                  .withHoodDegrees(-18.0)
+                  .withTurretDegrees(0.0)
+                  .withIndexerVolts(0.0))
+          .right(
+              Setpoint.SideConstants.builder()
+                  .withFlywheelRPS(0.0)
+                  .withHoodDegrees(-18.0)
+                  .withTurretDegrees(0.0)
+                  .withIndexerVolts(0.0))),
+
+  INDEX(
+      Setpoint.builder()
+          .left(Setpoint.SideConstants.builder().withIndexerVolts(6.0))
+          .right(Setpoint.SideConstants.builder().withIndexerVolts(6.0))),
+
+  INTAKE(Setpoint.builder().withGroundRollersVolts(11.0));
+
+  private final Setpoint setpoint;
 
   SetpointGoal(Setpoint setpoint) {
     this.setpoint = setpoint;

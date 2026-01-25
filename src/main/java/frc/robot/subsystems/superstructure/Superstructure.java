@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.lib.shooter.ShooterConfig;
 import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.superstructure.Setpoint.Side;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -18,14 +19,28 @@ import org.littletonrobotics.junction.AutoLogOutput;
 @Getter
 public class Superstructure {
   // Add subsystems here as they are created
-  public final Flywheel flywheel;
-  public final Hood hood;
-  public final Indexer indexer;
-  public final Turret turret;
-  public final GroundRollers groundRollers;
 
-  private final ShooterHandler shooterHandler;
-  private final ShooterTuner shooterTuner;
+  public final FlywheelRight flywheelRight;
+  public final FlywheelLeft flywheelLeft;
+
+  public final HoodRight hoodRight;
+  public final HoodLeft hoodLeft;
+
+  public final SpindexerLeft indexerLeft;
+  public final SpindexerRight indexerRight;
+  public final GroundRollers groundRollers;
+  public final GroundPivot groundPivot;
+
+  public final ShooterTuner shooterTunerRight;
+  public final ShooterTuner shooterTunerLeft;
+
+  public final ShooterHandler shooterHandlerRight;
+  public final ShooterHandler shooterHandlerLeft;
+
+  public final TurretRight turretRight;
+  public final TurretLeft turretLeft;
+
+  public final Kicker kicker;
 
   private enum Goal {
     MANUAL,
@@ -36,20 +51,40 @@ public class Superstructure {
   @AutoLogOutput @Getter private Goal goal;
 
   public Superstructure(RobotContainer robotContainer) {
-    flywheel = new Flywheel();
-    hood = new Hood();
-    indexer = new Indexer();
-    turret = new Turret();
+    flywheelRight = new FlywheelRight();
+    flywheelLeft = new FlywheelLeft();
+    hoodRight = new HoodRight();
+    hoodLeft = new HoodLeft();
+    indexerLeft = new SpindexerLeft();
+    indexerRight = new SpindexerRight();
+    turretRight = new TurretRight();
+    turretLeft = new TurretLeft();
+    groundPivot = new GroundPivot();
     groundRollers = new GroundRollers();
-    shooterHandler =
+    kicker = new Kicker();
+
+    shooterTunerRight = new ShooterTuner(flywheelRight, hoodRight, turretRight);
+    shooterTunerLeft = new ShooterTuner(flywheelLeft, hoodLeft, turretLeft);
+
+    shooterHandlerRight =
         new ShooterHandler(
-            turret,
-            hood,
-            flywheel,
-            indexer,
+            turretRight,
+            hoodRight,
+            flywheelRight,
+            indexerRight,
             robotContainer.drivetrain,
-            RobotBase.isReal() ? ShooterConfig.actualConfig() : ShooterConfig.testConfig());
-    shooterTuner = new ShooterTuner(flywheel, hood, turret);
+            RobotBase.isReal() ? ShooterConfig.actualConfig() : ShooterConfig.testConfig(),
+            Setpoint.Side.RIGHT);
+
+    shooterHandlerLeft =
+        new ShooterHandler(
+            turretLeft,
+            hoodLeft,
+            flywheelLeft,
+            indexerLeft,
+            robotContainer.drivetrain,
+            RobotBase.isReal() ? ShooterConfig.actualConfig() : ShooterConfig.testConfig(),
+            Setpoint.Side.LEFT);
 
     setGoal(SetpointGoal.NEUTRAL);
     this.goal = Goal.TUNER;
@@ -59,60 +94,79 @@ public class Superstructure {
     if (DriverStation.isTeleop()) {
       setGoal(SetpointGoal.NEUTRAL);
 
-      if (Controllers.XBOX.a().getAsBoolean()) setGoal(SetpointGoal.INTAKE);
+      if (Controllers.XBOX.a().getAsBoolean()) {
+        setGoal(SetpointGoal.INTAKE);
+      }
 
-      if (Controllers.XBOX.button(8).getAsBoolean()) goal = Goal.MANUAL;
-      if (Controllers.XBOX.x().getAsBoolean()) goal = Goal.SHOOT;
-      if (Controllers.XBOX.y().getAsBoolean()) goal = Goal.TUNER;
+      if (Controllers.XBOX.button(8).getAsBoolean()) {
+        goal = Goal.MANUAL;
+      }
+      if (Controllers.XBOX.x().getAsBoolean()) {
+        goal = Goal.SHOOT;
+      }
+      if (Controllers.XBOX.y().getAsBoolean()) {
+        goal = Goal.TUNER;
+      }
     }
 
     switch (goal) {
       case MANUAL -> {
-        shooterTuner.setGoal(ShooterTuner.Goal.NONE);
-        shooterHandler.setShooterGoal(ShooterHandler.Goal.NONE);
+        shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
+        shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+
+        shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+        shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
 
         setGoal(SetpointGoal.RESET);
       }
       case SHOOT -> {
-        shooterTuner.setGoal(ShooterTuner.Goal.NONE);
-        shooterHandler.setShooterGoal(ShooterHandler.Goal.SHOOT);
+        shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
+        shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.SHOOT);
+
+        shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+        shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
       }
       case TUNER -> {
-        shooterTuner.setGoal(ShooterTuner.Goal.ACTIVE);
-        shooterHandler.setShooterGoal(ShooterHandler.Goal.NONE);
+        shooterTunerRight.setGoal(ShooterTuner.Goal.ACTIVE);
+        shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+
+        shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+        shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
 
         setGoal(SetpointGoal.INDEX);
         setGoal(SetpointGoal.INTAKE);
       }
     }
 
-    shooterHandler.periodic();
-    shooterTuner.periodic();
+    shooterHandlerLeft.periodic();
+    shooterHandlerRight.periodic();
 
     // subsystems
-    flywheel.periodic();
-    hood.periodic();
-    indexer.periodic();
-    turret.periodic();
+    flywheelRight.periodic();
+    flywheelLeft.periodic();
+    hoodRight.periodic();
+    hoodLeft.periodic();
+    indexerLeft.periodic();
+    indexerRight.periodic();
+    turretRight.periodic();
+    turretLeft.periodic();
+    groundPivot.periodic();
     groundRollers.periodic();
   }
 
-  public void setGoal(Setpoint setpoint) {
-    if (setpoint.getFlywheel().isPresent()) flywheel.setVelocity(setpoint.getFlywheel().get());
-    if (setpoint.getHood().isPresent()) hood.setPosition(setpoint.getHood().get());
-    if (setpoint.getTurret().isPresent()) turret.setPosition(setpoint.getTurret().get());
-    if (setpoint.getIndexer().isPresent()) indexer.setVoltage(setpoint.getIndexer().get());
-    if (setpoint.getGroundRollers().isPresent())
-      groundRollers.setVoltage(setpoint.getGroundRollers().get());
-  }
+  public void setGoal(Setpoint setpoint) {}
 
   public void setGoal(SetpointGoal setpoint) {
     setGoal(setpoint.getSetpoint());
   }
 
   public void resetPositions() {
-    hood.resetPosition(SetpointGoal.RESET.getSetpoint().getHood().get());
-    turret.resetPosition(SetpointGoal.RESET.getSetpoint().getTurret().get());
+    hoodRight.resetPosition(SetpointGoal.RESET.getSetpoint().getSide(Side.RIGHT).getHood().get());
+    turretRight.resetPosition(
+        SetpointGoal.RESET.getSetpoint().getSide(Side.RIGHT).getTurret().get());
+    hoodLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getSide(Side.LEFT).getHood().get());
+    turretLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getSide(Side.LEFT).getTurret().get());
+    groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
   }
 
   public Command neutral() {
@@ -120,6 +174,7 @@ public class Superstructure {
   }
 
   public boolean freezeDriving() {
-    return goal == Goal.TUNER && shooterTuner.freezeDriving();
+    return goal == Goal.TUNER
+        && (shooterTunerRight.freezeDriving() || shooterTunerLeft.freezeDriving());
   }
 }

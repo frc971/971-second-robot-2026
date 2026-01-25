@@ -2,8 +2,8 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.*;
+import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.Controllers;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,9 +23,9 @@ public class ShooterTuner {
     FLYWHEEL
   }
 
-  private Flywheel flywheel;
-  private Hood hood;
-  private Turret turret;
+  private AngularSubsystem flywheel;
+  private AngularSubsystem hood;
+  private AngularSubsystem turret;
 
   @Setter @Getter private Goal goal = Goal.NONE;
   @Getter private Mode mode = Mode.DRIVING;
@@ -47,7 +47,7 @@ public class ShooterTuner {
   private static final double MIN_HOOD_DEGREES = -18.5;
   private static final double MAX_HOOD_DEGREES = 25.0;
 
-  public ShooterTuner(Flywheel flywheel, Hood hood, Turret turret) {
+  public ShooterTuner(AngularSubsystem flywheel, AngularSubsystem hood, AngularSubsystem turret) {
     this.flywheel = flywheel;
     this.hood = hood;
     this.turret = turret;

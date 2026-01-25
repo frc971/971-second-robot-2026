@@ -11,8 +11,8 @@ import frc.robot.lib.superstructure.*;
 
 // TODO: change the constants!! and the other numbers
 
-public class Hood extends AngularSubsystem {
-  public Hood() {
+public class Climber extends LinearSubsystem {
+  public Climber() {
     super(getMotorConfig());
   }
 
@@ -23,13 +23,13 @@ public class Hood extends AngularSubsystem {
     tc.Slot0.kS = 0.4; // Static friction compensation
     tc.Slot0.kV = 11.5; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = 0.11; // Gravity compensation
+    tc.Slot0.kG = -0.11; // Gravity compensation, negative
 
     tc.Slot0.kP = 3.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
-    tc.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Motion Magic profile constraints
     tc.MotionMagic.MotionMagicCruiseVelocity = 0.75;
@@ -44,14 +44,17 @@ public class Hood extends AngularSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 112.0 / 1.0; // Motor to output gear ratio
+    double drumRadius = 1.5 / 2.0; // 1.5in diameter, radius 0.75in
+    double gearRatio = 60.0;
+    tc.Feedback.SensorToMechanismRatio =
+        2 * Math.PI * drumRadius / gearRatio; // meters per motor rotation
 
     return MotorConfig.builder()
-        .NAME("Hood")
-        .ID(10)
-        .BUS(new CANBus("Turret"))
+        .NAME("Climber")
+        .ID(11)
+        .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
-        .LOG_UNIT(Degrees)
+        .LOG_UNIT(Meters)
         .build();
   }
 }

@@ -1,24 +1,19 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.Angle;
 import frc.robot.lib.superstructure.*;
 
 // TODO: change the constants...
 
-public class Turret extends AngularSubsystem {
-  public static final Angle UPPER_LIMIT = Degrees.of(90);
-  public static final Angle LOWER_LIMIT = Degrees.of(-45);
-  public static final boolean ENABLE_WRAP = false;
+public class GroundPivot extends AngularSubsystem {
 
-  public Turret() {
+  public GroundPivot() {
     super(getMotorConfig());
   }
 
@@ -50,40 +45,14 @@ public class Turret extends AngularSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 63.0 / 1.0; // Motor to output gear ratio
-
-    tc.ClosedLoopGeneral.ContinuousWrap = ENABLE_WRAP;
+    tc.Feedback.SensorToMechanismRatio = 40.0 / 1.0; // Motor to output gear ratio
 
     return MotorConfig.builder()
-        .NAME("Turret")
+        .NAME("Ground Pivot")
         .ID(30)
         .BUS(new CANBus("Drivetrain Bus"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
         .build();
-  }
-
-  // Countinuous Wrap stuff:
-
-  public Angle limitAngle(Angle goalAngle) {
-
-    // translating the angle into -180 to 180 range
-    double radians = goalAngle.in(Radians);
-    double normalizedDeg = Radians.of(MathUtil.angleModulus(radians)).in(Degrees);
-
-    // clamping the angle into -180 to 180 range; also keeps the units degrees
-    double clampedDeg = MathUtil.clamp(normalizedDeg, -180, 180);
-    return (Degrees.of(
-        clampedDeg)); // clampedAngle is just goalAngle but forced in the -180 to 180 range
-  }
-
-  @Override
-  public void setPosition(Angle goalPosition) {
-    if (!ENABLE_WRAP
-        && (goalPosition.in(Degrees) < LOWER_LIMIT.in(Degrees)
-            || goalPosition.in(Degrees) > UPPER_LIMIT.in(Degrees))) return;
-
-    this.goalPosition = (ENABLE_WRAP) ? limitAngle(goalPosition) : goalPosition;
-    super.setPosition(goalPosition);
   }
 }
