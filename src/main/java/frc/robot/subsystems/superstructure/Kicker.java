@@ -23,7 +23,7 @@ public class Kicker extends MotorSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 25.0;
     tc.CurrentLimits.StatorCurrentLimit = 50.0;
 
-    tc.Feedback.SensorToMechanismRatio = 1.0; // Motor to output gear ratio (small rollers)
+    tc.Feedback.SensorToMechanismRatio = 1.0 / 1.0; // Motor to output gear ratio (small rollers)
 
     return MotorConfig.builder()
         .NAME("Kicker")

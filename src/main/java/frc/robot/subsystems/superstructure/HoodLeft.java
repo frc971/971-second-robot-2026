@@ -20,12 +20,12 @@ public class HoodLeft extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.4; // Static friction compensation
-    tc.Slot0.kV = 11.5; // Velocity feedforward
+    tc.Slot0.kS = 0.0; // Static friction compensation
+    tc.Slot0.kV = 0.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = 0.11; // Gravity compensation
+    tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 3.0; // Proportional gain
+    tc.Slot0.kP = 0.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
@@ -44,7 +44,7 @@ public class HoodLeft extends AngularSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 112.0 / 1.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio = 125.0 / 1.0; // Motor to output gear ratio
 
     return MotorConfig.builder()
         .NAME("Hood Left")

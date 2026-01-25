@@ -20,12 +20,12 @@ public class Climber extends LinearSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.4; // Static friction compensation
-    tc.Slot0.kV = 11.5; // Velocity feedforward
+    tc.Slot0.kS = 0.0; // Static friction compensation
+    tc.Slot0.kV = 0.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = -0.11; // Gravity compensation, negative
+    tc.Slot0.kG = 0.0; // Gravity compensation, negative
 
-    tc.Slot0.kP = 3.0; // Proportional gain
+    tc.Slot0.kP = 0.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
@@ -46,8 +46,7 @@ public class Climber extends LinearSubsystem {
 
     double drumRadius = 1.5 / 2.0; // 1.5in diameter, radius 0.75in
     double gearRatio = 60.0;
-    tc.Feedback.SensorToMechanismRatio =
-        2 * Math.PI * drumRadius / gearRatio; // meters per motor rotation
+    tc.Feedback.SensorToMechanismRatio = 60.0 / 1.0; // meters per motor rotation
 
     return MotorConfig.builder()
         .NAME("Climber")

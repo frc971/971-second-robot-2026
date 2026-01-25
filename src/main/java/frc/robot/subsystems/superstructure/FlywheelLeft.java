@@ -28,8 +28,8 @@ public class FlywheelLeft extends AngularSubsystem {
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
-    tc.Slot0.kS = 0.3;
-    tc.Slot0.kV = 0.46;
+    tc.Slot0.kS = 0.0;
+    tc.Slot0.kV = 0.0;
     tc.Slot0.kA = 0.0;
     tc.Slot0.kG = 0.0;
 
@@ -51,7 +51,7 @@ public class FlywheelLeft extends AngularSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 44.0 / 12.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio = 1.0 / 1.0; // Motor to output gear ratio
 
     return MotorConfig.builder()
         .NAME("Flywheel Left Lead")

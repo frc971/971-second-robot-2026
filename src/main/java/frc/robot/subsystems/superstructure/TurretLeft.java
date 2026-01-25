@@ -26,12 +26,12 @@ public class TurretLeft extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.39; // Static friction compensation
-    tc.Slot0.kV = 6.0; // Velocity feedforward
+    tc.Slot0.kS = 0.0; // Static friction compensation
+    tc.Slot0.kV = 0.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 3.0; // Proportional gain
+    tc.Slot0.kP = 0.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
@@ -50,7 +50,7 @@ public class TurretLeft extends AngularSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 63.0 / 1.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio = 185.0 / 16.0; // Motor to output gear ratio
 
     tc.ClosedLoopGeneral.ContinuousWrap = ENABLE_WRAP;
 
