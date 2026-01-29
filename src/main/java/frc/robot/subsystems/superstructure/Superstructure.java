@@ -94,7 +94,7 @@ public class Superstructure {
     if (DriverStation.isTeleop()) {
       setGoal(SetpointGoal.NEUTRAL);
 
-      if (Controllers.XBOX.a().getAsBoolean()) {
+      if (Controllers.INTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE);
       }
 
