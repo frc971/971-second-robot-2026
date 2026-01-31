@@ -46,19 +46,20 @@ public class Setpoint {
     }
   }
 
-  private SideConstants left = new SideConstants();
+  private Optional<SideConstants> left = Optional.empty();
+  private Optional<SideConstants> right = Optional.empty();
 
-  private SideConstants right = new SideConstants();
   private Optional<Voltage> groundRollers = Optional.empty();
   private Optional<Angle> groundPivot = Optional.empty();
+  private Optional<Voltage> kicker = Optional.empty();
 
   public Setpoint left(SideConstants left) {
-    this.left = left;
+    this.left = Optional.of(left);
     return this;
   }
 
   public Setpoint right(SideConstants right) {
-    this.right = right;
+    this.right = Optional.of(right);
     return this;
   }
 
@@ -76,10 +77,15 @@ public class Setpoint {
     return new Setpoint();
   }
 
+  public Setpoint withKickerVolts(double volts) {
+    this.kicker = Optional.of(Volts.of(volts));
+    return this;
+  }
+
   public SideConstants getSide(Side side) {
     return switch (side) {
-      case LEFT -> left;
-      case RIGHT -> right;
+      case LEFT -> left.get();
+      case RIGHT -> right.get();
     };
   }
 }

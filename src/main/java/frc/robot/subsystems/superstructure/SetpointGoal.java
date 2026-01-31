@@ -34,14 +34,18 @@ public enum SetpointGoal {
                   .withFlywheelRPS(0.0)
                   .withHoodDegrees(-18.0)
                   .withTurretDegrees(0.0)
-                  .withIndexerVolts(0.0))),
+                  .withIndexerVolts(0.0))
+          .withGroundPivotDegrees(0.0)
+          .withGroundRollersVolts(0.0)
+          .withKickerVolts(0.0)),
 
   INDEX(
       Setpoint.builder()
           .left(Setpoint.SideConstants.builder().withIndexerVolts(6.0))
           .right(Setpoint.SideConstants.builder().withIndexerVolts(6.0))),
 
-  INTAKE(Setpoint.builder().withGroundRollersVolts(11.0));
+  INTAKE(Setpoint.builder().withGroundRollersVolts(11.0)),
+  SHOOT(Setpoint.builder().withKickerVolts(5.0));
 
   private final Setpoint setpoint;
 

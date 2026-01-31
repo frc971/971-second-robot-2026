@@ -138,6 +138,14 @@ public class Superstructure {
       }
     }
 
+    if (goal == Goal.SHOOT
+        && (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
+            || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)) {
+      kicker.setVoltage(SetpointGoal.SHOOT.getSetpoint().getKicker().get());
+    } else {
+      kicker.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getKicker().get());
+    }
+
     shooterHandlerLeft.periodic();
     shooterHandlerRight.periodic();
 
@@ -151,6 +159,7 @@ public class Superstructure {
     turretRight.periodic();
     turretLeft.periodic();
     groundPivot.periodic();
+    kicker.periodic();
     groundRollers.periodic();
   }
 
