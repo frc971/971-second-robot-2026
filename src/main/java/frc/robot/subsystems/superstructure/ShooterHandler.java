@@ -225,7 +225,10 @@ public class ShooterHandler {
 
   private Angle turretRotationAbsDiff() {
     return Radians.of(
-        launchSolution.turretRotation.getMeasure().minus(getTurretAbsRotation()).abs(Radians));
+        Math.abs(
+            MathUtil.angleModulus(
+                launchSolution.turretRotation.getMeasure().in(Radians)
+                    - MathUtil.angleModulus(getTurretAbsRotation().in(Radians)))));
   }
 
   private Angle hoodAngleAbsDiff() {
