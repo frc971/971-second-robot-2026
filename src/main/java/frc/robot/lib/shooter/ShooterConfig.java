@@ -26,64 +26,96 @@ public class ShooterConfig {
    * This assumes that targetpose is predetermined
    * and that multiple target poses --> multiple config files
    */
-  @Builder.Default ShotTable SHOT_TABLE = new ShotTable();
-
-  @Builder.Default Time TIME_DELAY = Time.ofBaseUnits(0, Seconds);
-
-  // low-priority constraints
-  @Builder.Default Distance MIN_SHOT_DISTANCE = Meters.of(1);
-  @Builder.Default Distance MAX_SHOT_DISTANCE = Meters.of(1000);
-
-  // high-priority constraints
-  @Builder.Default LinearVelocity MIN_FLYWHEEL_SPEED = MetersPerSecond.of(0);
-
-  @Builder.Default LinearVelocity MAX_FLYWHEEL_SPEED = MetersPerSecond.of(1000);
-
-  @Builder.Default Angle MIN_HOOD_ANGLE = Degrees.of(0);
-
-  @Builder.Default Angle MAX_HOOD_ANGLE = Degrees.of(30);
-
-  // flywheel conversion factors
-  // NOTE: needs to be *effective* radius so that math works properly
-  @Builder.Default Distance FLYWHEEL_RADIUS = Distance.ofBaseUnits(0.05, Meters);
-
-  @Builder.Default double FLYWHEEL_FUDGE_FACTOR = 0;
-
-  // ball related offsets
-  // positive x is towards FRONT of the robot
-  // positive y is towards PORT/LEFT side
-  @Builder.Default Translation3d TURRET_OFFSET = new Translation3d();
-
-  @Builder.Default Distance RADIUS_TO_BALL = Distance.ofBaseUnits(0, Meters);
-
-  @Builder.Default Rotation2d TURRET_ROTATION = Rotation2d.fromDegrees(0);
-
-  // --- STATE related constants ---
-
-  // IDLE constants
-  @Builder.Default Angle IDLE_HOOD_ANGLE = Angle.ofBaseUnits(0, Degrees);
+  @Builder.Default private String name = "Shooter";
+  @Builder.Default private Constraints CONSTRAINTS = Constraints.builder().build();
+  @Builder.Default private Threshold THRESHOLD = Threshold.builder().build();
+  @Builder.Default private Physics PHYSICS = Physics.builder().build();
 
   @Builder.Default
-  LinearVelocity IDLE_FLYWHEEL_LINEAR_VELOCITY = LinearVelocity.ofBaseUnits(0, MetersPerSecond);
+  private PhysicalConversion PHYSICAL_CONVERSION = PhysicalConversion.builder().build();
+
+  @Builder
+  @Getter
+  public static class Physics {
+    @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
+
+    @Builder.Default private Time TIME_DELAY = Time.ofBaseUnits(0, Seconds);
+  }
+
+  @Getter
+  @Builder
+  public static class Constraints {
+    // low-priority constraints
+    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(1);
+    @Builder.Default private Distance MAX_SHOT_DISTANCE = Meters.of(1000);
+
+    // high-priority constraints
+    @Builder.Default private LinearVelocity MIN_FLYWHEEL_SPEED = MetersPerSecond.of(0);
+
+    @Builder.Default private LinearVelocity MAX_FLYWHEEL_SPEED = MetersPerSecond.of(1000);
+
+    @Builder.Default private Angle MIN_HOOD_ANGLE = Degrees.of(0);
+
+    @Builder.Default private Angle MAX_HOOD_ANGLE = Degrees.of(30);
+  }
+
+  @Getter
+  @Builder
+  public static class PhysicalConversion {
+    // flywheel conversion factors
+    // NOTE: needs to be *effective* radius so that math works properly
+    @Builder.Default private Distance FLYWHEEL_RADIUS = Distance.ofBaseUnits(0.05, Meters);
+
+    @Builder.Default private double FLYWHEEL_FUDGE_FACTOR = 0;
+
+    // ball related offsets
+    // positive x is towards FRONT of the robot
+    // positive y is towards PORT/LEFT side
+    @Builder.Default private Translation3d TURRET_OFFSET = new Translation3d();
+
+    @Builder.Default private Distance RADIUS_TO_BALL = Distance.ofBaseUnits(0, Meters);
+
+    @Builder.Default private Rotation2d TURRET_ROTATION = Rotation2d.fromDegrees(0);
+
+    // --- STATE related constants ---
+
+    // IDLE constants
+    @Builder.Default private Angle IDLE_HOOD_ANGLE = Angle.ofBaseUnits(0, Degrees);
+
+    @Builder.Default
+    private LinearVelocity IDLE_FLYWHEEL_LINEAR_VELOCITY =
+        LinearVelocity.ofBaseUnits(0, MetersPerSecond);
+  }
 
   // AIMING thresholds (once below, will transition to SHOOTING)
-  @Builder.Default
-  AngularVelocity AIMING_FLYWHEEL_THRESHOLD =
-      Radian.per(Seconds).of(300); // TODO: this is obscene, need to fix it later
+  @Getter
+  @Builder
+  public static class Threshold {
+    @Builder.Default
+    private AngularVelocity AIMING_FLYWHEEL_THRESHOLD =
+        Radian.per(Seconds).of(300); // TODO: this is obscene, need to fix it later
 
-  @Builder.Default Angle AIMING_ROTATION_THRESHOLD = Radian.of(Math.PI / 6.0); // 45 degrees
-  @Builder.Default Angle AIMING_HOOD_ANGLE_THRESHOLD = Radian.of(Math.PI / 6.0); // 30 degrees
+    @Builder.Default
+    private Angle AIMING_ROTATION_THRESHOLD = Radian.of(Math.PI / 6.0); // 45 degrees
 
-  /*
-   * Note: very important that the two thresholds (AIMING & SHOOTING) overlap
-   * So that robot doesn't flicker between the two states when near threshold boundary
-   * (aka, shooter thresholds must be larger/greater than aiming thresholds)
-   */
+    @Builder.Default
+    private Angle AIMING_HOOD_ANGLE_THRESHOLD = Radian.of(Math.PI / 6.0); // 30 degrees
 
-  // SHOOTING thresholds (once above, will abort the shot)
-  @Builder.Default AngularVelocity SHOOTING_FLYWHEEL_ABORT = Radian.per(Seconds).of(500);
-  @Builder.Default Angle SHOOTING_ROTATION_THRESHOLD = Radian.of(Math.PI / 8.0); // 45 degrees
-  @Builder.Default Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Radian.of(Math.PI / 8.0); // 45 degrees
+    /*
+     * Note: very important that the two thresholds (AIMING & SHOOTING) overlap
+     * So that robot doesn't flicker between the two states when near threshold boundary
+     * (aka, shooter thresholds must be larger/greater than aiming thresholds)
+     */
+
+    // SHOOTING thresholds (once above, will abort the shot)
+    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = Radian.per(Seconds).of(500);
+
+    @Builder.Default
+    private Angle SHOOTING_ROTATION_THRESHOLD = Radian.of(Math.PI / 8.0); // 45 degrees
+
+    @Builder.Default
+    private Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Radian.of(Math.PI / 8.0); // 45 degrees
+  }
 
   // Default config
   // changes here can break a LOT of stuff
@@ -108,7 +140,7 @@ public class ShooterConfig {
     table.put(Meters.of(2.5), Degrees.of(41.6492543046), MetersPerSecond.of(15.6753316472));
     table.put(Meters.of(3.0), Degrees.of(36.8586755743), MetersPerSecond.of(16.6385620582));
 
-    return ShooterConfig.builder().SHOT_TABLE(table).build();
+    return ShooterConfig.builder().PHYSICS(Physics.builder().SHOT_TABLE(table).build()).build();
   }
 
   public static ShooterConfig actualConfig() {
@@ -120,8 +152,11 @@ public class ShooterConfig {
     table.put(Meters.of(1.5), Degrees.of(15.8687578859), MetersPerSecond.of(3.8321560354));
 
     return ShooterConfig.builder()
-        .TURRET_OFFSET(new Translation3d(0.0215805258, 0.0, 0.0))
-        .SHOT_TABLE(table)
+        .PHYSICAL_CONVERSION(
+            PhysicalConversion.builder()
+                .TURRET_OFFSET(new Translation3d(0.0215805258, 0.0, 0.0))
+                .build())
+        .PHYSICS(Physics.builder().SHOT_TABLE(table).build())
         .build();
   }
 }

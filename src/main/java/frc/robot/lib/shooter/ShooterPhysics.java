@@ -12,9 +12,9 @@ import frc.robot.lib.shooter.ShotTable.ShooterData;
 public class ShooterPhysics {
   public static final Translation3d gravity = new Translation3d(0, 0, -9.81);
 
-  private final ShooterConfig config;
+  private final ShooterConfig.Physics config;
 
-  public ShooterPhysics(ShooterConfig config) {
+  public ShooterPhysics(ShooterConfig.Physics config) {
     this.config = config;
   }
 
