@@ -17,6 +17,9 @@ public class TurretLeft extends AngularSubsystem {
   public static final Angle UPPER_LIMIT = Degrees.of(90);
   public static final Angle LOWER_LIMIT = Degrees.of(-45);
   public static final boolean ENABLE_WRAP = false;
+  // If the turret has a goal outside its range BUT it is within this extra buffer it will still
+  // clamp to end of its range
+  private static final Angle BUFFER = Degrees.of(20);
 
   public TurretLeft() {
     super(getMotorConfig());
@@ -67,21 +70,28 @@ public class TurretLeft extends AngularSubsystem {
 
     // translating the angle into -180 to 180 range
     double radians = goalAngle.in(Radians);
-    double normalizedDeg = Radians.of(MathUtil.angleModulus(radians)).in(Degrees);
+    Angle normalizedDeg = Radians.of(MathUtil.angleModulus(radians));
 
     // clamping the angle into -180 to 180 range; also keeps the units degrees
-    double clampedDeg = MathUtil.clamp(normalizedDeg, -180, 180);
-    return (Degrees.of(
-        clampedDeg)); // clampedAngle is just goalAngle but forced in the -180 to 180 range
+    return normalizedDeg;
   }
 
   @Override
   public void setPosition(Angle goalPosition) {
-    if (!ENABLE_WRAP
-        && (goalPosition.in(Degrees) < LOWER_LIMIT.in(Degrees)
-            || goalPosition.in(Degrees) > UPPER_LIMIT.in(Degrees))) return;
-
-    this.goalPosition = (ENABLE_WRAP) ? limitAngle(goalPosition) : goalPosition;
-    super.setPosition(goalPosition);
+    Angle clampedGoalPosition;
+    if (ENABLE_WRAP) {
+      clampedGoalPosition = limitAngle(goalPosition);
+    } else {
+      if ((goalPosition.in(Degrees) > UPPER_LIMIT.in(Degrees) + BUFFER.in(Degrees))
+          || (goalPosition.in(Degrees) < LOWER_LIMIT.in(Degrees) - BUFFER.in(Degrees))) {
+        clampedGoalPosition = UPPER_LIMIT.plus(LOWER_LIMIT).div(2);
+      } else {
+        clampedGoalPosition =
+            Degrees.of(
+                MathUtil.clamp(
+                    goalPosition.in(Degrees), LOWER_LIMIT.in(Degrees), UPPER_LIMIT.in(Degrees)));
+      }
+    }
+    super.setPosition(clampedGoalPosition);
   }
 }
