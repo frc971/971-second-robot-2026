@@ -19,7 +19,8 @@ public enum SetpointGoal {
                   .withTurretDegrees(90.0)
                   .withIndexerVolts(0.0))
           .withGroundPivotDegrees(0.0)
-          .withGroundRollersVolts(0.0)),
+          .withGroundRollersVolts(0.0)
+          .withClimberMeters(0.0)),
 
   NEUTRAL(
       Setpoint.builder()
@@ -45,6 +46,9 @@ public enum SetpointGoal {
           .right(Setpoint.SideConstants.builder().withIndexerVolts(6.0))),
 
   INTAKE(Setpoint.builder().withGroundRollersVolts(11.0)),
+
+  EXTEND(Setpoint.builder().withClimberMeters(6.0)),
+  RETRACT(Setpoint.builder().withClimberMeters(0.0)),
   SHOOT(Setpoint.builder().withKickerVolts(5.0));
 
   private final Setpoint setpoint;

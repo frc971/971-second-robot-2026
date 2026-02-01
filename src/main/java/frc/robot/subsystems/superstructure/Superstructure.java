@@ -41,6 +41,7 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Kicker kicker;
+  public final Climber climber;
 
   private enum Goal {
     MANUAL,
@@ -62,6 +63,7 @@ public class Superstructure {
     groundPivot = new GroundPivot();
     groundRollers = new GroundRollers();
     kicker = new Kicker();
+    climber = new Climber();
 
     shooterTunerRight = new ShooterTuner(flywheelRight, hoodRight, turretRight);
     shooterTunerLeft = new ShooterTuner(flywheelLeft, hoodLeft, turretLeft);
@@ -96,6 +98,14 @@ public class Superstructure {
 
       if (Controllers.INTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE);
+      }
+
+      if (Controllers.XBOX.button(6).getAsBoolean()) {
+        setGoal(SetpointGoal.RETRACT);
+      }
+
+      if (Controllers.XBOX.button(7).getAsBoolean()) {
+        setGoal(SetpointGoal.EXTEND);
       }
 
       if (Controllers.XBOX.button(8).getAsBoolean()) {
@@ -161,9 +171,22 @@ public class Superstructure {
     groundPivot.periodic();
     kicker.periodic();
     groundRollers.periodic();
+    climber.periodic();
   }
 
-  public void setGoal(Setpoint setpoint) {}
+  public void setGoal(Setpoint setpoint) {
+    if (setpoint.getGroundPivot().isPresent()) {
+      groundPivot.setPosition(setpoint.getGroundPivot().get());
+    }
+
+    if (setpoint.getGroundRollers().isPresent()) {
+      groundRollers.setVoltage(setpoint.getGroundRollers().get());
+    }
+
+    if (setpoint.getClimber().isPresent()) {
+      climber.setPosition(setpoint.getClimber().get());
+    }
+  }
 
   public void setGoal(SetpointGoal setpoint) {
     setGoal(setpoint.getSetpoint());
@@ -176,6 +199,7 @@ public class Superstructure {
     hoodLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getSide(Side.LEFT).getHood().get());
     turretLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getSide(Side.LEFT).getTurret().get());
     groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
+    climber.resetPosition(SetpointGoal.RESET.getSetpoint().getClimber().get());
   }
 
   public Command neutral() {

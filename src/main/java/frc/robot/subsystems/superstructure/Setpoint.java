@@ -51,6 +51,7 @@ public class Setpoint {
 
   private Optional<Voltage> groundRollers = Optional.empty();
   private Optional<Angle> groundPivot = Optional.empty();
+  private Optional<Distance> climber = Optional.empty();
   private Optional<Voltage> kicker = Optional.empty();
 
   public Setpoint left(SideConstants left) {
@@ -70,6 +71,11 @@ public class Setpoint {
 
   public Setpoint withGroundPivotDegrees(double degrees) {
     this.groundPivot = Optional.of(Degrees.of(degrees));
+    return this;
+  }
+
+  public Setpoint withClimberMeters(double meters) {
+    this.climber = Optional.of(Meters.of(meters));
     return this;
   }
 
