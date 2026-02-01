@@ -21,7 +21,6 @@ public enum SetpointGoal {
           .withGroundPivotDegrees(0.0)
           .withGroundRollersVolts(0.0)
           .withClimberMeters(0.0)),
-
   NEUTRAL(
       Setpoint.builder()
           .left(
@@ -36,20 +35,19 @@ public enum SetpointGoal {
                   .withHoodDegrees(-18.0)
                   .withTurretDegrees(0.0)
                   .withIndexerVolts(0.0))
-          .withGroundPivotDegrees(0.0)
+          // should be changed 67 is a placeholder........
+          .withGroundPivotDegrees(67.0)
           .withGroundRollersVolts(0.0)
           .withKickerVolts(0.0)),
-
   INDEX(
       Setpoint.builder()
           .left(Setpoint.SideConstants.builder().withIndexerVolts(6.0))
           .right(Setpoint.SideConstants.builder().withIndexerVolts(6.0))),
-
-  INTAKE(Setpoint.builder().withGroundRollersVolts(11.0)),
-
+  SHOOT(Setpoint.builder().withKickerVolts(5.0)),
+  INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(11.0)),
+  INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(0.0)),
   EXTEND(Setpoint.builder().withClimberMeters(6.0)),
-  RETRACT(Setpoint.builder().withClimberMeters(0.0)),
-  SHOOT(Setpoint.builder().withKickerVolts(5.0));
+  RETRACT(Setpoint.builder().withClimberMeters(0.0));
 
   private final Setpoint setpoint;
 

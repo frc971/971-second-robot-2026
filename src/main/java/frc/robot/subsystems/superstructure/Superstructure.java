@@ -43,6 +43,9 @@ public class Superstructure {
   public final Kicker kicker;
   public final Climber climber;
 
+  private boolean prevIntakePivotBtn = false;
+  private boolean intakeLowered = false;
+
   private enum Goal {
     MANUAL,
     SHOOT,
@@ -96,10 +99,25 @@ public class Superstructure {
     if (DriverStation.isTeleop()) {
       setGoal(SetpointGoal.NEUTRAL);
 
-      if (Controllers.INTAKE.getAsBoolean()) {
-        setGoal(SetpointGoal.INTAKE);
+      // Intake roller logic
+      if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
+        setGoal(SetpointGoal.INTAKE_ROLLERS);
       }
 
+      // Intake pivot logic
+      boolean intakePivotBtn = Controllers.INTAKE_PIVOT.getAsBoolean();
+
+      if (!prevIntakePivotBtn && intakePivotBtn) {
+        intakeLowered = !intakeLowered;
+      }
+
+      if (intakeLowered) {
+        groundPivot.setPosition(SetpointGoal.INTAKE_PIVOT.getSetpoint().getGroundPivot().get());
+      }
+
+      prevIntakePivotBtn = intakePivotBtn;
+
+      // Climber logic
       if (Controllers.XBOX.button(6).getAsBoolean()) {
         setGoal(SetpointGoal.RETRACT);
       }
@@ -108,6 +126,7 @@ public class Superstructure {
         setGoal(SetpointGoal.EXTEND);
       }
 
+      // Shooter logic
       if (Controllers.XBOX.button(8).getAsBoolean()) {
         goal = Goal.MANUAL;
       }
@@ -142,9 +161,6 @@ public class Superstructure {
 
         shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
         shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
-
-        setGoal(SetpointGoal.INDEX);
-        setGoal(SetpointGoal.INTAKE);
       }
     }
 
