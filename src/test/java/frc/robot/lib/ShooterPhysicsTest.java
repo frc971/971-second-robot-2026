@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.lib.shooter.LaunchSolution;
 import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfig;
+import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.lib.shooter.ShooterPhysics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ public class ShooterPhysicsTest {
 
   @BeforeEach
   public void setup() {
-    config = ShooterConfig.testConfig();
+    config = ShooterConfigs.TEST_CONFIG.getConfig();
     physics = new ShooterPhysics(config.PHYSICS());
   }
 

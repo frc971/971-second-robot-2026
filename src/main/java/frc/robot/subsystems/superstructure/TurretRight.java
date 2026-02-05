@@ -14,8 +14,8 @@ import frc.robot.lib.superstructure.*;
 // TODO: change the constants...
 public class TurretRight extends AngularSubsystem {
 
-  public static final Angle UPPER_LIMIT = Degrees.of(90);
-  public static final Angle LOWER_LIMIT = Degrees.of(-45);
+  public static final Angle UPPER_LIMIT = Degrees.of(150);
+  public static final Angle LOWER_LIMIT = Degrees.of(30);
   public static final boolean ENABLE_WRAP = false;
   // If the turret has a goal outside its range BUT it is within this extra buffer it will still
   // clamp to end of its range

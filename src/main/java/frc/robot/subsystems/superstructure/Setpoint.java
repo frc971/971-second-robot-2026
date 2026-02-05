@@ -74,6 +74,11 @@ public class Setpoint {
     return this;
   }
 
+  public Setpoint withKickerVolts(double volts) {
+    this.kicker = Optional.of(Volts.of(volts));
+    return this;
+  }
+
   public Setpoint withClimberMeters(double meters) {
     this.climber = Optional.of(Meters.of(meters));
     return this;
@@ -83,15 +88,10 @@ public class Setpoint {
     return new Setpoint();
   }
 
-  public Setpoint withKickerVolts(double volts) {
-    this.kicker = Optional.of(Volts.of(volts));
-    return this;
-  }
-
-  public SideConstants getSide(Side side) {
+  public Optional<SideConstants> getSide(Side side) {
     return switch (side) {
-      case LEFT -> left.get();
-      case RIGHT -> right.get();
+      case LEFT -> left;
+      case RIGHT -> right;
     };
   }
 }

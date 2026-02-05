@@ -1,12 +1,10 @@
-package frc.robot.lib.superstructure;
+package frc.robot.lib.shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.geometry.Translation3d;
-import frc.robot.lib.shooter.ShooterConfig;
-import frc.robot.lib.shooter.ShotTable;
 import lombok.Getter;
 
 @Getter
@@ -18,14 +16,41 @@ public enum ShooterConfigs {
       ShooterConfig.builder()
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(testShotTable()).build())
           .build()),
-
-  ACTUAL_CONFIG(
+  RIGHT_LOW(
       ShooterConfig.builder()
+          .name("Shooter Right")
           .PHYSICAL_CONVERSION(
               ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_OFFSET(new Translation3d(0.0215805258, 0.0, 0.0))
+                  .TURRET_XY_OFFSET(new Translation3d(0.20955, 0.147955, 0.0))
                   .build())
-          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(actualShotTable()).build())
+          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(lowArcTable()).build())
+          .build()),
+  LEFT_LOW(
+      ShooterConfig.builder()
+          .name("Shooter Left")
+          .PHYSICAL_CONVERSION(
+              ShooterConfig.PhysicalConversion.builder()
+                  .TURRET_XY_OFFSET(new Translation3d(-0.20955, 0.147955, 0.0))
+                  .build())
+          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(lowArcTable()).build())
+          .build()),
+  RIGHT_HIGH(
+      ShooterConfig.builder()
+          .name("Shooter Right")
+          .PHYSICAL_CONVERSION(
+              ShooterConfig.PhysicalConversion.builder()
+                  .TURRET_XY_OFFSET(new Translation3d(0.20955, 0.147955, 0.0))
+                  .build())
+          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(highArcTable()).build())
+          .build()),
+  LEFT_HIGH(
+      ShooterConfig.builder()
+          .name("Shooter Left")
+          .PHYSICAL_CONVERSION(
+              ShooterConfig.PhysicalConversion.builder()
+                  .TURRET_XY_OFFSET(new Translation3d(-0.20955, 0.147955, 0.0))
+                  .build())
+          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(highArcTable()).build())
           .build());
 
   private final ShooterConfig config;
@@ -45,7 +70,15 @@ public enum ShooterConfigs {
     return table;
   }
 
-  private static ShotTable actualShotTable() {
+  private static ShotTable highArcTable() {
+    ShotTable table = new ShotTable();
+    table.put(Meters.of(0.5), Degrees.of(25.9925402176), MetersPerSecond.of(2.9919493835));
+    table.put(Meters.of(1.0), Degrees.of(15.8687578859), MetersPerSecond.of(3.8321560354));
+    table.put(Meters.of(1.5), Degrees.of(5.01), MetersPerSecond.of(4.2));
+    return table;
+  }
+
+  private static ShotTable lowArcTable() {
     ShotTable table = new ShotTable();
     table.put(Meters.of(0.5), Degrees.of(37.8668349861), MetersPerSecond.of(1.23134170253));
     table.put(Meters.of(1.0), Degrees.of(25.9925402176), MetersPerSecond.of(2.9919493835));

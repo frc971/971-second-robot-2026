@@ -47,8 +47,8 @@ public class ShooterHandler {
           new Translation3d());
 
   // config + physics model
-  private final ShooterConfig config;
-  private final ShooterPhysics physics;
+  private ShooterConfig config;
+  private ShooterPhysics physics;
   private ObjectState projectileState;
   private ObjectState targetState;
   private final String name;
@@ -65,8 +65,14 @@ public class ShooterHandler {
     SHOOT
   }
 
-  @AutoLogOutput @Getter private ShooterHandler.State shooterState;
-  @AutoLogOutput @Getter @Setter private ShooterHandler.Goal shooterGoal;
+  @AutoLogOutput(key = "{name}/shooterState")
+  @Getter
+  private ShooterHandler.State shooterState;
+
+  @AutoLogOutput(key = "{name}/shooterGoal")
+  @Getter
+  @Setter
+  private ShooterHandler.Goal shooterGoal;
 
   private LaunchSolution launchSolution = null;
 
@@ -150,9 +156,9 @@ public class ShooterHandler {
     }
 
     if (shooterState == State.FIRING) {
-      indexer.setVoltage(SetpointGoal.INDEX.getSetpoint().getSide(side).getIndexer().get());
+      indexer.setVoltage(SetpointGoal.INDEX.getSetpoint().getSide(side).get().getIndexer().get());
     } else {
-      indexer.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getSide(side).getIndexer().get());
+      indexer.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getSide(side).get().getIndexer().get());
     }
   }
 
@@ -202,15 +208,27 @@ public class ShooterHandler {
     }
   }
 
-  @AutoLogOutput
+  public void setPhysics(ShooterConfig.Physics shooterConfig) {
+    this.physics = new ShooterPhysics(shooterConfig);
+  }
+
+  @AutoLogOutput(key = "{name}/canTransitionToReady")
   private boolean canTransitionToReady() {
+    if (launchSolution == null) {
+      return false;
+    }
+
     return flywheelAngularVelocityAbsDiff().lt(config.THRESHOLD().AIMING_FLYWHEEL_THRESHOLD())
         && turretRotationAbsDiff().lt(config.THRESHOLD().AIMING_ROTATION_THRESHOLD())
         && hoodAngleAbsDiff().lt(config.THRESHOLD().AIMING_HOOD_ANGLE_THRESHOLD());
   }
 
-  @AutoLogOutput
+  @AutoLogOutput(key = "{name}/canTransitionToNotReady")
   private boolean canTransitionToNotReady() {
+    if (launchSolution == null) {
+      return true;
+    }
+
     return flywheelAngularVelocityAbsDiff().gt(config.THRESHOLD().SHOOTING_FLYWHEEL_ABORT())
         || turretRotationAbsDiff().gt(config.THRESHOLD().SHOOTING_ROTATION_THRESHOLD())
         || hoodAngleAbsDiff().gt(config.THRESHOLD().SHOOTING_HOOD_ANGLE_THRESHOLD());
@@ -243,8 +261,13 @@ public class ShooterHandler {
 
   // Check if within hardware (+ other) constraints for shooting
   // determines if shot is even remotely possible
-  @AutoLogOutput
+  @AutoLogOutput(key = "{name}/satisfiesConstraints")
   public boolean satisfiesConstraints() {
+    if (launchSolution == null) {
+      DataLogManager.log("WARNING: Launch solution is null");
+      return false;
+    }
+
     // --- HIGH PRIORITY CONSTRAINTS ---
     LinearVelocity speed = launchSolution.linearFlywheelVelocity();
     if (speed.lt(config.CONSTRAINTS().MIN_FLYWHEEL_SPEED())
@@ -288,7 +311,7 @@ public class ShooterHandler {
     Translation2d robotCenterToTurret =
         config
             .PHYSICAL_CONVERSION()
-            .TURRET_OFFSET()
+            .TURRET_XY_OFFSET()
             .toTranslation2d()
             .rotateBy(drivetrainState.Pose.getRotation());
 
@@ -302,7 +325,9 @@ public class ShooterHandler {
     Translation3d projPoseOffset =
         new Translation3d(robotCenterToTurret)
             .plus(new Translation3d(turretCenterToBall))
-            .plus(new Translation3d(0.0, 0.0, config.PHYSICAL_CONVERSION().TURRET_OFFSET().getZ()));
+            .plus(
+                new Translation3d(
+                    0.0, 0.0, config.PHYSICAL_CONVERSION().TURRET_XY_OFFSET().getZ()));
 
     Translation3d projVelOffset = new Translation3d(v_robotRot.plus(v_turRot));
 
