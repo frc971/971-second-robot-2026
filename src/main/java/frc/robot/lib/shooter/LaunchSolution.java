@@ -25,7 +25,7 @@ public class LaunchSolution {
     LinearVelocity flywheelSpeed = MetersPerSecond.of(fireVelocity.getNorm());
     Angle hoodAngle = Radians.of(Math.asin(fireVelocity.getZ() / fireVelocity.getNorm()));
 
-    this.shooterData = new ShooterData(hoodAngle, flywheelSpeed);
+    this.shooterData = new ShooterData(hoodAngle, flywheelSpeed, Seconds.of(0));
     this.turretRotation = new Rotation2d(fireVelocity.getX(), fireVelocity.getY());
   }
 

@@ -116,7 +116,7 @@ public class ShooterHandler {
     projectileState = getProjectileState();
 
     // calculate physics
-    launchSolution = physics.alexSolve(projectileState, targetState);
+    launchSolution = physics.iterativeTimeSolve(projectileState, targetState, 20);
 
     logStates();
 

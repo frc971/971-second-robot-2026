@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Drive {
   private final CommandSwerveDrivetrain drivetrain;
+
   private final Superstructure superstructure;
 
   private final Manual manual;

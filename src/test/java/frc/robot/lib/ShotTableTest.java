@@ -15,15 +15,15 @@ public class ShotTableTest {
   public void setup() {
     shotTable = new ShotTable();
 
-    // Populate with test data
-    // Distance: 1m -> Angle: 30°, Speed: 10 m/s
-    shotTable.put(Meters.of(1.0), Degrees.of(30.0), MetersPerSecond.of(10.0));
+    // Populate with test data (distance -> angle, speed, time of flight)
+    // Distance: 1m -> Angle: 30°, Speed: 10 m/s, ToF: 0.4 s
+    shotTable.put(Meters.of(1.0), Degrees.of(30.0), MetersPerSecond.of(10.0), Seconds.of(0.4));
 
-    // Distance: 2m -> Angle: 40°, Speed: 15 m/s
-    shotTable.put(Meters.of(2.0), Degrees.of(40.0), MetersPerSecond.of(15.0));
+    // Distance: 2m -> Angle: 40°, Speed: 15 m/s, ToF: 0.6 s
+    shotTable.put(Meters.of(2.0), Degrees.of(40.0), MetersPerSecond.of(15.0), Seconds.of(0.6));
 
-    // Distance: 4m -> Angle: 50°, Speed: 25 m/s
-    shotTable.put(Meters.of(4.0), Degrees.of(50.0), MetersPerSecond.of(25.0));
+    // Distance: 4m -> Angle: 50°, Speed: 25 m/s, ToF: 0.9 s
+    shotTable.put(Meters.of(4.0), Degrees.of(50.0), MetersPerSecond.of(25.0), Seconds.of(0.9));
   }
 
   @Test
@@ -33,29 +33,30 @@ public class ShotTableTest {
 
     assertEquals(40.0, data.hoodAngle().in(Degrees), DELTA);
     assertEquals(15.0, data.flywheelSpeed().in(MetersPerSecond), DELTA);
+    assertEquals(0.6, data.timeOfFlight().in(Seconds), DELTA);
   }
 
   @Test
   public void testInterpolation() {
     // Test interpolation between 2m and 4m
     // At 3m (midpoint), should interpolate to midpoint values
-    // Angle: (40 + 50) / 2 = 45°
-    // Speed: (15 + 25) / 2 = 20 m/s
+    // Angle: (40 + 50) / 2 = 45°, Speed: (15 + 25) / 2 = 20 m/s, ToF: (0.6 + 0.9) / 2 = 0.75 s
     ShotTable.ShooterData data = shotTable.getShooterData(Meters.of(3.0));
 
     assertEquals(45.0, data.hoodAngle().in(Degrees), DELTA);
     assertEquals(20.0, data.flywheelSpeed().in(MetersPerSecond), DELTA);
+    assertEquals(0.75, data.timeOfFlight().in(Seconds), DELTA);
   }
 
   @Test
   public void testInterpolationQuarterPoint() {
-    // Test interpolation at 1.5m (25% between 1m and 2m)
-    // Angle: 30 + (40 - 30) * 0.5 = 35°
-    // Speed: 10 + (15 - 10) * 0.5 = 12.5 m/s
+    // Test interpolation at 1.5m (50% between 1m and 2m)
+    // Angle: 30 + (40 - 30) * 0.5 = 35°, Speed: 12.5 m/s, ToF: (0.4 + 0.6) / 2 = 0.5 s
     ShotTable.ShooterData data = shotTable.getShooterData(Meters.of(1.5));
 
     assertEquals(35.0, data.hoodAngle().in(Degrees), DELTA);
     assertEquals(12.5, data.flywheelSpeed().in(MetersPerSecond), DELTA);
+    assertEquals(0.5, data.timeOfFlight().in(Seconds), DELTA);
   }
 
   @Test
@@ -66,6 +67,7 @@ public class ShotTableTest {
 
     assertEquals(30.0, data.hoodAngle().in(Degrees), DELTA);
     assertEquals(10.0, data.flywheelSpeed().in(MetersPerSecond), DELTA);
+    assertEquals(0.4, data.timeOfFlight().in(Seconds), DELTA);
   }
 
   @Test
@@ -76,6 +78,7 @@ public class ShotTableTest {
 
     assertEquals(50.0, data.hoodAngle().in(Degrees), DELTA);
     assertEquals(25.0, data.flywheelSpeed().in(MetersPerSecond), DELTA);
+    assertEquals(0.9, data.timeOfFlight().in(Seconds), DELTA);
   }
 
   @Test
@@ -85,6 +88,7 @@ public class ShotTableTest {
 
     assertEquals(30.0, data.hoodAngle().in(Degrees), DELTA);
     assertEquals(10.0, data.flywheelSpeed().in(MetersPerSecond), DELTA);
+    assertEquals(0.4, data.timeOfFlight().in(Seconds), DELTA);
   }
 
   @Test
@@ -94,6 +98,7 @@ public class ShotTableTest {
 
     assertEquals(50.0, data.hoodAngle().in(Degrees), DELTA);
     assertEquals(25.0, data.flywheelSpeed().in(MetersPerSecond), DELTA);
+    assertEquals(0.9, data.timeOfFlight().in(Seconds), DELTA);
   }
 
   @Test
@@ -102,10 +107,12 @@ public class ShotTableTest {
     ShotTable table = new ShotTable();
     table.put(Meters.of(1.0), Degrees.of(20.0));
     table.put(Meters.of(1.0), MetersPerSecond.of(5.0));
+    table.put(Meters.of(1.0), Seconds.of(0.3));
 
     ShotTable.ShooterData data = table.getShooterData(Meters.of(1.0));
 
     assertEquals(20.0, data.hoodAngle().in(Degrees), DELTA);
     assertEquals(5.0, data.flywheelSpeed().in(MetersPerSecond), DELTA);
+    assertEquals(0.3, data.timeOfFlight().in(Seconds), DELTA);
   }
 }

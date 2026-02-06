@@ -31,6 +31,7 @@ public class ShooterTuner {
   @Getter private Mode mode = Mode.DRIVING;
 
   private boolean prevPovUp = false;
+  private boolean currentPovUp = false;
 
   // default params
   private AngularVelocity flywheelSpeed = RotationsPerSecond.of(15);
@@ -59,21 +60,20 @@ public class ShooterTuner {
       return;
     }
 
-    boolean currentPovUp = Controllers.XBOX.povUp().getAsBoolean();
-
     if (Controllers.XBOX.povLeft().getAsBoolean()) {
       mode = Mode.HOOD;
     } else if (Controllers.XBOX.povRight().getAsBoolean()) {
       mode = Mode.FLYWHEEL;
     }
 
+    currentPovUp = Controllers.XBOX.povUp().getAsBoolean();
     if (currentPovUp && !prevPovUp) {
       mode = Mode.DRIVING;
     }
     prevPovUp = currentPovUp;
 
     switch (mode) {
-      case FLYWHEEL:
+      case FLYWHEEL -> {
         if (Controllers.XBOX.leftBumper().getAsBoolean()) {
           flywheelSpeed =
               RotationsPerSecond.of(
@@ -85,19 +85,18 @@ public class ShooterTuner {
                   Math.max(
                       MIN_FLYWHEEL_RPS, flywheelSpeed.minus(FLYWHEEL_STEP).in(RotationsPerSecond)));
         }
-        break;
+      }
 
-      case HOOD:
+      case HOOD -> {
         if (Controllers.XBOX.leftBumper().getAsBoolean()) {
           hoodAngle = Degrees.of(Math.min(MAX_HOOD_DEGREES, hoodAngle.plus(HOOD_STEP).in(Degrees)));
         } else if (Controllers.XBOX.rightBumper().getAsBoolean()) {
           hoodAngle =
               Degrees.of(Math.max(MIN_HOOD_DEGREES, hoodAngle.minus(HOOD_STEP).in(Degrees)));
         }
-        break;
+      }
 
-      case DRIVING:
-        break;
+      case DRIVING -> {}
     }
 
     Logger.recordOutput("ShooterTuner/FlywheelSpeed (rps)", flywheelSpeed);

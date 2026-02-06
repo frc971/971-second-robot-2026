@@ -7,6 +7,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import frc.robot.lib.shooter.ShotTable.ShooterData;
 
 public class ShooterPhysics {
@@ -33,6 +35,66 @@ public class ShooterPhysics {
 
     return new LaunchSolution(shooterData, turretRotation);
   }
+
+  /*
+   * Only works when robot not moving at insane speeds
+   * Uses a single iteration approach, approximating offset with time of flight
+   */
+  public LaunchSolution simpleTimeSolve(ObjectState projectile, ObjectState target) {
+
+    Distance currentDistance =
+        Meters.of(
+            projectile.minus(target).xyPosition().getNorm()); // double check if actually meters
+
+    // get time of flight from shot table
+    Time timeOfFlight = config.getTime(currentDistance);
+
+    // find future pose
+    // TODO: account for time delay in measuring pose & actual pose
+    ObjectState futureRobot = projectile.getFutureState(timeOfFlight);
+
+    return stationaryInterpolation(futureRobot, target);
+  }
+
+  /**
+   * simpleTimeSolve but with multiple Iterations
+   *
+   * @param maxIterations number of iterations to do
+   */
+  public LaunchSolution iterativeTimeSolve(
+      ObjectState projectile, ObjectState target, int maxIterations) {
+
+    Distance currentDistance =
+        Meters.of(
+            projectile.minus(target).xyPosition().getNorm()); // double check if actually meters
+
+    // get time of flight from shot table
+    Time timeOfFlight = config.getTime(currentDistance);
+
+    // iteratively update time of flight
+    for (int i = 0; i < maxIterations; i++) {
+      ObjectState futureRobot = projectile.getFutureState(timeOfFlight);
+      Distance interceptDistance =
+          Meters.of(
+              futureRobot
+                  .minus(target)
+                  .xyPosition()
+                  .getNorm()); // check that this is actually meters
+
+      Time newTimeOfFlight = config.getTime(interceptDistance);
+
+      // Quit early if already converged
+      if (Math.abs(newTimeOfFlight.in(Seconds) - timeOfFlight.in(Seconds)) < 0.01) {
+        break;
+      }
+
+      timeOfFlight = newTimeOfFlight;
+    }
+
+    return stationaryInterpolation(projectile.getFutureState(timeOfFlight), target);
+  }
+
+  // === Deprecated physics solvers === //
 
   public LaunchSolution alexSolve(ObjectState robot, ObjectState target) {
     // assume ball is stationary --> get LUT predicition
@@ -108,6 +170,4 @@ public class ShooterPhysics {
     // convert velocity vector to LaunchSolution
     return new LaunchSolution(fireVelocityVector);
   }
-
-  // public Solution attackAngle(ObjectState proj, ObjectState target) {}
 }
