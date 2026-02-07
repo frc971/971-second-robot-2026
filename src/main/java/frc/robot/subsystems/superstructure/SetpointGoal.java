@@ -68,8 +68,19 @@ public enum SetpointGoal {
           .left(Setpoint.SideConstants.builder().withIndexerVolts(3.0))
           .right(Setpoint.SideConstants.builder().withIndexerVolts(3.0))),
   INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(0.0)),
+  OUTTAKE(
+      Setpoint.builder()
+          .left(Setpoint.SideConstants.builder().withIndexerVolts(-6.0))
+          .right(Setpoint.SideConstants.builder().withIndexerVolts(-6.0))
+          .withKickerVolts(-6.0)
+          .withGroundRollersVolts(-11.0)),
   EXTEND(Setpoint.builder().withClimberMeters(6.0)),
-  RETRACT(Setpoint.builder().withClimberMeters(0.0));
+  RETRACT(Setpoint.builder().withClimberMeters(0.0)),
+  UNJAM(
+      Setpoint.builder()
+          .left(Setpoint.SideConstants.builder().withIndexerVolts(-6.0))
+          .right(Setpoint.SideConstants.builder().withIndexerVolts(-6.0))
+          .withKickerVolts(-6.0));
 
   private final Setpoint setpoint;
 

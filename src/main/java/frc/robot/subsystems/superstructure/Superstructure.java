@@ -115,7 +115,9 @@ public class Superstructure {
       setGoal(SetpointGoal.NEUTRAL);
 
       // Intake roller logic
-      if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
+      if (Controllers.OUTTAKE.getAsBoolean()) {
+        setGoal(SetpointGoal.OUTTAKE);
+      } else if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE_ROLLERS);
       }
 
@@ -233,6 +235,8 @@ public class Superstructure {
         shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
         shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
 
+        shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
+        shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
         switch (shooterGoal) {
           case TUNER_LEFT -> {
             shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
@@ -248,7 +252,30 @@ public class Superstructure {
             break;
           }
         }
+
+        if (Controllers.OUTTAKE.getAsBoolean()) {
+          setGoal(SetpointGoal.OUTTAKE);
+        } else {
+          setGoal(SetpointGoal.INDEX);
+          setGoal(SetpointGoal.INTAKE_ROLLERS);
+        }
       }
+    }
+
+    if (Controllers.OUTTAKE.getAsBoolean()) {
+      kicker.setVoltage(SetpointGoal.OUTTAKE.getSetpoint().getKicker().get());
+    } else if ((shooterGoal == ShooterGoal.SHOOT_BOTH
+            || shooterGoal == ShooterGoal.SHOOT_LEFT
+            || shooterGoal == ShooterGoal.SHOOT_RIGHT)
+        && (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
+            || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)) {
+      kicker.setVoltage(SetpointGoal.SHOOT.getSetpoint().getKicker().get());
+    } else {
+      kicker.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getKicker().get());
+    }
+
+    if (Controllers.UNJAM.getAsBoolean()) {
+      setGoal(SetpointGoal.UNJAM);
     }
 
     shooterHandlerLeft.periodic();
@@ -271,6 +298,13 @@ public class Superstructure {
   }
 
   public void setGoal(Setpoint setpoint) {
+    if (setpoint.getLeft().isPresent() && setpoint.getLeft().get().getIndexer().isPresent()) {
+      indexerLeft.setVoltage(setpoint.getLeft().get().getIndexer().get());
+    }
+    if (setpoint.getRight().isPresent() && setpoint.getRight().get().getIndexer().isPresent()) {
+      indexerRight.setVoltage(setpoint.getRight().get().getIndexer().get());
+    }
+
     if (setpoint.getGroundPivot().isPresent()) {
       groundPivot.setPosition(setpoint.getGroundPivot().get());
     }

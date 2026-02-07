@@ -10,15 +10,17 @@ public class Controllers {
 
   public static final JoystickButton INTAKE_ROLLERS = new JoystickButton(BUTTONBOARD, 1);
   public static final JoystickButton INTAKE_PIVOT = new JoystickButton(BUTTONBOARD, 2);
+  public static final JoystickButton OUTTAKE = new JoystickButton(BUTTONBOARD, 3);
+  public static final JoystickButton UNJAM = new JoystickButton(BUTTONBOARD, 4);
 
-  public static final JoystickButton MANUAL_BOTH = new JoystickButton(BUTTONBOARD, 2);
-  public static final JoystickButton MANUAL_LEFT = new JoystickButton(BUTTONBOARD, 3);
-  public static final JoystickButton MANUAL_RIGHT = new JoystickButton(BUTTONBOARD, 4);
+  public static final JoystickButton MANUAL_BOTH = new JoystickButton(BUTTONBOARD, 5);
+  public static final JoystickButton MANUAL_LEFT = new JoystickButton(BUTTONBOARD, 6);
+  public static final JoystickButton MANUAL_RIGHT = new JoystickButton(BUTTONBOARD, 7);
 
-  public static final JoystickButton SHOOT_BOTH = new JoystickButton(BUTTONBOARD, 5);
-  public static final JoystickButton SHOOT_LEFT = new JoystickButton(BUTTONBOARD, 6);
-  public static final JoystickButton SHOOT_RIGHT = new JoystickButton(BUTTONBOARD, 7);
+  public static final JoystickButton SHOOT_BOTH = new JoystickButton(BUTTONBOARD, 8);
+  public static final JoystickButton SHOOT_LEFT = new JoystickButton(BUTTONBOARD, 9);
+  public static final JoystickButton SHOOT_RIGHT = new JoystickButton(BUTTONBOARD, 10);
 
-  public static final JoystickButton TUNE_LEFT = new JoystickButton(BUTTONBOARD, 8);
-  public static final JoystickButton TUNE_RIGHT = new JoystickButton(BUTTONBOARD, 9);
+  public static final JoystickButton TUNE_LEFT = new JoystickButton(BUTTONBOARD, 11);
+  public static final JoystickButton TUNE_RIGHT = new JoystickButton(BUTTONBOARD, 12);
 }
