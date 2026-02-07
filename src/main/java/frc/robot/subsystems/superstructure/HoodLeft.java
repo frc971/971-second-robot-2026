@@ -48,7 +48,7 @@ public class HoodLeft extends AngularSubsystem {
 
     return MotorConfig.builder()
         .NAME("Hood Left")
-        .ID(10)
+        .ID(-1)
         .BUS(new CANBus("Turret"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Degrees)

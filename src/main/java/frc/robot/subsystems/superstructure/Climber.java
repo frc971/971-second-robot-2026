@@ -50,7 +50,7 @@ public class Climber extends LinearSubsystem {
 
     return MotorConfig.builder()
         .NAME("Climber")
-        .ID(11)
+        .ID(-1)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Meters)

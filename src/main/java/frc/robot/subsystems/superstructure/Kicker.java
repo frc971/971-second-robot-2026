@@ -27,7 +27,7 @@ public class Kicker extends MotorSubsystem {
 
     return MotorConfig.builder()
         .NAME("Kicker")
-        .ID(7)
+        .ID(-1)
         .BUS(new CANBus("Drivetrain Bus"))
         .TALONFX_CONFIG(tc)
         .build();
