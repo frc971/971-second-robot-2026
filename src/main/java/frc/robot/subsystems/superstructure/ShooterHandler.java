@@ -236,9 +236,7 @@ public class ShooterHandler {
 
   // --- Threshold helper functions ---
   private AngularVelocity flywheelAngularVelocityAbsDiff() {
-    AngularVelocity diff = getFlywheelAngularVelocity().minus(flywheel.getVelocity());
-    double absoluteOmega = Math.abs(diff.in(RadiansPerSecond));
-    return Radians.per(Seconds).of(absoluteOmega);
+    return getFlywheelAngularVelocity().minus(flywheel.getVelocity());
   }
 
   private Angle turretRotationAbsDiff() {
@@ -250,9 +248,7 @@ public class ShooterHandler {
   }
 
   private Angle hoodAngleAbsDiff() {
-    Angle diff = launchSolution.hoodAngle().minus(hood.getPosition());
-    double absoluteOmega = diff.in(Radians);
-    return Radians.of(absoluteOmega);
+    return launchSolution.hoodAngle().minus(hood.getPosition());
   }
 
   private Angle getTurretAbsRotation() {

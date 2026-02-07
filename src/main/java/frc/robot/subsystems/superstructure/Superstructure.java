@@ -48,10 +48,11 @@ public class Superstructure {
   public final Kicker kicker;
   public final Climber climber;
 
+  public final Visualization visualization;
   @AutoLogOutput @Getter private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
-  // If the turret is not with the range 90 +/- SWAP_BUFFER one of the two turrets will take a
-  // different arc to prevent collisions in the air
+  // If the turret is not within the interval (-SWAP_BUFFER, SWAP_BUFFER) one of the two turrets
+  // will take a different arc to prevent collisions in the air
   private static final Angle SWAP_BUFFER = Degrees.of(30);
 
   private enum ShooterGoal {
@@ -106,6 +107,8 @@ public class Superstructure {
             robotContainer.drivetrain,
             ShooterConfigs.LEFT_LOW.getConfig(),
             Setpoint.Side.LEFT);
+
+    visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -202,22 +205,20 @@ public class Superstructure {
 
         switch (shooterGoal) {
           case SHOOT_LEFT -> {
-            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.SHOOT);
-            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.SHOOT);
+            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
             setGoal(SetpointGoal.LEFT_ONLY);
           }
           case SHOOT_RIGHT -> {
-            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.SHOOT);
-            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.SHOOT);
             setGoal(SetpointGoal.RIGHT_ONLY);
           }
           case SHOOT_BOTH -> {
-            if (shooterHandlerRight.getRelativeTurretAngle().gt(Degrees.of(90).plus(SWAP_BUFFER))) {
+            if (shooterHandlerRight.getRelativeTurretAngle().gt(SWAP_BUFFER)) {
               shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.getConfig().PHYSICS());
               shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_LOW.getConfig().PHYSICS());
-            } else if (shooterHandlerRight
-                .getRelativeTurretAngle()
-                .lt(Degrees.of(90).minus(SWAP_BUFFER))) {
+            } else if (shooterHandlerRight.getRelativeTurretAngle().lt(SWAP_BUFFER.unaryMinus())) {
               shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_LOW.getConfig().PHYSICS());
               shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.getConfig().PHYSICS());
             }
@@ -295,6 +296,8 @@ public class Superstructure {
     groundRollers.periodic();
     kicker.periodic();
     climber.periodic();
+
+    visualization.periodic();
   }
 
   public void setGoal(Setpoint setpoint) {

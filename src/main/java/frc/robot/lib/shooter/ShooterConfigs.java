@@ -19,7 +19,8 @@ public enum ShooterConfigs {
           .name("Shooter Right")
           .PHYSICAL_CONVERSION(
               ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_XY_OFFSET(new Translation3d(0.20955, 0.147955, 0.0))
+                  .TURRET_XY_OFFSET(
+                      new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.272987))
                   .build())
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(lowArcTable()).build())
           .build()),
@@ -28,7 +29,8 @@ public enum ShooterConfigs {
           .name("Shooter Left")
           .PHYSICAL_CONVERSION(
               ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_XY_OFFSET(new Translation3d(-0.20955, 0.147955, 0.0))
+                  .TURRET_XY_OFFSET(
+                      new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.2761615))
                   .build())
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(lowArcTable()).build())
           .build()),
@@ -37,7 +39,8 @@ public enum ShooterConfigs {
           .name("Shooter Right")
           .PHYSICAL_CONVERSION(
               ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_XY_OFFSET(new Translation3d(0.20955, 0.147955, 0.0))
+                  .TURRET_XY_OFFSET(
+                      new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.272987))
                   .build())
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(highArcTable()).build())
           .build()),
@@ -46,7 +49,8 @@ public enum ShooterConfigs {
           .name("Shooter Left")
           .PHYSICAL_CONVERSION(
               ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_XY_OFFSET(new Translation3d(-0.20955, 0.147955, 0.0))
+                  .TURRET_XY_OFFSET(
+                      new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.2761615))
                   .build())
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(highArcTable()).build())
           .build());

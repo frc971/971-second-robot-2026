@@ -57,7 +57,7 @@ public class ShooterConfig {
     // positive x is towards FRONT of the robot
     // positive y is towards PORT/LEFT side
     @Builder.Default private Translation3d TURRET_XY_OFFSET = new Translation3d();
-    @Builder.Default private Distance RADIUS_TO_BALL = Inches.of(3.5);
+    @Builder.Default private Distance RADIUS_TO_BALL = Inches.of(0.0);
   }
 
   // AIMING thresholds (once below, will transition to SHOOTING)
