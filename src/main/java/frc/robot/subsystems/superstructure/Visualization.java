@@ -27,14 +27,21 @@ public class Visualization {
 
   private TurretRight turretRight;
   private HoodRight hoodRight;
+  private Climber climber;
 
   public Visualization(
-      TurretLeft turretLeft, TurretRight turretRight, HoodLeft hoodLeft, HoodRight hoodRight) {
+      TurretLeft turretLeft,
+      TurretRight turretRight,
+      HoodLeft hoodLeft,
+      HoodRight hoodRight,
+      Climber climber) {
     this.turretLeft = turretLeft;
     this.hoodLeft = hoodLeft;
 
     this.turretRight = turretRight;
     this.hoodRight = hoodRight;
+
+    this.climber = climber;
   }
 
   public void periodic() {
@@ -66,7 +73,16 @@ public class Visualization {
                     Translation3d.kZero,
                     new Rotation3d(0.0, hoodRight.getPosition().in(Radians), 0.0)));
 
+    Transform3d climberPose =
+        new Transform3d(
+            new Translation3d(0.0, 0.0, climber.getLinearPosition().in(Meters)), Rotation3d.kZero);
+
     Logger.recordOutput(
-        "Visualization/Components", turretLeftPose, hoodLeftPose, turretRightPose, hoodRightPose);
+        "Visualization/Components",
+        turretLeftPose,
+        hoodLeftPose,
+        turretRightPose,
+        hoodRightPose,
+        climberPose);
   }
 }

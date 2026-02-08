@@ -41,9 +41,9 @@ public final class Constants {
 
   public static final class SimSwerveConstants {
     // TODO: update constants to what's physically on the robot
-    public static final Mass ROBOT_MASS = Pounds.of(115);
-    public static final Distance BUMPER_LENGTH_X = Inches.of(30);
-    public static final Distance BUMPER_LENGTH_Y = Inches.of(30);
+    public static final Mass ROBOT_MASS = Kilograms.of(64.0);
+    public static final Distance BUMPER_LENGTH_X = Meters.of(0.792);
+    public static final Distance BUMPER_LENGTH_Y = Meters.of(0.919);
     public static final double WHEEL_COF = 1.2;
     public static final DCMotor DRIVE_MOTOR_WHEEL = DCMotor.getKrakenX60(1);
     public static final DCMotor STEER_MOTOR_WHEEL = DCMotor.getKrakenX60(1);

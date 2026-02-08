@@ -1,5 +1,5 @@
 {
-  "name": "971 First Robot",
+  "name": "TWICE",
   "isFTC": false,
   "rotations": [
     {
@@ -8,9 +8,9 @@
     }
   ],
   "position": [
-    -0.0144525,
-    -0.0144525,
-    0
+    0.0,
+    0.0,
+    0.0
   ],
   "components": [
     {
@@ -63,6 +63,19 @@
         -0.219786,
         0.195097,
         -0.445927
+      ]
+    },
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [
+        0.0,
+        0.0,
+        0.0
       ]
     }
   ]

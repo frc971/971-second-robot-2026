@@ -60,7 +60,7 @@ public enum SetpointGoal {
           .withKickerVolts(-6.0)
           .withGroundRollersVolts(-11.0)
           .withGroundPivotDegrees(0.0)),
-  EXTEND(Setpoint.builder().withClimberMeters(6.0)),
+  EXTEND(Setpoint.builder().withClimberMeters(0.2)),
   RETRACT(Setpoint.builder().withClimberMeters(0.0));
 
   private final Setpoint setpoint;
