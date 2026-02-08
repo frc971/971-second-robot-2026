@@ -19,7 +19,7 @@ public class ShooterPhysicsTest {
 
   @BeforeEach
   public void setup() {
-    config = ShooterConfigs.TEST_CONFIG.getConfig();
+    config = ShooterConfigs.TEST_CONFIG;
     physics = new ShooterPhysics(config.PHYSICS());
   }
 

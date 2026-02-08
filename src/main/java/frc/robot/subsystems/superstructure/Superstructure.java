@@ -93,15 +93,11 @@ public class Superstructure {
             hoodRight,
             flywheelRight,
             robotContainer.drivetrain,
-            ShooterConfigs.RIGHT_LOW.getConfig());
+            ShooterConfigs.RIGHT_LOW);
 
     shooterHandlerLeft =
         new ShooterHandler(
-            turretLeft,
-            hoodLeft,
-            flywheelLeft,
-            robotContainer.drivetrain,
-            ShooterConfigs.LEFT_LOW.getConfig());
+            turretLeft, hoodLeft, flywheelLeft, robotContainer.drivetrain, ShooterConfigs.LEFT_LOW);
 
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight);
 
@@ -195,8 +191,8 @@ public class Superstructure {
         shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
         shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
 
-        shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.getConfig().PHYSICS());
-        shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.getConfig().PHYSICS());
+        shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.PHYSICS());
+        shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.PHYSICS());
 
         switch (shooterGoal) {
           case SHOOT_LEFT -> {
@@ -215,11 +211,11 @@ public class Superstructure {
           }
           case SHOOT_BOTH -> {
             if (shooterHandlerRight.getRelativeTurretAngle().gt(SWAP_BUFFER)) {
-              shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.getConfig().PHYSICS());
-              shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_LOW.getConfig().PHYSICS());
+              shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.PHYSICS());
+              shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_LOW.PHYSICS());
             } else if (shooterHandlerRight.getRelativeTurretAngle().lt(SWAP_BUFFER.unaryMinus())) {
-              shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_LOW.getConfig().PHYSICS());
-              shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.getConfig().PHYSICS());
+              shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_LOW.PHYSICS());
+              shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.PHYSICS());
             }
 
             shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.SHOOT);

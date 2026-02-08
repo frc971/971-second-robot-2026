@@ -3,18 +3,15 @@ package frc.robot.lib.shooter;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Translation3d;
-import lombok.Getter;
 
-@Getter
-public enum ShooterConfigs {
-  ALL_DEFAULTS(ShooterConfig.builder().build()),
+public class ShooterConfigs {
+  public static final ShooterConfig ALL_DEFAULTS = ShooterConfig.builder().build();
 
-  // Used by ShooterPhysicsTest - do not edit
-  TEST_CONFIG(
+  public static final ShooterConfig TEST_CONFIG =
       ShooterConfig.builder()
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(testShotTable()).build())
-          .build()),
-  RIGHT_LOW(
+          .build();
+  public static final ShooterConfig RIGHT_LOW =
       ShooterConfig.builder()
           .name("Shooter Right")
           .PHYSICAL_CONVERSION(
@@ -23,8 +20,8 @@ public enum ShooterConfigs {
                       new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.272987))
                   .build())
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(lowArcTable()).build())
-          .build()),
-  LEFT_LOW(
+          .build();
+  public static final ShooterConfig LEFT_LOW =
       ShooterConfig.builder()
           .name("Shooter Left")
           .PHYSICAL_CONVERSION(
@@ -33,33 +30,15 @@ public enum ShooterConfigs {
                       new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.2761615))
                   .build())
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(lowArcTable()).build())
-          .build()),
-  RIGHT_HIGH(
-      ShooterConfig.builder()
-          .name("Shooter Right")
-          .PHYSICAL_CONVERSION(
-              ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_XY_OFFSET(
-                      new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.272987))
-                  .build())
+          .build();
+  public static final ShooterConfig RIGHT_HIGH =
+      RIGHT_LOW.toBuilder()
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(highArcTable()).build())
-          .build()),
-  LEFT_HIGH(
-      ShooterConfig.builder()
-          .name("Shooter Left")
-          .PHYSICAL_CONVERSION(
-              ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_XY_OFFSET(
-                      new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.2761615))
-                  .build())
+          .build();
+  public static final ShooterConfig LEFT_HIGH =
+      LEFT_LOW.toBuilder()
           .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(highArcTable()).build())
-          .build());
-
-  private final ShooterConfig config;
-
-  ShooterConfigs(ShooterConfig config) {
-    this.config = config;
-  }
+          .build();
 
   private static ShotTable testShotTable() {
     ShotTable table = new ShotTable();
