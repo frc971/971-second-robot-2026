@@ -61,7 +61,7 @@ public class ShooterHandler {
 
   public enum Goal {
     NONE,
-    SHOOT
+    ACTIVE
   }
 
   @AutoLogOutput(key = "{name}/shooterState")
@@ -93,11 +93,13 @@ public class ShooterHandler {
     this.hood = hood;
     this.config = config;
     this.physics = new ShooterPhysics(this.config.PHYSICS());
-    this.name = config.name() + "/ShooterHandler";
+    this.name = config.name();
 
     this.shooterState = State.NOT_READY;
     this.shooterGoal = Goal.NONE;
     this.targetState = TARGET_BLUE;
+
+    this.launchSolution = physics.iterativeTimeSolve(getProjectileState(), TARGET_BLUE, 1);
   }
 
   public void periodic() {

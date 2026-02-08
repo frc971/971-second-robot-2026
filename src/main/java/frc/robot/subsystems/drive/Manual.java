@@ -57,7 +57,7 @@ public class Manual {
 
     JOYSTICK_VALUES
         .setValues(
-            Controllers.XBOX.getLeftY(), Controllers.XBOX.getLeftX(), Controllers.XBOX.getRightX())
+            Controllers.TROY.getLeftY(), Controllers.TROY.getLeftX(), Controllers.TROY.getRightX())
         .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
         .scale(
             -MAX_SPEED, // Negative max speed and angular rate since
@@ -73,9 +73,9 @@ public class Manual {
             .withVelocityY(JOYSTICK_VALUES.getY())
             .withRotationalRate(JOYSTICK_VALUES.getRot()));
 
-    Logger.recordOutput("Drive/Manual/Joystick/X", Controllers.XBOX.getLeftY());
-    Logger.recordOutput("Drive/Manual/Joystick/Y", Controllers.XBOX.getLeftX());
-    Logger.recordOutput("Drive/Manual/Joystick/Rot", Controllers.XBOX.getRightX());
+    Logger.recordOutput("Drive/Manual/Joystick/X", Controllers.TROY.getLeftY());
+    Logger.recordOutput("Drive/Manual/Joystick/Y", Controllers.TROY.getLeftX());
+    Logger.recordOutput("Drive/Manual/Joystick/Rot", Controllers.TROY.getRightX());
   }
 
   public JoystickValues getValues() {

@@ -7,6 +7,7 @@ import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.Controllers;
 import lombok.Getter;
 import lombok.Setter;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterTuner {
@@ -27,16 +28,13 @@ public class ShooterTuner {
   private AngularSubsystem hood;
   private AngularSubsystem turret;
 
-  @Setter @Getter private Goal goal = Goal.NONE;
-  @Getter private Mode mode = Mode.DRIVING;
-
-  private boolean prevPovUp = false;
-  private boolean currentPovUp = false;
+  @AutoLogOutput @Setter @Getter private Goal goal = Goal.NONE;
+  @AutoLogOutput @Getter private Mode mode = Mode.DRIVING;
 
   // default params
-  private AngularVelocity flywheelSpeed = RotationsPerSecond.of(15);
-  private Angle hoodAngle = Degrees.of(10.0);
-  private Angle turretAngle = Degrees.of(45.0);
+  @AutoLogOutput private AngularVelocity flywheelSpeed = RotationsPerSecond.of(15);
+  @AutoLogOutput private Angle hoodAngle = Degrees.of(10.0);
+  @AutoLogOutput private Angle turretAngle = Degrees.of(45.0);
 
   // adjustment step sizes (every cycle)
   private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(0.5);
@@ -60,26 +58,27 @@ public class ShooterTuner {
       return;
     }
 
-    if (Controllers.XBOX.povLeft().getAsBoolean()) {
+    if (Controllers.TOGGLE_HOOD_FLYWHEEL.toggled()) {
       mode = Mode.HOOD;
-    } else if (Controllers.XBOX.povRight().getAsBoolean()) {
+    } else {
       mode = Mode.FLYWHEEL;
     }
 
-    currentPovUp = Controllers.XBOX.povUp().getAsBoolean();
-    if (currentPovUp && !prevPovUp) {
+    // TODO: replace with toggle class
+    if (Controllers.TOGGLE_DRIVE.toggled()) {
+      mode = Mode.FLYWHEEL;
+    } else {
       mode = Mode.DRIVING;
     }
-    prevPovUp = currentPovUp;
 
     switch (mode) {
       case FLYWHEEL -> {
-        if (Controllers.XBOX.leftBumper().getAsBoolean()) {
+        if (Controllers.UNDERSHOOT.getAsBoolean()) {
           flywheelSpeed =
               RotationsPerSecond.of(
                   Math.min(
                       MAX_FLYWHEEL_RPS, flywheelSpeed.plus(FLYWHEEL_STEP).in(RotationsPerSecond)));
-        } else if (Controllers.XBOX.rightBumper().getAsBoolean()) {
+        } else if (Controllers.OVERSHOOT.getAsBoolean()) {
           flywheelSpeed =
               RotationsPerSecond.of(
                   Math.max(
@@ -88,15 +87,15 @@ public class ShooterTuner {
       }
 
       case HOOD -> {
-        if (Controllers.XBOX.leftBumper().getAsBoolean()) {
+        if (Controllers.UNDERSHOOT.getAsBoolean()) {
           hoodAngle = Degrees.of(Math.min(MAX_HOOD_DEGREES, hoodAngle.plus(HOOD_STEP).in(Degrees)));
-        } else if (Controllers.XBOX.rightBumper().getAsBoolean()) {
+        } else if (Controllers.OVERSHOOT.getAsBoolean()) {
           hoodAngle =
               Degrees.of(Math.max(MIN_HOOD_DEGREES, hoodAngle.minus(HOOD_STEP).in(Degrees)));
         }
       }
 
-      case DRIVING -> {}
+      case DRIVING, NONE -> {}
     }
 
     Logger.recordOutput("ShooterTuner/FlywheelSpeed (rps)", flywheelSpeed);

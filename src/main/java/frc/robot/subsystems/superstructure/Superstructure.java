@@ -10,7 +10,6 @@ import frc.robot.RobotContainer;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
@@ -18,7 +17,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
  * {@code RobotContainer} from being cluttered with individual mechanism construction logic and
  * makes it easier to expand later.
  */
-@Getter
 public class Superstructure {
   // Add subsystems here as they are created
 
@@ -48,7 +46,7 @@ public class Superstructure {
   public final Climber climber;
 
   public final Visualization visualization;
-  @AutoLogOutput @Getter private ShooterGoal shooterGoal = ShooterGoal.NONE;
+  @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   // If the turret is not within the interval (-SWAP_BUFFER, SWAP_BUFFER) one of the two turrets
   // will take a different arc to prevent collisions in the air
@@ -56,18 +54,14 @@ public class Superstructure {
 
   private enum ShooterGoal {
     NONE,
-    MANUAL_BOTH,
-    MANUAL_LEFT,
-    MANUAL_RIGHT,
-    SHOOT_BOTH,
-    SHOOT_LEFT,
-    SHOOT_RIGHT,
-    TUNER_LEFT,
-    TUNER_RIGHT
+    MANUAL,
+    TARGETING,
+    TUNE_LEFT_SHOOTER,
+    TUNE_RIGHT_SHOOTER,
   }
 
-  private boolean prevIntakePivotBtn = false;
-  private boolean intakeLowered = false;
+  private boolean freezeIntake = false;
+  private boolean prevIntakePressed = false;
 
   public Superstructure(RobotContainer robotContainer) {
     drivetrain = robotContainer.drivetrain;
@@ -108,165 +102,124 @@ public class Superstructure {
     if (DriverStation.isTeleop()) {
       setGoal(SetpointGoal.NEUTRAL);
 
-      // Intake roller logic
-      if (Controllers.OUTTAKE.getAsBoolean()) {
-        setGoal(SetpointGoal.OUTTAKE);
-      } else if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
-        setGoal(SetpointGoal.INTAKE_ROLLERS);
-      }
-
-      // Intake pivot logic
-      boolean intakePivotBtn = Controllers.INTAKE_PIVOT.getAsBoolean();
-
-      if (!prevIntakePivotBtn && intakePivotBtn) {
-        intakeLowered = !intakeLowered;
-      }
-
-      if (intakeLowered) {
-        setGoal(SetpointGoal.INTAKE_PIVOT);
-      }
-
-      prevIntakePivotBtn = intakePivotBtn;
-
       // Climber logic
-      if (Controllers.XBOX.button(6).getAsBoolean()) {
+      if (Controllers.CLIMB_RETRACT.getAsBoolean()) {
         setGoal(SetpointGoal.RETRACT);
-      }
-
-      if (Controllers.XBOX.button(7).getAsBoolean()) {
+      } else if (Controllers.CLIMB_EXTEND.getAsBoolean()) {
         setGoal(SetpointGoal.EXTEND);
       }
 
-      // Shooter logic
-      if (Controllers.TUNE_LEFT.getAsBoolean()) {
-        shooterGoal = ShooterGoal.TUNER_LEFT;
+      // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
+      if (Controllers.MANUAL.toggled()) {
+        shooterGoal = ShooterGoal.MANUAL;
+      } else if (Controllers.TUNING.toggled()) {
+        shooterGoal = ShooterGoal.TUNE_LEFT_SHOOTER;
+        // TODO: make something for right tuner?
+      } else {
+        shooterGoal = ShooterGoal.TARGETING;
       }
 
-      if (Controllers.TUNE_RIGHT.getAsBoolean()) {
-        shooterGoal = ShooterGoal.TUNER_RIGHT;
-      }
+      // TODO: is this covered by the neutral setpoint or no?
+      shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+      shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+      shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
+      shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
 
-      if (Controllers.SHOOT_BOTH.getAsBoolean()) {
-        shooterGoal = ShooterGoal.SHOOT_BOTH;
-      }
+      switch (shooterGoal) {
+        case NONE -> {}
+        case TARGETING -> {
+          shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.PHYSICS());
+          shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.PHYSICS());
 
-      if (Controllers.SHOOT_LEFT.getAsBoolean()) {
-        shooterGoal = ShooterGoal.SHOOT_LEFT;
-      }
-
-      if (Controllers.SHOOT_RIGHT.getAsBoolean()) {
-        shooterGoal = ShooterGoal.SHOOT_RIGHT;
-      }
-
-      if (Controllers.MANUAL_BOTH.getAsBoolean()) {
-        shooterGoal = ShooterGoal.MANUAL_BOTH;
-      }
-
-      if (Controllers.MANUAL_LEFT.getAsBoolean()) {
-        shooterGoal = ShooterGoal.MANUAL_LEFT;
-      }
-
-      if (Controllers.MANUAL_RIGHT.getAsBoolean()) {
-        shooterGoal = ShooterGoal.MANUAL_RIGHT;
-      }
-    }
-
-    switch (shooterGoal) {
-      case NONE, MANUAL_LEFT, MANUAL_RIGHT, MANUAL_BOTH -> {
-        shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
-        shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-        shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-        shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
-
-        switch (shooterGoal) {
-          case MANUAL_LEFT -> setGoal(SetpointGoal.MANUAL_LEFT);
-          case MANUAL_RIGHT -> setGoal(SetpointGoal.MANUAL_RIGHT);
-          case MANUAL_BOTH -> setGoal(SetpointGoal.MANUAL_RIGHT);
-          default -> {
-            break;
+          if (!Controllers.KILL_LEFT.toggled()) {
+            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
           }
-        }
-      }
-      case SHOOT_BOTH, SHOOT_LEFT, SHOOT_RIGHT -> {
-        shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
-        shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
-
-        shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.PHYSICS());
-        shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.PHYSICS());
-
-        switch (shooterGoal) {
-          case SHOOT_LEFT -> {
-            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.SHOOT);
-            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-            if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING) {
-              setGoal(SetpointGoal.LEFT_ONLY);
-            }
+          if (!Controllers.KILL_RIGHT.toggled()) {
+            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
           }
-          case SHOOT_RIGHT -> {
-            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.SHOOT);
-            if (shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
-              setGoal(SetpointGoal.RIGHT_ONLY);
-            }
-          }
-          case SHOOT_BOTH -> {
+
+          if (!Controllers.KILL_RIGHT.toggled() && !Controllers.KILL_LEFT.toggled()) {
             if (shooterHandlerRight.getRelativeTurretAngle().gt(SWAP_BUFFER)) {
-              shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.PHYSICS());
               shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_LOW.PHYSICS());
             } else if (shooterHandlerRight.getRelativeTurretAngle().lt(SWAP_BUFFER.unaryMinus())) {
               shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_LOW.PHYSICS());
-              shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.PHYSICS());
-            }
-
-            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.SHOOT);
-            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.SHOOT);
-            if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
-                && shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
-              setGoal(SetpointGoal.BOTH_SHOOT);
-            } else if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING) {
-              setGoal(SetpointGoal.LEFT_ONLY);
-            } else if (shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
-              setGoal(SetpointGoal.RIGHT_ONLY);
             }
           }
-          default -> {
-            break;
+        }
+        case MANUAL -> {
+          SetpointGoal setpoint = SetpointGoal.NEUTRAL;
+
+          if (Controllers.MANUAL_SHOOT_UP.getAsBoolean()) {
+            setpoint = SetpointGoal.MANUAL_MID;
+          } else if (Controllers.MANUAL_SHOOT_LEFT.getAsBoolean()) {
+            setpoint = SetpointGoal.MANUAL_LEFT;
+          } else if (Controllers.MANUAL_SHOOT_RIGHT.getAsBoolean()) {
+            setpoint = SetpointGoal.MANUAL_RIGHT;
+          } else if (Controllers.MANUAL_SHUTTLE_LEFT.getAsBoolean()) {
+            setpoint = SetpointGoal.MANUAL_SHUTTLE_LEFT;
+          } else if (Controllers.MANUAL_SHUTTLE_RIGHT.getAsBoolean()) {
+            setpoint = SetpointGoal.MANUAL_SHUTTLE_RIGHT;
           }
+
+          setGoal(setpoint);
+        }
+        case TUNE_LEFT_SHOOTER -> {
+          shooterTunerLeft.setGoal(ShooterTuner.Goal.ACTIVE);
+        }
+        case TUNE_RIGHT_SHOOTER -> {
+          shooterTunerRight.setGoal(ShooterTuner.Goal.ACTIVE);
         }
       }
-      case TUNER_LEFT, TUNER_RIGHT -> {
-        shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-        shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
 
-        shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
-        shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
-        switch (shooterGoal) {
-          case TUNER_LEFT -> {
-            shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
-            shooterTunerLeft.setGoal(ShooterTuner.Goal.ACTIVE);
-            setGoal(SetpointGoal.LEFT_ONLY);
-          }
-          case TUNER_RIGHT -> {
-            shooterTunerRight.setGoal(ShooterTuner.Goal.ACTIVE);
-            shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
-            setGoal(SetpointGoal.RIGHT_ONLY);
-          }
-          default -> {
-            break;
-          }
+      // Indexer Logic
+      // Driver has to say we can shoot AND we need to be ready to shoot
+      boolean indexing =
+          (Controllers.LEFT_SHUTTLE.getAsBoolean()
+                  || Controllers.RIGHT_SHUTTLE.getAsBoolean()
+                  || Controllers.SHOOT.getAsBoolean()
+                  || Controllers.SHOOT_REDUNDANCY.getAsBoolean())
+              && (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
+                  || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING);
+
+      if (indexing) {
+        if (!Controllers.KILL_LEFT.toggled() && !Controllers.KILL_LEFT.toggled()) {
+          setGoal(SetpointGoal.INDEX_BOTH);
+        } else if (Controllers.KILL_LEFT.toggled()) {
+          setGoal(SetpointGoal.INDEX_RIGHT);
+        } else if (Controllers.KILL_RIGHT.toggled()) {
+          setGoal(SetpointGoal.INDEX_LEFT);
+        }
+      } else if (Controllers.OUTTAKE.getAsBoolean()) {
+        setGoal(SetpointGoal.OUTTAKE);
+      }
+
+      // intake (will override outtake)
+      if (freezeIntake) {
+        setGoal(SetpointGoal.INTAKE_PIVOT);
+      }
+
+      if (Controllers.INTAKE.getAsBoolean()) {
+        setGoal(SetpointGoal.INTAKE_ROLLERS);
+        setGoal(SetpointGoal.INTAKE_PIVOT);
+
+        if (!prevIntakePressed) {
+          freezeIntake = false;
         }
 
-        if (Controllers.OUTTAKE.getAsBoolean()) {
-          setGoal(SetpointGoal.OUTTAKE);
-        } else {
-          setGoal(SetpointGoal.INDEX);
-          setGoal(SetpointGoal.INTAKE_ROLLERS);
+        if (Controllers.INTAKE_FREEZE.getAsBoolean()) {
+          freezeIntake = true;
         }
       }
-    }
 
-    if (Controllers.OUTTAKE.getAsBoolean()) {
-      kicker.setVoltage(SetpointGoal.OUTTAKE.getSetpoint().getKicker().get());
+      prevIntakePressed = Controllers.INTAKE.getAsBoolean();
+
+      // Killing turret logic
+      if (Controllers.KILL_LEFT.toggled()) {
+        setGoal(SetpointGoal.KILL_LEFT.getSetpoint());
+      }
+      if (Controllers.KILL_RIGHT.toggled()) {
+        setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
+      }
     }
 
     shooterHandlerLeft.periodic();
@@ -286,6 +239,9 @@ public class Superstructure {
     groundRollers.periodic();
     kicker.periodic();
     climber.periodic();
+
+    shooterTunerLeft.periodic();
+    shooterTunerRight.periodic();
 
     visualization.periodic();
   }
@@ -357,6 +313,8 @@ public class Superstructure {
   }
 
   public boolean freezeDriving() {
-    return (shooterTunerRight.freezeDriving() || shooterTunerLeft.freezeDriving());
+    return (shooterTunerRight.freezeDriving() || shooterTunerLeft.freezeDriving())
+        && (shooterGoal == ShooterGoal.TUNE_LEFT_SHOOTER
+            || shooterGoal == ShooterGoal.TUNE_RIGHT_SHOOTER);
   }
 }

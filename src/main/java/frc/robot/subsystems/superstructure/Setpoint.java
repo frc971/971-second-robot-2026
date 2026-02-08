@@ -49,7 +49,7 @@ public class Setpoint {
   }
 
   public Setpoint withRightFlywheelRPS(double rps) {
-    this.leftFlywheel = Optional.of(RotationsPerSecond.of(rps));
+    this.rightFlywheel = Optional.of(RotationsPerSecond.of(rps));
     return this;
   }
 

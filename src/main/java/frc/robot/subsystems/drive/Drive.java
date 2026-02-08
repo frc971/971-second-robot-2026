@@ -76,7 +76,7 @@ public class Drive {
       return;
     }
 
-    if (Controllers.XBOX.leftBumper().getAsBoolean()) {
+    if (Controllers.AUTO_ALIGN.getAsBoolean()) {
       mode = Mode.AUTO_ALIGN;
     } else {
       mode = Mode.MANUAL;
