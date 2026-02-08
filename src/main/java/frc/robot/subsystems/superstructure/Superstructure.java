@@ -10,7 +10,6 @@ import frc.robot.RobotContainer;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import frc.robot.subsystems.superstructure.Setpoint.Side;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -93,20 +92,16 @@ public class Superstructure {
             turretRight,
             hoodRight,
             flywheelRight,
-            indexerRight,
             robotContainer.drivetrain,
-            ShooterConfigs.RIGHT_LOW.getConfig(),
-            Setpoint.Side.RIGHT);
+            ShooterConfigs.RIGHT_LOW.getConfig());
 
     shooterHandlerLeft =
         new ShooterHandler(
             turretLeft,
             hoodLeft,
             flywheelLeft,
-            indexerLeft,
             robotContainer.drivetrain,
-            ShooterConfigs.LEFT_LOW.getConfig(),
-            Setpoint.Side.LEFT);
+            ShooterConfigs.LEFT_LOW.getConfig());
 
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight);
 
@@ -207,12 +202,16 @@ public class Superstructure {
           case SHOOT_LEFT -> {
             shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.SHOOT);
             shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-            setGoal(SetpointGoal.LEFT_ONLY);
+            if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING) {
+              setGoal(SetpointGoal.LEFT_ONLY);
+            }
           }
           case SHOOT_RIGHT -> {
             shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
             shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.SHOOT);
-            setGoal(SetpointGoal.RIGHT_ONLY);
+            if (shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
+              setGoal(SetpointGoal.RIGHT_ONLY);
+            }
           }
           case SHOOT_BOTH -> {
             if (shooterHandlerRight.getRelativeTurretAngle().gt(SWAP_BUFFER)) {
@@ -225,7 +224,14 @@ public class Superstructure {
 
             shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.SHOOT);
             shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.SHOOT);
-            setGoal(SetpointGoal.BOTH_SHOOT);
+            if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
+                && shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
+              setGoal(SetpointGoal.BOTH_SHOOT);
+            } else if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING) {
+              setGoal(SetpointGoal.LEFT_ONLY);
+            } else if (shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
+              setGoal(SetpointGoal.RIGHT_ONLY);
+            }
           }
           default -> {
             break;
@@ -265,18 +271,6 @@ public class Superstructure {
 
     if (Controllers.OUTTAKE.getAsBoolean()) {
       kicker.setVoltage(SetpointGoal.OUTTAKE.getSetpoint().getKicker().get());
-    } else if ((shooterGoal == ShooterGoal.SHOOT_BOTH
-            || shooterGoal == ShooterGoal.SHOOT_LEFT
-            || shooterGoal == ShooterGoal.SHOOT_RIGHT)
-        && (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
-            || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)) {
-      kicker.setVoltage(SetpointGoal.SHOOT.getSetpoint().getKicker().get());
-    } else {
-      kicker.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getKicker().get());
-    }
-
-    if (Controllers.UNJAM.getAsBoolean()) {
-      setGoal(SetpointGoal.UNJAM);
     }
 
     shooterHandlerLeft.periodic();
@@ -301,11 +295,11 @@ public class Superstructure {
   }
 
   public void setGoal(Setpoint setpoint) {
-    if (setpoint.getLeft().isPresent() && setpoint.getLeft().get().getIndexer().isPresent()) {
-      indexerLeft.setVoltage(setpoint.getLeft().get().getIndexer().get());
+    if (setpoint.getLeftIndexer().isPresent()) {
+      indexerLeft.setVoltage(setpoint.getLeftIndexer().get());
     }
-    if (setpoint.getRight().isPresent() && setpoint.getRight().get().getIndexer().isPresent()) {
-      indexerRight.setVoltage(setpoint.getRight().get().getIndexer().get());
+    if (setpoint.getRightIndexer().isPresent()) {
+      indexerRight.setVoltage(setpoint.getRightIndexer().get());
     }
 
     if (setpoint.getGroundPivot().isPresent()) {
@@ -317,34 +311,31 @@ public class Superstructure {
     if (setpoint.getKicker().isPresent()) {
       kicker.setVoltage(setpoint.getKicker().get());
     }
-    if (setpoint.getLeft().isPresent()) {
-      if (setpoint.getLeft().get().getFlywheel().isPresent()) {
-        flywheelLeft.setVelocity(setpoint.getLeft().get().getFlywheel().get());
-      }
-      if (setpoint.getLeft().get().getHood().isPresent()) {
-        hoodLeft.setPosition(setpoint.getLeft().get().getHood().get());
-      }
-      if (setpoint.getLeft().get().getTurret().isPresent()) {
-        turretLeft.setPosition(setpoint.getLeft().get().getTurret().get());
-      }
-      if (setpoint.getLeft().get().getIndexer().isPresent()) {
-        indexerLeft.setVoltage(setpoint.getLeft().get().getIndexer().get());
-      }
+    // left
+    if (setpoint.getLeftFlywheel().isPresent()) {
+      flywheelLeft.setVelocity(setpoint.getLeftFlywheel().get());
     }
-
-    if (setpoint.getRight().isPresent()) {
-      if (setpoint.getRight().get().getFlywheel().isPresent()) {
-        flywheelRight.setVelocity(setpoint.getRight().get().getFlywheel().get());
-      }
-      if (setpoint.getRight().get().getHood().isPresent()) {
-        hoodRight.setPosition(setpoint.getRight().get().getHood().get());
-      }
-      if (setpoint.getRight().get().getTurret().isPresent()) {
-        turretRight.setPosition(setpoint.getRight().get().getTurret().get());
-      }
-      if (setpoint.getRight().get().getIndexer().isPresent()) {
-        indexerRight.setVoltage(setpoint.getRight().get().getIndexer().get());
-      }
+    if (setpoint.getLeftHood().isPresent()) {
+      hoodLeft.setPosition(setpoint.getLeftHood().get());
+    }
+    if (setpoint.getLeftTurret().isPresent()) {
+      turretLeft.setPosition(setpoint.getLeftTurret().get());
+    }
+    if (setpoint.getLeftIndexer().isPresent()) {
+      indexerLeft.setVoltage(setpoint.getLeftIndexer().get());
+    }
+    // right
+    if (setpoint.getRightFlywheel().isPresent()) {
+      flywheelRight.setVelocity(setpoint.getRightFlywheel().get());
+    }
+    if (setpoint.getRightHood().isPresent()) {
+      hoodRight.setPosition(setpoint.getRightHood().get());
+    }
+    if (setpoint.getRightTurret().isPresent()) {
+      turretRight.setPosition(setpoint.getRightTurret().get());
+    }
+    if (setpoint.getRightIndexer().isPresent()) {
+      indexerRight.setVoltage(setpoint.getRightIndexer().get());
     }
 
     if (setpoint.getClimber().isPresent()) {
@@ -357,14 +348,10 @@ public class Superstructure {
   }
 
   public void resetPositions() {
-    hoodRight.resetPosition(
-        SetpointGoal.RESET.getSetpoint().getSide(Side.RIGHT).get().getHood().get());
-    turretRight.resetPosition(
-        SetpointGoal.RESET.getSetpoint().getSide(Side.RIGHT).get().getTurret().get());
-    hoodLeft.resetPosition(
-        SetpointGoal.RESET.getSetpoint().getSide(Side.LEFT).get().getHood().get());
-    turretLeft.resetPosition(
-        SetpointGoal.RESET.getSetpoint().getSide(Side.LEFT).get().getTurret().get());
+    hoodRight.resetPosition(SetpointGoal.RESET.getSetpoint().getRightHood().get());
+    turretRight.resetPosition(SetpointGoal.RESET.getSetpoint().getRightTurret().get());
+    hoodLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getLeftHood().get());
+    turretLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getLeftTurret().get());
     groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
     climber.resetPosition(SetpointGoal.RESET.getSetpoint().getClimber().get());
   }

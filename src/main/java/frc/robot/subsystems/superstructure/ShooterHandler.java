@@ -20,7 +20,6 @@ import frc.robot.lib.shooter.*;
 import frc.robot.lib.shooter.ShooterConfig;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.superstructure.Setpoint.Side;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -81,30 +80,23 @@ public class ShooterHandler {
   private final AngularSubsystem turret;
   private final AngularSubsystem hood;
   private final AngularSubsystem flywheel;
-  private final MotorSubsystem indexer;
-
-  private final Side side;
 
   public ShooterHandler(
       AngularSubsystem turret,
       AngularSubsystem hood,
       AngularSubsystem flywheel,
-      MotorSubsystem indexer,
       CommandSwerveDrivetrain drivetrain,
-      ShooterConfig config,
-      Side side) {
+      ShooterConfig config) {
     this.drivetrain = drivetrain;
     this.turret = turret;
     this.flywheel = flywheel;
     this.hood = hood;
-    this.indexer = indexer;
     this.config = config;
     this.physics = new ShooterPhysics(this.config.PHYSICS());
     this.name = config.name() + "/ShooterHandler";
 
     this.shooterState = State.NOT_READY;
     this.shooterGoal = Goal.NONE;
-    this.side = side;
     this.targetState = TARGET_BLUE;
   }
 
@@ -153,12 +145,6 @@ public class ShooterHandler {
       flywheel.setVelocity(getFlywheelAngularVelocity());
       hood.setPosition(launchSolution.hoodAngle());
       turret.setPosition(getRelativeTurretAngle());
-    }
-
-    if (shooterState == State.FIRING) {
-      indexer.setVoltage(SetpointGoal.INDEX.getSetpoint().getSide(side).get().getIndexer().get());
-    } else {
-      indexer.setVoltage(SetpointGoal.NEUTRAL.getSetpoint().getSide(side).get().getIndexer().get());
     }
   }
 
