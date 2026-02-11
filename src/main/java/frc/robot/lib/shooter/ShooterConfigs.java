@@ -42,22 +42,22 @@ public class ShooterConfigs {
 
   private static ShotTable testShotTable() {
     ShotTable table = new ShotTable();
-    table.put(Meters.of(0.5), Degrees.of(77.8668349861), MetersPerSecond.of(9.23134170253));
-    table.put(Meters.of(1.0), Degrees.of(65.9925402176), MetersPerSecond.of(10.9919493835));
-    table.put(Meters.of(1.5), Degrees.of(55.8687578859), MetersPerSecond.of(12.8321560354));
-    table.put(Meters.of(2.0), Degrees.of(47.7289563383), MetersPerSecond.of(14.7174046972));
-    table.put(Meters.of(2.5), Degrees.of(41.6492543046), MetersPerSecond.of(15.6753316472));
-    table.put(Meters.of(3.0), Degrees.of(36.8586755743), MetersPerSecond.of(16.6385620582));
+    table.put(Meters.of(0.5), Degrees.of(77.8668349861), RotationsPerSecond.of(9.23134170253));
+    table.put(Meters.of(1.0), Degrees.of(65.9925402176), RotationsPerSecond.of(10.9919493835));
+    table.put(Meters.of(1.5), Degrees.of(55.8687578859), RotationsPerSecond.of(12.8321560354));
+    table.put(Meters.of(2.0), Degrees.of(47.7289563383), RotationsPerSecond.of(14.7174046972));
+    table.put(Meters.of(2.5), Degrees.of(41.6492543046), RotationsPerSecond.of(15.6753316472));
+    table.put(Meters.of(3.0), Degrees.of(36.8586755743), RotationsPerSecond.of(16.6385620582));
 
-    table.put(Meters.of(1), Seconds.of(0)); // do not delete, would cause errors
+    table.put(Meters.of(1.0), Seconds.of(0)); // do not delete, would cause errors
     return table;
   }
 
   private static ShotTable highArcTable() {
     ShotTable table = new ShotTable();
-    table.put(Meters.of(0.5), Degrees.of(25.9925402176), MetersPerSecond.of(2.9919493835));
-    table.put(Meters.of(1.0), Degrees.of(15.8687578859), MetersPerSecond.of(3.8321560354));
-    table.put(Meters.of(1.5), Degrees.of(5.01), MetersPerSecond.of(4.2));
+    table.put(Meters.of(0.5), Degrees.of(25.9925402176), RotationsPerSecond.of(2.9919493835));
+    table.put(Meters.of(1.0), Degrees.of(15.8687578859), RotationsPerSecond.of(3.8321560354));
+    table.put(Meters.of(1.5), Degrees.of(5.01), RotationsPerSecond.of(4.2));
 
     // TODO: input reasonable tof table
     table.put(Meters.of(1.0), Seconds.of(0));
@@ -66,12 +66,12 @@ public class ShooterConfigs {
 
   private static ShotTable lowArcTable() {
     ShotTable table = new ShotTable();
-    table.put(Meters.of(0.5), Degrees.of(37.8668349861), MetersPerSecond.of(1.23134170253));
-    table.put(Meters.of(1.0), Degrees.of(25.9925402176), MetersPerSecond.of(2.9919493835));
-    table.put(Meters.of(1.5), Degrees.of(15.8687578859), MetersPerSecond.of(3.8321560354));
+    table.put(Meters.of(0.5), Degrees.of(37.8668349861), RotationsPerSecond.of(1.23134170253));
+    table.put(Meters.of(1.0), Degrees.of(25.9925402176), RotationsPerSecond.of(2.9919493835));
+    table.put(Meters.of(1.5), Degrees.of(15.8687578859), RotationsPerSecond.of(3.8321560354));
 
     // TODO: input reasonable tof table
-    table.put(Meters.of(1), Seconds.of(0));
+    table.put(Meters.of(1.0), Seconds.of(0));
     return table;
   }
 }

@@ -1,11 +1,8 @@
 package frc.robot.lib.shooter;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.lib.shooter.ShotTable.ShooterData;
 
 /**
@@ -21,27 +18,7 @@ public class LaunchSolution {
     this.turretRotation = turretRotation;
   }
 
-  public LaunchSolution(Translation3d fireVelocity) {
-    LinearVelocity flywheelSpeed = MetersPerSecond.of(fireVelocity.getNorm());
-    Angle hoodAngle = Radians.of(Math.asin(fireVelocity.getZ() / fireVelocity.getNorm()));
-
-    this.shooterData = new ShooterData(hoodAngle, flywheelSpeed, Seconds.of(0));
-    this.turretRotation = new Rotation2d(fireVelocity.getX(), fireVelocity.getY());
-  }
-
-  public Translation3d fireVector() {
-    double speed = shooterData.flywheelSpeed().in(MetersPerSecond);
-    double theta = shooterData.hoodAngle().in(Radians);
-
-    double horizontalComponent = speed * Math.cos(theta);
-    double x = horizontalComponent * turretRotation.getCos();
-    double y = horizontalComponent * turretRotation.getSin();
-    double z = speed * Math.sin(theta);
-
-    return new Translation3d(x, y, z);
-  }
-
-  public LinearVelocity linearFlywheelVelocity() {
+  public AngularVelocity flywheelSpeed() {
     return this.shooterData.flywheelSpeed();
   }
 

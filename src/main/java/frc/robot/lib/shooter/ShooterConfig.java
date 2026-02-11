@@ -25,8 +25,6 @@ public class ShooterConfig {
   public static class Physics {
     @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
 
-    @Builder.Default private Time TIME_DELAY = Seconds.of(0);
-
     public Time getTime(Distance distance) {
       return SHOT_TABLE.getTime(distance);
     }
@@ -40,8 +38,8 @@ public class ShooterConfig {
     @Builder.Default private Distance MAX_SHOT_DISTANCE = Meters.of(1000);
 
     // high-priority constraints
-    @Builder.Default private LinearVelocity MIN_FLYWHEEL_SPEED = MetersPerSecond.of(0);
-    @Builder.Default private LinearVelocity MAX_FLYWHEEL_SPEED = MetersPerSecond.of(1000);
+    @Builder.Default private AngularVelocity MIN_FLYWHEEL_SPEED = RotationsPerSecond.of(0);
+    @Builder.Default private AngularVelocity MAX_FLYWHEEL_SPEED = RotationsPerSecond.of(1000);
     @Builder.Default private Angle MIN_HOOD_ANGLE = Degrees.of(0);
     @Builder.Default private Angle MAX_HOOD_ANGLE = Degrees.of(70);
   }
@@ -49,10 +47,6 @@ public class ShooterConfig {
   @Getter
   @Builder
   public static class PhysicalConversion {
-    // flywheel conversion factors
-    // NOTE: needs to be *effective* radius so that math works properly
-    @Builder.Default private Distance FLYWHEEL_RADIUS = Inches.of(4.0);
-
     // ball related offsets (in meters!)
     // positive x is towards FRONT of the robot
     // positive y is towards PORT/LEFT side

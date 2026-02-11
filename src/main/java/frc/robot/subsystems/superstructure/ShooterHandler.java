@@ -144,18 +144,14 @@ public class ShooterHandler {
 
     // set output
     if (shooterState != State.NOT_READY) {
-      flywheel.setVelocity(getFlywheelAngularVelocity());
+      flywheel.setVelocity(getFlywheelSpeed());
       hood.setPosition(launchSolution.hoodAngle());
       turret.setPosition(getRelativeTurretAngle());
     }
   }
 
-  public AngularVelocity getFlywheelAngularVelocity() {
-    double omega =
-        launchSolution.linearFlywheelVelocity().in(MetersPerSecond)
-            / config.PHYSICAL_CONVERSION().FLYWHEEL_RADIUS().in(Meters);
-
-    return RadiansPerSecond.of(omega);
+  public AngularVelocity getFlywheelSpeed() {
+    return launchSolution.flywheelSpeed();
   }
 
   public Angle getRelativeTurretAngle() {
@@ -169,8 +165,8 @@ public class ShooterHandler {
   private void logStates() {
     if (launchSolution != null) {
       Logger.recordOutput(
-          name + "/LaunchGoals/Flywheel (mps)",
-          launchSolution.linearFlywheelVelocity().in(MetersPerSecond));
+          name + "/LaunchGoals/Flywheel (rps)",
+          launchSolution.flywheelSpeed().in(RotationsPerSecond));
       Logger.recordOutput(
           name + "/LaunchGoals/Turret (deg)",
           Radians.of(launchSolution.turretRotation.getRadians()).in(Degrees));
@@ -182,7 +178,7 @@ public class ShooterHandler {
       Logger.recordOutput(name + "/Distance/1D", distance2d.getNorm());
 
       Logger.recordOutput(
-          name + "/Error/Flywheel (rps)", flywheelAngularVelocityAbsDiff().in(RotationsPerSecond));
+          name + "/Error/Flywheel (rps)", flywheelSpeedAbsDiff().in(RotationsPerSecond));
       Logger.recordOutput(name + "/Error/Turret (deg)", turretRotationAbsDiff().in(Degrees));
       Logger.recordOutput(name + "/Error/Hood (physics deg)", hoodAngleAbsDiff().in(Degrees));
     }
@@ -206,7 +202,7 @@ public class ShooterHandler {
       return false;
     }
 
-    return flywheelAngularVelocityAbsDiff().lt(config.THRESHOLD().AIMING_FLYWHEEL_THRESHOLD())
+    return flywheelSpeedAbsDiff().lt(config.THRESHOLD().AIMING_FLYWHEEL_THRESHOLD())
         && turretRotationAbsDiff().lt(config.THRESHOLD().AIMING_ROTATION_THRESHOLD())
         && hoodAngleAbsDiff().lt(config.THRESHOLD().AIMING_HOOD_ANGLE_THRESHOLD());
   }
@@ -217,14 +213,14 @@ public class ShooterHandler {
       return true;
     }
 
-    return flywheelAngularVelocityAbsDiff().gt(config.THRESHOLD().SHOOTING_FLYWHEEL_ABORT())
+    return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHOOTING_FLYWHEEL_ABORT())
         || turretRotationAbsDiff().gt(config.THRESHOLD().SHOOTING_ROTATION_THRESHOLD())
         || hoodAngleAbsDiff().gt(config.THRESHOLD().SHOOTING_HOOD_ANGLE_THRESHOLD());
   }
 
   // --- Threshold helper functions ---
-  private AngularVelocity flywheelAngularVelocityAbsDiff() {
-    return getFlywheelAngularVelocity().minus(flywheel.getVelocity());
+  private AngularVelocity flywheelSpeedAbsDiff() {
+    return getFlywheelSpeed().minus(flywheel.getVelocity());
   }
 
   private Angle turretRotationAbsDiff() {
@@ -253,7 +249,7 @@ public class ShooterHandler {
     }
 
     // --- HIGH PRIORITY CONSTRAINTS ---
-    LinearVelocity speed = launchSolution.linearFlywheelVelocity();
+    AngularVelocity speed = launchSolution.flywheelSpeed();
     if (speed.lt(config.CONSTRAINTS().MIN_FLYWHEEL_SPEED())
         || speed.gt(config.CONSTRAINTS().MAX_FLYWHEEL_SPEED())) {
       DataLogManager.log("WARNING: Calculated flywheel speed is out constraints");
