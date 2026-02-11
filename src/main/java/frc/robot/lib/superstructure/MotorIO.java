@@ -36,6 +36,10 @@ public abstract class MotorIO {
   @AutoLogOutput(key = "{name}/Temperature")
   protected Temperature temperature;
 
+  @Getter
+  @AutoLogOutput(key = "{name}/Connected")
+  protected boolean connected = false;
+
   @Getter protected Angle absolutePosition = Rotations.of(0.0);
   @Getter protected Angle position = Rotations.of(0.0);
   @Getter protected AngularVelocity velocity = RotationsPerSecond.of(0.0);

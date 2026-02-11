@@ -132,6 +132,7 @@ public class MotorTalonFX extends MotorIO {
     supplyCurrent = supplyCurrentSignal.getValue();
     statorCurrent = statorCurrentSignal.getValue();
     temperature = temperatureSignal.getValue();
+    connected = BaseStatusSignal.isAllGood(positionSignal, velocitySignal, appliedVoltageSignal);
 
     if (cancoder.isPresent()) {
       BaseStatusSignal.refreshAll(absolutePositionSignal.get());

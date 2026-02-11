@@ -56,6 +56,7 @@ public class MotorSim extends MotorIO {
     supplyCurrent = Amps.of(10.0);
     statorCurrent = Amps.of(10.0);
     temperature = Celsius.of(20.0);
+    connected = true;
 
     super.periodic();
   }
