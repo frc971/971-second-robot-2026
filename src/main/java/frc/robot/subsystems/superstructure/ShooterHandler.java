@@ -14,8 +14,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.lib.shooter.*;
 import frc.robot.lib.shooter.ShooterConfig;
 import frc.robot.lib.superstructure.*;
@@ -29,27 +27,45 @@ public class ShooterHandler {
   public static final double X_DISTANCE_FROM_CENTER = 3.6448975;
   public static final double HEIGHT = 1.4370877;
 
-  public static final ObjectState TARGET_BLUE =
-      new ObjectState(
-          new Translation3d(
-              (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
-              (FlippingUtil.fieldSizeY / 2),
-              HEIGHT),
-          new Translation3d());
+  public static final class Targets {
 
-  public static final ObjectState TARGET_RED =
-      new ObjectState(
-          new Translation3d(
-              (FlippingUtil.fieldSizeX / 2) + X_DISTANCE_FROM_CENTER,
-              (FlippingUtil.fieldSizeY / 2),
-              HEIGHT),
-          new Translation3d());
+    public static final ObjectState BLUE =
+        new ObjectState(
+            new Translation3d(
+                (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
+                (FlippingUtil.fieldSizeY / 2),
+                HEIGHT),
+            new Translation3d());
+
+    public static final ObjectState RED =
+        new ObjectState(
+            new Translation3d(
+                (FlippingUtil.fieldSizeX / 2) + X_DISTANCE_FROM_CENTER,
+                (FlippingUtil.fieldSizeY / 2),
+                HEIGHT),
+            new Translation3d());
+
+    // These constants need updating based on the actual coordinates, they are currently
+    // guesstimated based on the simulator
+
+    public static final ObjectState LEFT_RED_SHUTTLE =
+        new ObjectState(new Translation3d(3.246, 5.303, HEIGHT), new Translation3d());
+
+    public static final ObjectState RIGHT_RED_SHUTTLE =
+        new ObjectState(new Translation3d(3.241, 2.675, HEIGHT), new Translation3d());
+
+    public static final ObjectState RIGHT_BLUE_SHUTTLE =
+        new ObjectState(new Translation3d(13.346, 2.635, HEIGHT), new Translation3d());
+
+    public static final ObjectState LEFT_BLUE_SHUTTLE =
+        new ObjectState(new Translation3d(13.352, 5.272, HEIGHT), new Translation3d());
+  }
 
   // config + physics model
   private ShooterConfig config;
   private ShooterPhysics physics;
   private ObjectState projectileState;
-  private ObjectState targetState;
+  private @Setter @Getter ObjectState targetState;
   private final String name;
 
   // state machine
@@ -97,16 +113,12 @@ public class ShooterHandler {
 
     this.shooterState = State.NOT_READY;
     this.shooterGoal = Goal.NONE;
-    this.targetState = TARGET_BLUE;
+    this.targetState = Targets.BLUE;
 
-    this.launchSolution = physics.iterativeTimeSolve(getProjectileState(), TARGET_BLUE, 1);
+    this.launchSolution = physics.iterativeTimeSolve(getProjectileState(), Targets.BLUE, 1);
   }
 
   public void periodic() {
-    targetState =
-        DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Blue)
-            ? TARGET_BLUE
-            : TARGET_RED;
     projectileState = getProjectileState();
 
     // calculate physics

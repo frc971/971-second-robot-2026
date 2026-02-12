@@ -59,6 +59,6 @@ public class Controllers {
   // MANUAL Shuttle Setpoints
   public static final Trigger MANUAL_SHUTTLE_UP = ANDRE.axisGreaterThan(1, 0.85);
   public static final Trigger MANUAL_SHUTTLE_DOWN = ANDRE.axisLessThan(1, -0.85);
-  public static final Trigger MANUAL_SHUTTLE_LEFT = ANDRE.axisGreaterThan(0, 0.85);
-  public static final Trigger MANUAL_SHUTTLE_RIGHT = ANDRE.axisLessThan(0, -0.85);
+  public static final Trigger SHUTTLE_LEFT = ANDRE.axisGreaterThan(0, 0.85);
+  public static final Trigger SHUTTLE_RIGHT = ANDRE.axisLessThan(0, -0.85);
 }

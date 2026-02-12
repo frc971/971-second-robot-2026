@@ -4,9 +4,11 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
+import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
@@ -145,6 +147,33 @@ public class Superstructure {
               shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_LOW.PHYSICS());
             }
           }
+
+          if (Controllers.SHUTTLE_LEFT.getAsBoolean()) {
+            ObjectState curTarget =
+                (DriverStation.getAlliance().get() == Alliance.Blue)
+                    ? ShooterHandler.Targets.LEFT_BLUE_SHUTTLE
+                    : ShooterHandler.Targets.LEFT_RED_SHUTTLE;
+            shooterHandlerLeft.setTargetState(curTarget);
+            shooterHandlerRight.setTargetState(curTarget);
+          }
+
+          if (Controllers.SHUTTLE_RIGHT.getAsBoolean()) {
+            ObjectState curTarget =
+                (DriverStation.getAlliance().get() == Alliance.Blue)
+                    ? ShooterHandler.Targets.RIGHT_BLUE_SHUTTLE
+                    : ShooterHandler.Targets.RIGHT_RED_SHUTTLE;
+            shooterHandlerLeft.setTargetState(curTarget);
+            shooterHandlerRight.setTargetState(curTarget);
+          }
+
+          if (Controllers.SHOOT.getAsBoolean()) {
+            ObjectState curTarget =
+                (DriverStation.getAlliance().get() == Alliance.Blue)
+                    ? ShooterHandler.Targets.BLUE
+                    : ShooterHandler.Targets.RED;
+            shooterHandlerLeft.setTargetState(curTarget);
+            shooterHandlerRight.setTargetState(curTarget);
+          }
         }
         case MANUAL -> {
           SetpointGoal setpoint = SetpointGoal.NEUTRAL;
@@ -155,9 +184,9 @@ public class Superstructure {
             setpoint = SetpointGoal.MANUAL_LEFT;
           } else if (Controllers.MANUAL_SHOOT_RIGHT.getAsBoolean()) {
             setpoint = SetpointGoal.MANUAL_RIGHT;
-          } else if (Controllers.MANUAL_SHUTTLE_LEFT.getAsBoolean()) {
+          } else if (Controllers.SHUTTLE_LEFT.getAsBoolean()) {
             setpoint = SetpointGoal.MANUAL_SHUTTLE_LEFT;
-          } else if (Controllers.MANUAL_SHUTTLE_RIGHT.getAsBoolean()) {
+          } else if (Controllers.SHUTTLE_RIGHT.getAsBoolean()) {
             setpoint = SetpointGoal.MANUAL_SHUTTLE_RIGHT;
           }
 
