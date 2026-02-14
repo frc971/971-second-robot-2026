@@ -149,32 +149,24 @@ public class Superstructure {
             }
           }
 
+          ObjectState curTarget =
+              DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                  ? ShooterHandler.Targets.BLUE
+                  : ShooterHandler.Targets.RED;
           if (Controllers.SHUTTLE_LEFT.getAsBoolean()) {
-            ObjectState curTarget =
-                (DriverStation.getAlliance().get() == Alliance.Blue)
+            curTarget =
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                     ? ShooterHandler.Targets.LEFT_BLUE_SHUTTLE
                     : ShooterHandler.Targets.LEFT_RED_SHUTTLE;
-            shooterHandlerLeft.setTargetState(curTarget);
-            shooterHandlerRight.setTargetState(curTarget);
           }
-
           if (Controllers.SHUTTLE_RIGHT.getAsBoolean()) {
-            ObjectState curTarget =
-                (DriverStation.getAlliance().get() == Alliance.Blue)
+            curTarget =
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                     ? ShooterHandler.Targets.RIGHT_BLUE_SHUTTLE
                     : ShooterHandler.Targets.RIGHT_RED_SHUTTLE;
-            shooterHandlerLeft.setTargetState(curTarget);
-            shooterHandlerRight.setTargetState(curTarget);
           }
-
-          if (Controllers.SHOOT.getAsBoolean()) {
-            ObjectState curTarget =
-                (DriverStation.getAlliance().get() == Alliance.Blue)
-                    ? ShooterHandler.Targets.BLUE
-                    : ShooterHandler.Targets.RED;
-            shooterHandlerLeft.setTargetState(curTarget);
-            shooterHandlerRight.setTargetState(curTarget);
-          }
+          shooterHandlerLeft.setTargetState(curTarget);
+          shooterHandlerRight.setTargetState(curTarget);
         }
         case MANUAL -> {
           SetpointGoal setpoint = SetpointGoal.NEUTRAL;

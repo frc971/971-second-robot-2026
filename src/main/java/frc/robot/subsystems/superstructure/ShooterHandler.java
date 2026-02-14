@@ -5,13 +5,8 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.lib.shooter.*;
@@ -24,41 +19,34 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterHandler {
-  public static final double X_DISTANCE_FROM_CENTER = 3.6448975;
-  public static final double HEIGHT = 1.4370877;
-
   public static final class Targets {
+    private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
 
     public static final ObjectState BLUE =
         new ObjectState(
-            new Translation3d(
+            new Translation2d(
                 (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
-                (FlippingUtil.fieldSizeY / 2),
-                HEIGHT),
-            new Translation3d());
-
+                (FlippingUtil.fieldSizeY / 2)),
+            new Translation2d());
     public static final ObjectState RED =
-        new ObjectState(
-            new Translation3d(
-                (FlippingUtil.fieldSizeX / 2) + X_DISTANCE_FROM_CENTER,
-                (FlippingUtil.fieldSizeY / 2),
-                HEIGHT),
-            new Translation3d());
+        new ObjectState(FlippingUtil.flipFieldPosition(BLUE.position()), new Translation2d());
 
-    // These constants need updating based on the actual coordinates, they are currently
-    // guesstimated based on the simulator
-
-    public static final ObjectState LEFT_RED_SHUTTLE =
-        new ObjectState(new Translation3d(3.246, 5.303, HEIGHT), new Translation3d());
-
-    public static final ObjectState RIGHT_RED_SHUTTLE =
-        new ObjectState(new Translation3d(3.241, 2.675, HEIGHT), new Translation3d());
-
-    public static final ObjectState RIGHT_BLUE_SHUTTLE =
-        new ObjectState(new Translation3d(13.346, 2.635, HEIGHT), new Translation3d());
+    // offset from the corner
+    private static final Translation2d SHUTTLE_OFFSET = new Translation2d(1.0, 1.0);
 
     public static final ObjectState LEFT_BLUE_SHUTTLE =
-        new ObjectState(new Translation3d(13.352, 5.272, HEIGHT), new Translation3d());
+        new ObjectState(SHUTTLE_OFFSET, new Translation2d());
+    public static final ObjectState RIGHT_BLUE_SHUTTLE =
+        new ObjectState(
+            new Translation2d(
+                SHUTTLE_OFFSET.getX(), FlippingUtil.fieldSizeY - SHUTTLE_OFFSET.getY()),
+            new Translation2d());
+    public static final ObjectState LEFT_RED_SHUTTLE =
+        new ObjectState(
+            FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.position()), new Translation2d());
+    public static final ObjectState RIGHT_RED_SHUTTLE =
+        new ObjectState(
+            FlippingUtil.flipFieldPosition(RIGHT_BLUE_SHUTTLE.position()), new Translation2d());
   }
 
   // config + physics model
@@ -114,6 +102,7 @@ public class ShooterHandler {
     this.shooterState = State.NOT_READY;
     this.shooterGoal = Goal.NONE;
     this.targetState = Targets.BLUE;
+    this.projectileState = Targets.BLUE;
 
     this.launchSolution = physics.iterativeTimeSolve(getProjectileState(), Targets.BLUE, 1);
   }
@@ -185,7 +174,7 @@ public class ShooterHandler {
       Logger.recordOutput(
           name + "/LaunchGoals/Turret Rel (deg)", getRelativeTurretAngle().in(Degrees));
       Logger.recordOutput(name + "/LaunchGoals/Hood (deg)", launchSolution.hoodAngle().in(Degrees));
-      Translation2d distance2d = targetState.minus(projectileState).xyPosition();
+      Translation2d distance2d = targetState.minus(projectileState).position();
       Logger.recordOutput(name + "/Distance/2D", distance2d);
       Logger.recordOutput(name + "/Distance/1D", distance2d.getNorm());
 
@@ -199,8 +188,7 @@ public class ShooterHandler {
       Logger.recordOutput(name + "/Projectile Position", projectileState.position());
       Logger.recordOutput(name + "/Projectile Velocity", projectileState.velocity());
       Logger.recordOutput(name + "/Target Position", targetState.position());
-      Logger.recordOutput(
-          name + "/Target Velocity", new Pose3d(targetState.velocity(), new Rotation3d()));
+      Logger.recordOutput(name + "/Target Velocity", targetState.velocity());
     }
   }
 
@@ -307,21 +295,15 @@ public class ShooterHandler {
             .toTranslation2d()
             .rotateBy(drivetrainState.Pose.getRotation());
 
-    Vector<N3> W_robot = new Translation3d(0, 0, robotOmega).toVector();
-    Vector<N3> W_turret = new Translation3d(0, 0, turretOmega).toVector();
+    Translation2d v_robotRot =
+        new Translation2d(
+            -robotOmega * robotCenterToTurret.getY(), robotOmega * robotCenterToTurret.getX());
+    Translation2d v_turRot =
+        new Translation2d(
+            -turretOmega * turretCenterToBall.getY(), turretOmega * turretCenterToBall.getX());
 
-    Vector<N3> v_robotRot =
-        Vector.cross(W_robot, new Translation3d(robotCenterToTurret).toVector());
-    Vector<N3> v_turRot = Vector.cross(W_turret, new Translation3d(turretCenterToBall).toVector());
-
-    Translation3d projPoseOffset =
-        new Translation3d(robotCenterToTurret)
-            .plus(new Translation3d(turretCenterToBall))
-            .plus(
-                new Translation3d(
-                    0.0, 0.0, config.PHYSICAL_CONVERSION().TURRET_XY_OFFSET().getZ()));
-
-    Translation3d projVelOffset = new Translation3d(v_robotRot.plus(v_turRot));
+    Translation2d projPoseOffset = robotCenterToTurret.plus(turretCenterToBall);
+    Translation2d projVelOffset = v_robotRot.plus(v_turRot);
 
     ObjectState robotState = new ObjectState(drivetrainState);
 

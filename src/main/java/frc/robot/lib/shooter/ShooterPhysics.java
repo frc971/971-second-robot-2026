@@ -23,7 +23,7 @@ public class ShooterPhysics {
    * - interpolation of angle + speed is close enough (aka ~linear)
    */
   public LaunchSolution stationaryInterpolation(ObjectState proj, ObjectState target) {
-    Translation2d distance2d = target.minus(proj).xyPosition();
+    Translation2d distance2d = target.minus(proj).position();
 
     ShooterData shooterData =
         physicsConfig.SHOT_TABLE().getShooterData(Meters.of(distance2d.getNorm()));
@@ -39,8 +39,7 @@ public class ShooterPhysics {
   public LaunchSolution simpleTimeSolve(ObjectState projectile, ObjectState target) {
 
     Distance currentDistance =
-        Meters.of(
-            projectile.minus(target).xyPosition().getNorm()); // double check if actually meters
+        Meters.of(projectile.minus(target).position().getNorm()); // double check if actually meters
 
     // get time of flight from shot table
     Time timeOfFlight = physicsConfig.getTime(currentDistance);
@@ -61,8 +60,7 @@ public class ShooterPhysics {
       ObjectState projectile, ObjectState target, int maxIterations) {
 
     Distance currentDistance =
-        Meters.of(
-            projectile.minus(target).xyPosition().getNorm()); // double check if actually meters
+        Meters.of(projectile.minus(target).position().getNorm()); // double check if actually meters
 
     // get time of flight from shot table
     Time timeOfFlight = physicsConfig.getTime(currentDistance);
@@ -72,10 +70,7 @@ public class ShooterPhysics {
       ObjectState futureRobot = projectile.getFutureState(timeOfFlight);
       Distance interceptDistance =
           Meters.of(
-              futureRobot
-                  .minus(target)
-                  .xyPosition()
-                  .getNorm()); // check that this is actually meters
+              futureRobot.minus(target).position().getNorm()); // check that this is actually meters
 
       Time newTimeOfFlight = physicsConfig.getTime(interceptDistance);
 
