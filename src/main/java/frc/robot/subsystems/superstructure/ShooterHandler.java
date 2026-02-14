@@ -33,19 +33,19 @@ public class ShooterHandler {
     // offset from the corner
     private static final Translation2d SHUTTLE_OFFSET = new Translation2d(1.0, 1.0);
 
-    public static final ObjectState LEFT_BLUE_SHUTTLE =
-        new ObjectState(SHUTTLE_OFFSET, new Translation2d());
     public static final ObjectState RIGHT_BLUE_SHUTTLE =
+        new ObjectState(SHUTTLE_OFFSET, new Translation2d());
+    public static final ObjectState LEFT_BLUE_SHUTTLE =
         new ObjectState(
             new Translation2d(
                 SHUTTLE_OFFSET.getX(), FlippingUtil.fieldSizeY - SHUTTLE_OFFSET.getY()),
             new Translation2d());
-    public static final ObjectState LEFT_RED_SHUTTLE =
-        new ObjectState(
-            FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.position()), new Translation2d());
     public static final ObjectState RIGHT_RED_SHUTTLE =
         new ObjectState(
             FlippingUtil.flipFieldPosition(RIGHT_BLUE_SHUTTLE.position()), new Translation2d());
+    public static final ObjectState LEFT_RED_SHUTTLE =
+        new ObjectState(
+            FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.position()), new Translation2d());
   }
 
   // config + physics model
