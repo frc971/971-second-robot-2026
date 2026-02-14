@@ -22,6 +22,7 @@ public class MotorSubsystem {
     VOLTAGE,
     VELOCITY,
     POSITION,
+    COAST,
     NONE
   }
 
@@ -57,6 +58,7 @@ public class MotorSubsystem {
       case VOLTAGE -> io.setVoltage(goalVoltage);
       case VELOCITY -> io.setVelocity(goalVelocity);
       case POSITION -> io.setPosition(goalPosition);
+      case COAST -> io.setCoast();
       case NONE -> {}
     }
 
@@ -89,6 +91,10 @@ public class MotorSubsystem {
   public void setVelocity(AngularVelocity goalVelocity) {
     this.goalVelocity = goalVelocity;
     this.controlMode = Mode.VELOCITY;
+  }
+
+  public void setCoast() {
+    this.controlMode = Mode.COAST;
   }
 
   public Angle getPosition() {

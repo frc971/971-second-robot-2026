@@ -72,4 +72,9 @@ public class MotorSim extends MotorIO {
     position = Rotations.of(newPosition.in(Meters));
     state.position = position.in(Rotations);
   }
+
+  @Override
+  public void setCoast() {
+    setVelocity(RotationsPerSecond.zero());
+  }
 }

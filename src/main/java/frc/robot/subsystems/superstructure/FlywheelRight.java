@@ -1,11 +1,14 @@
 package frc.robot.subsystems.superstructure;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.lib.superstructure.*;
 
@@ -67,5 +70,15 @@ public class FlywheelRight extends AngularSubsystem {
         .ID(-1)
         .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
         .build();
+  }
+
+  @Override
+  public void setVelocity(AngularVelocity goalVelocity) {
+    if (goalVelocity.equals(RotationsPerSecond.zero())) {
+      setCoast();
+      this.goalVelocity = RotationsPerSecond.zero();
+    } else {
+      super.setVelocity(goalVelocity);
+    }
   }
 }

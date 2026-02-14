@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
@@ -115,6 +116,14 @@ public class MotorWithFollowerTalonFX extends MotorTalonFX {
     super.resetPosition(newPosition);
     for (TalonFX motor : followerMotors) {
       motor.setPosition(newPosition.in(Meters));
+    }
+  }
+
+  @Override
+  public void setCoast() {
+    super.setCoast();
+    for (TalonFX motor : followerMotors) {
+      motor.setControl(new CoastOut());
     }
   }
 }
