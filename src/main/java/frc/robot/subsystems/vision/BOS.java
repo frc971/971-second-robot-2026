@@ -12,7 +12,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class BOS {
   private final CommandSwerveDrivetrain drivetrain;
 
-  DoubleArraySubscriber[] topics = new DoubleArraySubscriber[2];
+  DoubleArraySubscriber[] topics = new DoubleArraySubscriber[3];
 
   public BOS(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -24,11 +24,15 @@ public class BOS {
 
     topics[0] =
         table
-            .getDoubleArrayTopic("PoseEstimate/FrontLeft/TagEstimation")
+            .getDoubleArrayTopic("PoseEstimate/Front/TagEstimation")
             .subscribe(blank, PubSubOption.keepDuplicates(true));
     topics[1] =
         table
-            .getDoubleArrayTopic("PoseEstimate/FrontRight/TagEstimation")
+            .getDoubleArrayTopic("PoseEstimate/Right/TagEstimation")
+            .subscribe(blank, PubSubOption.keepDuplicates(true));
+    topics[2] =
+        table
+            .getDoubleArrayTopic("PoseEstimate/Left/TagEstimation")
             .subscribe(blank, PubSubOption.keepDuplicates(true));
   }
 
