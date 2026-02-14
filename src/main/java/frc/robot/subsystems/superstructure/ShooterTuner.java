@@ -2,14 +2,23 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.*;
-import frc.robot.lib.superstructure.*;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import frc.robot.lib.shooter.ShooterConfig;
+import frc.robot.lib.shooter.ShooterConfigs;
+import frc.robot.lib.superstructure.AngularSubsystem;
 import frc.robot.subsystems.Controllers;
+import java.util.Stack;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
+/*
+ * ShotTuner class to collect data for the shot table. Handles shooting parameters
+ * based on shot feedback (overshoot/undershoot/hit), and uses binary search to find
+ * optimal values.
+ */
 public class ShooterTuner {
 
   public enum Goal {
@@ -24,32 +33,58 @@ public class ShooterTuner {
     FLYWHEEL
   }
 
+  public enum ShotResult {
+    OVERSHOOT,
+    UNDERSHOOT,
+    HIT
+  }
+
+  public enum Arc {
+    LOW,
+    HIGH
+  }
+
+  private record TunerState(
+      AngularVelocity flywheelSpeed, Angle hoodAngle, double minVal, double maxVal) {}
+
   private AngularSubsystem flywheel;
   private AngularSubsystem hood;
   private AngularSubsystem turret;
+  private final ShooterHandler shooterHandler;
+  private final ShooterConfig config;
 
   @AutoLogOutput @Setter @Getter private Goal goal = Goal.NONE;
   @AutoLogOutput @Getter private Mode mode = Mode.DRIVING;
+  @AutoLogOutput @Getter private ShotResult lastShotResult = ShotResult.HIT;
+  @AutoLogOutput @Getter private Arc currentArc = Arc.LOW;
+  @AutoLogOutput @Getter private boolean indexing = false;
 
-  // default params
-  @AutoLogOutput private AngularVelocity flywheelSpeed = RotationsPerSecond.of(15);
-  @AutoLogOutput private Angle hoodAngle = Degrees.of(10.0);
-  @AutoLogOutput private Angle turretAngle = Degrees.of(45.0);
+  @AutoLogOutput private AngularVelocity flywheelSpeed = RotationsPerSecond.of(RESET_FLYWHEEL_RPS);
+  @AutoLogOutput private Angle hoodAngle = Degrees.of(RESET_HOOD_DEGREES);
+  @AutoLogOutput @Setter private double currentDistance = 0;
 
-  // adjustment step sizes (every cycle)
-  private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(0.5);
-  private static final Angle HOOD_STEP = Degrees.of(0.1);
+  private static final double MIN_FLYWHEEL_RPS = 0.0, MAX_FLYWHEEL_RPS = 50.0;
+  private static final double MIN_HOOD_DEGREES = -18.5, MAX_HOOD_DEGREES = 25.0;
+  private static final double RESET_FLYWHEEL_RPS = 15, RESET_HOOD_DEGREES = 5;
 
-  private static final double MIN_FLYWHEEL_RPS = 0.0;
-  private static final double MAX_FLYWHEEL_RPS = 50.0;
+  @AutoLogOutput private double flywheelMinValue = MIN_FLYWHEEL_RPS;
+  @AutoLogOutput private double flywheelMaxValue = MAX_FLYWHEEL_RPS;
+  @AutoLogOutput private double hoodMinValue = MIN_HOOD_DEGREES;
+  @AutoLogOutput private double hoodMaxValue = MAX_HOOD_DEGREES;
 
-  private static final double MIN_HOOD_DEGREES = -18.5;
-  private static final double MAX_HOOD_DEGREES = 25.0;
+  private final Stack<TunerState> flywheelHistory = new Stack<>();
+  private final Stack<TunerState> hoodHistory = new Stack<>();
 
-  public ShooterTuner(AngularSubsystem flywheel, AngularSubsystem hood, AngularSubsystem turret) {
+  public ShooterTuner(
+      AngularSubsystem flywheel,
+      AngularSubsystem hood,
+      AngularSubsystem turret,
+      ShooterHandler shooterHandler) {
     this.flywheel = flywheel;
     this.hood = hood;
     this.turret = turret;
+    this.shooterHandler = shooterHandler;
+    this.config = ShooterConfigs.LEFT_LOW;
   }
 
   public void periodic() {
@@ -58,52 +93,104 @@ public class ShooterTuner {
       return;
     }
 
-    if (Controllers.TOGGLE_HOOD_FLYWHEEL.toggled()) {
-      mode = Mode.HOOD;
-    } else {
-      mode = Mode.FLYWHEEL;
+    if (Controllers.TOGGLE_HOOD_FLYWHEEL.pressed()) {
+      mode = (mode == Mode.DRIVING || mode == Mode.HOOD) ? Mode.FLYWHEEL : Mode.HOOD;
     }
 
-    // TODO: replace with toggle class
-    if (Controllers.TOGGLE_DRIVE.toggled()) {
-      mode = Mode.FLYWHEEL;
-    } else {
-      mode = Mode.DRIVING;
+    if (Controllers.SCORE.pressed() && mode == Mode.DRIVING) {
+      currentArc = (currentArc == Arc.LOW) ? Arc.HIGH : Arc.LOW;
+      updateConfig();
     }
 
-    switch (mode) {
-      case FLYWHEEL -> {
-        if (Controllers.UNDERSHOOT.getAsBoolean()) {
-          flywheelSpeed =
-              RotationsPerSecond.of(
-                  Math.min(
-                      MAX_FLYWHEEL_RPS, flywheelSpeed.plus(FLYWHEEL_STEP).in(RotationsPerSecond)));
-        } else if (Controllers.OVERSHOOT.getAsBoolean()) {
-          flywheelSpeed =
-              RotationsPerSecond.of(
-                  Math.max(
-                      MIN_FLYWHEEL_RPS, flywheelSpeed.minus(FLYWHEEL_STEP).in(RotationsPerSecond)));
-        }
-      }
+    if (Controllers.REVERT.pressed()) revertToPrevious();
+    if (Controllers.RESET_TUNING.pressed()) clearShotTable();
+    if (Controllers.UNDERSHOOT.pressed()) applyShotResult(ShotResult.UNDERSHOOT);
+    if (Controllers.OVERSHOOT.pressed()) applyShotResult(ShotResult.OVERSHOOT);
+    if (Controllers.HIT.pressed()) applyShotResult(ShotResult.HIT);
 
-      case HOOD -> {
-        if (Controllers.UNDERSHOOT.getAsBoolean()) {
-          hoodAngle = Degrees.of(Math.min(MAX_HOOD_DEGREES, hoodAngle.plus(HOOD_STEP).in(Degrees)));
-        } else if (Controllers.OVERSHOOT.getAsBoolean()) {
-          hoodAngle =
-              Degrees.of(Math.max(MIN_HOOD_DEGREES, hoodAngle.minus(HOOD_STEP).in(Degrees)));
-        }
-      }
-
-      case DRIVING, NONE -> {}
-    }
-
-    Logger.recordOutput("ShooterTuner/FlywheelSpeed (rps)", flywheelSpeed);
-    Logger.recordOutput("ShooterTuner/HoodAngle (deg)", hoodAngle);
+    indexing = Controllers.INDEX.getAsBoolean();
 
     flywheel.setVelocity(flywheelSpeed);
     hood.setPosition(hoodAngle);
-    turret.setPosition(turretAngle);
+    turret.setPosition(shooterHandler.getRelativeTurretAngle());
+  }
+
+  private void applyShotResult(ShotResult result) {
+    lastShotResult = result;
+    if (result == ShotResult.HIT) {
+      config.PHYSICS().SHOT_TABLE().put(shooterHandler.currentDistance(), hoodAngle, flywheelSpeed);
+      reset();
+      mode = Mode.DRIVING;
+    } else {
+      double currentValue =
+          (mode == Mode.FLYWHEEL) ? flywheelSpeed.in(RotationsPerSecond) : hoodAngle.in(Degrees);
+
+      if (mode == Mode.FLYWHEEL) {
+        if (result == ShotResult.OVERSHOOT) flywheelMaxValue = currentValue;
+        else if (result == ShotResult.UNDERSHOOT) flywheelMinValue = currentValue;
+
+        double newValue = (flywheelMinValue + flywheelMaxValue) / 2;
+        flywheelSpeed =
+            RotationsPerSecond.of(MathUtil.clamp(newValue, MIN_FLYWHEEL_RPS, MAX_FLYWHEEL_RPS));
+        flywheelHistory.push(
+            new TunerState(flywheelSpeed, hoodAngle, flywheelMinValue, flywheelMaxValue));
+      } else if (mode == Mode.HOOD) {
+        if (result == ShotResult.OVERSHOOT) hoodMaxValue = currentValue;
+        else if (result == ShotResult.UNDERSHOOT) hoodMinValue = currentValue;
+
+        double newValue = (hoodMinValue + hoodMaxValue) / 2;
+        hoodAngle = Degrees.of(MathUtil.clamp(newValue, MIN_HOOD_DEGREES, MAX_HOOD_DEGREES));
+        hoodHistory.push(new TunerState(flywheelSpeed, hoodAngle, hoodMinValue, hoodMaxValue));
+      }
+    }
+  }
+
+  private void revertToPrevious() {
+    Stack<TunerState> history = (mode == Mode.FLYWHEEL) ? flywheelHistory : hoodHistory;
+    if (history.isEmpty()) {
+      return;
+    }
+    TunerState previous = history.pop();
+    if (mode == Mode.FLYWHEEL) {
+      flywheelSpeed = previous.flywheelSpeed;
+      flywheelMinValue = previous.minVal;
+      flywheelMaxValue = previous.maxVal;
+    } else if (mode == Mode.HOOD) {
+      hoodAngle = previous.hoodAngle;
+      hoodMinValue = previous.minVal;
+      hoodMaxValue = previous.maxVal;
+    }
+  }
+
+  private void reset() {
+    ShooterConfig config = getCurrentConfig();
+
+    System.out.println("SHOT TABLE ENTRIES");
+    System.out.println("Arc:" + currentArc);
+    System.out.println(config.PHYSICS().SHOT_TABLE().printSingleLine());
+
+    flywheelSpeed = RotationsPerSecond.of(RESET_FLYWHEEL_RPS);
+    hoodAngle = Degrees.of(RESET_HOOD_DEGREES);
+
+    flywheelMinValue = MIN_FLYWHEEL_RPS;
+    flywheelMaxValue = MAX_FLYWHEEL_RPS;
+    hoodMinValue = MIN_HOOD_DEGREES;
+    hoodMaxValue = MAX_HOOD_DEGREES;
+  }
+
+  private void clearShotTable() {
+    config.PHYSICS().SHOT_TABLE().clear();
+    // placeholder TOF entry
+    config.PHYSICS().SHOT_TABLE().put(Meters.of(1), Seconds.of(0));
+  }
+
+  private ShooterConfig getCurrentConfig() {
+    return (currentArc == Arc.LOW) ? this.config : ShooterConfigs.LEFT_HIGH;
+  }
+
+  private void updateConfig() {
+    ShooterConfig config = getCurrentConfig();
+    shooterHandler.setPhysics(config.PHYSICS());
   }
 
   public boolean freezeDriving() {

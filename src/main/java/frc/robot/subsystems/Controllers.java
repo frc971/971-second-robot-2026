@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.lib.superstructure.RisingEdge;
 import frc.robot.lib.superstructure.Toggle;
 
 public class Controllers {
@@ -16,20 +17,21 @@ public class Controllers {
   public static final Trigger CLIMB_RETRACT = TROY.b(); // TODO: add drivetrain controls
 
   // === Software's Controls
-  public static final Trigger RESET_TUNING = TROY.back();
+  public static final RisingEdge RESET_TUNING = new RisingEdge(TROY.back());
   public static final Toggle TUNING = new Toggle(TROY.start());
-  public static final Toggle TOGGLE_HOOD_FLYWHEEL = new Toggle(TROY.x());
+  public static final RisingEdge TOGGLE_HOOD_FLYWHEEL = new RisingEdge(TROY.x());
 
   // TODO: do we need autoalign? This is the only button that is potentially free
   public static final Trigger AUTO_ALIGN = TROY.rightBumper();
+  public static final Trigger INDEX = TROY.rightTrigger();
 
   // score/save must be the same button, no space
-  public static final Trigger SCORE = TROY.a();
+  public static final RisingEdge SCORE = new RisingEdge(TROY.a());
 
-  public static final Trigger UNDERSHOOT = TROY.povUp();
-  public static final Trigger OVERSHOOT = TROY.povDown();
-  public static final Trigger REVERT = TROY.povLeft();
-  public static final Toggle TOGGLE_DRIVE = new Toggle(TROY.povRight());
+  public static final RisingEdge UNDERSHOOT = new RisingEdge(TROY.povUp());
+  public static final RisingEdge OVERSHOOT = new RisingEdge(TROY.povDown());
+  public static final RisingEdge REVERT = new RisingEdge(TROY.povLeft());
+  public static final RisingEdge HIT = new RisingEdge(TROY.povRight());
 
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();

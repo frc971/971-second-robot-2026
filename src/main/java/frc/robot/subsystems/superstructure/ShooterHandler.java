@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.lib.shooter.*;
-import frc.robot.lib.shooter.ShooterConfig;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import lombok.Getter;
@@ -308,5 +307,13 @@ public class ShooterHandler {
     ObjectState robotState = new ObjectState(drivetrainState);
 
     return robotState.plus(projPoseOffset, projVelOffset);
+  }
+
+  public Angle physicsHoodAngle() {
+    return launchSolution.hoodAngle();
+  }
+
+  public Distance currentDistance() {
+    return Meters.of(targetState.minus(projectileState).position().getNorm());
   }
 }

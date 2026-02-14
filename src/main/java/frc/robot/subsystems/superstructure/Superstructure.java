@@ -35,8 +35,7 @@ public class Superstructure {
   public final GroundRollers groundRollers;
   public final GroundPivot groundPivot;
 
-  public final ShooterTuner shooterTunerRight;
-  public final ShooterTuner shooterTunerLeft;
+  public final ShooterTuner shooterTuner;
 
   public final ShooterHandler shooterHandlerRight;
   public final ShooterHandler shooterHandlerLeft;
@@ -80,9 +79,6 @@ public class Superstructure {
     kicker = new Kicker();
     climber = new Climber();
 
-    shooterTunerRight = new ShooterTuner(flywheelRight, hoodRight, turretRight);
-    shooterTunerLeft = new ShooterTuner(flywheelLeft, hoodLeft, turretLeft);
-
     shooterHandlerRight =
         new ShooterHandler(
             turretRight,
@@ -94,6 +90,9 @@ public class Superstructure {
     shooterHandlerLeft =
         new ShooterHandler(
             turretLeft, hoodLeft, flywheelLeft, robotContainer.drivetrain, ShooterConfigs.LEFT_LOW);
+
+    // default left turret
+    shooterTuner = new ShooterTuner(flywheelLeft, hoodLeft, turretLeft, shooterHandlerLeft);
 
     visualization =
         new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber, groundPivot);
@@ -125,8 +124,7 @@ public class Superstructure {
       // TODO: is this covered by the neutral setpoint or no?
       shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
       shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-      shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
-      shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
+      shooterTuner.setGoal(ShooterTuner.Goal.NONE);
 
       switch (shooterGoal) {
         case NONE -> {}
@@ -186,11 +184,15 @@ public class Superstructure {
           setGoal(setpoint);
         }
         case TUNE_LEFT_SHOOTER -> {
-          shooterTunerLeft.setGoal(ShooterTuner.Goal.ACTIVE);
+          shooterTuner.setGoal(ShooterTuner.Goal.ACTIVE);
+
+          if (shooterTuner.isIndexing()) {
+            setGoal(SetpointGoal.INDEX_LEFT);
+          }
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
         }
-        case TUNE_RIGHT_SHOOTER -> {
-          shooterTunerRight.setGoal(ShooterTuner.Goal.ACTIVE);
-        }
+        case TUNE_RIGHT_SHOOTER -> {}
       }
 
       // Indexer Logic
@@ -247,6 +249,8 @@ public class Superstructure {
     shooterHandlerLeft.periodic();
     shooterHandlerRight.periodic();
 
+    shooterTuner.periodic();
+
     // subsystems
     flywheelRight.periodic();
     flywheelLeft.periodic();
@@ -261,9 +265,6 @@ public class Superstructure {
     groundRollers.periodic();
     kicker.periodic();
     climber.periodic();
-
-    shooterTunerLeft.periodic();
-    shooterTunerRight.periodic();
 
     visualization.periodic();
   }
@@ -335,7 +336,7 @@ public class Superstructure {
   }
 
   public boolean freezeDriving() {
-    return (shooterTunerRight.freezeDriving() || shooterTunerLeft.freezeDriving())
+    return (shooterTuner.freezeDriving())
         && (shooterGoal == ShooterGoal.TUNE_LEFT_SHOOTER
             || shooterGoal == ShooterGoal.TUNE_RIGHT_SHOOTER);
   }
