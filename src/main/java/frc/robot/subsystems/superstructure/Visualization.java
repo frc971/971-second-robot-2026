@@ -22,19 +22,25 @@ public class Visualization {
       new Transform3d(
           0.219786 - 0.1624076, -0.195097 - -0.195097, 0.445927 - 0.2761615, Rotation3d.kZero);
 
+  public static final Transform3d robotToGroundPivot =
+      new Transform3d(-0.156033, 0.0, 0.132797, Rotation3d.kZero);
+
   private TurretLeft turretLeft;
   private HoodLeft hoodLeft;
 
   private TurretRight turretRight;
   private HoodRight hoodRight;
+
   private Climber climber;
+  private GroundPivot groundPivot;
 
   public Visualization(
       TurretLeft turretLeft,
       TurretRight turretRight,
       HoodLeft hoodLeft,
       HoodRight hoodRight,
-      Climber climber) {
+      Climber climber,
+      GroundPivot groundPivot) {
     this.turretLeft = turretLeft;
     this.hoodLeft = hoodLeft;
 
@@ -42,6 +48,7 @@ public class Visualization {
     this.hoodRight = hoodRight;
 
     this.climber = climber;
+    this.groundPivot = groundPivot;
   }
 
   public void periodic() {
@@ -77,12 +84,19 @@ public class Visualization {
         new Transform3d(
             new Translation3d(0.0, 0.0, climber.getLinearPosition().in(Meters)), Rotation3d.kZero);
 
+    Transform3d groundPivotPose =
+        robotToGroundPivot.plus(
+            new Transform3d(
+                Translation3d.kZero,
+                new Rotation3d(0.0, groundPivot.getPosition().in(Radians), 0.0)));
+
     Logger.recordOutput(
         "Visualization/Components",
         turretLeftPose,
         hoodLeftPose,
         turretRightPose,
         hoodRightPose,
-        climberPose);
+        climberPose,
+        groundPivotPose);
   }
 }

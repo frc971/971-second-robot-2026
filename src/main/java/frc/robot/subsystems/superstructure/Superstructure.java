@@ -95,7 +95,8 @@ public class Superstructure {
         new ShooterHandler(
             turretLeft, hoodLeft, flywheelLeft, robotContainer.drivetrain, ShooterConfigs.LEFT_LOW);
 
-    visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber);
+    visualization =
+        new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber, groundPivot);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
