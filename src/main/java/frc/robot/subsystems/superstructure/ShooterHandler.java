@@ -191,10 +191,6 @@ public class ShooterHandler {
     }
   }
 
-  public void setPhysics(ShooterConfig.Physics shooterConfig) {
-    this.physics = new ShooterPhysics(shooterConfig);
-  }
-
   @AutoLogOutput(key = "{name}/canTransitionToReady")
   private boolean canTransitionToReady() {
     if (launchSolution == null) {
@@ -315,5 +311,9 @@ public class ShooterHandler {
 
   public Distance currentDistance() {
     return Meters.of(targetState.minus(projectileState).position().getNorm());
+  }
+
+  public ShooterConfig getConfig() {
+    return config;
   }
 }

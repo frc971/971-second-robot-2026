@@ -6,7 +6,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.lib.shooter.ShooterConfig;
-import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.lib.superstructure.AngularSubsystem;
 import frc.robot.subsystems.Controllers;
 import java.util.Stack;
@@ -56,7 +55,6 @@ public class ShooterTuner {
   @AutoLogOutput @Setter @Getter private Goal goal = Goal.NONE;
   @AutoLogOutput @Getter private Mode mode = Mode.DRIVING;
   @AutoLogOutput @Getter private ShotResult lastShotResult = ShotResult.HIT;
-  @AutoLogOutput @Getter private Arc currentArc = Arc.LOW;
   @AutoLogOutput @Getter private boolean indexing = false;
 
   @AutoLogOutput private AngularVelocity flywheelSpeed = RotationsPerSecond.of(RESET_FLYWHEEL_RPS);
@@ -84,7 +82,7 @@ public class ShooterTuner {
     this.hood = hood;
     this.turret = turret;
     this.shooterHandler = shooterHandler;
-    this.config = ShooterConfigs.LEFT_LOW;
+    this.config = shooterHandler.getConfig();
   }
 
   public void periodic() {
@@ -95,11 +93,6 @@ public class ShooterTuner {
 
     if (Controllers.TOGGLE_HOOD_FLYWHEEL.pressed()) {
       mode = (mode == Mode.DRIVING || mode == Mode.HOOD) ? Mode.FLYWHEEL : Mode.HOOD;
-    }
-
-    if (Controllers.SCORE.pressed() && mode == Mode.DRIVING) {
-      currentArc = (currentArc == Arc.LOW) ? Arc.HIGH : Arc.LOW;
-      updateConfig();
     }
 
     if (Controllers.REVERT.pressed()) revertToPrevious();
@@ -163,10 +156,7 @@ public class ShooterTuner {
   }
 
   private void reset() {
-    ShooterConfig config = getCurrentConfig();
-
     System.out.println("SHOT TABLE ENTRIES");
-    System.out.println("Arc:" + currentArc);
     System.out.println(config.PHYSICS().SHOT_TABLE().printSingleLine());
 
     flywheelSpeed = RotationsPerSecond.of(RESET_FLYWHEEL_RPS);
@@ -182,15 +172,6 @@ public class ShooterTuner {
     config.PHYSICS().SHOT_TABLE().clear();
     // placeholder TOF entry
     config.PHYSICS().SHOT_TABLE().put(Meters.of(1), Seconds.of(0));
-  }
-
-  private ShooterConfig getCurrentConfig() {
-    return (currentArc == Arc.LOW) ? this.config : ShooterConfigs.LEFT_HIGH;
-  }
-
-  private void updateConfig() {
-    ShooterConfig config = getCurrentConfig();
-    shooterHandler.setPhysics(config.PHYSICS());
   }
 
   public boolean freezeDriving() {

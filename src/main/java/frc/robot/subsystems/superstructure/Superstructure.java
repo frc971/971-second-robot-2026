@@ -81,15 +81,11 @@ public class Superstructure {
 
     shooterHandlerRight =
         new ShooterHandler(
-            turretRight,
-            hoodRight,
-            flywheelRight,
-            robotContainer.drivetrain,
-            ShooterConfigs.RIGHT_LOW);
+            turretRight, hoodRight, flywheelRight, robotContainer.drivetrain, ShooterConfigs.RIGHT);
 
     shooterHandlerLeft =
         new ShooterHandler(
-            turretLeft, hoodLeft, flywheelLeft, robotContainer.drivetrain, ShooterConfigs.LEFT_LOW);
+            turretLeft, hoodLeft, flywheelLeft, robotContainer.drivetrain, ShooterConfigs.LEFT);
 
     // default left turret
     shooterTuner = new ShooterTuner(flywheelLeft, hoodLeft, turretLeft, shooterHandlerLeft);
@@ -129,22 +125,11 @@ public class Superstructure {
       switch (shooterGoal) {
         case NONE -> {}
         case TARGETING -> {
-          shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_HIGH.PHYSICS());
-          shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_HIGH.PHYSICS());
-
           if (!Controllers.KILL_LEFT.toggled()) {
             shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
           }
           if (!Controllers.KILL_RIGHT.toggled()) {
             shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          }
-
-          if (!Controllers.KILL_RIGHT.toggled() && !Controllers.KILL_LEFT.toggled()) {
-            if (shooterHandlerRight.getRelativeTurretAngle().gt(SWAP_BUFFER)) {
-              shooterHandlerLeft.setPhysics(ShooterConfigs.LEFT_LOW.PHYSICS());
-            } else if (shooterHandlerRight.getRelativeTurretAngle().lt(SWAP_BUFFER.unaryMinus())) {
-              shooterHandlerRight.setPhysics(ShooterConfigs.RIGHT_LOW.PHYSICS());
-            }
           }
 
           ObjectState curTarget =
