@@ -11,11 +11,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.*;
 import frc.robot.lib.superstructure.*;
 
-// TODO: change the constants...
 public class TurretLeft extends AngularSubsystem {
-  public static final Angle UPPER_LIMIT = Degrees.of(100);
-  public static final Angle LOWER_LIMIT = Degrees.of(-100);
+  public static final Angle UPPER_LIMIT = Degrees.of(104.0);
+  public static final Angle LOWER_LIMIT = Degrees.of(-100.0);
   public static final boolean ENABLE_WRAP = false;
+
+  private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);
+
   // If the turret has a goal outside its range BUT it is within this extra buffer it will still
   // clamp to end of its range
   private static final Angle BUFFER = Degrees.of(20);
@@ -29,37 +31,30 @@ public class TurretLeft extends AngularSubsystem {
 
     // Motion Magic PID and feedforward gains
     tc.Slot0.kS = 0.0; // Static friction compensation
-    tc.Slot0.kV = 0.0; // Velocity feedforward
-    tc.Slot0.kA = 0.0; // Acceleration feedforward
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 0.0; // Proportional gain
+    tc.Slot0.kP = 60.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
-    // Motion Magic profile constraints
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.9;
-    tc.MotionMagic.MotionMagicAcceleration = 20.0;
-    tc.MotionMagic.MotionMagicJerk = 0.0;
-
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 185.0 / 16.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio = 200.0 / 14.0; // Motor to output gear ratio
 
     tc.ClosedLoopGeneral.ContinuousWrap = ENABLE_WRAP;
 
     return MotorConfig.builder()
         .NAME("Turret Left")
-        .ID(-1)
-        .BUS(new CANBus("Drivetrain Bus"))
+        .ID(30)
+        .BUS(new CANBus("Left Superstructure"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
         .build();
@@ -91,6 +86,19 @@ public class TurretLeft extends AngularSubsystem {
                     goalPosition.in(Degrees), LOWER_LIMIT.in(Degrees), UPPER_LIMIT.in(Degrees)));
       }
     }
-    super.setPosition(clampedGoalPosition);
+    setFeedforward(calculatePositionFeedforward(clampedGoalPosition));
+    super.setPositionVoltage(clampedGoalPosition);
+  }
+
+  private Voltage calculatePositionFeedforward(Angle goalPosition) {
+    double kG = io.getMotorConfig().TALONFX_CONFIG().Slot0.kG;
+    double kS = io.getMotorConfig().TALONFX_CONFIG().Slot0.kS;
+
+    double positionError = goalPosition.minus(getPosition()).in(Degrees);
+    if (Math.abs(positionError) < KS_ERROR_DEADBAND.in(Degrees)) {
+      return Volts.of(kG);
+    }
+
+    return Volts.of(kG + (kS * Math.signum(positionError)));
   }
 }

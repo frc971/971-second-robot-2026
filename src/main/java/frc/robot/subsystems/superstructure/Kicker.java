@@ -16,7 +16,7 @@ public class Kicker extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -27,8 +27,8 @@ public class Kicker extends MotorSubsystem {
 
     return MotorConfig.builder()
         .NAME("Kicker")
-        .ID(-1)
-        .BUS(new CANBus("Drivetrain Bus"))
+        .ID(16)
+        .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();
   }

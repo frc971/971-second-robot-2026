@@ -49,6 +49,16 @@ public class MotorSim extends MotorIO {
   }
 
   @Override
+  public void setPositionVoltage(Angle goalPosition) {
+    setPosition(goalPosition);
+  }
+
+  @Override
+  public void setPositionVoltage(Distance goalPosition) {
+    setPosition(goalPosition);
+  }
+
+  @Override
   public void periodic() {
     state = profile.calculate(Constants.UPDATE_PERIOD.in(Seconds), state, goal);
     position = Rotations.of(state.position);

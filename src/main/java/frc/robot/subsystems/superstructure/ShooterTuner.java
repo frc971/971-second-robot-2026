@@ -63,9 +63,9 @@ public class ShooterTuner {
   @AutoLogOutput private Angle hoodAngle = Degrees.of(RESET_HOOD_DEGREES);
   @AutoLogOutput @Setter private double currentDistance = 0;
 
-  private static final double MIN_FLYWHEEL_RPS = 0.0, MAX_FLYWHEEL_RPS = 50.0;
-  private static final double MIN_HOOD_DEGREES = -18.5, MAX_HOOD_DEGREES = 25.0;
-  private static final double RESET_FLYWHEEL_RPS = 15, RESET_HOOD_DEGREES = 5;
+  private static final double MIN_FLYWHEEL_RPS = 0.0, MAX_FLYWHEEL_RPS = 100.0;
+  private static final double MIN_HOOD_DEGREES = 0, MAX_HOOD_DEGREES = 50.0;
+  private static final double RESET_FLYWHEEL_RPS = 50, RESET_HOOD_DEGREES = 25;
 
   @AutoLogOutput private double flywheelMinValue = MIN_FLYWHEEL_RPS;
   @AutoLogOutput private double flywheelMaxValue = MAX_FLYWHEEL_RPS;

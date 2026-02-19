@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -27,7 +28,9 @@ public class MotorTalonFX extends MotorIO {
 
   protected final VoltageOut voltageRequest = new VoltageOut(0.0).withEnableFOC(true);
   protected final VelocityVoltage velocityRequest = new VelocityVoltage(0.0).withEnableFOC(true);
-  protected final DynamicMotionMagicVoltage positionRequest;
+  protected final DynamicMotionMagicVoltage dynamicMotionMagicPositionRequest;
+  protected final PositionVoltage positionVoltageRequest =
+      new PositionVoltage(0.0).withEnableFOC(true);
 
   protected StatusSignal<Angle> positionSignal;
   protected StatusSignal<AngularVelocity> velocitySignal;
@@ -43,7 +46,7 @@ public class MotorTalonFX extends MotorIO {
     this.cancoderConfig = optionalCancoderConfig;
 
     MotionMagicConfigs mmConfigs = motorConfig.TALONFX_CONFIG().MotionMagic;
-    positionRequest =
+    dynamicMotionMagicPositionRequest =
         new DynamicMotionMagicVoltage(
             0, mmConfigs.MotionMagicCruiseVelocity, mmConfigs.MotionMagicAcceleration);
 
@@ -99,19 +102,37 @@ public class MotorTalonFX extends MotorIO {
 
   @Override
   public void setPosition(Angle goalPosition) {
+    setDynamicMotionMagicPosition(goalPosition.in(Rotations));
+  }
+
+  @Override
+  public void setPosition(Distance goalPosition) {
+    setDynamicMotionMagicPosition(goalPosition.in(Meters));
+  }
+
+  @Override
+  public void setPositionVoltage(Angle goalPosition) {
+    setPositionVoltage(goalPosition.in(Rotations));
+  }
+
+  @Override
+  public void setPositionVoltage(Distance goalPosition) {
+    setPositionVoltage(goalPosition.in(Meters));
+  }
+
+  private void setDynamicMotionMagicPosition(double goalPosition) {
     motor.setControl(
-        positionRequest
-            .withPosition(goalPosition.in(Rotations))
+        dynamicMotionMagicPositionRequest
+            .withPosition(goalPosition)
             .withFeedForward(feedforward)
             .withEnableFOC(true)
             .withSlot(0));
   }
 
-  @Override
-  public void setPosition(Distance goalPosition) {
+  private void setPositionVoltage(double goalPosition) {
     motor.setControl(
-        positionRequest
-            .withPosition(goalPosition.in(Meters))
+        positionVoltageRequest
+            .withPosition(goalPosition)
             .withFeedForward(feedforward)
             .withEnableFOC(true)
             .withSlot(0));

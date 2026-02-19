@@ -24,6 +24,7 @@ public class ShooterConfig {
   @Getter
   public static class Physics {
     @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
+    @Builder.Default private double FUDGE_FACTOR = 1.0;
 
     public Time getTime(Distance distance) {
       return SHOT_TABLE.getTime(distance);
@@ -60,13 +61,11 @@ public class ShooterConfig {
   public static class Threshold {
     @Builder.Default
     private AngularVelocity AIMING_FLYWHEEL_THRESHOLD =
-        Radian.per(Seconds).of(300); // TODO: this is obscene, need to fix it later
+        RotationsPerSecond.of(5.0); // TODO: this is obscene, need to fix it later
 
-    @Builder.Default
-    private Angle AIMING_ROTATION_THRESHOLD = Radian.of(Math.PI / 6.0); // 45 degrees
+    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(5.0); // 45 degrees
 
-    @Builder.Default
-    private Angle AIMING_HOOD_ANGLE_THRESHOLD = Radian.of(Math.PI / 6.0); // 30 degrees
+    @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(5.0); // 30 degrees
 
     /*
      * Note: very important that the two thresholds (AIMING & SHOOTING) overlap

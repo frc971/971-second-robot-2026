@@ -17,7 +17,7 @@ public class SpindexerLeft extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -28,8 +28,8 @@ public class SpindexerLeft extends MotorSubsystem {
 
     return MotorConfig.builder()
         .NAME("Spindexer Left")
-        .ID(-1)
-        .BUS(new CANBus("Drivetrain Bus"))
+        .ID(32)
+        .BUS(new CANBus("Left Superstructure"))
         .TALONFX_CONFIG(tc)
         .build();
   }

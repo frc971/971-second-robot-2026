@@ -28,8 +28,8 @@ public class SpindexerRight extends MotorSubsystem {
 
     return MotorConfig.builder()
         .NAME("Spindexer Right")
-        .ID(-1)
-        .BUS(new CANBus("Drivetrain Bus"))
+        .ID(42)
+        .BUS(new CANBus("Right Superstructure"))
         .TALONFX_CONFIG(tc)
         .build();
   }

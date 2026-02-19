@@ -72,11 +72,17 @@ public abstract class MotorIO {
   /** Set angular goal position */
   public abstract void setPosition(Angle goalPosition);
 
+  /** Set angular goal position using PositionVoltage request */
+  public abstract void setPositionVoltage(Angle goalPosition);
+
   /* Set linear goal position.
    *
    * Meant for elevators where gear ratio takes into account rotational to linear conversion.
    */
   public abstract void setPosition(Distance goalPosition);
+
+  /** Set linear goal position using PositionVoltage request */
+  public abstract void setPositionVoltage(Distance goalPosition);
 
   public abstract void resetPosition(Angle newPosition);
 

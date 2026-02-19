@@ -40,7 +40,7 @@ public class ShotTable {
   public void put(Distance distance, AngularVelocity flywheelSpeed) {
     double distanceMeters = distance.in(Meters);
     distances.add(distanceMeters);
-    flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RadiansPerSecond));
+    flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RotationsPerSecond));
   }
 
   public void put(Distance distance, Time timeOfFlight) {
@@ -53,7 +53,7 @@ public class ShotTable {
     double distanceMeters = distance.in(Meters);
     distances.add(distanceMeters);
     hoodAngleTable.put(distanceMeters, hoodAngle.in(Degrees));
-    flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RadiansPerSecond));
+    flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RotationsPerSecond));
   }
 
   public void put(
@@ -61,7 +61,7 @@ public class ShotTable {
     double distanceMeters = distance.in(Meters);
     distances.add(distanceMeters);
     hoodAngleTable.put(distanceMeters, hoodAngle.in(Degrees));
-    flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RadiansPerSecond));
+    flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RotationsPerSecond));
     timeTable.put(distanceMeters, timeOfFlight.in(Seconds));
   }
 
@@ -71,7 +71,9 @@ public class ShotTable {
     double flywheelSpeed = flywheelSpeedTable.get(distanceMeters);
     double timeOfFlight = timeTable.get(distanceMeters);
     return new ShooterData(
-        Degrees.of(hoodAngleDegrees), RadiansPerSecond.of(flywheelSpeed), Seconds.of(timeOfFlight));
+        Degrees.of(hoodAngleDegrees),
+        RotationsPerSecond.of(flywheelSpeed),
+        Seconds.of(timeOfFlight));
   }
 
   public Time getTime(Distance distance) {
@@ -93,7 +95,7 @@ public class ShotTable {
       }
       sb.append(
           String.format(
-              "table.put(Meters.of(%.5f), Degrees.of(%.5f), RadiansPerSecond.of(%.5f));",
+              "table.put(Meters.of(%.5f), Degrees.of(%.5f), RotationsPerSecond.of(%.5f));",
               distance, hoodAngleTable.get(distance), flywheelSpeedTable.get(distance)));
     }
     return sb.toString();

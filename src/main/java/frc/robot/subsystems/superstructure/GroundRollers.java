@@ -15,7 +15,7 @@ public class GroundRollers extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -24,8 +24,8 @@ public class GroundRollers extends MotorSubsystem {
 
     return MotorConfig.builder()
         .NAME("Ground Rollers")
-        .ID(-1)
-        .BUS(new CANBus("Drivetrain Bus"))
+        .ID(15)
+        .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();
   }

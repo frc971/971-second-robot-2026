@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Usage: ./scripts/extract-logs.sh [minutes] [destination-directory]
 
-REMOTE="admin@10.99.72.2"
+REMOTE="admin@10.9.71.2"
 LOG_DIR="/home/lvuser/logs"
 MINUTES="${1:-0}"
 DEST_DIR="${2:-$HOME/logs}"

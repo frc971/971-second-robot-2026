@@ -195,6 +195,26 @@ public class Superstructure {
         case TUNE_RIGHT_SHOOTER -> {}
       }
 
+      // intake (will override outtake)
+      if (freezeIntake) {
+        setGoal(SetpointGoal.INTAKE_PIVOT);
+      }
+
+      if (Controllers.INTAKE.getAsBoolean()) {
+        setGoal(SetpointGoal.INTAKE_ROLLERS);
+        setGoal(SetpointGoal.INTAKE_PIVOT);
+
+        if (!prevIntakePressed) {
+          freezeIntake = false;
+        }
+
+        if (Controllers.INTAKE_FREEZE.getAsBoolean()) {
+          freezeIntake = true;
+        }
+      }
+
+      prevIntakePressed = Controllers.INTAKE.getAsBoolean();
+
       // Indexer Logic
       // Driver has to say we can shoot AND we need to be ready to shoot
       boolean indexing =
@@ -216,26 +236,6 @@ public class Superstructure {
       } else if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
       }
-
-      // intake (will override outtake)
-      if (freezeIntake) {
-        setGoal(SetpointGoal.INTAKE_PIVOT);
-      }
-
-      if (Controllers.INTAKE.getAsBoolean()) {
-        setGoal(SetpointGoal.INTAKE_ROLLERS);
-        setGoal(SetpointGoal.INTAKE_PIVOT);
-
-        if (!prevIntakePressed) {
-          freezeIntake = false;
-        }
-
-        if (Controllers.INTAKE_FREEZE.getAsBoolean()) {
-          freezeIntake = true;
-        }
-      }
-
-      prevIntakePressed = Controllers.INTAKE.getAsBoolean();
 
       // Killing turret logic
       if (Controllers.KILL_LEFT.toggled()) {
