@@ -155,14 +155,20 @@ public class Superstructure {
           SetpointGoal setpoint = SetpointGoal.NEUTRAL;
 
           if (Controllers.MANUAL_SHOOT_UP.getAsBoolean()) {
-            setpoint = SetpointGoal.MANUAL_MID;
+            setpoint = SetpointGoal.MANUAL_UP;
+          } else if (Controllers.MANUAL_SHOOT_DOWN.getAsBoolean()) {
+            setpoint = SetpointGoal.MANUAL_DOWN;
           } else if (Controllers.MANUAL_SHOOT_LEFT.getAsBoolean()) {
             setpoint = SetpointGoal.MANUAL_LEFT;
           } else if (Controllers.MANUAL_SHOOT_RIGHT.getAsBoolean()) {
             setpoint = SetpointGoal.MANUAL_RIGHT;
-          } else if (Controllers.SHUTTLE_LEFT.getAsBoolean()) {
+          } else if (Controllers.MANUAL_SHUTTLE_UP.getAsBoolean()) {
+            setpoint = SetpointGoal.MANUAL_SHUTTLE_UP;
+          } else if (Controllers.MANUAL_SHUTTLE_DOWN.getAsBoolean()) {
+            setpoint = SetpointGoal.MANUAL_SHUTTLE_DOWN;
+          } else if (Controllers.MANUAL_SHUTTLE_LEFT.getAsBoolean()) {
             setpoint = SetpointGoal.MANUAL_SHUTTLE_LEFT;
-          } else if (Controllers.SHUTTLE_RIGHT.getAsBoolean()) {
+          } else if (Controllers.MANUAL_SHUTTLE_RIGHT.getAsBoolean()) {
             setpoint = SetpointGoal.MANUAL_SHUTTLE_RIGHT;
           }
 
@@ -211,7 +217,7 @@ public class Superstructure {
                   || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING);
 
       if (indexing) {
-        if (!Controllers.KILL_LEFT.toggled() && !Controllers.KILL_LEFT.toggled()) {
+        if (!Controllers.KILL_LEFT.toggled() && !Controllers.KILL_RIGHT.toggled()) {
           setGoal(SetpointGoal.INDEX_BOTH);
         } else if (Controllers.KILL_LEFT.toggled()) {
           setGoal(SetpointGoal.INDEX_RIGHT);

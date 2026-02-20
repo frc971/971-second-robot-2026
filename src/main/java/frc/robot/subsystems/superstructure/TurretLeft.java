@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
@@ -36,8 +35,6 @@ public class TurretLeft extends AngularSubsystem {
     tc.Slot0.kP = 60.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
-
-    tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

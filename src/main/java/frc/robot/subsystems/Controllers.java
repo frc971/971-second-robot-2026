@@ -45,6 +45,9 @@ public class Controllers {
   public static final Toggle MANUAL = new Toggle(ANDRE.y());
   public static final Trigger REZERO = ANDRE.a();
 
+  public static final Trigger SHUTTLE_LEFT = ANDRE.leftBumper();
+  public static final Trigger SHUTTLE_RIGHT = ANDRE.rightBumper();
+
   // OTF Tuning (AndreTuner)
   public static final Toggle TUNE_LEFT = new Toggle(ANDRE.back());
   public static final Toggle TUNE_RIGHT = new Toggle(ANDRE.start());
@@ -56,14 +59,14 @@ public class Controllers {
 
   // TODO: get a feel for what axis threshold is the best to congrol with
   // MANUAL Shooter Setpoints
-  public static final Trigger MANUAL_SHOOT_UP = ANDRE.axisGreaterThan(1, 0.85);
-  public static final Trigger MANUAL_SHOOT_DOWN = ANDRE.axisLessThan(1, -0.85);
-  public static final Trigger MANUAL_SHOOT_LEFT = ANDRE.axisGreaterThan(0, 0.85);
-  public static final Trigger MANUAL_SHOOT_RIGHT = ANDRE.axisLessThan(0, -0.85);
+  public static final Trigger MANUAL_SHOOT_UP = ANDRE.axisLessThan(1, -0.85);
+  public static final Trigger MANUAL_SHOOT_DOWN = ANDRE.axisGreaterThan(1, 0.85);
+  public static final Trigger MANUAL_SHOOT_LEFT = ANDRE.axisLessThan(0, -0.85);
+  public static final Trigger MANUAL_SHOOT_RIGHT = ANDRE.axisGreaterThan(0, 0.85);
 
   // MANUAL Shuttle Setpoints
-  public static final Trigger MANUAL_SHUTTLE_UP = ANDRE.axisGreaterThan(5, 0.85);
-  public static final Trigger MANUAL_SHUTTLE_DOWN = ANDRE.axisLessThan(5, -0.85);
-  public static final Trigger SHUTTLE_LEFT = ANDRE.leftBumper();
-  public static final Trigger SHUTTLE_RIGHT = ANDRE.rightBumper();
+  public static final Trigger MANUAL_SHUTTLE_UP = ANDRE.axisLessThan(5, -0.85);
+  public static final Trigger MANUAL_SHUTTLE_DOWN = ANDRE.axisGreaterThan(5, 0.85);
+  public static final Trigger MANUAL_SHUTTLE_LEFT = ANDRE.axisLessThan(4, -0.85);
+  public static final Trigger MANUAL_SHUTTLE_RIGHT = ANDRE.axisGreaterThan(4, 0.85);
 }

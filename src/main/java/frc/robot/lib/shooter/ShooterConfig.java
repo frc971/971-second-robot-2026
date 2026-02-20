@@ -59,13 +59,11 @@ public class ShooterConfig {
   @Getter
   @Builder
   public static class Threshold {
-    @Builder.Default
-    private AngularVelocity AIMING_FLYWHEEL_THRESHOLD =
-        RotationsPerSecond.of(5.0); // TODO: this is obscene, need to fix it later
+    @Builder.Default private AngularVelocity AIMING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(2.0);
 
-    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(5.0); // 45 degrees
+    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(2.0);
 
-    @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(5.0); // 30 degrees
+    @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(2.0);
 
     /*
      * Note: very important that the two thresholds (AIMING & SHOOTING) overlap
@@ -74,12 +72,10 @@ public class ShooterConfig {
      */
 
     // SHOOTING thresholds (once above, will abort the shot)
-    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = Radian.per(Seconds).of(500);
+    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = RotationsPerSecond.of(4.0);
 
-    @Builder.Default
-    private Angle SHOOTING_ROTATION_THRESHOLD = Radian.of(Math.PI / 8.0); // 45 degrees
+    @Builder.Default private Angle SHOOTING_ROTATION_THRESHOLD = Degrees.of(4);
 
-    @Builder.Default
-    private Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Radian.of(Math.PI / 8.0); // 45 degrees
+    @Builder.Default private Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Degrees.of(4);
   }
 }

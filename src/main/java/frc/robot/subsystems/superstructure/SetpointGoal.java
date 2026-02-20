@@ -23,11 +23,11 @@ public enum SetpointGoal {
       Setpoint.builder()
           .withLeftFlywheelRPS(0.0)
           .withLeftHoodDegrees(0.0)
-          .withLeftTurretDegrees(104.0)
+          .withLeftTurretDegrees(101.0)
           .withLeftIndexerVolts(0.0)
           .withRightFlywheelRPS(0.0)
           .withRightHoodDegrees(0.0)
-          .withRightTurretDegrees(104.0)
+          .withRightTurretDegrees(101.0)
           .withRightIndexerVolts(0.0)
           .withGroundPivotDegrees(90.0)
           .withGroundRollersVolts(0.0)
@@ -49,8 +49,8 @@ public enum SetpointGoal {
   OUTTAKE(
       Setpoint.builder()
           .withKickerVolts(-6.0)
-          .withLeftIndexerVolts(-6.0)
-          .withRightIndexerVolts(-6.0)
+          .withLeftIndexerVolts(0.0)
+          .withRightIndexerVolts(0.0)
           .withGroundRollersVolts(-11.0)
           .withGroundPivotDegrees(24.0)),
   INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(22.0)),
@@ -69,41 +69,14 @@ public enum SetpointGoal {
           .withLeftFlywheelRPS(0.0)
           .withLeftHoodDegrees(0.0)
           .withLeftTurretDegrees(0.0)),
-  MANUAL_MID(
-      Setpoint.builder()
-          .withLeftTurretDegrees(0.0)
-          .withLeftHoodDegrees(10)
-          .withRightHoodDegrees(10)
-          .withLeftFlywheelRPS(10)
-          .withRightFlywheelRPS(10)),
-  MANUAL_LEFT(
-      Setpoint.builder()
-          .withLeftTurretDegrees(0.0)
-          .withLeftHoodDegrees(0)
-          .withRightHoodDegrees(10)
-          .withLeftFlywheelRPS(10)
-          .withRightFlywheelRPS(10)),
-  MANUAL_RIGHT(
-      Setpoint.builder()
-          .withLeftTurretDegrees(0)
-          .withLeftHoodDegrees(10)
-          .withRightHoodDegrees(10)
-          .withLeftFlywheelRPS(10)
-          .withRightFlywheelRPS(10)),
-  MANUAL_SHUTTLE_LEFT(
-      Setpoint.builder()
-          .withLeftTurretDegrees(0)
-          .withLeftHoodDegrees(20)
-          .withRightHoodDegrees(10)
-          .withLeftFlywheelRPS(10)
-          .withRightFlywheelRPS(10)),
-  MANUAL_SHUTTLE_RIGHT(
-      Setpoint.builder()
-          .withLeftTurretDegrees(0)
-          .withLeftHoodDegrees(30)
-          .withRightHoodDegrees(10)
-          .withLeftFlywheelRPS(10)
-          .withRightFlywheelRPS(10));
+  MANUAL_UP(Setpoint.builder().withLeftHoodDegrees(10).withLeftFlywheelRPS(10)),
+  MANUAL_DOWN(Setpoint.builder().withLeftHoodDegrees(20).withLeftFlywheelRPS(10)),
+  MANUAL_LEFT(Setpoint.builder().withLeftHoodDegrees(15).withLeftFlywheelRPS(10)),
+  MANUAL_RIGHT(Setpoint.builder().withLeftHoodDegrees(5).withLeftFlywheelRPS(10)),
+  MANUAL_SHUTTLE_UP(Setpoint.builder().withLeftHoodDegrees(30).withLeftFlywheelRPS(10)),
+  MANUAL_SHUTTLE_DOWN(Setpoint.builder().withLeftHoodDegrees(40).withLeftFlywheelRPS(10)),
+  MANUAL_SHUTTLE_LEFT(Setpoint.builder().withLeftHoodDegrees(35).withLeftFlywheelRPS(10)),
+  MANUAL_SHUTTLE_RIGHT(Setpoint.builder().withLeftHoodDegrees(25).withLeftFlywheelRPS(10));
 
   private final Setpoint setpoint;
 
