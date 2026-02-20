@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Controllers;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -55,6 +56,12 @@ public class ShooterHandler {
   private @Setter @Getter ObjectState targetState;
   private final String name;
 
+  private AngularVelocity flywheelOffset = RotationsPerSecond.of(0.0);
+  private Angle turretOffset = Degrees.of(0.0);
+
+  private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(0.5);
+  private static final Angle TURRET_STEP = Degrees.of(0.5);
+
   // state machine
   public enum State {
     NOT_READY,
@@ -83,6 +90,10 @@ public class ShooterHandler {
   private final AngularSubsystem turret;
   private final AngularSubsystem hood;
   private final AngularSubsystem flywheel;
+
+  @AutoLogOutput(key = "{name}/TuningEnabled")
+  @Setter
+  private boolean tuningEnabled = false;
 
   public ShooterHandler(
       AngularSubsystem turret,
@@ -114,6 +125,7 @@ public class ShooterHandler {
 
     logStates();
 
+    liveTuning(); // live tuning during matches & superstructure decides which one is enabled
     if (shooterGoal == Goal.NONE) {
       shooterState = State.NOT_READY;
       return;
@@ -144,10 +156,34 @@ public class ShooterHandler {
 
     // set output
     if (shooterState != State.NOT_READY) {
-      flywheel.setVelocity(getFlywheelSpeed());
+      AngularVelocity adjustedFlywheel = getFlywheelSpeed().plus(flywheelOffset);
+      adjustedFlywheel =
+          RadiansPerSecond.of(
+              MathUtil.clamp(
+                  adjustedFlywheel.in(RadiansPerSecond),
+                  config.CONSTRAINTS().MIN_FLYWHEEL_SPEED().in(RadiansPerSecond),
+                  config.CONSTRAINTS().MAX_FLYWHEEL_SPEED().in(RadiansPerSecond)));
+
+      Angle adjustedTurret = getRelativeTurretAngle().plus(turretOffset);
+
+      flywheel.setVelocity(adjustedFlywheel);
       hood.setPosition(launchSolution.hoodAngle());
-      turret.setPosition(getRelativeTurretAngle());
+      turret.setPosition(adjustedTurret);
     }
+    AngularVelocity adjustedFlywheel = getFlywheelSpeed().plus(flywheelOffset);
+    Angle adjustedTurret = getRelativeTurretAngle().plus(turretOffset);
+    flywheel.setVelocity(adjustedFlywheel);
+    hood.setPosition(launchSolution.hoodAngle());
+    turret.setPosition(adjustedTurret);
+  }
+
+  private void liveTuning() {
+    if (!tuningEnabled) return;
+
+    if (Controllers.FLYWHEEL_UP.pressed()) flywheelOffset = flywheelOffset.plus(FLYWHEEL_STEP);
+    if (Controllers.FLYWHEEL_DOWN.pressed()) flywheelOffset = flywheelOffset.minus(FLYWHEEL_STEP);
+    if (Controllers.TURRET_LEFT.pressed()) turretOffset = turretOffset.plus(TURRET_STEP);
+    if (Controllers.TURRET_RIGHT.pressed()) turretOffset = turretOffset.plus(TURRET_STEP);
   }
 
   public AngularVelocity getFlywheelSpeed() {

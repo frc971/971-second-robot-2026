@@ -46,10 +46,13 @@ public class Controllers {
   public static final Trigger REZERO = ANDRE.a();
 
   // OTF Tuning (AndreTuner)
-  public static final Trigger FLYWHEEL_UP = ANDRE.povUp();
-  public static final Trigger FLYWHEEL_DOWN = ANDRE.povDown();
-  public static final Trigger TURRET_LEFT = ANDRE.povLeft();
-  public static final Trigger TURRET_RIGHT = ANDRE.povRight();
+  public static final Toggle TUNE_LEFT = new Toggle(ANDRE.back());
+  public static final Toggle TUNE_RIGHT = new Toggle(ANDRE.start());
+
+  public static final RisingEdge FLYWHEEL_UP = new RisingEdge(ANDRE.povUp());
+  public static final RisingEdge FLYWHEEL_DOWN = new RisingEdge(ANDRE.povDown());
+  public static final RisingEdge TURRET_LEFT = new RisingEdge(ANDRE.povLeft());
+  public static final RisingEdge TURRET_RIGHT = new RisingEdge(ANDRE.povRight());
 
   // TODO: get a feel for what axis threshold is the best to congrol with
   // MANUAL Shooter Setpoints

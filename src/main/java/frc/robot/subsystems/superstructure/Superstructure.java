@@ -231,8 +231,8 @@ public class Superstructure {
       }
     }
 
-    shooterHandlerLeft.periodic();
-    shooterHandlerRight.periodic();
+    shooterHandlerLeft.setTuningEnabled(Controllers.TUNE_LEFT.toggled());
+    shooterHandlerRight.setTuningEnabled(Controllers.TUNE_RIGHT.toggled());
 
     shooterTuner.periodic();
 
