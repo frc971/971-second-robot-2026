@@ -1,16 +1,16 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import frc.robot.lib.superstructure.*;
+import frc.robot.lib.superstructure.LinearSubsystem;
+import frc.robot.lib.superstructure.MotorConfig;
 
-// TODO: change the constants!! and the other numbers
-
+// TODO: Get correct constants
 public class Climber extends LinearSubsystem {
   public Climber() {
     super(getMotorConfig());
@@ -50,7 +50,7 @@ public class Climber extends LinearSubsystem {
 
     return MotorConfig.builder()
         .NAME("Climber")
-        .ID(17)
+        .ID(-1)
         .BUS(new CANBus("Drivetrain Bus"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Meters)

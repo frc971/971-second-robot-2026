@@ -1,8 +1,8 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
 
-import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -46,7 +46,6 @@ public class Superstructure {
   public final Kicker kicker;
   public final Climber climber;
 
-  public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   // If the turret is not within the interval (-SWAP_BUFFER, SWAP_BUFFER) one of the two turrets
@@ -89,9 +88,6 @@ public class Superstructure {
 
     // default left turret
     shooterTuner = new ShooterTuner(flywheelLeft, hoodLeft, turretLeft, shooterHandlerLeft);
-
-    visualization =
-        new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber, groundPivot);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -256,8 +252,6 @@ public class Superstructure {
     groundRollers.periodic();
     kicker.periodic();
     climber.periodic();
-
-    visualization.periodic();
   }
 
   public void setGoal(Setpoint setpoint) {

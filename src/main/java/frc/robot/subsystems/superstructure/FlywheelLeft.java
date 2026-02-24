@@ -1,6 +1,6 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -10,7 +10,11 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.lib.superstructure.*;
+import frc.robot.lib.superstructure.AngularSubsystem;
+import frc.robot.lib.superstructure.MotorConfig;
+import frc.robot.lib.superstructure.MotorIO;
+import frc.robot.lib.superstructure.MotorSim;
+import frc.robot.lib.superstructure.MotorWithFollowerTalonFX;
 
 // TODO: change the constants!!
 public class FlywheelLeft extends AngularSubsystem {
@@ -31,12 +35,12 @@ public class FlywheelLeft extends AngularSubsystem {
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
-    tc.Slot0.kS = 0.21;
-    tc.Slot0.kV = 0.125;
+    tc.Slot0.kS = 0;
+    tc.Slot0.kV = 0;
     tc.Slot0.kA = 0.0;
     tc.Slot0.kG = 0.0;
 
-    tc.Slot0.kP = 0.4;
+    tc.Slot0.kP = 0.0;
     tc.Slot0.kI = 0.0;
     tc.Slot0.kD = 0.0;
 
@@ -58,7 +62,7 @@ public class FlywheelLeft extends AngularSubsystem {
 
     return MotorConfig.builder()
         .NAME("Flywheel Left Lead")
-        .ID(33)
+        .ID(-1)
         .BUS(new CANBus("Left Superstructure"))
         .TALONFX_CONFIG(tc)
         .build();
@@ -67,7 +71,7 @@ public class FlywheelLeft extends AngularSubsystem {
   public static MotorConfig getFollowerConfig() {
     return getMotorConfig().toBuilder()
         .NAME("Flywheel Left Follower")
-        .ID(34)
+        .ID(-1)
         .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
         .build();
   }

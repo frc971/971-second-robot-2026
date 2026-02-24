@@ -4,9 +4,10 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import frc.robot.lib.superstructure.*;
+import frc.robot.lib.superstructure.MotorConfig;
+import frc.robot.lib.superstructure.MotorSubsystem;
 
-// TODO: change the constants
+// TODO: Get correct constants
 public class Kicker extends MotorSubsystem {
   Kicker() {
     super(getMotorConfig());
@@ -27,7 +28,7 @@ public class Kicker extends MotorSubsystem {
 
     return MotorConfig.builder()
         .NAME("Kicker")
-        .ID(16)
+        .ID(-1)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();

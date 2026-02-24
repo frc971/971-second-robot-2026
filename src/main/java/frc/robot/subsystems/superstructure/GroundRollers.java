@@ -4,8 +4,10 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import frc.robot.lib.superstructure.*;
+import frc.robot.lib.superstructure.MotorConfig;
+import frc.robot.lib.superstructure.MotorSubsystem;
 
+// TODO: Get correct constants
 public class GroundRollers extends MotorSubsystem {
   public GroundRollers() {
     super(getMotorConfig());
@@ -24,7 +26,7 @@ public class GroundRollers extends MotorSubsystem {
 
     return MotorConfig.builder()
         .NAME("Ground Rollers")
-        .ID(15)
+        .ID(-1)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();

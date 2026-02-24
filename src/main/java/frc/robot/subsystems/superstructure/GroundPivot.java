@@ -7,10 +7,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import frc.robot.lib.superstructure.*;
+import frc.robot.lib.superstructure.AngularSubsystem;
+import frc.robot.lib.superstructure.MotorConfig;
 
-// TODO: change the constants...
-
+// TODO: Get correct constants
 public class GroundPivot extends AngularSubsystem {
 
   public GroundPivot() {
@@ -21,10 +21,10 @@ public class GroundPivot extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.33; // Static friction compensation
-    tc.Slot0.kV = 5.0; // Velocity feedforward
+    tc.Slot0.kS = 0.0; // Static friction compensation
+    tc.Slot0.kV = 0.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = -0.15; // Gravity compensation
+    tc.Slot0.kG = 0.0; // Gravity compensation
 
     tc.Slot0.kP = 8.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
@@ -49,7 +49,7 @@ public class GroundPivot extends AngularSubsystem {
 
     return MotorConfig.builder()
         .NAME("Ground Pivot")
-        .ID(14)
+        .ID(-1)
         .BUS(new CANBus("rio"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
