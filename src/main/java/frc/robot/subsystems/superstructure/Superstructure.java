@@ -53,6 +53,8 @@ public class Superstructure {
   // will take a different arc to prevent collisions in the air
   private static final Angle SWAP_BUFFER = Degrees.of(30);
 
+  private final LED led;
+
   private enum ShooterGoal {
     NONE,
     MANUAL,
@@ -89,6 +91,8 @@ public class Superstructure {
 
     visualization =
         new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber, groundPivot);
+
+    led = new LED();
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -276,6 +280,21 @@ public class Superstructure {
     climber.periodic();
 
     visualization.periodic();
+
+    updateLEDS();
+  }
+
+  private void updateLEDS() {
+    boolean leftKilled = Controllers.KILL_LEFT.toggled();
+    boolean rightKilled = Controllers.KILL_RIGHT.toggled();
+    boolean shootCommandActive =
+        Controllers.LEFT_SHUTTLE.getAsBoolean()
+            || Controllers.RIGHT_SHUTTLE.getAsBoolean()
+            || Controllers.SHOOT.getAsBoolean()
+            || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
+    boolean leftLocked = shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING;
+    boolean rightLocked = shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING;
+    led.updateTurretSegments(leftKilled, rightKilled, shootCommandActive, leftLocked, rightLocked);
   }
 
   public void setGoal(Setpoint setpoint) {
