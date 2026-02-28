@@ -61,9 +61,6 @@ public class Superstructure {
     TUNE_RIGHT_SHOOTER,
   }
 
-  private boolean freezeIntake = false;
-  private boolean prevIntakePressed = false;
-
   public Superstructure(RobotContainer robotContainer) {
     drivetrain = robotContainer.drivetrain;
     flywheelRight = new FlywheelRight();
@@ -117,7 +114,9 @@ public class Superstructure {
         shooterGoal = ShooterGoal.TARGETING;
       }
 
-      // TODO: is this covered by the neutral setpoint or no?
+      shooterHandlerLeft.setTuningEnabled(Controllers.TUNE_LEFT.getAsBoolean());
+      shooterHandlerRight.setTuningEnabled(Controllers.TUNE_RIGHT.getAsBoolean());
+
       shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
       shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
       shooterTuner.setGoal(ShooterTuner.Goal.NONE);
@@ -187,24 +186,28 @@ public class Superstructure {
       }
 
       // intake (will override outtake)
-      if (freezeIntake) {
-        setGoal(SetpointGoal.INTAKE_PIVOT);
-      }
-
-      if (Controllers.INTAKE.getAsBoolean()) {
-        setGoal(SetpointGoal.INTAKE_ROLLERS);
+      if (Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);
 
-        if (!prevIntakePressed) {
-          freezeIntake = false;
-        }
-
-        if (Controllers.INTAKE_FREEZE.getAsBoolean()) {
-          freezeIntake = true;
+        if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
+          setGoal(SetpointGoal.INTAKE_ROLLERS);
         }
       }
 
-      prevIntakePressed = Controllers.INTAKE.getAsBoolean();
+      if (Controllers.LEFT_SHUTTLE.getAsBoolean()
+          || Controllers.RIGHT_SHUTTLE.getAsBoolean()
+          || Controllers.SHOOT.getAsBoolean()
+          || Controllers.SHOOT_REDUNDANCY.getAsBoolean()) {
+        if (!Controllers.KILL_LEFT.toggled()
+            && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
+          hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+        }
+
+        if (!Controllers.KILL_RIGHT.toggled()
+            && shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
+          hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+        }
+      }
 
       // Indexer Logic
       // Driver has to say we can shoot AND we need to be ready to shoot
@@ -224,6 +227,7 @@ public class Superstructure {
         } else if (Controllers.KILL_RIGHT.toggled()) {
           setGoal(SetpointGoal.INDEX_LEFT);
         }
+
       } else if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
       }
@@ -235,12 +239,26 @@ public class Superstructure {
       if (Controllers.KILL_RIGHT.toggled()) {
         setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
       }
+    } else if (DriverStation.isAutonomous()) {
+      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
+          && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
+        hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+      }
+
+      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE
+          && shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
+        hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+      }
+
+      if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
+          || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
+        setGoal(SetpointGoal.INDEX_BOTH);
+      }
     }
 
-    shooterHandlerLeft.setTuningEnabled(Controllers.TUNE_LEFT.toggled());
-    shooterHandlerRight.setTuningEnabled(Controllers.TUNE_RIGHT.toggled());
-
     shooterTuner.periodic();
+    shooterHandlerLeft.periodic();
+    shooterHandlerRight.periodic();
 
     // subsystems
     flywheelRight.periodic();
@@ -323,7 +341,45 @@ public class Superstructure {
   }
 
   public Command neutral() {
-    return Commands.run(() -> setGoal(SetpointGoal.NEUTRAL));
+    return Commands.runOnce(
+        () -> {
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+          setGoal(SetpointGoal.AUTO_NEUTRAL);
+        });
+  }
+
+  public Command intakeAuto() {
+    return Commands.runOnce(
+        () -> {
+          setGoal(SetpointGoal.INTAKE_ROLLERS);
+          setGoal(SetpointGoal.INTAKE_PIVOT);
+        });
+  }
+
+  public Command deployedAuto() {
+    return Commands.runOnce(
+        () -> {
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+          setGoal(SetpointGoal.AUTO_NEUTRAL);
+          setGoal(SetpointGoal.INTAKE_PIVOT);
+        });
+  }
+
+  public Command shootAuto() {
+    return Commands.runOnce(
+        () -> {
+          ObjectState curTarget =
+              DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                  ? ShooterHandler.Targets.BLUE
+                  : ShooterHandler.Targets.RED;
+          shooterHandlerLeft.setTargetState(curTarget);
+          shooterHandlerRight.setTargetState(curTarget);
+
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+        });
   }
 
   public boolean freezeDriving() {

@@ -24,10 +24,10 @@ public class GroundPivot extends AngularSubsystem {
     tc.Slot0.kS = 0.33; // Static friction compensation
     tc.Slot0.kV = 5.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = -0.15; // Gravity compensation
+    tc.Slot0.kG = -0.2; // Gravity compensation
 
     tc.Slot0.kP = 8.0; // Proportional gain
-    tc.Slot0.kI = 0.0; // Integral gain
+    tc.Slot0.kI = 30.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
@@ -42,8 +42,8 @@ public class GroundPivot extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
-    tc.CurrentLimits.StatorCurrentLimit = 100.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
+    tc.CurrentLimits.StatorCurrentLimit = 70.0;
 
     tc.Feedback.SensorToMechanismRatio = (36.0 / 1.0); // Motor to output gear ratio
 

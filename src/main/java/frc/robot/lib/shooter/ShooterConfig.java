@@ -35,7 +35,7 @@ public class ShooterConfig {
   @Builder
   public static class Constraints {
     // low-priority constraints
-    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(1);
+    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(1.0);
     @Builder.Default private Distance MAX_SHOT_DISTANCE = Meters.of(1000);
 
     // high-priority constraints
@@ -61,7 +61,7 @@ public class ShooterConfig {
   public static class Threshold {
     @Builder.Default private AngularVelocity AIMING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(2.0);
 
-    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(2.0);
+    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(10.0);
 
     @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(2.0);
 
@@ -72,10 +72,10 @@ public class ShooterConfig {
      */
 
     // SHOOTING thresholds (once above, will abort the shot)
-    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = RotationsPerSecond.of(4.0);
+    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = RotationsPerSecond.of(3.0);
 
-    @Builder.Default private Angle SHOOTING_ROTATION_THRESHOLD = Degrees.of(4);
+    @Builder.Default private Angle SHOOTING_ROTATION_THRESHOLD = Degrees.of(15.0);
 
-    @Builder.Default private Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Degrees.of(4);
+    @Builder.Default private Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Degrees.of(4.0);
   }
 }

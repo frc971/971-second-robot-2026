@@ -36,7 +36,7 @@ public class FlywheelLeft extends AngularSubsystem {
     tc.Slot0.kA = 0.0;
     tc.Slot0.kG = 0.0;
 
-    tc.Slot0.kP = 0.4;
+    tc.Slot0.kP = 0.55;
     tc.Slot0.kI = 0.0;
     tc.Slot0.kD = 0.0;
 

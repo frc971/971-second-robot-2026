@@ -32,9 +32,13 @@ public class TurretLeft extends AngularSubsystem {
     tc.Slot0.kS = 0.0; // Static friction compensation
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 60.0; // Proportional gain
+    tc.Slot0.kP = 200.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
+
+    // for sim only
+    tc.MotionMagic.MotionMagicCruiseVelocity = 10.0;
+    tc.MotionMagic.MotionMagicAcceleration = 10.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

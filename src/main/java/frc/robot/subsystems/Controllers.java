@@ -10,8 +10,9 @@ public class Controllers {
   public static final CommandXboxController ANDRE = new CommandXboxController(1);
 
   // === Troy's Controls
-  public static final Trigger INTAKE_FREEZE = TROY.leftBumper();
-  public static final Trigger INTAKE = TROY.leftTrigger();
+  public static final Toggle INTAKE_PIVOT = new Toggle(TROY.leftBumper());
+  public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
+
   public static final Trigger SHOOT_REDUNDANCY = TROY.rightTrigger();
   public static final Trigger CLIMB_EXTEND = TROY.y();
   public static final Trigger CLIMB_RETRACT = TROY.b(); // TODO: add drivetrain controls
@@ -43,14 +44,14 @@ public class Controllers {
   public static final Toggle KILL_LEFT = new Toggle(ANDRE.x());
   public static final Toggle KILL_RIGHT = new Toggle(ANDRE.b());
   public static final Toggle MANUAL = new Toggle(ANDRE.y());
-  public static final Trigger REZERO = ANDRE.a();
+  public static final RisingEdge REZERO = new RisingEdge(ANDRE.a());
 
   public static final Trigger SHUTTLE_LEFT = ANDRE.leftBumper();
   public static final Trigger SHUTTLE_RIGHT = ANDRE.rightBumper();
 
   // OTF Tuning (AndreTuner)
-  public static final Toggle TUNE_LEFT = new Toggle(ANDRE.back());
-  public static final Toggle TUNE_RIGHT = new Toggle(ANDRE.start());
+  public static final Trigger TUNE_LEFT = ANDRE.back();
+  public static final Trigger TUNE_RIGHT = ANDRE.start();
 
   public static final RisingEdge FLYWHEEL_UP = new RisingEdge(ANDRE.povUp());
   public static final RisingEdge FLYWHEEL_DOWN = new RisingEdge(ANDRE.povDown());

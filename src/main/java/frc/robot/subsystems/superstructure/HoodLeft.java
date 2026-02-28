@@ -28,6 +28,10 @@ public class HoodLeft extends AngularSubsystem {
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
+    // for sim only
+    tc.MotionMagic.MotionMagicCruiseVelocity = 10.0;
+    tc.MotionMagic.MotionMagicAcceleration = 10.0;
+
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
