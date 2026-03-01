@@ -14,9 +14,9 @@ public enum SetpointGoal {
   RESET(
       Setpoint.builder()
           .withLeftHoodDegrees(0.0)
-          .withLeftTurretDegrees(104.0)
+          .withLeftTurretDegrees(103.5)
           .withRightHoodDegrees(0.0)
-          .withRightTurretDegrees(104.0)
+          .withRightTurretDegrees(103.5)
           .withGroundPivotDegrees(90.0)
           .withClimberMeters(0.0)),
   NEUTRAL(
@@ -48,30 +48,30 @@ public enum SetpointGoal {
   EXTEND(Setpoint.builder().withClimberMeters(0.2)),
   RETRACT(Setpoint.builder().withClimberMeters(0.0)),
   INDEX_BOTH(
-      Setpoint.builder().withLeftIndexerVolts(6.0).withRightIndexerVolts(6.0).withKickerVolts(8.0)),
+      Setpoint.builder()
+          .withLeftIndexerVolts(10.0)
+          .withRightIndexerVolts(10.0)
+          .withKickerVolts(8.0)),
   INDEX_RIGHT(
       Setpoint.builder()
           .withKickerVolts(8.0)
-          .withLeftIndexerVolts(-6.0)
-          .withRightIndexerVolts(6.0)),
+          .withLeftIndexerVolts(-10.0)
+          .withRightIndexerVolts(10.0)),
   INDEX_LEFT(
       Setpoint.builder()
           .withKickerVolts(8.0)
-          .withLeftIndexerVolts(6.0)
-          .withRightIndexerVolts(-6.0)),
+          .withLeftIndexerVolts(10.0)
+          .withRightIndexerVolts(-10.0)),
   OUTTAKE(
       Setpoint.builder()
           .withKickerVolts(-7.0)
           .withLeftIndexerVolts(0.0)
           .withRightIndexerVolts(0.0)
-          .withGroundRollersVolts(-11.0)
+          .withGroundRollersVolts(-12.0)
           .withGroundPivotDegrees(24.0)),
   INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(23.0)),
-  INTAKE_ROLLERS(
-      Setpoint.builder()
-          .withGroundRollersVolts(10.0)
-          .withLeftIndexerVolts(0.0)
-          .withRightIndexerVolts(0.0)),
+  AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(12.0)),
+  INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
   KILL_RIGHT(
       Setpoint.builder()
           .withRightFlywheelRPS(0.0)

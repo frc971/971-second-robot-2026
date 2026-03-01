@@ -52,13 +52,14 @@ public class ShooterConfigs {
 
   private static ShotTable shotTable() {
     ShotTable table = new ShotTable();
+    table.put(Meters.of(1.01), Degrees.of(9.37500), RotationsPerSecond.of(30.0));
     table.put(Meters.of(1.5794), Degrees.of(9.37500), RotationsPerSecond.of(46.87500));
-    table.put(Meters.of(2.0), Degrees.of(13.03411), RotationsPerSecond.of(50.537067));
-    table.put(Meters.of(2.65702), Degrees.of(18.75000), RotationsPerSecond.of(54.97559));
-    table.put(Meters.of(3.0), Degrees.of(23.23695), RotationsPerSecond.of(55.1));
-    table.put(Meters.of(3.5), Degrees.of(29.77807), RotationsPerSecond.of(55.5398495));
-    table.put(Meters.of(4.0), Degrees.of(37.50000), RotationsPerSecond.of(55.3));
-    table.put(Meters.of(5.04561), Degrees.of(37.50000), RotationsPerSecond.of(66.75));
+    table.put(Meters.of(2.0), Degrees.of(13.03411), RotationsPerSecond.of(48.));
+    table.put(Meters.of(2.65702), Degrees.of(18.75000), RotationsPerSecond.of(50.0));
+    table.put(Meters.of(3.0), Degrees.of(23.23695), RotationsPerSecond.of(55.0));
+    table.put(Meters.of(3.5), Degrees.of(29.77807), RotationsPerSecond.of(55.0));
+    table.put(Meters.of(4.0), Degrees.of(37.50000), RotationsPerSecond.of(55.0));
+    table.put(Meters.of(5.04561), Degrees.of(37.50000), RotationsPerSecond.of(58.0));
     table.put(Meters.of(5.23), Degrees.of(41), RotationsPerSecond.of(67.0));
     table.put(Meters.of(5.69375), Degrees.of(48.4375), RotationsPerSecond.of(69.53125));
 
@@ -66,10 +67,10 @@ public class ShooterConfigs {
     table.put(Meters.of(1.07), Seconds.of(1.15));
     table.put(Meters.of(1.47), Seconds.of(1.15));
     table.put(Meters.of(2.0), Seconds.of(1.28));
-    table.put(Meters.of(2.5), Seconds.of(1.34));
-    table.put(Meters.of(3.0), Seconds.of(1.37));
-    table.put(Meters.of(3.5), Seconds.of(1.32));
-    table.put(Meters.of(4.0), Seconds.of(1.23));
+    table.put(Meters.of(2.5), Seconds.of(1.1));
+    table.put(Meters.of(3.0), Seconds.of(0.8));
+    table.put(Meters.of(3.5), Seconds.of(1.1));
+    table.put(Meters.of(4.0), Seconds.of(1.1));
     table.put(Meters.of(4.5), Seconds.of(1.28));
     table.put(Meters.of(5.0), Seconds.of(1.383));
     table.put(Meters.of(6.0), Seconds.of(1.24)); // 32% vibed

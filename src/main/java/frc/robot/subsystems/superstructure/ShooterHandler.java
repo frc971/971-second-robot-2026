@@ -269,9 +269,15 @@ public class ShooterHandler {
       return true;
     }
 
-    return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHOOTING_FLYWHEEL_ABORT())
-        || turretRotationAbsDiff().gt(config.THRESHOLD().SHOOTING_ROTATION_THRESHOLD())
-        || hoodAngleAbsDiff().gt(config.THRESHOLD().SHOOTING_HOOD_ANGLE_THRESHOLD());
+    if (targetState == Targets.BLUE || targetState == Targets.RED) {
+      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHOOTING_FLYWHEEL_ABORT())
+          || turretRotationAbsDiff().gt(config.THRESHOLD().SHOOTING_ROTATION_THRESHOLD())
+          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHOOTING_HOOD_ANGLE_THRESHOLD());
+    } else {
+      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHUTTLING_FLYWHEEL_THRESHOLD())
+          || turretRotationAbsDiff().gt(config.THRESHOLD().SHUTTLING_ROTATION_THRESHOLD())
+          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHUTTLING_HOOD_ANGLE_THRESHOLD());
+    }
   }
 
   // --- Threshold helper functions ---

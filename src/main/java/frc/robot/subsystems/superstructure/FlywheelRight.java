@@ -47,7 +47,7 @@ public class FlywheelRight extends AngularSubsystem {
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;

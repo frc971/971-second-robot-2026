@@ -72,10 +72,17 @@ public class ShooterConfig {
      */
 
     // SHOOTING thresholds (once above, will abort the shot)
-    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = RotationsPerSecond.of(3.0);
+    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = RotationsPerSecond.of(2.5);
 
     @Builder.Default private Angle SHOOTING_ROTATION_THRESHOLD = Degrees.of(15.0);
 
     @Builder.Default private Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Degrees.of(4.0);
+
+    @Builder.Default
+    private AngularVelocity SHUTTLING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(8.0);
+
+    @Builder.Default private Angle SHUTTLING_ROTATION_THRESHOLD = Degrees.of(20.0);
+
+    @Builder.Default private Angle SHUTTLING_HOOD_ANGLE_THRESHOLD = Degrees.of(5.0);
   }
 }

@@ -220,8 +220,9 @@ public class Superstructure {
                   || Controllers.RIGHT_SHUTTLE.getAsBoolean()
                   || Controllers.SHOOT.getAsBoolean()
                   || Controllers.SHOOT_REDUNDANCY.getAsBoolean())
-              && (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
-                  || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING);
+              && ((shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
+                      || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)
+                  || shooterGoal == ShooterGoal.MANUAL);
 
       if (indexing) {
         if (!Controllers.KILL_LEFT.toggled() && !Controllers.KILL_RIGHT.toggled()) {
@@ -371,7 +372,7 @@ public class Superstructure {
   public Command intakeAuto() {
     return Commands.runOnce(
         () -> {
-          setGoal(SetpointGoal.INTAKE_ROLLERS);
+          setGoal(SetpointGoal.AUTO_INTAKE_ROLLERS);
           setGoal(SetpointGoal.INTAKE_PIVOT);
         });
   }

@@ -31,7 +31,7 @@ public class RobotContainer {
   public final Superstructure superstructure;
 
   private double MAX_SPEED = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-  private double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.90).in(RadiansPerSecond);
+  private double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
