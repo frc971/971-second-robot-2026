@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 
 public class ShooterConfigs {
   public static final ShooterConfig ALL_DEFAULTS = ShooterConfig.builder().build();
-  public static final double RIGHT_SIDE_FUDGE = 1.0;
 
   public static final ShooterConfig TEST_CONFIG =
       ShooterConfig.builder()
@@ -20,11 +19,7 @@ public class ShooterConfigs {
                   .TURRET_XY_OFFSET(
                       new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.272987))
                   .build())
-          .PHYSICS(
-              ShooterConfig.Physics.builder()
-                  .SHOT_TABLE(shotTable())
-                  .FUDGE_FACTOR(RIGHT_SIDE_FUDGE)
-                  .build())
+          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(shotTable()).build())
           .build();
   public static final ShooterConfig LEFT =
       ShooterConfig.builder()

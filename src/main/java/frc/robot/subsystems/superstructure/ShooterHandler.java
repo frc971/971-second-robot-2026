@@ -197,7 +197,7 @@ public class ShooterHandler {
   }
 
   public AngularVelocity getFlywheelSpeed() {
-    return launchSolution.flywheelSpeed().times(config.PHYSICS().FUDGE_FACTOR());
+    return launchSolution.flywheelSpeed();
   }
 
   public Angle getRelativeTurretAngle() {
