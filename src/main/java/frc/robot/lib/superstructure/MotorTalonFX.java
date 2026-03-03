@@ -26,11 +26,10 @@ public class MotorTalonFX extends MotorIO {
   protected Optional<CANcoder> cancoder = Optional.empty();
   protected final TalonFX motor;
 
-  protected final VoltageOut voltageRequest = new VoltageOut(0.0).withEnableFOC(true);
-  protected final VelocityVoltage velocityRequest = new VelocityVoltage(0.0).withEnableFOC(true);
+  protected final VoltageOut voltageRequest;
+  protected final VelocityVoltage velocityRequest;
   protected final DynamicMotionMagicVoltage dynamicMotionMagicPositionRequest;
-  protected final PositionVoltage positionVoltageRequest =
-      new PositionVoltage(0.0).withEnableFOC(true);
+  protected final PositionVoltage positionVoltageRequest;
 
   protected StatusSignal<Angle> positionSignal;
   protected StatusSignal<AngularVelocity> velocitySignal;
@@ -46,6 +45,11 @@ public class MotorTalonFX extends MotorIO {
     this.cancoderConfig = optionalCancoderConfig;
 
     MotionMagicConfigs mmConfigs = motorConfig.TALONFX_CONFIG().MotionMagic;
+
+    voltageRequest = new VoltageOut(0.0).withEnableFOC(motorConfig.FOC());
+    velocityRequest = new VelocityVoltage(0.0).withEnableFOC(motorConfig.FOC());
+    positionVoltageRequest = new PositionVoltage(0.0).withEnableFOC(motorConfig.FOC());
+
     dynamicMotionMagicPositionRequest =
         new DynamicMotionMagicVoltage(
             0, mmConfigs.MotionMagicCruiseVelocity, mmConfigs.MotionMagicAcceleration);
@@ -125,7 +129,7 @@ public class MotorTalonFX extends MotorIO {
         dynamicMotionMagicPositionRequest
             .withPosition(goalPosition)
             .withFeedForward(feedforward)
-            .withEnableFOC(true)
+            .withEnableFOC(motorConfig.FOC())
             .withSlot(0));
   }
 
@@ -134,7 +138,7 @@ public class MotorTalonFX extends MotorIO {
         positionVoltageRequest
             .withPosition(goalPosition)
             .withFeedForward(feedforward)
-            .withEnableFOC(true)
+            .withEnableFOC(motorConfig.FOC())
             .withSlot(0));
   }
 

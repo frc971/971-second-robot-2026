@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left 1"
+            "pathName": "Right 1"
           }
         },
         {
@@ -37,31 +37,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Neutral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left 2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
+            "waitTime": 5.0
           }
         },
         {

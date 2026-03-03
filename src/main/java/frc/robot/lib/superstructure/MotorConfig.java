@@ -19,6 +19,8 @@ public class MotorConfig {
   private CANBus BUS;
   private TalonFXConfiguration TALONFX_CONFIG;
 
+  @Builder.Default private boolean FOC = true;
+
   @Builder.Default private Unit LOG_UNIT = Rotations;
 
   @Builder.Default private MotorAlignmentValue FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned;
