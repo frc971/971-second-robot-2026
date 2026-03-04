@@ -54,7 +54,9 @@ public class BOS {
                 tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2])),
             tagEstimations[i][4],
             VecBuilder.fill(
-                tagEstimations[i][3], tagEstimations[i][3], tagEstimations[i][3] * 1.5));
+                tagEstimations[i][3] / 5,
+                tagEstimations[i][3] / 5,
+                tagEstimations[i][3] * 1.5 / 5));
       }
     }
   }

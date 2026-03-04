@@ -70,6 +70,13 @@ public class RobotContainer {
     registerNamedCommands();
 
     autoChooser = AutoBuilder.buildAutoChooser("Outpost Side");
+    AutoBuilder.getAllAutoNames().stream()
+        .sorted()
+        .forEach(
+            autoName ->
+                autoChooser.addOption(
+                    autoName + " (Mirrored)", new PathPlannerAuto(autoName, true)));
+
     SmartDashboard.putData("Auto Mode", autoChooser);
 
     configureDrivetrain();

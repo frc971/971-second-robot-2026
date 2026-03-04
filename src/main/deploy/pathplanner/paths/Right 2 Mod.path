@@ -8,56 +8,56 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.536219686162623,
-        "y": 0.5678790691860083
+        "x": 4.24493803127818,
+        "y": 0.698226300814764
       },
       "isLocked": false,
       "linkedName": "Shoot"
     },
     {
       "anchor": {
-        "x": 6.4992023668791115,
-        "y": 0.9975438168174344
+        "x": 5.879570551375611,
+        "y": 0.6887094598067438
       },
       "prevControl": {
-        "x": 6.097383197985197,
-        "y": 1.0904158742804282
+        "x": 5.350978962955465,
+        "y": 0.5585503467943215
       },
       "nextControl": {
-        "x": 6.889591974127865,
-        "y": 0.9073134623593224
-      },
-      "isLocked": false,
-      "linkedName": "Trench Start"
-    },
-    {
-      "anchor": {
-        "x": 6.20859664113898,
-        "y": 1.9294591000205594
-      },
-      "prevControl": {
-        "x": 6.574710243626644,
-        "y": 1.2380489951685854
-      },
-      "nextControl": {
-        "x": 5.590979185633192,
-        "y": 3.0958373683179103
+        "x": 6.164193581908642,
+        "y": 0.7587943457728841
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.8891447368421055,
-        "y": 3.430934544613487
+        "x": 6.033960826739037,
+        "y": 4.887091324296723
       },
       "prevControl": {
-        "x": 6.3721202700845705,
-        "y": 4.03230043276387
+        "x": 6.040270122842366,
+        "y": 5.557332938910675
       },
       "nextControl": {
-        "x": 7.595551179584704,
-        "y": 2.6092930843955595
+        "x": 6.027602513711755,
+        "y": 4.211642602310493
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.879570551375611,
+        "y": 0.6887094598067438
+      },
+      "prevControl": {
+        "x": 6.24167957342403,
+        "y": 0.9738631500200983
+      },
+      "nextControl": {
+        "x": 5.683159583794401,
+        "y": 0.5340397090026099
       },
       "isLocked": false,
       "linkedName": null
@@ -68,30 +68,26 @@
         "y": 0.6887094598067438
       },
       "prevControl": {
-        "x": 6.38095577746077,
-        "y": 0.5031857738935686
+        "x": 3.303467716351987,
+        "y": 0.7815815172697377
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Shoot"
+      "linkedName": "Trench Start"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.4605543710021454,
-      "rotationDegrees": -145.3322665691217
+      "waypointRelativePos": 1.0502687850088437,
+      "rotationDegrees": -137.1395710000378
     },
     {
-      "waypointRelativePos": 2.0,
+      "waypointRelativePos": 1.3404667692364383,
       "rotationDegrees": -90.0
     },
     {
-      "waypointRelativePos": 2.4136460554370784,
-      "rotationDegrees": -138.31674834133452
-    },
-    {
-      "waypointRelativePos": 3.0788912579957377,
-      "rotationDegrees": 91.99195886781169
+      "waypointRelativePos": 1.8669007499262964,
+      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [],
@@ -99,7 +95,7 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.3889264010803504,
+      "waypointRelativePos": 0.8,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -110,7 +106,7 @@
     },
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 3.52194463200541,
+      "waypointRelativePos": 4.0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -136,7 +132,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 145.71428048925867
+    "rotation": 168.15568092586324
   },
   "useDefaultConstraints": false
 }

@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.316311475409836,
-        "y": 0.7486138313914432
+        "x": 4.320692157684423,
+        "y": 0.7158332566331376
       },
       "isLocked": false,
       "linkedName": "Start"
     },
     {
       "anchor": {
-        "x": 7.497755512438322,
-        "y": 1.3980099326685853
+        "x": 7.804208273894435,
+        "y": 1.2608353060883837
       },
       "prevControl": {
-        "x": 7.1854041654308665,
-        "y": 0.5640079942187048
+        "x": 7.772379321016061,
+        "y": 0.2789384465324235
       },
       "nextControl": {
-        "x": 7.8864012676208555,
-        "y": 2.435723764537589
+        "x": 7.840109487758862,
+        "y": 2.368358047487727
       },
       "isLocked": false,
       "linkedName": "IntakeA"
@@ -36,12 +36,12 @@
         "y": 2.65819091796875
       },
       "prevControl": {
-        "x": 7.80102381889227,
-        "y": 2.9081706356386827
+        "x": 7.806567909082756,
+        "y": 2.9081797819642854
       },
       "nextControl": {
-        "x": 7.830085592011411,
-        "y": 0.6268214457861543
+        "x": 7.781044843874801,
+        "y": 0.20416769204429208
       },
       "isLocked": false,
       "linkedName": "IntakeB"
@@ -52,8 +52,8 @@
         "y": 0.6887094598067438
       },
       "prevControl": {
-        "x": 5.7720491108141445,
-        "y": 0.779364013671875
+        "x": 6.00425804260059,
+        "y": 0.6339684288341778
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,8 +62,12 @@
   ],
   "rotationTargets": [
     {
+      "waypointRelativePos": 0.05687281770526148,
+      "rotationDegrees": 180.0
+    },
+    {
       "waypointRelativePos": 0.5,
-      "rotationDegrees": 90.0
+      "rotationDegrees": 180.0
     },
     {
       "waypointRelativePos": 1.0,
@@ -75,6 +79,10 @@
     },
     {
       "waypointRelativePos": 2.648187633262268,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 2.9647349231647997,
       "rotationDegrees": 180.0
     }
   ],
@@ -128,13 +136,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 145.71428048925867
+    "rotation": 168.15568092586324
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 89.17476521732927
+    "rotation": 166.91230194543223
   },
   "useDefaultConstraints": false
 }
