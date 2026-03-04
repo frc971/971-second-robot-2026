@@ -1,0 +1,107 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.9765495704977862,
+        "y": 7.417968965712284
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.976549570497787,
+        "y": 7.417968965712284
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.528962205399132,
+        "y": 7.417968965712284
+      },
+      "prevControl": {
+        "x": 5.188015394369046,
+        "y": 7.417968965712284
+      },
+      "nextControl": {
+        "x": 5.869909016429219,
+        "y": 7.417968965712284
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.793995816660177,
+        "y": 4.920871741437139
+      },
+      "prevControl": {
+        "x": 7.766276578573926,
+        "y": 7.717315513189446
+      },
+      "nextControl": {
+        "x": 7.798838696424348,
+        "y": 4.432299836548372
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.794675134049229,
+        "y": 7.417968965712284
+      },
+      "prevControl": {
+        "x": 6.728869612337093,
+        "y": 7.362526731148913
+      },
+      "nextControl": {
+        "x": 5.1151406411469,
+        "y": 7.458297731964938
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.4165705545015057,
+        "y": 7.417968965712284
+      },
+      "prevControl": {
+        "x": 1.929537339624782,
+        "y": 7.409508164618642
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.8588648382222872,
+      "rotationDegrees": 90.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 6.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 540.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 179.77497130032233
+  },
+  "reversed": false,
+  "folder": "Center Depot Climb",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 157.52162129027715
+  },
+  "useDefaultConstraints": true
+}
