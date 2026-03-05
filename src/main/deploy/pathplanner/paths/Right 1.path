@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.7052868852459016,
-        "y": 0.6887094598067438
+        "x": 3.9444918228490664,
+        "y": 0.6447634117443339
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.320692157684423,
-        "y": 0.7158332566331376
+        "x": 4.559897095287588,
+        "y": 0.6718872085707277
       },
       "isLocked": false,
-      "linkedName": "Start"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -28,7 +28,7 @@
         "y": 2.368358047487727
       },
       "isLocked": false,
-      "linkedName": "IntakeA"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -44,20 +44,20 @@
         "y": 0.20416769204429208
       },
       "isLocked": false,
-      "linkedName": "IntakeB"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.7052868852459016,
-        "y": 0.6887094598067438
+        "x": 3.9444918228490664,
+        "y": 0.6447634117443339
       },
       "prevControl": {
-        "x": 6.00425804260059,
-        "y": 0.6339684288341778
+        "x": 6.243462980203756,
+        "y": 0.5900223807717679
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Shoot"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
@@ -116,6 +116,17 @@
     },
     {
       "name": "cosmetic field",
+      "waypointRelativePos": 2.106446373980979,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Flywheel"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
       "waypointRelativePos": 2.4794058068872395,
       "endWaypointRelativePos": null,
       "command": {
@@ -136,13 +147,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 145.71428048925867
+    "rotation": 161.71887561600607
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 166.91230194543223
+    "rotation": 157.72527935838286
   },
   "useDefaultConstraints": false
 }

@@ -401,4 +401,12 @@ public class Superstructure {
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
         });
   }
+
+  public Command flywheelAuto() {
+    return Commands.runOnce(
+        () -> {
+          setGoal(SetpointGoal.AUTO_FLYWHEEL);
+          setGoal(SetpointGoal.INTAKE_PIVOT);
+        });
+  }
 }

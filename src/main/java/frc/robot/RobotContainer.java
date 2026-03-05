@@ -95,6 +95,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake", superstructure.intakeAuto());
     NamedCommands.registerCommand("Deployed", superstructure.deployedAuto());
     NamedCommands.registerCommand("Shoot", superstructure.shootAuto());
+    NamedCommands.registerCommand("Flywheel", superstructure.flywheelAuto());
     NamedCommands.registerCommand("Neutral", superstructure.neutral());
   }
 

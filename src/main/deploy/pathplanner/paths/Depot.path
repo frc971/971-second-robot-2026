@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.5743063939493687,
-        "y": 6.095164167020267
+        "x": 1.5500006591016873,
+        "y": 5.959664890667121
       },
       "prevControl": {
-        "x": 3.0344996131190087,
-        "y": 6.9071892759670455
+        "x": 2.512044371583591,
+        "y": 6.087589461841523
       },
       "nextControl": {
-        "x": 1.217434518924005,
-        "y": 5.896704867666512
+        "x": 1.302181958465399,
+        "y": 5.926712021066104
       },
       "isLocked": false,
       "linkedName": null
@@ -63,10 +63,34 @@
         "nominalVoltage": 12.0,
         "unlimited": false
       }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 6.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 540.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
     }
   ],
   "pointTowardsZones": [],
   "eventMarkers": [
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Shoot"
+        }
+      }
+    },
     {
       "name": "cosmetic field",
       "waypointRelativePos": 1.0207441689311596,
@@ -88,6 +112,17 @@
           "name": "Deployed"
         }
       }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 2.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Neutral"
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -106,7 +141,7 @@
   "folder": "Hitchhiker",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -179.89740311462552
+    "rotation": 0.21979543858416406
   },
   "useDefaultConstraints": true
 }

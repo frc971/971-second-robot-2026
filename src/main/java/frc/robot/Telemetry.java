@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -65,6 +66,10 @@ public class Telemetry {
       driveStateTable.getDoubleTopic("Timestamp").publish();
   private final DoublePublisher driveOdometryFrequency =
       driveStateTable.getDoubleTopic("OdometryFrequency").publish();
+  private final IntegerPublisher driveSuccessfulDaqs =
+      driveStateTable.getIntegerTopic("SuccessfulDaqs").publish();
+  private final IntegerPublisher driveFailedDaqs =
+      driveStateTable.getIntegerTopic("FailedDaqs").publish();
 
   /* Robot pose for field positioning */
   private final NetworkTable table = inst.getTable("Pose");
@@ -123,6 +128,8 @@ public class Telemetry {
     driveModulePositions.set(state.ModulePositions);
     driveTimestamp.set(state.Timestamp);
     driveOdometryFrequency.set(1.0 / state.OdometryPeriod);
+    driveSuccessfulDaqs.set(state.SuccessfulDaqs);
+    driveFailedDaqs.set(state.FailedDaqs);
 
     /* Also write to log file */
     poseArray[0] = state.Pose.getX();
@@ -140,6 +147,8 @@ public class Telemetry {
     SignalLogger.writeDoubleArray("DriveState/ModuleStates", moduleStatesArray);
     SignalLogger.writeDoubleArray("DriveState/ModuleTargets", moduleTargetsArray);
     SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
+    SignalLogger.writeInteger("DriveState/SuccessfulDaqs", state.SuccessfulDaqs);
+    SignalLogger.writeInteger("DriveState/FailedDaqs", state.FailedDaqs);
 
     /* Telemeterize the pose to a Field2d */
     robotPose.setPose(state.Pose);

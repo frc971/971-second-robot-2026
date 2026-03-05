@@ -64,12 +64,12 @@
     },
     {
       "anchor": {
-        "x": 3.4165705545015057,
+        "x": 3.9765495704977862,
         "y": 7.417968965712284
       },
       "prevControl": {
-        "x": 1.9295373396247817,
-        "y": 7.409508164618642
+        "x": 4.576170766909662,
+        "y": 7.422659879690542
       },
       "nextControl": null,
       "isLocked": false,
@@ -80,11 +80,52 @@
     {
       "waypointRelativePos": 1.8588648382222872,
       "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 3.141233048349056,
+      "rotationDegrees": 0.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 2.8860832767210143,
+      "maxWaypointRelativePos": 4.0,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 6.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 540.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 1.5466145833333327,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 3.2894389719202892,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Deployed"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 6.0,
@@ -95,7 +136,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.77497130032236
+    "rotation": -0.3212590847131745
   },
   "reversed": false,
   "folder": "Hitchhiker",

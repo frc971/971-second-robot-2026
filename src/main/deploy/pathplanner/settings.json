@@ -6,9 +6,7 @@
     "Hitchhiker",
     "Misc"
   ],
-  "autoFolders": [
-    "Left Center"
-  ],
+  "autoFolders": [],
   "defaultMaxVel": 4.0,
   "defaultMaxAccel": 6.0,
   "defaultMaxAngVel": 540.0,
