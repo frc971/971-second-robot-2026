@@ -401,10 +401,4 @@ public class Superstructure {
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
         });
   }
-
-  public boolean freezeDriving() {
-    return (shooterTuner.freezeDriving())
-        && (shooterGoal == ShooterGoal.TUNE_LEFT_SHOOTER
-            || shooterGoal == ShooterGoal.TUNE_RIGHT_SHOOTER);
-  }
 }

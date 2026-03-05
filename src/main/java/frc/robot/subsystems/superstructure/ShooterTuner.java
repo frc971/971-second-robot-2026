@@ -96,7 +96,6 @@ public class ShooterTuner {
     }
 
     if (Controllers.REVERT.pressed()) revertToPrevious();
-    if (Controllers.RESET_TUNING.pressed()) clearShotTable();
     if (Controllers.UNDERSHOOT.pressed()) applyShotResult(ShotResult.UNDERSHOOT);
     if (Controllers.OVERSHOOT.pressed()) applyShotResult(ShotResult.OVERSHOOT);
     if (Controllers.HIT.pressed()) applyShotResult(ShotResult.HIT);
@@ -166,15 +165,5 @@ public class ShooterTuner {
     flywheelMaxValue = MAX_FLYWHEEL_RPS;
     hoodMinValue = MIN_HOOD_DEGREES;
     hoodMaxValue = MAX_HOOD_DEGREES;
-  }
-
-  private void clearShotTable() {
-    config.PHYSICS().SHOT_TABLE().clear();
-    // placeholder TOF entry
-    config.PHYSICS().SHOT_TABLE().put(Meters.of(1), Seconds.of(0));
-  }
-
-  public boolean freezeDriving() {
-    return mode == Mode.HOOD || mode == Mode.FLYWHEEL;
   }
 }

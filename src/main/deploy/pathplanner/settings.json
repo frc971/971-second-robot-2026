@@ -3,10 +3,8 @@
   "robotLength": 0.792,
   "holonomicMode": true,
   "pathFolders": [
-    "Left Center",
-    "Misc",
-    "Center Depot Climb",
-    "Right Center"
+    "Hitchhiker",
+    "Misc"
   ],
   "autoFolders": [
     "Left Center"

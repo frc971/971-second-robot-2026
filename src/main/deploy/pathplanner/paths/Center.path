@@ -68,7 +68,7 @@
         "y": 7.417968965712284
       },
       "prevControl": {
-        "x": 1.929537339624782,
+        "x": 1.9295373396247817,
         "y": 7.409508164618642
       },
       "nextControl": null,
@@ -95,10 +95,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.77497130032233
+    "rotation": 179.77497130032236
   },
   "reversed": false,
-  "folder": "Center Depot Climb",
+  "folder": "Hitchhiker",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 157.52162129027715

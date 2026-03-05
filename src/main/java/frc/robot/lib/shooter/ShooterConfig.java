@@ -34,7 +34,7 @@ public class ShooterConfig {
   @Builder
   public static class Constraints {
     // low-priority constraints
-    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(1.0);
+    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(0.5);
     @Builder.Default private Distance MAX_SHOT_DISTANCE = Meters.of(1000);
 
     // high-priority constraints

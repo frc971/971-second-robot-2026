@@ -57,8 +57,17 @@ public class ShooterHandler {
   private @Setter @Getter ObjectState targetState;
   private final String name;
 
+  @AutoLogOutput(key = "{name}/flywheelOffset")
   private AngularVelocity flywheelOffset = RotationsPerSecond.of(0.0);
+
+  @AutoLogOutput(key = "{name}/turretOffset")
   private Angle turretOffset = Degrees.of(0.0);
+
+  @AutoLogOutput(key = "{name}/desiredFlywheel")
+  private AngularVelocity desiredFlywheel = RotationsPerSecond.of(0.0);
+
+  @AutoLogOutput(key = "{name}/desiredTurret")
+  private Angle desiredTurretRel = Degrees.of(0.0);
 
   private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(2.0);
   private static final Angle TURRET_STEP = Degrees.of(2.0);
@@ -126,8 +135,6 @@ public class ShooterHandler {
     // calculate physics
     launchSolution = physics.iterativeTimeSolve(projectileState, targetState, 20);
 
-    logStates();
-
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
     if (shooterGoal == Goal.NONE) {
       shooterState = State.NOT_READY;
@@ -157,26 +164,43 @@ public class ShooterHandler {
       }
     }
 
-    // initial output
-    AngularVelocity flywheelVelocity = getFlywheelSpeed();
-    // use future position turrent angle in order to prevent lag
-    Angle turretAngle = getFutureRelativeTurretAngle();
+    // --- compute tuned + clamped desired goals (used for outputs AND error) ---
+    if (launchSolution == null || shooterState == State.NOT_READY) {
+      desiredFlywheel = RotationsPerSecond.of(0.0);
+      desiredTurretRel = Degrees.of(0.0);
+    } else {
+      // Base goals from physics
+      AngularVelocity flywheelGoal = getFlywheelSpeed(); // includes fudge factor
+      Angle turretGoalRel = getRelativeTurretAngle();
 
-    // adjust with tuning
-    flywheelVelocity.plus(flywheelOffset);
-    turretAngle.plus(turretOffset);
+      // Apply live-tuning offsets TO THE GOALS
+      flywheelGoal = flywheelGoal.plus(flywheelOffset);
+      turretGoalRel = turretGoalRel.plus(turretOffset);
 
-    // clamp flwyheel outputs to constraints
-    flywheelVelocity =
-        RadiansPerSecond.of(
-            MathUtil.clamp(
-                flywheelVelocity.in(RadiansPerSecond),
-                config.CONSTRAINTS().MIN_FLYWHEEL_SPEED().in(RadiansPerSecond),
-                config.CONSTRAINTS().MAX_FLYWHEEL_SPEED().in(RadiansPerSecond)));
+      // Clamp flywheel goal (do not exceed constraints)
+      flywheelGoal =
+          RadiansPerSecond.of(
+              MathUtil.clamp(
+                  flywheelGoal.in(RadiansPerSecond),
+                  config.CONSTRAINTS().MIN_FLYWHEEL_SPEED().in(RadiansPerSecond),
+                  config.CONSTRAINTS().MAX_FLYWHEEL_SPEED().in(RadiansPerSecond)));
 
-    // set outputs
-    flywheel.setVelocity(flywheelVelocity);
-    turret.setPosition(turretAngle);
+      desiredFlywheel = flywheelGoal;
+      desiredTurretRel = turretGoalRel;
+    }
+
+    logStates();
+
+    // set output
+    if (shooterState != State.NOT_READY) {
+      flywheel.setVelocity(desiredFlywheel);
+
+      // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
+      turret.setPosition(desiredTurretRel);
+    }
+
+    // ShooterHandler no longer commands hood here.
+    // Superstructure applies hood via Optional<Angle> when indexing.
   }
 
   private void liveTuning() {
@@ -185,7 +209,7 @@ public class ShooterHandler {
     if (Controllers.FLYWHEEL_UP.pressed()) flywheelOffset = flywheelOffset.plus(FLYWHEEL_STEP);
     if (Controllers.FLYWHEEL_DOWN.pressed()) flywheelOffset = flywheelOffset.minus(FLYWHEEL_STEP);
     if (Controllers.TURRET_LEFT.pressed()) turretOffset = turretOffset.plus(TURRET_STEP);
-    if (Controllers.TURRET_RIGHT.pressed()) turretOffset = turretOffset.plus(TURRET_STEP);
+    if (Controllers.TURRET_RIGHT.pressed()) turretOffset = turretOffset.minus(TURRET_STEP);
   }
 
   public Optional<Angle> getDesiredHoodAngle() {

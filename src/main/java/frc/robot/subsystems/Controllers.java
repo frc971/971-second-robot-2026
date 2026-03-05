@@ -18,7 +18,6 @@ public class Controllers {
   public static final Trigger CLIMB_RETRACT = TROY.b(); // TODO: add drivetrain controls
 
   // === Software's Controls
-  public static final RisingEdge RESET_TUNING = new RisingEdge(TROY.back());
   public static final Toggle TUNING = new Toggle(TROY.start());
   public static final RisingEdge TOGGLE_HOOD_FLYWHEEL = new RisingEdge(TROY.x());
 

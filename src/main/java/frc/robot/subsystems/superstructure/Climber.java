@@ -7,11 +7,15 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.superstructure.*;
 
 // TODO: change the constants!! and the other numbers
 
 public class Climber extends LinearSubsystem {
+  private static final Distance KS_ERROR_DEADBAND = Meters.of(0.05);
+
   public Climber() {
     super(getMotorConfig());
   }
@@ -32,8 +36,8 @@ public class Climber extends LinearSubsystem {
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Motion Magic profile constraints
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.75;
-    tc.MotionMagic.MotionMagicAcceleration = 24.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 0.1;
+    tc.MotionMagic.MotionMagicAcceleration = 1.0;
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -44,9 +48,8 @@ public class Climber extends LinearSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    double drumRadius = 1.5 / 2.0; // 1.5in diameter, radius 0.75in
-    double gearRatio = 60.0;
-    tc.Feedback.SensorToMechanismRatio = 60.0 / 1.0; // meters per motor rotation
+    tc.Feedback.SensorToMechanismRatio =
+        100.0 / 1.0; // Not a real gear ratio, put this in so position values aren't obscene
 
     return MotorConfig.builder()
         .NAME("Climber")
@@ -55,5 +58,23 @@ public class Climber extends LinearSubsystem {
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Meters)
         .build();
+  }
+
+  @Override
+  public void setPosition(Distance goalPosition) {
+    setFeedforward(calculatePositionFeedforward(goalPosition));
+    super.setPositionVoltage(goalPosition);
+  }
+
+  private Voltage calculatePositionFeedforward(Distance goalPosition) {
+    double kG = io.getMotorConfig().TALONFX_CONFIG().Slot0.kG;
+    double kS = io.getMotorConfig().TALONFX_CONFIG().Slot0.kS;
+
+    double positionError = goalPosition.minus(getLinearPosition()).in(Meters);
+    if (Math.abs(positionError) < KS_ERROR_DEADBAND.in(Meters)) {
+      return Volts.of(kG);
+    }
+
+    return Volts.of(kG + (kS * Math.signum(positionError)));
   }
 }
