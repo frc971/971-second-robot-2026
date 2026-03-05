@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 
 public class ShooterConfigs {
   public static final ShooterConfig ALL_DEFAULTS = ShooterConfig.builder().build();
-  public static final double RIGHT_SIDE_FUDGE = 1.01;
 
   public static final ShooterConfig TEST_CONFIG =
       ShooterConfig.builder()
@@ -20,11 +19,7 @@ public class ShooterConfigs {
                   .TURRET_XY_OFFSET(
                       new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.272987))
                   .build())
-          .PHYSICS(
-              ShooterConfig.Physics.builder()
-                  .SHOT_TABLE(shotTable())
-                  .FUDGE_FACTOR(RIGHT_SIDE_FUDGE)
-                  .build())
+          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(shotTable()).build())
           .build();
   public static final ShooterConfig LEFT =
       ShooterConfig.builder()
@@ -52,16 +47,28 @@ public class ShooterConfigs {
 
   private static ShotTable shotTable() {
     ShotTable table = new ShotTable();
-    table.put(Meters.of(1.39940 + .18), Degrees.of(9.37500), RotationsPerSecond.of(46.87500));
-    table.put(Meters.of(2.47702 + .18), Degrees.of(18.75000), RotationsPerSecond.of(49.97559));
-    table.put(Meters.of(3.91026 + .18), Degrees.of(37.50000), RotationsPerSecond.of(50.00000));
-    table.put(Meters.of(5.04561), Degrees.of(37.50000), RotationsPerSecond.of(62.50000));
+    table.put(Meters.of(1.01), Degrees.of(9.37500), RotationsPerSecond.of(30.0));
+    table.put(Meters.of(1.5794), Degrees.of(9.37500), RotationsPerSecond.of(46.87500));
+    table.put(Meters.of(2.0), Degrees.of(13.03411), RotationsPerSecond.of(48.));
+    table.put(Meters.of(2.65702), Degrees.of(18.75000), RotationsPerSecond.of(50.0));
+    table.put(Meters.of(3.0), Degrees.of(23.23695), RotationsPerSecond.of(55.0));
+    table.put(Meters.of(3.5), Degrees.of(29.77807), RotationsPerSecond.of(55.0));
+    table.put(Meters.of(4.0), Degrees.of(37.50000), RotationsPerSecond.of(55.0));
+    table.put(Meters.of(5.04561), Degrees.of(37.50000), RotationsPerSecond.of(58.0));
+    table.put(Meters.of(5.23), Degrees.of(41), RotationsPerSecond.of(67.0));
+    table.put(Meters.of(5.69375), Degrees.of(48.4375), RotationsPerSecond.of(69.53125));
 
-    table.put(Meters.of(1.47), Seconds.of(1.28)); // do not delete, would cause errors
-    table.put(Meters.of(2.06), Seconds.of(1.2 - .15));
-    table.put(Meters.of(3.01), Seconds.of(1.21 - .15));
-    table.put(Meters.of(4.1), Seconds.of(1.06 - .2));
-    table.put(Meters.of(5.01), Seconds.of(1.34 - .2));
+    table.put(Meters.of(0.01), Seconds.of(0.0)); // do not delete, would cause errors
+    table.put(Meters.of(1.07), Seconds.of(1.15));
+    table.put(Meters.of(1.47), Seconds.of(1.15));
+    table.put(Meters.of(2.0), Seconds.of(1.28));
+    table.put(Meters.of(2.5), Seconds.of(1.1));
+    table.put(Meters.of(3.0), Seconds.of(0.8));
+    table.put(Meters.of(3.5), Seconds.of(1.1));
+    table.put(Meters.of(4.0), Seconds.of(1.1));
+    table.put(Meters.of(4.5), Seconds.of(1.28));
+    table.put(Meters.of(5.0), Seconds.of(1.383));
+    table.put(Meters.of(6.0), Seconds.of(1.24)); // 32% vibed
     return table;
   }
 }

@@ -6,10 +6,14 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.FlippingUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,31 +22,64 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.Superstructure;
 
 public class RobotContainer {
   public final Superstructure superstructure;
 
   private double MAX_SPEED = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+  private double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
+
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric drive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(MAX_SPEED * 0.05)
+          .withRotationalDeadband(MAX_ANGULAR_RATE * 0.1) // Add a 10% deadband
+          .withDriveRequestType(
+              DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
+  // Current values are placeholders and should be tuned for optimal robot control
+  // Slew rate limit for translation (m/s^2)
+  private static final double SLEW_TRANSLATE_LIMIT = 100.0;
+  // Slew rate limit for rotation (rad/s^2)
+  private static final double SLEW_ROTATION_LIMIT = 100.0;
+
+  // Exponential curve for translation joystick
+  private static final double TRANSLATION_EXP_CURVE = 2;
+  // Exponential curve for rotation joystick
+  private static final double ROTATION_EXP_CURVE = 2;
+
+  // Rate limiters for smooth control
+  private static final SlewRateLimiter X_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter Y_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter ROT_LIMITER = new SlewRateLimiter(SLEW_ROTATION_LIMIT);
+
+  private static final JoystickValues JOYSTICK_VALUES = new JoystickValues();
 
   private final Telemetry logger = new Telemetry(MAX_SPEED);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
-  private final Drive drive;
 
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
     superstructure = new Superstructure(this);
-    drive = new Drive(drivetrain, superstructure);
 
-    autoChooser = AutoBuilder.buildAutoChooser("Mobility");
+    registerNamedCommands();
+
+    autoChooser = AutoBuilder.buildAutoChooser("Outpost Side");
+    AutoBuilder.getAllAutoNames().stream()
+        .sorted()
+        .forEach(
+            autoName ->
+                autoChooser.addOption(
+                    autoName + " (Mirrored)", new PathPlannerAuto(autoName, true)));
+
     SmartDashboard.putData("Auto Mode", autoChooser);
 
-    // NOTE: registering drivetrain is necessary for CommandSwerveDrivetrain#periodic to run
-    CommandScheduler.getInstance().registerSubsystem(drivetrain);
+    configureDrivetrain();
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -54,9 +91,40 @@ public class RobotContainer {
     if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
   }
 
-  public void periodic() {
-    drive.periodic();
+  private void registerNamedCommands() {
+    NamedCommands.registerCommand("Intake", superstructure.intakeAuto());
+    NamedCommands.registerCommand("Deployed", superstructure.deployedAuto());
+    NamedCommands.registerCommand("Shoot", superstructure.shootAuto());
+    NamedCommands.registerCommand("Neutral", superstructure.neutral());
+  }
 
+  private void configureDrivetrain() {
+    // Note that X is defined as forward according to WPILib convention,
+    // and Y is defined as to the left according to WPILib convention.
+    drivetrain.setDefaultCommand(
+        drivetrain.applyRequest(
+            () -> {
+              JOYSTICK_VALUES
+                  .setValues(
+                      Controllers.TROY.getLeftY(),
+                      Controllers.TROY.getLeftX(),
+                      Controllers.TROY.getRightX())
+                  .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+                  .scale(
+                      -MAX_SPEED, // Negative max speed and angular rate since
+                      -MAX_ANGULAR_RATE) // controller inputs are reversed
+                  .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
+
+              return drive
+                  .withVelocityX(JOYSTICK_VALUES.getX())
+                  .withVelocityY(JOYSTICK_VALUES.getY())
+                  .withRotationalRate(JOYSTICK_VALUES.getRot());
+            }));
+
+    drivetrain.registerTelemetry(logger::telemeterize);
+  }
+
+  public void periodic() {
     superstructure.periodic();
   }
 

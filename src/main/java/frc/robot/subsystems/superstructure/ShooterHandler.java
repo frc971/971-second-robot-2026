@@ -13,6 +13,7 @@ import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -32,7 +33,7 @@ public class ShooterHandler {
         new ObjectState(FlippingUtil.flipFieldPosition(BLUE.position()), new Translation2d());
 
     // offset from the corner
-    private static final Translation2d SHUTTLE_OFFSET = new Translation2d(1.0, 1.0);
+    private static final Translation2d SHUTTLE_OFFSET = new Translation2d(1.8, 2.0);
 
     public static final ObjectState RIGHT_BLUE_SHUTTLE =
         new ObjectState(SHUTTLE_OFFSET, new Translation2d());
@@ -56,11 +57,22 @@ public class ShooterHandler {
   private @Setter @Getter ObjectState targetState;
   private final String name;
 
+  @AutoLogOutput(key = "{name}/flywheelOffset")
   private AngularVelocity flywheelOffset = RotationsPerSecond.of(0.0);
+
+  @AutoLogOutput(key = "{name}/turretOffset")
   private Angle turretOffset = Degrees.of(0.0);
 
-  private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(0.5);
-  private static final Angle TURRET_STEP = Degrees.of(0.5);
+  @AutoLogOutput(key = "{name}/desiredFlywheel")
+  private AngularVelocity desiredFlywheel = RotationsPerSecond.of(0.0);
+
+  @AutoLogOutput(key = "{name}/desiredTurret")
+  private Angle desiredTurretRel = Degrees.of(0.0);
+
+  private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(2.0);
+  private static final Angle TURRET_STEP = Degrees.of(2.0);
+
+  private static final Time TURRET_TIME_DELAY = Seconds.of(0.1);
 
   // state machine
   public enum State {
@@ -123,8 +135,6 @@ public class ShooterHandler {
     // calculate physics
     launchSolution = physics.iterativeTimeSolve(projectileState, targetState, 20);
 
-    logStates();
-
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
     if (shooterGoal == Goal.NONE) {
       shooterState = State.NOT_READY;
@@ -154,27 +164,43 @@ public class ShooterHandler {
       }
     }
 
-    // set output
-    if (shooterState != State.NOT_READY) {
-      AngularVelocity adjustedFlywheel = getFlywheelSpeed().plus(flywheelOffset);
-      adjustedFlywheel =
+    // --- compute tuned + clamped desired goals (used for outputs AND error) ---
+    if (launchSolution == null || shooterState == State.NOT_READY) {
+      desiredFlywheel = RotationsPerSecond.of(0.0);
+      desiredTurretRel = Degrees.of(0.0);
+    } else {
+      // Base goals from physics
+      AngularVelocity flywheelGoal = getFlywheelSpeed(); // includes fudge factor
+      Angle turretGoalRel = getRelativeTurretAngle();
+
+      // Apply live-tuning offsets TO THE GOALS
+      flywheelGoal = flywheelGoal.plus(flywheelOffset);
+      turretGoalRel = turretGoalRel.plus(turretOffset);
+
+      // Clamp flywheel goal (do not exceed constraints)
+      flywheelGoal =
           RadiansPerSecond.of(
               MathUtil.clamp(
-                  adjustedFlywheel.in(RadiansPerSecond),
+                  flywheelGoal.in(RadiansPerSecond),
                   config.CONSTRAINTS().MIN_FLYWHEEL_SPEED().in(RadiansPerSecond),
                   config.CONSTRAINTS().MAX_FLYWHEEL_SPEED().in(RadiansPerSecond)));
 
-      Angle adjustedTurret = getRelativeTurretAngle().plus(turretOffset);
-
-      flywheel.setVelocity(adjustedFlywheel);
-      hood.setPosition(launchSolution.hoodAngle());
-      turret.setPosition(adjustedTurret);
+      desiredFlywheel = flywheelGoal;
+      desiredTurretRel = turretGoalRel;
     }
-    AngularVelocity adjustedFlywheel = getFlywheelSpeed().plus(flywheelOffset);
-    Angle adjustedTurret = getRelativeTurretAngle().plus(turretOffset);
-    flywheel.setVelocity(adjustedFlywheel);
-    hood.setPosition(launchSolution.hoodAngle());
-    turret.setPosition(adjustedTurret);
+
+    logStates();
+
+    // set output
+    if (shooterState != State.NOT_READY) {
+      flywheel.setVelocity(desiredFlywheel);
+
+      // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
+      turret.setPosition(desiredTurretRel);
+    }
+
+    // ShooterHandler no longer commands hood here.
+    // Superstructure applies hood via Optional<Angle> when indexing.
   }
 
   private void liveTuning() {
@@ -183,15 +209,35 @@ public class ShooterHandler {
     if (Controllers.FLYWHEEL_UP.pressed()) flywheelOffset = flywheelOffset.plus(FLYWHEEL_STEP);
     if (Controllers.FLYWHEEL_DOWN.pressed()) flywheelOffset = flywheelOffset.minus(FLYWHEEL_STEP);
     if (Controllers.TURRET_LEFT.pressed()) turretOffset = turretOffset.plus(TURRET_STEP);
-    if (Controllers.TURRET_RIGHT.pressed()) turretOffset = turretOffset.plus(TURRET_STEP);
+    if (Controllers.TURRET_RIGHT.pressed()) turretOffset = turretOffset.minus(TURRET_STEP);
+  }
+
+  public Optional<Angle> getDesiredHoodAngle() {
+    if (launchSolution == null || shooterState == State.NOT_READY) {
+      return Optional.empty();
+    }
+
+    return Optional.of(launchSolution.hoodAngle());
   }
 
   public AngularVelocity getFlywheelSpeed() {
-    return launchSolution.flywheelSpeed().times(config.PHYSICS().FUDGE_FACTOR());
+    return launchSolution.flywheelSpeed();
   }
 
   public Angle getRelativeTurretAngle() {
     Angle absolute = Degrees.of(launchSolution.turretRotation.getDegrees());
+    Angle relative =
+        absolute.minus(Degrees.of(drivetrain.getState().Pose.getRotation().getDegrees()));
+
+    return Radians.of(MathUtil.angleModulus(relative.in(Radians)));
+  }
+
+  public Angle getFutureRelativeTurretAngle() {
+    LaunchSolution turretAheadSolution =
+        physics.iterativeTimeSolve(
+            projectileState.getFutureState(this.TURRET_TIME_DELAY), targetState, 20);
+
+    Angle absolute = Degrees.of(turretAheadSolution.turretRotation.getDegrees());
     Angle relative =
         absolute.minus(Degrees.of(drivetrain.getState().Pose.getRotation().getDegrees()));
 
@@ -208,6 +254,9 @@ public class ShooterHandler {
           Radians.of(launchSolution.turretRotation.getRadians()).in(Degrees));
       Logger.recordOutput(
           name + "/LaunchGoals/Turret Rel (deg)", getRelativeTurretAngle().in(Degrees));
+      Logger.recordOutput(
+          name + "/LaunchGoals/Turret Future Rel (deg)",
+          getFutureRelativeTurretAngle().in(Degrees));
       Logger.recordOutput(name + "/LaunchGoals/Hood (deg)", launchSolution.hoodAngle().in(Degrees));
       Translation2d distance2d = targetState.minus(projectileState).position();
       Logger.recordOutput(name + "/Distance/2D", distance2d);
@@ -244,14 +293,21 @@ public class ShooterHandler {
       return true;
     }
 
-    return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHOOTING_FLYWHEEL_ABORT())
-        || turretRotationAbsDiff().gt(config.THRESHOLD().SHOOTING_ROTATION_THRESHOLD())
-        || hoodAngleAbsDiff().gt(config.THRESHOLD().SHOOTING_HOOD_ANGLE_THRESHOLD());
+    if (targetState == Targets.BLUE || targetState == Targets.RED) {
+      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHOOTING_FLYWHEEL_ABORT())
+          || turretRotationAbsDiff().gt(config.THRESHOLD().SHOOTING_ROTATION_THRESHOLD())
+          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHOOTING_HOOD_ANGLE_THRESHOLD());
+    } else {
+      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHUTTLING_FLYWHEEL_THRESHOLD())
+          || turretRotationAbsDiff().gt(config.THRESHOLD().SHUTTLING_ROTATION_THRESHOLD())
+          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHUTTLING_HOOD_ANGLE_THRESHOLD());
+    }
   }
 
   // --- Threshold helper functions ---
   private AngularVelocity flywheelSpeedAbsDiff() {
-    return getFlywheelSpeed().minus(flywheel.getVelocity());
+    return RadiansPerSecond.of(
+        getFlywheelSpeed().minus(flywheel.getVelocity()).abs(RadiansPerSecond));
   }
 
   private Angle turretRotationAbsDiff() {
@@ -263,7 +319,7 @@ public class ShooterHandler {
   }
 
   private Angle hoodAngleAbsDiff() {
-    return launchSolution.hoodAngle().minus(hood.getPosition());
+    return Radians.of(launchSolution.hoodAngle().minus(hood.getPosition()).abs(Radians));
   }
 
   private Angle getTurretAbsRotation() {

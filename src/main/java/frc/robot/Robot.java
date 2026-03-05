@@ -28,7 +28,7 @@ public class Robot extends LoggedRobot {
   private final BOS bos;
 
   public Robot() {
-    Logger.recordMetadata("ProjectName", "971 Second Robot 2026");
+    Logger.recordMetadata("ProjectName", "971 First Bot 2026");
     Logger.recordMetadata("TeamNumber", "971");
     Logger.recordMetadata("RobotName", "971 Robot");
 

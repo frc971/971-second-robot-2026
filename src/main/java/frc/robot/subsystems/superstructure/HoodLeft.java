@@ -1,16 +1,14 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.lib.superstructure.AngularSubsystem;
-import frc.robot.lib.superstructure.MotorConfig;
+import frc.robot.lib.superstructure.*;
 
 public class HoodLeft extends AngularSubsystem {
   private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);
@@ -23,12 +21,16 @@ public class HoodLeft extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0; // Static friction compensation
+    tc.Slot0.kS = 0.35; // Static friction compensation
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 0; // Proportional gain
+    tc.Slot0.kP = 971; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
+
+    // for sim only
+    tc.MotionMagic.MotionMagicCruiseVelocity = 10.0;
+    tc.MotionMagic.MotionMagicAcceleration = 10.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

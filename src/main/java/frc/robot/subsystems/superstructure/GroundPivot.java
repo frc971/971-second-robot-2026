@@ -7,10 +7,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import frc.robot.lib.superstructure.AngularSubsystem;
-import frc.robot.lib.superstructure.MotorConfig;
+import frc.robot.lib.superstructure.*;
 
-// TODO: Get correct constants
+// TODO: change the constants...
+
 public class GroundPivot extends AngularSubsystem {
 
   public GroundPivot() {
@@ -21,13 +21,13 @@ public class GroundPivot extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.0; // Static friction compensation
-    tc.Slot0.kV = 0.0; // Velocity feedforward
+    tc.Slot0.kS = 0.33; // Static friction compensation
+    tc.Slot0.kV = 5.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = 0.0; // Gravity compensation
+    tc.Slot0.kG = -0.2; // Gravity compensation
 
     tc.Slot0.kP = 8.0; // Proportional gain
-    tc.Slot0.kI = 0.0; // Integral gain
+    tc.Slot0.kI = 30.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
@@ -43,13 +43,13 @@ public class GroundPivot extends AngularSubsystem {
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
-    tc.CurrentLimits.StatorCurrentLimit = 100.0;
+    tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
     tc.Feedback.SensorToMechanismRatio = (36.0 / 1.0); // Motor to output gear ratio
 
     return MotorConfig.builder()
         .NAME("Ground Pivot")
-        .ID(-1)
+        .ID(14)
         .BUS(new CANBus("rio"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)

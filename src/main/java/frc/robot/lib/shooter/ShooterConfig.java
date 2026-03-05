@@ -24,7 +24,6 @@ public class ShooterConfig {
   @Getter
   public static class Physics {
     @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
-    @Builder.Default private double FUDGE_FACTOR = 1.0;
 
     public Time getTime(Distance distance) {
       return SHOT_TABLE.getTime(distance);
@@ -35,7 +34,7 @@ public class ShooterConfig {
   @Builder
   public static class Constraints {
     // low-priority constraints
-    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(1);
+    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(0.5);
     @Builder.Default private Distance MAX_SHOT_DISTANCE = Meters.of(1000);
 
     // high-priority constraints
@@ -61,7 +60,7 @@ public class ShooterConfig {
   public static class Threshold {
     @Builder.Default private AngularVelocity AIMING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(2.0);
 
-    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(2.0);
+    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(10.0);
 
     @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(2.0);
 
@@ -72,10 +71,17 @@ public class ShooterConfig {
      */
 
     // SHOOTING thresholds (once above, will abort the shot)
-    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = RotationsPerSecond.of(4.0);
+    @Builder.Default private AngularVelocity SHOOTING_FLYWHEEL_ABORT = RotationsPerSecond.of(2.5);
 
-    @Builder.Default private Angle SHOOTING_ROTATION_THRESHOLD = Degrees.of(4);
+    @Builder.Default private Angle SHOOTING_ROTATION_THRESHOLD = Degrees.of(15.0);
 
-    @Builder.Default private Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Degrees.of(4);
+    @Builder.Default private Angle SHOOTING_HOOD_ANGLE_THRESHOLD = Degrees.of(4.0);
+
+    @Builder.Default
+    private AngularVelocity SHUTTLING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(8.0);
+
+    @Builder.Default private Angle SHUTTLING_ROTATION_THRESHOLD = Degrees.of(20.0);
+
+    @Builder.Default private Angle SHUTTLING_HOOD_ANGLE_THRESHOLD = Degrees.of(5.0);
   }
 }

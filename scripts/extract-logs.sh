@@ -1,22 +1,20 @@
 #!/usr/bin/env bash
-# Usage: ./scripts/extract-logs.sh [minutes] [destination-directory]
+# Usage: ./scripts/extract-logs.sh [count] [destination-directory]
 
 REMOTE="admin@10.9.71.2"
 LOG_DIR="/home/lvuser/logs"
-MINUTES="${1:-0}"
+COUNT="${1:-1}"                 # default = 1 log
 DEST_DIR="${2:-$HOME/logs}"
+
 mkdir -p "$DEST_DIR"
 
-# Get logs from last N minutes (or just latest if 0)
-if [ "$MINUTES" -eq 0 ]; then
-  paths=$(ssh "$REMOTE" "ls -t $LOG_DIR/*.wpilog | head -n1")
-else
-  paths=$(ssh "$REMOTE" "find $LOG_DIR -name '*.wpilog' -mmin -$MINUTES")
-fi
+# Get the last N logs by modification time (newest first)
+paths=$(ssh "$REMOTE" "ls -t $LOG_DIR/*.wpilog 2>/dev/null | head -n $COUNT")
 
 # Always ensure at least the latest log if nothing found
 if [ -z "$paths" ]; then
-  paths=$(ssh "$REMOTE" "ls -t $LOG_DIR/*.wpilog | head -n1")
+  echo "No logs found."
+  exit 1
 fi
 
 count=$(echo "$paths" | wc -l)
