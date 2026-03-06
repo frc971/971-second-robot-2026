@@ -91,14 +91,14 @@ public class ShooterTuner {
       return;
     }
 
-    if (Controllers.TOGGLE_HOOD_FLYWHEEL.pressed()) {
+    if (Controllers.TOGGLE_HOOD_FLYWHEEL.rising()) {
       mode = (mode == Mode.DRIVING || mode == Mode.HOOD) ? Mode.FLYWHEEL : Mode.HOOD;
     }
 
-    if (Controllers.REVERT.pressed()) revertToPrevious();
-    if (Controllers.UNDERSHOOT.pressed()) applyShotResult(ShotResult.UNDERSHOOT);
-    if (Controllers.OVERSHOOT.pressed()) applyShotResult(ShotResult.OVERSHOOT);
-    if (Controllers.HIT.pressed()) applyShotResult(ShotResult.HIT);
+    if (Controllers.REVERT.rising()) revertToPrevious();
+    if (Controllers.UNDERSHOOT.rising()) applyShotResult(ShotResult.UNDERSHOOT);
+    if (Controllers.OVERSHOOT.rising()) applyShotResult(ShotResult.OVERSHOOT);
+    if (Controllers.HIT.rising()) applyShotResult(ShotResult.HIT);
 
     indexing = Controllers.INDEX.getAsBoolean();
 

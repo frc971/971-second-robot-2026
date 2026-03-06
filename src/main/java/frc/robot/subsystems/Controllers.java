@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.lib.superstructure.RisingEdge;
+import frc.robot.lib.superstructure.Edge;
 import frc.robot.lib.superstructure.Toggle;
 
 public class Controllers {
@@ -19,19 +19,19 @@ public class Controllers {
 
   // === Software's Controls
   public static final Toggle TUNING = new Toggle(TROY.start());
-  public static final RisingEdge TOGGLE_HOOD_FLYWHEEL = new RisingEdge(TROY.x());
+  public static final Edge TOGGLE_HOOD_FLYWHEEL = new Edge(TROY.x());
 
   // TODO: do we need autoalign? This is the only button that is potentially free
   public static final Trigger AUTO_ALIGN = TROY.rightBumper();
   public static final Trigger INDEX = TROY.rightTrigger();
 
   // score/save must be the same button, no space
-  public static final RisingEdge SCORE = new RisingEdge(TROY.a());
+  public static final Edge SCORE = new Edge(TROY.a());
 
-  public static final RisingEdge UNDERSHOOT = new RisingEdge(TROY.povUp());
-  public static final RisingEdge OVERSHOOT = new RisingEdge(TROY.povDown());
-  public static final RisingEdge REVERT = new RisingEdge(TROY.povLeft());
-  public static final RisingEdge HIT = new RisingEdge(TROY.povRight());
+  public static final Edge UNDERSHOOT = new Edge(TROY.povUp());
+  public static final Edge OVERSHOOT = new Edge(TROY.povDown());
+  public static final Edge REVERT = new Edge(TROY.povLeft());
+  public static final Edge HIT = new Edge(TROY.povRight());
 
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
@@ -43,7 +43,7 @@ public class Controllers {
   public static final Toggle KILL_LEFT = new Toggle(ANDRE.x());
   public static final Toggle KILL_RIGHT = new Toggle(ANDRE.b());
   public static final Toggle MANUAL = new Toggle(ANDRE.y());
-  public static final RisingEdge REZERO = new RisingEdge(ANDRE.a());
+  public static final Edge REZERO = new Edge(ANDRE.a());
 
   public static final Trigger SHUTTLE_LEFT = ANDRE.leftBumper();
   public static final Trigger SHUTTLE_RIGHT = ANDRE.rightBumper();
@@ -52,10 +52,10 @@ public class Controllers {
   public static final Trigger TUNE_LEFT = ANDRE.back();
   public static final Trigger TUNE_RIGHT = ANDRE.start();
 
-  public static final RisingEdge FLYWHEEL_UP = new RisingEdge(ANDRE.povUp());
-  public static final RisingEdge FLYWHEEL_DOWN = new RisingEdge(ANDRE.povDown());
-  public static final RisingEdge TURRET_LEFT = new RisingEdge(ANDRE.povLeft());
-  public static final RisingEdge TURRET_RIGHT = new RisingEdge(ANDRE.povRight());
+  public static final Edge FLYWHEEL_UP = new Edge(ANDRE.povUp());
+  public static final Edge FLYWHEEL_DOWN = new Edge(ANDRE.povDown());
+  public static final Edge TURRET_LEFT = new Edge(ANDRE.povLeft());
+  public static final Edge TURRET_RIGHT = new Edge(ANDRE.povRight());
 
   // TODO: get a feel for what axis threshold is the best to congrol with
   // MANUAL Shooter Setpoints

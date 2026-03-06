@@ -206,10 +206,10 @@ public class ShooterHandler {
   private void liveTuning() {
     if (!tuningEnabled) return;
 
-    if (Controllers.FLYWHEEL_UP.pressed()) flywheelOffset = flywheelOffset.plus(FLYWHEEL_STEP);
-    if (Controllers.FLYWHEEL_DOWN.pressed()) flywheelOffset = flywheelOffset.minus(FLYWHEEL_STEP);
-    if (Controllers.TURRET_LEFT.pressed()) turretOffset = turretOffset.plus(TURRET_STEP);
-    if (Controllers.TURRET_RIGHT.pressed()) turretOffset = turretOffset.minus(TURRET_STEP);
+    if (Controllers.FLYWHEEL_UP.rising()) flywheelOffset = flywheelOffset.plus(FLYWHEEL_STEP);
+    if (Controllers.FLYWHEEL_DOWN.rising()) flywheelOffset = flywheelOffset.minus(FLYWHEEL_STEP);
+    if (Controllers.TURRET_LEFT.rising()) turretOffset = turretOffset.plus(TURRET_STEP);
+    if (Controllers.TURRET_RIGHT.rising()) turretOffset = turretOffset.minus(TURRET_STEP);
   }
 
   public Optional<Angle> getDesiredHoodAngle() {
