@@ -5,15 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 0.0
+            "pathName": "Center"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Mobility Path"
+            "pathName": "Depot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Climb"
           }
         }
       ]

@@ -24,7 +24,7 @@
         "y": 6.087589461841523
       },
       "nextControl": {
-        "x": 1.302181958465399,
+        "x": 1.3021819584653989,
         "y": 5.926712021066104
       },
       "isLocked": false,
@@ -82,7 +82,7 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.1506087158808933,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -99,28 +99,6 @@
         "type": "named",
         "data": {
           "name": "Intake"
-        }
-      }
-    },
-    {
-      "name": "cosmetic field",
-      "waypointRelativePos": 2.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Deployed"
-        }
-      }
-    },
-    {
-      "name": "cosmetic field",
-      "waypointRelativePos": 2.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Neutral"
         }
       }
     }

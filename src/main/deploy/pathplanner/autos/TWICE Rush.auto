@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "Right 1"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Shoot"
@@ -13,7 +19,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.5
+            "waitTime": 2.5
           }
         },
         {
@@ -25,25 +31,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center"
+            "pathName": "Right 2"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Depot"
+            "name": "Shoot"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 3.0
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Climb"
+            "name": "Neutral"
           }
         }
       ]
