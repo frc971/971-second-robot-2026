@@ -30,22 +30,40 @@ import frc.robot.subsystems.superstructure.Superstructure;
 public class RobotContainer {
   public final Superstructure superstructure;
 
-  private double MAX_SPEED = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-  private double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
+  private static final double SUPERCHARGED_SPEED = 4.0;
+  private static final double SUPERCHARGED_ANGULAR_RATE =
+      RotationsPerSecond.of(1.0).in(RadiansPerSecond);
+
+  private static final double MAX_SPEED = 3.6;
+  private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
+
+  private static final double TRANSLATION_DEADBAND = 0.05;
+  private static final double ROTATION_DEADBAND = 0.1;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric superchargedDrive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(SUPERCHARGED_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(SUPERCHARGED_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
-          .withDeadband(MAX_SPEED * 0.05)
-          .withRotationalDeadband(MAX_ANGULAR_RATE * 0.1) // Add a 10% deadband
-          .withDriveRequestType(
-              DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+          .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   // Current values are placeholders and should be tuned for optimal robot control
   // Slew rate limit for translation (m/s^2)
-  private static final double SLEW_TRANSLATE_LIMIT = 100.0;
+  private static final double SUPERCHARGED_SLEW_TRANSLATE_LIMIT = 100.0;
   // Slew rate limit for rotation (rad/s^2)
-  private static final double SLEW_ROTATION_LIMIT = 100.0;
+  private static final double SUPERCHARGED_SLEW_ROTATION_LIMIT = 100.0;
+
+  // Current values are placeholders and should be tuned for optimal robot control
+  // Slew rate limit for translation (m/s^2)
+  private static final double SLEW_TRANSLATE_LIMIT = 4.0;
+  // Slew rate limit for rotation (rad/s^2)
+  private static final double SLEW_ROTATION_LIMIT = 10.0;
 
   // Exponential curve for translation joystick
   private static final double TRANSLATION_EXP_CURVE = 2;
@@ -56,6 +74,13 @@ public class RobotContainer {
   private static final SlewRateLimiter X_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
   private static final SlewRateLimiter Y_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
   private static final SlewRateLimiter ROT_LIMITER = new SlewRateLimiter(SLEW_ROTATION_LIMIT);
+
+  private static final SlewRateLimiter SUPERCHARGED_X_LIMITER =
+      new SlewRateLimiter(SUPERCHARGED_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SUPERCHARGED_Y_LIMITER =
+      new SlewRateLimiter(SUPERCHARGED_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SUPERCHARGED_ROT_LIMITER =
+      new SlewRateLimiter(SUPERCHARGED_SLEW_ROTATION_LIMIT);
 
   private static final JoystickValues JOYSTICK_VALUES = new JoystickValues();
 
@@ -105,21 +130,52 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () -> {
-              JOYSTICK_VALUES
-                  .setValues(
-                      Controllers.TROY.getLeftY(),
-                      Controllers.TROY.getLeftX(),
-                      Controllers.TROY.getRightX())
-                  .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                  .scale(
-                      -MAX_SPEED, // Negative max speed and angular rate since
-                      -MAX_ANGULAR_RATE) // controller inputs are reversed
-                  .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
+              if (Controllers.SUPERCHARGED.rising()) {
+                SUPERCHARGED_X_LIMITER.reset(X_LIMITER.lastValue());
+                SUPERCHARGED_Y_LIMITER.reset(Y_LIMITER.lastValue());
+                SUPERCHARGED_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
+              }
 
-              return drive
-                  .withVelocityX(JOYSTICK_VALUES.getX())
-                  .withVelocityY(JOYSTICK_VALUES.getY())
-                  .withRotationalRate(JOYSTICK_VALUES.getRot());
+              if (Controllers.SUPERCHARGED.falling()) {
+                X_LIMITER.reset(SUPERCHARGED_X_LIMITER.lastValue());
+                Y_LIMITER.reset(SUPERCHARGED_Y_LIMITER.lastValue());
+                ROT_LIMITER.reset(SUPERCHARGED_ROT_LIMITER.lastValue());
+              }
+
+              if (Controllers.SUPERCHARGED.getAsBoolean()) {
+                JOYSTICK_VALUES
+                    .setValues(
+                        Controllers.TROY.getLeftY(),
+                        Controllers.TROY.getLeftX(),
+                        Controllers.TROY.getRightX())
+                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+                    .scale(
+                        -SUPERCHARGED_SPEED, // Negative max speed and angular rate since
+                        -SUPERCHARGED_ANGULAR_RATE) // controller inputs are reversed
+                    .slewRateLimit(
+                        SUPERCHARGED_X_LIMITER, SUPERCHARGED_Y_LIMITER, SUPERCHARGED_ROT_LIMITER);
+                return superchargedDrive
+                    .withVelocityX(JOYSTICK_VALUES.getX())
+                    .withVelocityY(JOYSTICK_VALUES.getY())
+                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+
+              } else {
+                JOYSTICK_VALUES
+                    .setValues(
+                        Controllers.TROY.getLeftY(),
+                        Controllers.TROY.getLeftX(),
+                        Controllers.TROY.getRightX())
+                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+                    .scale(
+                        -MAX_SPEED, // Negative max speed and angular rate since
+                        -MAX_ANGULAR_RATE) // controller inputs are reversed
+                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
+
+                return drive
+                    .withVelocityX(JOYSTICK_VALUES.getX())
+                    .withVelocityY(JOYSTICK_VALUES.getY())
+                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+              }
             }));
 
     drivetrain.registerTelemetry(logger::telemeterize);

@@ -45,6 +45,19 @@ public enum SetpointGoal {
           .withGroundPivotDegrees(40.0)
           .withGroundRollersVolts(0.0)
           .withKickerVolts(0.0)),
+  SUPERCHARGED(
+      Setpoint.builder()
+          .withLeftFlywheelRPS(0.0)
+          .withLeftHoodDegrees(0.0)
+          .withLeftTurretDegrees(0.0)
+          .withLeftIndexerVolts(0.0)
+          .withRightFlywheelRPS(0.0)
+          .withRightHoodDegrees(0.0)
+          .withRightTurretDegrees(0.0)
+          .withRightIndexerVolts(0.0)
+          .withGroundPivotDegrees(88.0)
+          .withGroundRollersVolts(0.0)
+          .withKickerVolts(0.0)),
   AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(70.0).withRightFlywheelRPS(70.0)),
   EXTEND(Setpoint.builder().withClimberMeters(0.2)),
   RETRACT(Setpoint.builder().withClimberMeters(0.0)),

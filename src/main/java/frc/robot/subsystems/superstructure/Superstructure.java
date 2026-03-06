@@ -244,6 +244,13 @@ public class Superstructure {
       if (Controllers.KILL_RIGHT.toggled()) {
         setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
       }
+
+      if (Controllers.SUPERCHARGED.getAsBoolean()) {
+        setGoal(SetpointGoal.SUPERCHARGED);
+        shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+        shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+        shooterTuner.setGoal(ShooterTuner.Goal.NONE);
+      }
     } else if (DriverStation.isAutonomous()) {
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
           && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {

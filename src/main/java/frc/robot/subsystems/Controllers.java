@@ -22,7 +22,7 @@ public class Controllers {
   public static final Edge TOGGLE_HOOD_FLYWHEEL = new Edge(TROY.x());
 
   // TODO: do we need autoalign? This is the only button that is potentially free
-  public static final Trigger AUTO_ALIGN = TROY.rightBumper();
+  public static final Edge SUPERCHARGED = new Edge(TROY.rightBumper());
   public static final Trigger INDEX = TROY.rightTrigger();
 
   // score/save must be the same button, no space
