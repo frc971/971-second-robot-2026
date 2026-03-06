@@ -409,6 +409,26 @@ public class Superstructure {
         });
   }
 
+  public Command shootSequenceAuto() {
+    return Commands.parallel(
+        Commands.run(
+            () -> {
+              ObjectState curTarget =
+                  DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                      ? ShooterHandler.Targets.BLUE
+                      : ShooterHandler.Targets.RED;
+              shooterHandlerLeft.setTargetState(curTarget);
+              shooterHandlerRight.setTargetState(curTarget);
+              shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+              shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+            }),
+        Commands.repeatingSequence(
+            Commands.runOnce(() -> setGoal(SetpointGoal.INTAKE_PIVOT)),
+            Commands.waitSeconds(0.5),
+            Commands.runOnce(() -> setGoal(SetpointGoal.INTAKE_PIVOT_JUICE)),
+            Commands.waitSeconds(0.5)));
+  }
+
   public Command flywheelAuto() {
     return Commands.runOnce(
         () -> {

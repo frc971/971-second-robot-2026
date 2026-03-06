@@ -84,6 +84,7 @@ public enum SetpointGoal {
           .withGroundRollersVolts(-12.0)
           .withGroundPivotDegrees(24.0)),
   INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(23.0)),
+  INTAKE_PIVOT_JUICE(Setpoint.builder().withGroundPivotDegrees(45.0)),
   AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(12.0)),
   INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
   KILL_RIGHT(
