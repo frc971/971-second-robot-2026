@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.vision.BOS;
 import frc.robot.subsystems.vision.TagHelper;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -72,13 +73,21 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     robotContainer.periodic();
 
+    HubShiftUtil.ShiftInfo info = HubShiftUtil.getOfficialShiftInfo();
+
+    Logger.recordOutput("HubShift/Active", info.active());
+    Logger.recordOutput("HubShift/RemainingTime", info.remainingTime());
+    Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
+
     bos.updatePose();
 
     CommandScheduler.getInstance().run();
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    HubShiftUtil.initialize();
+  }
 
   @Override
   public void disabledPeriodic() {
@@ -111,6 +120,7 @@ public class Robot extends LoggedRobot {
       CommandScheduler.getInstance().schedule(autonomousCommand);
       robotContainer.resetPositionForAuto();
     }
+    HubShiftUtil.initialize();
   }
 
   @Override
@@ -124,6 +134,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    HubShiftUtil.initialize();
   }
 
   @Override
