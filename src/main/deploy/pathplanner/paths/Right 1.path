@@ -48,11 +48,11 @@
     },
     {
       "anchor": {
-        "x": 3.9444918228490664,
+        "x": 3.4,
         "y": 0.6447634117443339
       },
       "prevControl": {
-        "x": 6.243462980203756,
+        "x": 5.6989711573546895,
         "y": 0.5900223807717679
       },
       "nextControl": null,
@@ -105,23 +105,23 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
+      "waypointRelativePos": 0.28964578379755435,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "IntakePivotDown"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
       "waypointRelativePos": 0.7822892296122994,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
           "name": "Intake"
-        }
-      }
-    },
-    {
-      "name": "cosmetic field",
-      "waypointRelativePos": 2.106446373980979,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Flywheel"
         }
       }
     },
@@ -147,7 +147,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 161.71887561600607
+    "rotation": 155.0
   },
   "reversed": false,
   "folder": null,

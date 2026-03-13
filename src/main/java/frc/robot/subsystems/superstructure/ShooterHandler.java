@@ -57,10 +57,17 @@ public class ShooterHandler {
   private @Setter @Getter ObjectState targetState;
   private final String name;
 
+  @Setter
+  @Getter
+  @AutoLogOutput(key = "{name}/Use TOF")
+  private boolean useTOF = true;
+
   @AutoLogOutput(key = "{name}/flywheelOffset")
+  @Getter
   private AngularVelocity flywheelOffset = RotationsPerSecond.of(0.0);
 
   @AutoLogOutput(key = "{name}/turretOffset")
+  @Getter
   private Angle turretOffset = Degrees.of(0.0);
 
   @AutoLogOutput(key = "{name}/desiredFlywheel")
@@ -126,14 +133,15 @@ public class ShooterHandler {
     this.targetState = Targets.BLUE;
     this.projectileState = Targets.BLUE;
 
-    this.launchSolution = physics.iterativeTimeSolve(getProjectileState(), Targets.BLUE, 1);
+    this.launchSolution = physics.iterativeTimeSolve(getProjectileState(), Targets.BLUE, 1, false);
   }
 
   public void periodic() {
     projectileState = getProjectileState();
 
     // calculate physics
-    launchSolution = physics.iterativeTimeSolve(projectileState, targetState, 20);
+    launchSolution =
+        physics.iterativeTimeSolve(projectileState, targetState, 15, isShuttle(targetState));
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
     if (shooterGoal == Goal.NONE) {
@@ -234,8 +242,18 @@ public class ShooterHandler {
 
   public Angle getFutureRelativeTurretAngle() {
     LaunchSolution turretAheadSolution =
-        physics.iterativeTimeSolve(
-            projectileState.getFutureState(this.TURRET_TIME_DELAY), targetState, 20);
+        useTOF
+            ? physics.iterativeTimeSolve(
+                projectileState.getFutureState(TURRET_TIME_DELAY),
+                targetState,
+                15,
+                isShuttle(targetState))
+            : physics.stationaryInterpolation(
+                projectileState,
+                targetState,
+                isShuttle(targetState)
+                    ? config.PHYSICS().SHUTTLE_TABLE()
+                    : config.PHYSICS().SHOT_TABLE());
 
     Angle absolute = Degrees.of(turretAheadSolution.turretRotation.getDegrees());
     Angle relative =
@@ -339,14 +357,12 @@ public class ShooterHandler {
     AngularVelocity speed = launchSolution.flywheelSpeed();
     if (speed.lt(config.CONSTRAINTS().MIN_FLYWHEEL_SPEED())
         || speed.gt(config.CONSTRAINTS().MAX_FLYWHEEL_SPEED())) {
-      DataLogManager.log("WARNING: Calculated flywheel speed is out constraints");
       return false;
     }
 
     Angle angle = launchSolution.hoodAngle();
     if (angle.lt(config.CONSTRAINTS().MIN_HOOD_ANGLE())
         || angle.gt(config.CONSTRAINTS().MAX_HOOD_ANGLE())) {
-      DataLogManager.log("WARNING: Calculated hood angle is out of constraints");
       return false;
     }
 
@@ -355,7 +371,6 @@ public class ShooterHandler {
         Meters.of(targetState.position().minus(projectileState.position()).getNorm());
     if (targetDistance.lt(config.CONSTRAINTS().MIN_SHOT_DISTANCE())
         || targetDistance.gt(config.CONSTRAINTS().MAX_SHOT_DISTANCE())) {
-      DataLogManager.log("WARNING: Target distance is outside shot distance constraints");
       return false;
     }
 
@@ -395,6 +410,13 @@ public class ShooterHandler {
     ObjectState robotState = new ObjectState(drivetrainState);
 
     return robotState.plus(projPoseOffset, projVelOffset);
+  }
+
+  private boolean isShuttle(ObjectState target) {
+    return target == Targets.LEFT_BLUE_SHUTTLE
+        || target == Targets.RIGHT_BLUE_SHUTTLE
+        || target == Targets.LEFT_RED_SHUTTLE
+        || target == Targets.RIGHT_RED_SHUTTLE;
   }
 
   public Angle physicsHoodAngle() {

@@ -23,13 +23,12 @@ public enum SetpointGoal {
       Setpoint.builder()
           .withLeftFlywheelRPS(0.0)
           .withLeftHoodDegrees(0.0)
-          .withLeftTurretDegrees(101.0)
+          .withLeftTurretDegrees(0.0)
           .withLeftIndexerVolts(0.0)
           .withRightFlywheelRPS(0.0)
           .withRightHoodDegrees(0.0)
-          .withRightTurretDegrees(101.0)
+          .withRightTurretDegrees(0.0)
           .withRightIndexerVolts(0.0)
-          .withGroundPivotDegrees(88.0)
           .withGroundRollersVolts(0.0)
           .withKickerVolts(0.0)),
   AUTO_NEUTRAL(
@@ -42,7 +41,6 @@ public enum SetpointGoal {
           .withRightHoodDegrees(0.0)
           .withRightTurretDegrees(0.0)
           .withRightIndexerVolts(0.0)
-          .withGroundPivotDegrees(40.0)
           .withGroundRollersVolts(0.0)
           .withKickerVolts(0.0)),
   SUPERCHARGED(
@@ -55,10 +53,9 @@ public enum SetpointGoal {
           .withRightHoodDegrees(0.0)
           .withRightTurretDegrees(0.0)
           .withRightIndexerVolts(0.0)
-          .withGroundPivotDegrees(88.0)
           .withGroundRollersVolts(0.0)
           .withKickerVolts(0.0)),
-  AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(70.0).withRightFlywheelRPS(70.0)),
+  AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
   EXTEND(Setpoint.builder().withClimberMeters(0.2)),
   RETRACT(Setpoint.builder().withClimberMeters(0.0)),
   INDEX_BOTH(
@@ -81,8 +78,7 @@ public enum SetpointGoal {
           .withKickerVolts(-7.0)
           .withLeftIndexerVolts(0.0)
           .withRightIndexerVolts(0.0)
-          .withGroundRollersVolts(-12.0)
-          .withGroundPivotDegrees(24.0)),
+          .withGroundRollersVolts(-12.0)),
   INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(23.0)),
   INTAKE_PIVOT_JUICE(Setpoint.builder().withGroundPivotDegrees(45.0)),
   AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(12.0)),
@@ -122,18 +118,18 @@ public enum SetpointGoal {
       Setpoint.builder()
           .withLeftFlywheelRPS(63.488 + 5.0)
           .withLeftHoodDegrees(39.634)
-          .withLeftTurretDegrees(40.933)
+          .withLeftTurretDegrees(40.933 - 7.0)
           .withRightFlywheelRPS(68.156)
           .withRightHoodDegrees(39)
-          .withRightTurretDegrees(44.268)),
+          .withRightTurretDegrees(44.268 - 7.0)),
   MANUAL_DOWN( // up against the hub
       Setpoint.builder()
-          .withLeftFlywheelRPS(45)
-          .withLeftHoodDegrees(8)
-          .withLeftTurretDegrees(-13.152)
-          .withRightFlywheelRPS(45)
-          .withRightHoodDegrees(8)
-          .withRightTurretDegrees(13.871));
+          .withLeftFlywheelRPS(42.0)
+          .withLeftHoodDegrees(11.0)
+          .withLeftTurretDegrees(0.0)
+          .withRightFlywheelRPS(42.0)
+          .withRightHoodDegrees(11.0)
+          .withRightTurretDegrees(0.0));
 
   private final Setpoint setpoint;
 

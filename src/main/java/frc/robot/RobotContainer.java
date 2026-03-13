@@ -34,7 +34,7 @@ public class RobotContainer {
   private static final double SUPERCHARGED_ANGULAR_RATE =
       RotationsPerSecond.of(1.0).in(RadiansPerSecond);
 
-  private static final double MAX_SPEED = 3.6;
+  private static final double MAX_SPEED = 3.4;
   private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
 
   private static final double TRANSLATION_DEADBAND = 0.05;
@@ -61,7 +61,7 @@ public class RobotContainer {
 
   // Current values are placeholders and should be tuned for optimal robot control
   // Slew rate limit for translation (m/s^2)
-  private static final double SLEW_TRANSLATE_LIMIT = 4.0;
+  private static final double SLEW_TRANSLATE_LIMIT = 3.5;
   // Slew rate limit for rotation (rad/s^2)
   private static final double SLEW_ROTATION_LIMIT = 10.0;
 
@@ -118,10 +118,10 @@ public class RobotContainer {
 
   private void registerNamedCommands() {
     NamedCommands.registerCommand("Intake", superstructure.intakeAuto());
+    NamedCommands.registerCommand("IntakePivotDown", superstructure.intakePivotDownAuto());
     NamedCommands.registerCommand("Deployed", superstructure.deployedAuto());
     NamedCommands.registerCommand("Shoot", superstructure.shootAuto());
     NamedCommands.registerCommand("ShootSequence", superstructure.shootSequenceAuto());
-    NamedCommands.registerCommand("Flywheel", superstructure.flywheelAuto());
     NamedCommands.registerCommand("Neutral", superstructure.neutral());
   }
 

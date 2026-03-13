@@ -35,7 +35,7 @@ public class ShooterSolverTests {
     ObjectState robot = new ObjectState(new Translation2d(0, 0), new Translation2d(0.5, 0));
     ObjectState target = new ObjectState(new Translation2d(5.0, 0), new Translation2d());
 
-    LaunchSolution solution = physics.iterativeTimeSolve(robot, target, 3);
+    LaunchSolution solution = physics.iterativeTimeSolve(robot, target, 3, false);
 
     assertNotNull(solution);
     assertTrue(solution.flywheelSpeed().gt(RotationsPerSecond.of(0)));

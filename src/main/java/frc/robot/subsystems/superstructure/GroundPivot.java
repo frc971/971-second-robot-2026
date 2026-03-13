@@ -33,8 +33,8 @@ public class GroundPivot extends AngularSubsystem {
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Motion Magic profile constraints
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.7;
-    tc.MotionMagic.MotionMagicAcceleration = 20.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 0.5;
+    tc.MotionMagic.MotionMagicAcceleration = 10.0;
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -42,7 +42,7 @@ public class GroundPivot extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
     tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
     tc.Feedback.SensorToMechanismRatio = (36.0 / 1.0); // Motor to output gear ratio
@@ -50,7 +50,7 @@ public class GroundPivot extends AngularSubsystem {
     return MotorConfig.builder()
         .NAME("Ground Pivot")
         .ID(14)
-        .BUS(new CANBus("rio"))
+        .BUS(new CANBus("Left Superstructure"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
         .build();

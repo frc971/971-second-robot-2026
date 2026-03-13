@@ -28,7 +28,8 @@ public class ShooterPhysicsTest {
     ObjectState robot = new ObjectState(new Translation2d(0, 0), new Translation2d(0, 0));
     ObjectState target = new ObjectState(new Translation2d(2.0, 0), new Translation2d(0, 0));
 
-    LaunchSolution solution = physics.stationaryInterpolation(robot, target);
+    LaunchSolution solution =
+        physics.stationaryInterpolation(robot, target, config.PHYSICS().SHOT_TABLE());
 
     assertNotNull(solution);
     assertTrue(solution.flywheelSpeed().gt(RotationsPerSecond.of(0)));
@@ -50,7 +51,7 @@ public class ShooterPhysicsTest {
     ObjectState robot = new ObjectState(new Translation2d(0, 0), new Translation2d(1.0, 0));
     ObjectState target = new ObjectState(new Translation2d(3.0, 0), new Translation2d(0, 0));
 
-    LaunchSolution solution = physics.iterativeTimeSolve(robot, target, 5);
+    LaunchSolution solution = physics.iterativeTimeSolve(robot, target, 5, false);
 
     assertNotNull(solution);
     assertTrue(solution.flywheelSpeed().gt(RotationsPerSecond.of(0)));

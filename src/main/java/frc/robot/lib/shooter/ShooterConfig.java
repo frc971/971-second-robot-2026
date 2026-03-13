@@ -24,9 +24,14 @@ public class ShooterConfig {
   @Getter
   public static class Physics {
     @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
+    @Builder.Default private ShotTable SHUTTLE_TABLE = new ShotTable();
 
     public Time getTime(Distance distance) {
       return SHOT_TABLE.getTime(distance);
+    }
+
+    public Time getShuttleTime(Distance distance) {
+      return SHUTTLE_TABLE.getTime(distance);
     }
   }
 

@@ -22,11 +22,11 @@ public class ShooterPhysics {
    * - empirical data is true
    * - interpolation of angle + speed is close enough (aka ~linear)
    */
-  public LaunchSolution stationaryInterpolation(ObjectState proj, ObjectState target) {
+  public LaunchSolution stationaryInterpolation(
+      ObjectState proj, ObjectState target, ShotTable table) {
     Translation2d distance2d = target.minus(proj).position();
 
-    ShooterData shooterData =
-        physicsConfig.SHOT_TABLE().getShooterData(Meters.of(distance2d.getNorm()));
+    ShooterData shooterData = table.getShooterData(Meters.of(distance2d.getNorm()));
     Rotation2d turretRotation = distance2d.getAngle();
 
     return new LaunchSolution(shooterData, turretRotation);
@@ -48,7 +48,7 @@ public class ShooterPhysics {
     // TODO: account for time delay in measuring pose & actual pose
     ObjectState futureRobot = projectile.getFutureState(timeOfFlight);
 
-    return stationaryInterpolation(futureRobot, target);
+    return stationaryInterpolation(futureRobot, target, physicsConfig.SHOT_TABLE());
   }
 
   /**
@@ -57,13 +57,15 @@ public class ShooterPhysics {
    * @param maxIterations number of iterations to do
    */
   public LaunchSolution iterativeTimeSolve(
-      ObjectState projectile, ObjectState target, int maxIterations) {
+      ObjectState projectile, ObjectState target, int maxIterations, boolean shuttle) {
+
+    ShotTable table = shuttle ? physicsConfig.SHUTTLE_TABLE() : physicsConfig.SHOT_TABLE();
 
     Distance currentDistance =
         Meters.of(projectile.minus(target).position().getNorm()); // double check if actually meters
 
     // get time of flight from shot table
-    Time timeOfFlight = physicsConfig.getTime(currentDistance);
+    Time timeOfFlight = table.getTime(currentDistance);
 
     // iteratively update time of flight
     for (int i = 0; i < maxIterations; i++) {
@@ -72,7 +74,7 @@ public class ShooterPhysics {
           Meters.of(
               futureRobot.minus(target).position().getNorm()); // check that this is actually meters
 
-      Time newTimeOfFlight = physicsConfig.getTime(interceptDistance);
+      Time newTimeOfFlight = table.getTime(interceptDistance);
 
       // Quit early if already converged
       if (Math.abs(newTimeOfFlight.in(Seconds) - timeOfFlight.in(Seconds)) < 0.01) {
@@ -82,6 +84,6 @@ public class ShooterPhysics {
       timeOfFlight = newTimeOfFlight;
     }
 
-    return stationaryInterpolation(projectile.getFutureState(timeOfFlight), target);
+    return stationaryInterpolation(projectile.getFutureState(timeOfFlight), target, table);
   }
 }

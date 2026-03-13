@@ -29,7 +29,7 @@ public class SpindexerLeft extends MotorSubsystem {
     return MotorConfig.builder()
         .NAME("Spindexer Left")
         .ID(32)
-        .BUS(new CANBus("Left Superstructure"))
+        .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();
   }

@@ -55,7 +55,7 @@ public class TurretLeft extends AngularSubsystem {
     return MotorConfig.builder()
         .NAME("Turret Left")
         .ID(30)
-        .BUS(new CANBus("Left Superstructure"))
+        .BUS(new CANBus("rio"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
         .build();
