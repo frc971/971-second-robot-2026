@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
@@ -47,6 +48,8 @@ public class Superstructure {
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private boolean pivotAtPosition = false;
+  private final Timer pivotTimer = new edu.wpi.first.wpilibj.Timer();
+  private boolean pivotTimerStarted = false;
 
   private enum ShooterGoal {
     NONE,
@@ -182,31 +185,42 @@ public class Superstructure {
       // intake (will override outtake)
       if (Controllers.INTAKE_PIVOT_EDGE.rising()) {
         pivotAtPosition = false;
+        pivotTimerStarted = false;
       }
 
       if (!Controllers.INTAKE_PIVOT.toggled() || Controllers.OUTTAKE.getAsBoolean()) {
-        if (!pivotAtPosition
-            && groundPivot.getSupplyCurrent() != null
-            && groundPivot.getSupplyCurrent().abs(Amp) > 10.0) {
-          pivotAtPosition = true;
-          groundPivot.setVoltage(Volts.of(0.0));
-          groundPivot.resetPosition(SetpointGoal.INTAKE_PIVOT.getSetpoint().getGroundPivot().get());
-        } else {
-          groundPivot.setVoltage(Volts.of(-2.0));
+        if (!pivotAtPosition) {
+          if (!pivotTimerStarted) {
+            pivotTimer.restart();
+            pivotTimerStarted = true;
+          }
+          if (pivotTimer.hasElapsed(2.5)) {
+            pivotAtPosition = true;
+            pivotTimerStarted = false;
+            groundPivot.setVoltage(Volts.of(0.0));
+            groundPivot.resetPosition(
+                SetpointGoal.INTAKE_PIVOT.getSetpoint().getGroundPivot().get());
+          } else {
+            groundPivot.setVoltage(Volts.of(-2.0));
+          }
         }
-
         if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
           setGoal(SetpointGoal.INTAKE_ROLLERS);
         }
       } else {
-        if (!pivotAtPosition
-            && groundPivot.getSupplyCurrent() != null
-            && groundPivot.getSupplyCurrent().abs(Amp) > 10.0) {
-          pivotAtPosition = true;
-          groundPivot.setVoltage(Volts.of(0.0));
-          groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
-        } else {
-          groundPivot.setVoltage(Volts.of(2.0));
+        if (!pivotAtPosition) {
+          if (!pivotTimerStarted) {
+            pivotTimer.restart();
+            pivotTimerStarted = true;
+          }
+          if (pivotTimer.hasElapsed(2.5)) {
+            pivotAtPosition = true;
+            pivotTimerStarted = false;
+            groundPivot.setVoltage(Volts.of(0.0));
+            groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
+          } else {
+            groundPivot.setVoltage(Volts.of(2.0));
+          }
         }
       }
 
