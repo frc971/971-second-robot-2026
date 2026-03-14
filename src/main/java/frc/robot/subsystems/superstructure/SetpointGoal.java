@@ -14,17 +14,17 @@ public enum SetpointGoal {
   RESET(
       Setpoint.builder()
           .withLeftHoodDegrees(0.0)
-          .withLeftTurretDegrees(103.5)
+          .withLeftTurretDegrees(105)
           .withRightHoodDegrees(0.0)
-          .withRightTurretDegrees(103.5)
+          .withRightTurretDegrees(107)
           .withGroundPivotDegrees(90.0)
           .withClimberMeters(0.0)),
   MANUAL_RESET(
       Setpoint.builder()
           .withLeftHoodDegrees(0.0)
-          .withLeftTurretDegrees(103)
+          .withLeftTurretDegrees(104)
           .withRightHoodDegrees(0.0)
-          .withRightTurretDegrees(103)
+          .withRightTurretDegrees(106)
           .withGroundPivotDegrees(90.0)
           .withClimberMeters(0.0)),
   NEUTRAL(
