@@ -159,6 +159,10 @@ public class Superstructure {
             setpoint = SetpointGoal.MANUAL_SHUTTLE_RIGHT;
           }
 
+          if (Controllers.MANUAL_RESET.toggled()) {
+            setpoint = SetpointGoal.MANUAL_RESET;
+          }
+
           setGoal(setpoint);
         }
         case TUNE_LEFT_SHOOTER -> {}

@@ -42,8 +42,8 @@ public class GroundPivot extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
-    tc.CurrentLimits.StatorCurrentLimit = 80.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 20.0;
+    tc.CurrentLimits.StatorCurrentLimit = 40.0;
 
     tc.Feedback.SensorToMechanismRatio = (36.0 / 1.0); // Motor to output gear ratio
 

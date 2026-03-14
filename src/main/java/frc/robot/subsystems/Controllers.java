@@ -18,6 +18,8 @@ public class Controllers {
   public static final Trigger CLIMB_EXTEND = TROY.y();
   public static final Trigger CLIMB_RETRACT = TROY.b(); // TODO: add drivetrain controls
 
+  public static final Toggle MANUAL_RESET = new Toggle(TROY.a());
+
   // === Software's Controls
   public static final Toggle TUNING = new Toggle(TROY.start());
   public static final Edge TOGGLE_HOOD_FLYWHEEL = new Edge(TROY.x());

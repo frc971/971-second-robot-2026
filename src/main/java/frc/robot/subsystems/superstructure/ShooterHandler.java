@@ -312,9 +312,9 @@ public class ShooterHandler {
     }
 
     if (targetState == Targets.BLUE || targetState == Targets.RED) {
-      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHOOTING_FLYWHEEL_ABORT())
-          || turretRotationAbsDiff().gt(config.THRESHOLD().SHOOTING_ROTATION_THRESHOLD())
-          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHOOTING_HOOD_ANGLE_THRESHOLD());
+      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().FIRING_FLYWHEEL_ABORT())
+          || turretRotationAbsDiff().gt(config.THRESHOLD().FIRING_ROTATION_THRESHOLD())
+          || hoodAngleAbsDiff().gt(config.THRESHOLD().FIRING_HOOD_ANGLE_THRESHOLD());
     } else {
       return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHUTTLING_FLYWHEEL_THRESHOLD())
           || turretRotationAbsDiff().gt(config.THRESHOLD().SHUTTLING_ROTATION_THRESHOLD())

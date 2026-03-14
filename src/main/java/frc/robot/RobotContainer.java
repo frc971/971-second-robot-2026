@@ -61,9 +61,9 @@ public class RobotContainer {
 
   // Current values are placeholders and should be tuned for optimal robot control
   // Slew rate limit for translation (m/s^2)
-  private static final double SLEW_TRANSLATE_LIMIT = 3.5;
+  private static final double SLEW_TRANSLATE_LIMIT = 1000.0;
   // Slew rate limit for rotation (rad/s^2)
-  private static final double SLEW_ROTATION_LIMIT = 10.0;
+  private static final double SLEW_ROTATION_LIMIT = 1000.0;
 
   // Exponential curve for translation joystick
   private static final double TRANSLATION_EXP_CURVE = 2;
