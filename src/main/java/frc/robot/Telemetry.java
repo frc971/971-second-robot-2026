@@ -147,7 +147,6 @@ public class Telemetry {
     SignalLogger.writeDoubleArray("DriveState/ModuleStates", moduleStatesArray);
     SignalLogger.writeDoubleArray("DriveState/ModuleTargets", moduleTargetsArray);
     SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
-    SignalLogger.writeInteger("DriveState/SuccessfulDaqs", state.SuccessfulDaqs);
     SignalLogger.writeInteger("DriveState/FailedDaqs", state.FailedDaqs);
 
     /* Telemeterize the pose to a Field2d */

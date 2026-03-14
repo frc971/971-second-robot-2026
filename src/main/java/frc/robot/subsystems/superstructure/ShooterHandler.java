@@ -70,7 +70,6 @@ public class ShooterHandler {
   @Getter
   private Angle turretOffset = Degrees.of(0.0);
 
-  @AutoLogOutput(key = "{name}/desiredFlywheel")
   private AngularVelocity desiredFlywheel = RotationsPerSecond.of(0.0);
 
   @AutoLogOutput(key = "{name}/desiredTurret")
@@ -110,9 +109,7 @@ public class ShooterHandler {
   private final AngularSubsystem hood;
   private final AngularSubsystem flywheel;
 
-  @AutoLogOutput(key = "{name}/TuningEnabled")
-  @Setter
-  private boolean tuningEnabled = false;
+  @Setter private boolean tuningEnabled = false;
 
   public ShooterHandler(
       AngularSubsystem turret,
@@ -271,13 +268,10 @@ public class ShooterHandler {
           name + "/LaunchGoals/Turret (deg)",
           Radians.of(launchSolution.turretRotation.getRadians()).in(Degrees));
       Logger.recordOutput(
-          name + "/LaunchGoals/Turret Rel (deg)", getRelativeTurretAngle().in(Degrees));
-      Logger.recordOutput(
           name + "/LaunchGoals/Turret Future Rel (deg)",
           getFutureRelativeTurretAngle().in(Degrees));
       Logger.recordOutput(name + "/LaunchGoals/Hood (deg)", launchSolution.hoodAngle().in(Degrees));
       Translation2d distance2d = targetState.minus(projectileState).position();
-      Logger.recordOutput(name + "/Distance/2D", distance2d);
       Logger.recordOutput(name + "/Distance/1D", distance2d.getNorm());
 
       Logger.recordOutput(
