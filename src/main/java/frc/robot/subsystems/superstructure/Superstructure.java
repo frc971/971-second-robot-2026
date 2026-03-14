@@ -73,11 +73,21 @@ public class Superstructure {
 
     shooterHandlerRight =
         new ShooterHandler(
-            turretRight, hoodRight, flywheelRight, robotContainer.drivetrain, ShooterConfigs.RIGHT);
+            turretRight,
+            hoodRight,
+            flywheelRight,
+            robotContainer.drivetrain,
+            ShooterConfigs.RIGHT,
+            ShooterHandler.Side.RIGHT);
 
     shooterHandlerLeft =
         new ShooterHandler(
-            turretLeft, hoodLeft, flywheelLeft, robotContainer.drivetrain, ShooterConfigs.LEFT);
+            turretLeft,
+            hoodLeft,
+            flywheelLeft,
+            robotContainer.drivetrain,
+            ShooterConfigs.LEFT,
+            ShooterHandler.Side.LEFT);
 
     setGoal(SetpointGoal.NEUTRAL);
   }

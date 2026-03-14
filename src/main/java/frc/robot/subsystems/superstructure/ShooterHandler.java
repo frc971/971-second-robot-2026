@@ -50,12 +50,18 @@ public class ShooterHandler {
             FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.position()), new Translation2d());
   }
 
+  public enum Side {
+    LEFT,
+    RIGHT
+  }
+
   // config + physics model
   private ShooterConfig config;
   private ShooterPhysics physics;
   private ObjectState projectileState;
   private @Setter @Getter ObjectState targetState;
   private final String name;
+  private final Side side;
 
   @Setter
   @Getter
@@ -79,6 +85,7 @@ public class ShooterHandler {
   private static final Angle TURRET_STEP = Degrees.of(2.0);
 
   private static final Time TURRET_TIME_DELAY = Seconds.of(0.1);
+  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.15);
 
   // state machine
   public enum State {
@@ -116,7 +123,8 @@ public class ShooterHandler {
       AngularSubsystem hood,
       AngularSubsystem flywheel,
       CommandSwerveDrivetrain drivetrain,
-      ShooterConfig config) {
+      ShooterConfig config,
+      Side side) {
     this.drivetrain = drivetrain;
     this.turret = turret;
     this.flywheel = flywheel;
@@ -124,6 +132,7 @@ public class ShooterHandler {
     this.config = config;
     this.physics = new ShooterPhysics(this.config.PHYSICS());
     this.name = config.name();
+    this.side = side;
 
     this.shooterState = State.NOT_READY;
     this.shooterGoal = Goal.NONE;
@@ -136,9 +145,29 @@ public class ShooterHandler {
   public void periodic() {
     projectileState = getProjectileState();
 
+    Translation2d perpOffset =
+        new Translation2d(
+            PERPENDICULAR_TURRET_OFFSET.in(Meters),
+            new Rotation2d(
+                targetState.minus(projectileState).position().getAngle().getRadians()
+                    + ((side == Side.LEFT) ? Math.PI / 2 : -(Math.PI / 2))));
+
+    ObjectState adjustedTargetState = targetState.plus(perpOffset, new Translation2d());
+
     // calculate physics
     launchSolution =
-        physics.iterativeTimeSolve(projectileState, targetState, 15, isShuttle(targetState));
+        useTOF
+            ? physics.iterativeTimeSolve(
+                projectileState.getFutureState(TURRET_TIME_DELAY),
+                adjustedTargetState,
+                15,
+                isShuttle(targetState))
+            : physics.stationaryInterpolation(
+                projectileState,
+                adjustedTargetState,
+                isShuttle(targetState)
+                    ? config.PHYSICS().SHUTTLE_TABLE()
+                    : config.PHYSICS().SHOT_TABLE());
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
     if (shooterGoal == Goal.NONE) {
@@ -237,28 +266,6 @@ public class ShooterHandler {
     return Radians.of(MathUtil.angleModulus(relative.in(Radians)));
   }
 
-  public Angle getFutureRelativeTurretAngle() {
-    LaunchSolution turretAheadSolution =
-        useTOF
-            ? physics.iterativeTimeSolve(
-                projectileState.getFutureState(TURRET_TIME_DELAY),
-                targetState,
-                15,
-                isShuttle(targetState))
-            : physics.stationaryInterpolation(
-                projectileState,
-                targetState,
-                isShuttle(targetState)
-                    ? config.PHYSICS().SHUTTLE_TABLE()
-                    : config.PHYSICS().SHOT_TABLE());
-
-    Angle absolute = Degrees.of(turretAheadSolution.turretRotation.getDegrees());
-    Angle relative =
-        absolute.minus(Degrees.of(drivetrain.getState().Pose.getRotation().getDegrees()));
-
-    return Radians.of(MathUtil.angleModulus(relative.in(Radians)));
-  }
-
   private void logStates() {
     if (launchSolution != null) {
       Logger.recordOutput(
@@ -268,8 +275,7 @@ public class ShooterHandler {
           name + "/LaunchGoals/Turret (deg)",
           Radians.of(launchSolution.turretRotation.getRadians()).in(Degrees));
       Logger.recordOutput(
-          name + "/LaunchGoals/Turret Future Rel (deg)",
-          getFutureRelativeTurretAngle().in(Degrees));
+          name + "/LaunchGoals/Turret Rel (deg)", getRelativeTurretAngle().in(Degrees));
       Logger.recordOutput(name + "/LaunchGoals/Hood (deg)", launchSolution.hoodAngle().in(Degrees));
       Translation2d distance2d = targetState.minus(projectileState).position();
       Logger.recordOutput(name + "/Distance/1D", distance2d.getNorm());
