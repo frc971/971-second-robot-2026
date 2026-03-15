@@ -45,6 +45,7 @@ public class Superstructure {
   public final Kicker kicker;
   public final Climber climber;
 
+  public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private boolean pivotAtPosition = false;
@@ -91,6 +92,9 @@ public class Superstructure {
             robotContainer.drivetrain,
             ShooterConfigs.LEFT,
             ShooterHandler.Side.LEFT);
+
+    visualization =
+        new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber, groundPivot);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -311,6 +315,8 @@ public class Superstructure {
     groundRollers.periodic();
     kicker.periodic();
     climber.periodic();
+
+    visualization.periodic();
   }
 
   public void setGoal(Setpoint setpoint) {
