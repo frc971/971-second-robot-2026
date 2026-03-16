@@ -21,7 +21,7 @@ public class ShooterConfigs {
                   .build())
           .PHYSICS(
               ShooterConfig.Physics.builder()
-                  .SHOT_TABLE(shotTable())
+                  .SHOT_TABLE(shotTableRight())
                   .SHUTTLE_TABLE(shuttleTable())
                   .build())
           .build();
@@ -35,7 +35,7 @@ public class ShooterConfigs {
                   .build())
           .PHYSICS(
               ShooterConfig.Physics.builder()
-                  .SHOT_TABLE(shotTable())
+                  .SHOT_TABLE(shotTableLeft())
                   .SHUTTLE_TABLE(shuttleTable())
                   .build())
           .build();
@@ -53,7 +53,7 @@ public class ShooterConfigs {
     return table;
   }
 
-  private static ShotTable shotTable() {
+  private static ShotTable shotTableLeft() {
     ShotTable table = new ShotTable();
     table.put(Meters.of(1.01), Degrees.of(9.37500), RotationsPerSecond.of(30.0));
     table.put(Meters.of(1.5794), Degrees.of(9.37500), RotationsPerSecond.of(46.87500));
@@ -65,6 +65,31 @@ public class ShooterConfigs {
     table.put(Meters.of(5.04561), Degrees.of(37.50000), RotationsPerSecond.of(58.0));
     table.put(Meters.of(5.23), Degrees.of(41), RotationsPerSecond.of(64.0));
     table.put(Meters.of(5.69375), Degrees.of(48.4375), RotationsPerSecond.of(69.53125));
+
+    table.put(Meters.of(0.01), Seconds.of(0.0)); // do not delete, would cause errors
+    table.put(Meters.of(1.07), Seconds.of(1.15));
+    table.put(Meters.of(1.47), Seconds.of(1.15));
+    table.put(Meters.of(2.0), Seconds.of(1.28));
+    table.put(Meters.of(2.5), Seconds.of(1.1));
+    table.put(Meters.of(3.0), Seconds.of(1.0));
+    table.put(Meters.of(3.5), Seconds.of(1.2));
+    table.put(Meters.of(4.0), Seconds.of(1.1));
+    table.put(Meters.of(4.5), Seconds.of(1.28));
+    table.put(Meters.of(5.0), Seconds.of(1.383));
+    table.put(Meters.of(6.0), Seconds.of(1.3)); // 32% vibed
+    return table;
+  }
+
+  private static ShotTable shotTableRight() {
+    ShotTable table = new ShotTable();
+
+    table.put(Meters.of(0), Degrees.of(0), RotationsPerSecond.of(0));
+    table.put(Meters.of(1.46814), Degrees.of(18.75000), RotationsPerSecond.of(43.75000 - 2.5));
+    table.put(Meters.of(1.89302), Degrees.of(18.75000), RotationsPerSecond.of(43.75000 - 2.5));
+    table.put(Meters.of(2.51544), Degrees.of(21.87500), RotationsPerSecond.of(50.00000 - 2.5));
+    table.put(Meters.of(3.19479), Degrees.of(31.25000), RotationsPerSecond.of(50.00000 - 2.5));
+    table.put(Meters.of(3.74519), Degrees.of(31.25000), RotationsPerSecond.of(54.68750));
+    table.put(Meters.of(5.50000), Degrees.of(40.62500), RotationsPerSecond.of(60.93750));
 
     table.put(Meters.of(0.01), Seconds.of(0.0)); // do not delete, would cause errors
     table.put(Meters.of(1.07), Seconds.of(1.15));

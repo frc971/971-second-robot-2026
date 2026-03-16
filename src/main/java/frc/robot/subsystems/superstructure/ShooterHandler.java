@@ -85,7 +85,7 @@ public class ShooterHandler {
   private static final Angle TURRET_STEP = Degrees.of(2.0);
 
   private static final Time TURRET_TIME_DELAY = Seconds.of(0.1);
-  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.15);
+  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.0);
 
   // state machine
   public enum State {
