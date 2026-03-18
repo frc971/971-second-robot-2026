@@ -21,14 +21,14 @@ public class SpindexerLeft extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
-    tc.CurrentLimits.StatorCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
+    tc.CurrentLimits.StatorCurrentLimit = 0.0;
 
-    tc.Feedback.SensorToMechanismRatio = 1.0; // Motor to output gear ratio (small rollers)
+    tc.Feedback.SensorToMechanismRatio = 0.0; // Motor to output gear ratio (small rollers)
 
     return MotorConfig.builder()
         .NAME("Spindexer Left")
-        .ID(32)
+        .ID(0)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();

@@ -21,30 +21,30 @@ public class HoodLeft extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.35; // Static friction compensation
+    tc.Slot0.kS = 0.0; // Static friction compensation
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 971; // Proportional gain
+    tc.Slot0.kP = 0.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
     // for sim only
-    tc.MotionMagic.MotionMagicCruiseVelocity = 10.0;
-    tc.MotionMagic.MotionMagicAcceleration = 10.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0;
+    tc.MotionMagic.MotionMagicAcceleration = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
-    tc.CurrentLimits.StatorCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
+    tc.CurrentLimits.StatorCurrentLimit = 0.0;
 
-    tc.Feedback.SensorToMechanismRatio = 125.0 / 1.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio = 0.0; // Motor to output gear ratio
 
     return MotorConfig.builder()
         .NAME("Hood Left")
-        .ID(31)
+        .ID(0)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Degrees)

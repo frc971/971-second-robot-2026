@@ -21,20 +21,20 @@ public class GroundPivot extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.33; // Static friction compensation
-    tc.Slot0.kV = 5.0; // Velocity feedforward
+    tc.Slot0.kS = 0.0; // Static friction compensation
+    tc.Slot0.kV = 0.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = -0.2; // Gravity compensation
+    tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 8.0; // Proportional gain
-    tc.Slot0.kI = 30.0; // Integral gain
+    tc.Slot0.kP = 0.0; // Proportional gain
+    tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Motion Magic profile constraints
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.5;
-    tc.MotionMagic.MotionMagicAcceleration = 10.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0;
+    tc.MotionMagic.MotionMagicAcceleration = 0.0;
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -42,14 +42,14 @@ public class GroundPivot extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 20.0;
-    tc.CurrentLimits.StatorCurrentLimit = 40.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
+    tc.CurrentLimits.StatorCurrentLimit = 0.0;
 
-    tc.Feedback.SensorToMechanismRatio = (36.0 / 1.0); // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio = 0.0; // Motor to output gear ratio
 
     return MotorConfig.builder()
         .NAME("Ground Pivot")
-        .ID(14)
+        .ID(0)
         .BUS(new CANBus("Left Superstructure"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
