@@ -5,8 +5,7 @@ import lombok.Getter;
 /*
  * Turrets - Positive Voltage = Counterclockwise from top
  * Hoods - Positive Voltage = Higher altitude
- * Indexers - Positive Voltage = Spinning so that balls will go in its corresponding shooter
- * Kicker - Position Voltage = Pushing balls inward
+ * Indexer - Positive Voltage = Feeding notes forward
  * Flywheel - Positive Voltage = Push balls out of robot
  */
 @Getter
@@ -32,60 +31,38 @@ public enum SetpointGoal {
           .withLeftFlywheelRPS(0.0)
           .withLeftHoodDegrees(0.0)
           .withLeftTurretDegrees(0.0)
-          .withLeftIndexerVolts(0.0)
           .withRightFlywheelRPS(0.0)
           .withRightHoodDegrees(0.0)
           .withRightTurretDegrees(0.0)
-          .withRightIndexerVolts(0.0)
           .withGroundRollersVolts(0.0)
-          .withKickerVolts(0.0)),
+          .withIndexerVolts(0.0)),
   AUTO_NEUTRAL(
       Setpoint.builder()
           .withLeftFlywheelRPS(0.0)
           .withLeftHoodDegrees(0.0)
           .withLeftTurretDegrees(0.0)
-          .withLeftIndexerVolts(0.0)
           .withRightFlywheelRPS(0.0)
           .withRightHoodDegrees(0.0)
           .withRightTurretDegrees(0.0)
-          .withRightIndexerVolts(0.0)
           .withGroundRollersVolts(0.0)
-          .withKickerVolts(0.0)),
+          .withIndexerVolts(0.0)),
   SUPERCHARGED(
       Setpoint.builder()
           .withLeftFlywheelRPS(0.0)
           .withLeftHoodDegrees(0.0)
           .withLeftTurretDegrees(0.0)
-          .withLeftIndexerVolts(0.0)
           .withRightFlywheelRPS(0.0)
           .withRightHoodDegrees(0.0)
           .withRightTurretDegrees(0.0)
-          .withRightIndexerVolts(0.0)
           .withGroundRollersVolts(0.0)
-          .withKickerVolts(0.0)),
+          .withIndexerVolts(0.0)),
   AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
   EXTEND(Setpoint.builder().withClimberMeters(0.2)),
   RETRACT(Setpoint.builder().withClimberMeters(0.0)),
-  INDEX_BOTH(
-      Setpoint.builder()
-          .withLeftIndexerVolts(10.0)
-          .withRightIndexerVolts(10.0)
-          .withKickerVolts(8.0)),
-  INDEX_RIGHT(
-      Setpoint.builder()
-          .withKickerVolts(8.0)
-          .withLeftIndexerVolts(-10.0)
-          .withRightIndexerVolts(10.0)),
-  INDEX_LEFT(
-      Setpoint.builder()
-          .withKickerVolts(8.0)
-          .withLeftIndexerVolts(10.0)
-          .withRightIndexerVolts(-10.0)),
+  INDEX(Setpoint.builder().withIndexerVolts(10.0)),
   OUTTAKE(
       Setpoint.builder()
-          .withKickerVolts(-7.0)
-          .withLeftIndexerVolts(0.0)
-          .withRightIndexerVolts(0.0)
+          .withIndexerVolts(-10.0)
           .withGroundRollersVolts(-12.0)),
   INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(23.0)),
   INTAKE_PIVOT_JUICE(Setpoint.builder().withGroundPivotDegrees(45.0)),

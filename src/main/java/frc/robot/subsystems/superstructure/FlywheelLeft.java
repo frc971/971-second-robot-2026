@@ -58,8 +58,8 @@ public class FlywheelLeft extends AngularSubsystem {
 
     return MotorConfig.builder()
         .NAME("Flywheel Left Lead")
-        .ID(0)
-        .BUS(new CANBus("rio"))
+        .ID(31)
+        .BUS(new CANBus("Superstructure Bus"))
         .TALONFX_CONFIG(tc)
         .build();
   }
@@ -67,7 +67,7 @@ public class FlywheelLeft extends AngularSubsystem {
   public static MotorConfig getFollowerConfig() {
     return getMotorConfig().toBuilder()
         .NAME("Flywheel Left Follower")
-        .ID(0)
+        .ID(32)
         .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
         .build();
   }
