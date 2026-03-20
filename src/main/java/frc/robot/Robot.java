@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.FlippingUtil;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.vision.BOS;
 import frc.robot.subsystems.vision.TagHelper;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -21,12 +23,17 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import frc.robot.subsystems.limelight.Limelight;
+
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
 
   private final RobotContainer robotContainer;
 
   private final BOS bos;
+  private final Limelight limelight;
+
+  private final boolean USE_LIMELIGHT = false;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -60,6 +67,7 @@ public class Robot extends LoggedRobot {
 
     robotContainer = new RobotContainer();
     bos = new BOS(robotContainer.drivetrain);
+    limelight = new Limelight(robotContainer.drivetrain);
   }
 
   @Override
@@ -79,7 +87,11 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("HubShift/RemainingTime", info.remainingTime());
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
 
-    bos.updatePose();
+    if (USE_LIMELIGHT) {
+      limelight.updatePose();
+    } else {
+      bos.updatePose();
+    }
 
     CommandScheduler.getInstance().run();
   }
