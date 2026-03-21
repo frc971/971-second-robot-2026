@@ -28,29 +28,28 @@ public class Limelight {
     Rotation2d heading = driveState.Pose.getRotation();
     AngularVelocity omega = RadiansPerSecond.of(Math.abs(driveState.Speeds.omegaRadiansPerSecond));
 
-    for (String limelightName : LIMELIGHT_NAMES) {
-      LimelightHelpers.setPipelineIndex(limelightName, LIMELIGHT_LOCALIZATION_PIPELINE);
-      LimelightHelpers.SetRobotOrientation(limelightName, heading.getDegrees(), 0, 0, 0, 0, 0);
+    for (String name : LIMELIGHT_NAMES) {
+      LimelightHelpers.setPipelineIndex(name, LIMELIGHT_LOCALIZATION_PIPELINE);
+      LimelightHelpers.SetRobotOrientation(name, heading.getDegrees(), 0, 0, 0, 0, 0);
 
-      PoseEstimate llMeasurement =
-          LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+      PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
       boolean accept =
-          llMeasurement != null
-              && llMeasurement.tagCount >= MINIMUM_APRIL_TAG_COUNT
+          estimate != null
+              && estimate.tagCount >= MINIMUM_APRIL_TAG_COUNT
               && omega.lte(MAX_ANGULAR_SPEED);
 
       if (accept) {
         drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
-        drivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
+        drivetrain.addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
       }
 
-      Logger.recordOutput(limelightName + "/Accepted", accept);
-      if (llMeasurement != null) {
-        Logger.recordOutput(limelightName + "/Estimated Pose", llMeasurement.pose);
-        Logger.recordOutput(limelightName + "/Latency", llMeasurement.latency);
-        Logger.recordOutput(limelightName + "/Average Tag Distance", llMeasurement.avgTagDist);
-        Logger.recordOutput(limelightName + "/Tag Count", llMeasurement.tagCount);
+      Logger.recordOutput("Limelight/" + name + "/Accepted", accept);
+      if (estimate != null) {
+        Logger.recordOutput("Limelight/" + name + "/Estimated Pose", estimate.pose);
+        Logger.recordOutput("Limelight/" + name + "/Latency", estimate.latency);
+        Logger.recordOutput("Limelight/" + name + "/Average Tag Distance", estimate.avgTagDist);
+        Logger.recordOutput("Limelight/" + name + "/Tag Count", estimate.tagCount);
       }
     }
   }
