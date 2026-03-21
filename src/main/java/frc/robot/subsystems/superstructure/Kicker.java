@@ -20,14 +20,14 @@ public class Kicker extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
-    tc.CurrentLimits.StatorCurrentLimit = 0.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
+    tc.CurrentLimits.StatorCurrentLimit = 50.0;
 
-    tc.Feedback.SensorToMechanismRatio = 0.0; // Motor to output gear ratio (small rollers)
+    tc.Feedback.SensorToMechanismRatio = 1.0 / 1.0; // Motor to output gear ratio (small rollers)
 
     return MotorConfig.builder()
         .NAME("Kicker")
-        .ID(0)
+        .ID(16)
         .BUS(new CANBus("Left Superstructure"))
         .TALONFX_CONFIG(tc)
         .build();

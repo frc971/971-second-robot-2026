@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger;
 public class MotorSubsystem {
   protected final MotorIO io;
 
-  private final String name;
+  protected final String name;
 
   protected enum Mode {
     VOLTAGE,

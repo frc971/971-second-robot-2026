@@ -36,8 +36,8 @@ public class Climber extends LinearSubsystem {
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Motion Magic profile constraints
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-    tc.MotionMagic.MotionMagicAcceleration = 0.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 0.1;
+    tc.MotionMagic.MotionMagicAcceleration = 1.0;
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -45,15 +45,15 @@ public class Climber extends LinearSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
-    tc.CurrentLimits.StatorCurrentLimit = 0.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
+    tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
     tc.Feedback.SensorToMechanismRatio =
-        0.0; // Not a real gear ratio, put this in so position values aren't obscene
+        100.0 / 1.0; // Not a real gear ratio, put this in so position values aren't obscene
 
     return MotorConfig.builder()
         .NAME("Climber")
-        .ID(0)
+        .ID(17)
         .BUS(new CANBus("Left Superstructure"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Meters)

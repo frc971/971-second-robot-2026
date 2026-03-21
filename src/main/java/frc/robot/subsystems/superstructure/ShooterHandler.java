@@ -5,8 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.lib.shooter.*;
@@ -22,32 +25,51 @@ import org.littletonrobotics.junction.Logger;
 public class ShooterHandler {
   public static final class Targets {
     private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
+    private static final double HUB_HEIGHT = 1.63254385;
 
     public static final ObjectState BLUE =
         new ObjectState(
-            new Translation2d(
+            new Translation3d(
                 (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
-                (FlippingUtil.fieldSizeY / 2)),
-            new Translation2d());
+                (FlippingUtil.fieldSizeY / 2),
+                HUB_HEIGHT),
+            new Translation3d());
     public static final ObjectState RED =
-        new ObjectState(FlippingUtil.flipFieldPosition(BLUE.position()), new Translation2d());
+        new ObjectState(
+            new Translation3d(
+                FlippingUtil.flipFieldPosition(BLUE.xyPos()).getX(),
+                FlippingUtil.flipFieldPosition(BLUE.xyPos()).getY(),
+                HUB_HEIGHT),
+            new Translation3d());
 
     // offset from the corner
-    private static final Translation2d SHUTTLE_OFFSET = new Translation2d(1.8, 2.0);
+    private static final Translation3d SHUTTLE_OFFSET = new Translation3d(0.8, 1.3, 0.0);
 
     public static final ObjectState RIGHT_BLUE_SHUTTLE =
-        new ObjectState(SHUTTLE_OFFSET, new Translation2d());
+        new ObjectState(SHUTTLE_OFFSET, new Translation3d());
     public static final ObjectState LEFT_BLUE_SHUTTLE =
         new ObjectState(
-            new Translation2d(
-                SHUTTLE_OFFSET.getX(), FlippingUtil.fieldSizeY - SHUTTLE_OFFSET.getY()),
-            new Translation2d());
+            new Translation3d(
+                SHUTTLE_OFFSET.getX(),
+                FlippingUtil.fieldSizeY - SHUTTLE_OFFSET.getY(),
+                SHUTTLE_OFFSET.getZ()),
+            new Translation3d());
+
     public static final ObjectState RIGHT_RED_SHUTTLE =
         new ObjectState(
-            FlippingUtil.flipFieldPosition(RIGHT_BLUE_SHUTTLE.position()), new Translation2d());
+            new Translation3d(
+                FlippingUtil.flipFieldPosition(RIGHT_BLUE_SHUTTLE.xyPos()).getX(),
+                FlippingUtil.flipFieldPosition(RIGHT_BLUE_SHUTTLE.xyPos()).getY(),
+                RIGHT_BLUE_SHUTTLE.position().getZ()),
+            new Translation3d());
+
     public static final ObjectState LEFT_RED_SHUTTLE =
         new ObjectState(
-            FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.position()), new Translation2d());
+            new Translation3d(
+                FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.xyPos()).getX(),
+                FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.xyPos()).getY(),
+                LEFT_BLUE_SHUTTLE.position().getZ()),
+            new Translation3d());
   }
 
   public enum Side {
@@ -65,8 +87,8 @@ public class ShooterHandler {
 
   @Setter
   @Getter
-  @AutoLogOutput(key = "{name}/Use TOF")
-  private boolean useTOF = true;
+  @AutoLogOutput(key = "{name}/Use OTF")
+  private boolean useOTF = true;
 
   @AutoLogOutput(key = "{name}/flywheelOffset")
   @Getter
@@ -84,8 +106,7 @@ public class ShooterHandler {
   private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(2.0);
   private static final Angle TURRET_STEP = Degrees.of(2.0);
 
-  private static final Time TURRET_TIME_DELAY = Seconds.of(0.1);
-  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.0);
+  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.1);
 
   // state machine
   public enum State {
@@ -108,19 +129,19 @@ public class ShooterHandler {
   @Setter
   private ShooterHandler.Goal shooterGoal;
 
-  private LaunchSolution launchSolution = null;
+  @Getter private LaunchSolution launchSolution = null;
 
   // needs access DriveTrain (for robotState)
   private final CommandSwerveDrivetrain drivetrain;
   private final AngularSubsystem turret;
-  private final AngularSubsystem hood;
+  private final Hood hood;
   private final AngularSubsystem flywheel;
 
   @Setter private boolean tuningEnabled = false;
 
   public ShooterHandler(
       AngularSubsystem turret,
-      AngularSubsystem hood,
+      Hood hood,
       AngularSubsystem flywheel,
       CommandSwerveDrivetrain drivetrain,
       ShooterConfig config,
@@ -139,35 +160,34 @@ public class ShooterHandler {
     this.targetState = Targets.BLUE;
     this.projectileState = Targets.BLUE;
 
-    this.launchSolution = physics.iterativeTimeSolve(getProjectileState(), Targets.BLUE, 1, false);
+    this.launchSolution = new LaunchSolution();
   }
 
   public void periodic() {
     projectileState = getProjectileState();
 
-    Translation2d perpOffset =
-        new Translation2d(
-            PERPENDICULAR_TURRET_OFFSET.in(Meters),
-            new Rotation2d(
-                targetState.minus(projectileState).position().getAngle().getRadians()
-                    + ((side == Side.LEFT) ? Math.PI / 2 : -(Math.PI / 2))));
-
-    ObjectState adjustedTargetState = targetState.plus(perpOffset, new Translation2d());
+    // clear robot velocity if not using OTF
+    if (!useOTF) {
+      projectileState = new ObjectState(projectileState.position(), new Translation3d());
+    }
 
     // calculate physics
-    launchSolution =
-        useTOF
-            ? physics.iterativeTimeSolve(
-                projectileState.getFutureState(TURRET_TIME_DELAY),
-                adjustedTargetState,
-                15,
-                isShuttle(targetState))
-            : physics.stationaryInterpolation(
-                projectileState,
-                adjustedTargetState,
-                isShuttle(targetState)
-                    ? config.PHYSICS().SHUTTLE_TABLE()
-                    : config.PHYSICS().SHOT_TABLE());
+    if (isShuttle(targetState)) {
+      launchSolution = physics.thriceSolve(projectileState, targetState);
+    } else {
+      // use offset
+      Translation2d perpOffset =
+          new Translation2d(
+              PERPENDICULAR_TURRET_OFFSET.in(Meters),
+              new Rotation2d(
+                  targetState.minus(projectileState).xyPos().getAngle().getRadians()
+                      + ((side == Side.LEFT) ? Math.PI / 2 : -(Math.PI / 2))));
+
+      ObjectState adjustedTargetState =
+          targetState.plus(new Translation3d(perpOffset), new Translation3d());
+
+      launchSolution = physics.twiceSolve(projectileState, adjustedTargetState);
+    }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
     if (shooterGoal == Goal.NONE) {
@@ -277,7 +297,7 @@ public class ShooterHandler {
       Logger.recordOutput(
           name + "/LaunchGoals/Turret Rel (deg)", getRelativeTurretAngle().in(Degrees));
       Logger.recordOutput(name + "/LaunchGoals/Hood (deg)", launchSolution.hoodAngle().in(Degrees));
-      Translation2d distance2d = targetState.minus(projectileState).position();
+      Translation2d distance2d = targetState.minus(projectileState).xyPos();
       Logger.recordOutput(name + "/Distance/1D", distance2d.getNorm());
 
       Logger.recordOutput(
@@ -336,8 +356,15 @@ public class ShooterHandler {
                     - MathUtil.angleModulus(getTurretAbsRotation().in(Radians)))));
   }
 
+  public Translation2d getDirectRelativeTranslation() {
+    return targetState
+        .minus(projectileState)
+        .xyPos()
+        .rotateBy(drivetrain.getState().Pose.getRotation().unaryMinus());
+  }
+
   private Angle hoodAngleAbsDiff() {
-    return Radians.of(launchSolution.hoodAngle().minus(hood.getPosition()).abs(Radians));
+    return Radians.of(launchSolution.hoodAngle().minus(hood.getHoodAngle()).abs(Radians));
   }
 
   private Angle getTurretAbsRotation() {
@@ -368,7 +395,7 @@ public class ShooterHandler {
 
     // --- LOW PRIORITY CONSTRAINTS ---
     Distance targetDistance =
-        Meters.of(targetState.position().minus(projectileState.position()).getNorm());
+        Meters.of(targetState.xyPos().minus(projectileState.xyPos()).getNorm());
     if (targetDistance.lt(config.CONSTRAINTS().MIN_SHOT_DISTANCE())
         || targetDistance.gt(config.CONSTRAINTS().MAX_SHOT_DISTANCE())) {
       return false;
@@ -378,8 +405,7 @@ public class ShooterHandler {
     return true;
   }
 
-  private ObjectState getProjectileState() {
-    // This code is hella chopped but works maybe??
+  public ObjectState getProjectileState() {
     SwerveDriveState drivetrainState = drivetrain.getState();
 
     double radiusToBall = config.PHYSICAL_CONVERSION().RADIUS_TO_BALL().in(Meters);
@@ -393,19 +419,23 @@ public class ShooterHandler {
     Translation2d robotCenterToTurret =
         config
             .PHYSICAL_CONVERSION()
-            .TURRET_XY_OFFSET()
+            .TURRET_OFFSET()
             .toTranslation2d()
             .rotateBy(drivetrainState.Pose.getRotation());
 
-    Translation2d v_robotRot =
-        new Translation2d(
-            -robotOmega * robotCenterToTurret.getY(), robotOmega * robotCenterToTurret.getX());
-    Translation2d v_turRot =
-        new Translation2d(
-            -turretOmega * turretCenterToBall.getY(), turretOmega * turretCenterToBall.getX());
+    Vector<N3> W_robot = new Translation3d(0, 0, robotOmega).toVector();
+    Vector<N3> W_turret = new Translation3d(0, 0, turretOmega).toVector();
 
-    Translation2d projPoseOffset = robotCenterToTurret.plus(turretCenterToBall);
-    Translation2d projVelOffset = v_robotRot.plus(v_turRot);
+    Vector<N3> v_robotRot =
+        Vector.cross(W_robot, new Translation3d(robotCenterToTurret).toVector());
+    Vector<N3> v_turRot = Vector.cross(W_turret, new Translation3d(turretCenterToBall).toVector());
+
+    Translation3d projPoseOffset =
+        new Translation3d(robotCenterToTurret)
+            .plus(new Translation3d(turretCenterToBall))
+            .plus(new Translation3d(0.0, 0.0, config.PHYSICAL_CONVERSION().TURRET_OFFSET().getZ()));
+
+    Translation3d projVelOffset = new Translation3d(v_robotRot.plus(v_turRot));
 
     ObjectState robotState = new ObjectState(drivetrainState);
 
@@ -419,12 +449,8 @@ public class ShooterHandler {
         || target == Targets.RIGHT_RED_SHUTTLE;
   }
 
-  public Angle physicsHoodAngle() {
-    return launchSolution.hoodAngle();
-  }
-
   public Distance currentDistance() {
-    return Meters.of(targetState.minus(projectileState).position().getNorm());
+    return Meters.of(targetState.minus(projectileState).xyPos().getNorm());
   }
 
   public ShooterConfig getConfig() {

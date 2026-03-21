@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "Right 1 Flash"
+          }
+        },
+        {
           "type": "race",
           "data": {
             "commands": [
@@ -17,7 +23,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.5
+                  "waitTime": 2.5
                 }
               }
             ]
@@ -32,25 +38,32 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center"
+            "pathName": "Right 2 Mod"
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "Depot"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootSequence"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Climb"
+            "name": "Neutral"
           }
         }
       ]
