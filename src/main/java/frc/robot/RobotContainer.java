@@ -131,52 +131,21 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () -> {
-              if (Controllers.SUPERCHARGED.rising()) {
-                SUPERCHARGED_X_LIMITER.reset(X_LIMITER.lastValue());
-                SUPERCHARGED_Y_LIMITER.reset(Y_LIMITER.lastValue());
-                SUPERCHARGED_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
-              }
+              JOYSTICK_VALUES
+                  .setValues(
+                      Controllers.TROY.getLeftY(),
+                      Controllers.TROY.getLeftX(),
+                      Controllers.TROY.getRightX())
+                  .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+                  .scale(
+                      -MAX_SPEED, // Negative max speed and angular rate since
+                      -MAX_ANGULAR_RATE) // controller inputs are reversed
+                  .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
 
-              if (Controllers.SUPERCHARGED.falling()) {
-                X_LIMITER.reset(SUPERCHARGED_X_LIMITER.lastValue());
-                Y_LIMITER.reset(SUPERCHARGED_Y_LIMITER.lastValue());
-                ROT_LIMITER.reset(SUPERCHARGED_ROT_LIMITER.lastValue());
-              }
-
-              if (Controllers.SUPERCHARGED.getAsBoolean()) {
-                JOYSTICK_VALUES
-                    .setValues(
-                        Controllers.TROY.getLeftY(),
-                        Controllers.TROY.getLeftX(),
-                        Controllers.TROY.getRightX())
-                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                    .scale(
-                        -SUPERCHARGED_SPEED, // Negative max speed and angular rate since
-                        -SUPERCHARGED_ANGULAR_RATE) // controller inputs are reversed
-                    .slewRateLimit(
-                        SUPERCHARGED_X_LIMITER, SUPERCHARGED_Y_LIMITER, SUPERCHARGED_ROT_LIMITER);
-                return superchargedDrive
-                    .withVelocityX(JOYSTICK_VALUES.getX())
-                    .withVelocityY(JOYSTICK_VALUES.getY())
-                    .withRotationalRate(JOYSTICK_VALUES.getRot());
-
-              } else {
-                JOYSTICK_VALUES
-                    .setValues(
-                        Controllers.TROY.getLeftY(),
-                        Controllers.TROY.getLeftX(),
-                        Controllers.TROY.getRightX())
-                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                    .scale(
-                        -MAX_SPEED, // Negative max speed and angular rate since
-                        -MAX_ANGULAR_RATE) // controller inputs are reversed
-                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
-
-                return drive
-                    .withVelocityX(JOYSTICK_VALUES.getX())
-                    .withVelocityY(JOYSTICK_VALUES.getY())
-                    .withRotationalRate(JOYSTICK_VALUES.getRot());
-              }
+              return drive
+                  .withVelocityX(JOYSTICK_VALUES.getX())
+                  .withVelocityY(JOYSTICK_VALUES.getY())
+                  .withRotationalRate(JOYSTICK_VALUES.getRot());
             }));
 
     drivetrain.registerTelemetry(logger::telemeterize);

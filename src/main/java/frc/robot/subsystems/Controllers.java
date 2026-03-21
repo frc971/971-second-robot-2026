@@ -22,7 +22,6 @@ public class Controllers {
   public static final Toggle TUNE_LEFT_TURRET = new Toggle(TROY.back());
   public static final Toggle TUNE_RIGHT_TURRET = new Toggle(TROY.start());
 
-  public static final Edge SUPERCHARGED = new Edge(TROY.rightBumper());
   public static final Trigger INDEX = TROY.rightTrigger();
 
   // score/save must be the same button, no space
