@@ -111,10 +111,6 @@ public class Superstructure {
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
         shooterGoal = ShooterGoal.MANUAL;
-      } else if (Controllers.TUNE_LEFT_TURRET.toggled()) {
-        shooterGoal = ShooterGoal.TUNE_LEFT_SHOOTER;
-      } else if (Controllers.TUNE_RIGHT_TURRET.toggled()) {
-        shooterGoal = ShooterGoal.TUNE_RIGHT_SHOOTER;
       } else {
         shooterGoal = ShooterGoal.TARGETING;
       }
