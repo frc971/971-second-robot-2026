@@ -29,10 +29,10 @@ public class Limelight {
     AngularVelocity omega = RadiansPerSecond.of(Math.abs(driveState.Speeds.omegaRadiansPerSecond));
 
     for (String limelightName : LIMELIGHT_NAMES) {
-      LimelightHelpers.setPipelineIndex(limelightName, LIMELIGHT_LOCALIZATION_PIPELINE);
       LimelightHelpers.SetRobotOrientation(limelightName, heading.getDegrees(), 0, 0, 0, 0, 0);
 
-      PoseEstimate llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+      PoseEstimate llMeasurement =
+          LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
 
       boolean accept =
           llMeasurement != null
@@ -45,10 +45,12 @@ public class Limelight {
       }
 
       Logger.recordOutput(limelightName + "/Accepted", accept);
-      Logger.recordOutput(limelightName + "/Estimated Pose", llMeasurement.pose);
-      Logger.recordOutput(limelightName + "/Latency", llMeasurement.latency);
-      Logger.recordOutput(limelightName + "/Average Tag Distance", llMeasurement.avgTagDist);
-      Logger.recordOutput(limelightName + "/Tag Count", llMeasurement.tagCount);
+      if (llMeasurement != null) {
+        Logger.recordOutput(limelightName + "/Estimated Pose", llMeasurement.pose);
+        Logger.recordOutput(limelightName + "/Latency", llMeasurement.latency);
+        Logger.recordOutput(limelightName + "/Average Tag Distance", llMeasurement.avgTagDist);
+        Logger.recordOutput(limelightName + "/Tag Count", llMeasurement.tagCount);
+      }
     }
   }
 }
