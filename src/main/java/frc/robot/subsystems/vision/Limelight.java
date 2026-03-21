@@ -14,7 +14,7 @@ public class Limelight {
   public static String[] LIMELIGHT_NAMES = {"limelight"};
   public static int LIMELIGHT_LOCALIZATION_PIPELINE = 0;
   public static AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(2.0);
-  public static int MINIMUM_APRIL_TAG_COUNT = 0;
+  public static int MINIMUM_APRIL_TAG_COUNT = 1;
 
   private final CommandSwerveDrivetrain drivetrain;
 
@@ -37,7 +37,7 @@ public class Limelight {
 
       boolean accept =
           llMeasurement != null
-              && llMeasurement.tagCount > MINIMUM_APRIL_TAG_COUNT
+              && llMeasurement.tagCount >= MINIMUM_APRIL_TAG_COUNT
               && omega.lte(MAX_ANGULAR_SPEED);
 
       if (accept) {
