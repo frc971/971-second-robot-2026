@@ -226,7 +226,7 @@ public class Superstructure {
         setGoal(SetpointGoal.OUTTAKE);
       }
 
-      // Killing turret logicb 
+      // Killing turret logicb
       if (Controllers.KILL_LEFT.toggled()) {
         setGoal(SetpointGoal.KILL_LEFT.getSetpoint());
       }

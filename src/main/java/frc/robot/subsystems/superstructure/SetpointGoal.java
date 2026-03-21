@@ -60,10 +60,7 @@ public enum SetpointGoal {
   EXTEND(Setpoint.builder().withClimberMeters(0.2)),
   RETRACT(Setpoint.builder().withClimberMeters(0.0)),
   INDEX(Setpoint.builder().withIndexerVolts(10.0)),
-  OUTTAKE(
-      Setpoint.builder()
-          .withIndexerVolts(-10.0)
-          .withGroundRollersVolts(-12.0)),
+  OUTTAKE(Setpoint.builder().withIndexerVolts(-10.0).withGroundRollersVolts(-12.0)),
   INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(0.0)),
   INTAKE_PIVOT_JUICE(Setpoint.builder().withGroundPivotDegrees(45.0)),
   AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(12.0)),
