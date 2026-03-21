@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.HubShiftUtil;
-import frc.robot.subsystems.limelight.Limelight;
 import frc.robot.subsystems.vision.BOS;
+import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.TagHelper;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -29,8 +29,6 @@ public class Robot extends LoggedRobot {
 
   private final BOS bos;
   private final Limelight limelight;
-
-  private final boolean USE_LIMELIGHT = false;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -84,11 +82,8 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("HubShift/RemainingTime", info.remainingTime());
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
 
-    if (USE_LIMELIGHT) {
-      limelight.updatePose();
-    } else {
-      bos.updatePose();
-    }
+    bos.updatePose();
+    limelight.updatePose();
 
     CommandScheduler.getInstance().run();
   }

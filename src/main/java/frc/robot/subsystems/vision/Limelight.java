@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.vision.LimelightHelpers.PoseEstimate;
@@ -24,11 +25,13 @@ public class Limelight {
   public void updatePose() {
     SwerveDriveState driveState = drivetrain.getState();
 
-    double headingDeg = driveState.Pose.getRotation().getDegrees();
+    Rotation2d heading = driveState.Pose.getRotation();
     AngularVelocity omega = RadiansPerSecond.of(Math.abs(driveState.Speeds.omegaRadiansPerSecond));
 
     for (String limelightName : LIMELIGHT_NAMES) {
       LimelightHelpers.setPipelineIndex(limelightName, LIMELIGHT_LOCALIZATION_PIPELINE);
+      LimelightHelpers.SetRobotOrientation(limelightName, heading.getDegrees(), 0, 0, 0, 0, 0);
+
       PoseEstimate llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
 
       boolean accept =
@@ -37,7 +40,7 @@ public class Limelight {
               && omega.lte(MAX_ANGULAR_SPEED);
 
       if (accept) {
-        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, .7));
+        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
         drivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
       }
 
