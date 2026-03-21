@@ -40,6 +40,42 @@ public class HubShiftUtil {
   private static final double endingActiveFudge =
       shiftEndFuelCountExtension + -1 * (maxTimeOfFlight + maxFuelCountDelay);
 
+  private static final double[] shiftedActiveStartTimes = {
+    0.0,
+    10.0,
+    35.0 + endingActiveFudge,
+    60.0 + approachingActiveFudge,
+    85.0 + endingActiveFudge,
+    110.0 + approachingActiveFudge
+  };
+
+  private static final double[] shiftedActiveEndTimes = {
+    10.0,
+    35.0 + endingActiveFudge,
+    60.0 + approachingActiveFudge,
+    85.0 + endingActiveFudge,
+    110.0 + approachingActiveFudge,
+    140.0
+  };
+
+  private static final double[] shiftedInactiveStartTimes = {
+    0.0,
+    10.0 + endingActiveFudge,
+    35.0 + approachingActiveFudge,
+    60.0 + endingActiveFudge,
+    85.0 + approachingActiveFudge,
+    110.0
+  };
+
+  private static final double[] shiftedInactiveEndTimes = {
+    10.0 + endingActiveFudge,
+    35.0 + approachingActiveFudge,
+    60.0 + endingActiveFudge,
+    85.0 + approachingActiveFudge,
+    110.0,
+    140.0
+  };
+
   public static final double autoEndTime = 20.0;
   public static final double teleopDuration = 140.0;
   private static final boolean[] activeSchedule = {true, true, false, true, false, true};
@@ -162,41 +198,9 @@ public class HubShiftUtil {
     boolean[] shiftSchedule = getSchedule();
     // Starting active
     if (shiftSchedule[1] == true) {
-      double[] shiftedShiftStartTimes = {
-        0.0,
-        10.0,
-        35.0 + endingActiveFudge,
-        60.0 + approachingActiveFudge,
-        85.0 + endingActiveFudge,
-        110.0 + approachingActiveFudge
-      };
-      double[] shiftedShiftEndTimes = {
-        10.0,
-        35.0 + endingActiveFudge,
-        60.0 + approachingActiveFudge,
-        85.0 + endingActiveFudge,
-        110.0 + approachingActiveFudge,
-        140.0
-      };
-      return getShiftInfo(shiftSchedule, shiftedShiftStartTimes, shiftedShiftEndTimes);
+      return getShiftInfo(shiftSchedule, shiftedActiveStartTimes, shiftedActiveEndTimes);
     }
-    double[] shiftedShiftStartTimes = {
-      0.0,
-      10.0 + endingActiveFudge,
-      35.0 + approachingActiveFudge,
-      60.0 + endingActiveFudge,
-      85.0 + approachingActiveFudge,
-      110.0
-    };
-    double[] shiftedShiftEndTimes = {
-      10.0 + endingActiveFudge,
-      35.0 + approachingActiveFudge,
-      60.0 + endingActiveFudge,
-      85.0 + approachingActiveFudge,
-      110.0,
-      140.0
-    };
-    return getShiftInfo(shiftSchedule, shiftedShiftStartTimes, shiftedShiftEndTimes);
+    return getShiftInfo(shiftSchedule, shiftedInactiveStartTimes, shiftedInactiveEndTimes);
     // }
   }
 }

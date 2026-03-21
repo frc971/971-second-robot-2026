@@ -34,29 +34,29 @@ public class TurretRight extends AngularSubsystem {
     tc.Slot0.kS = 0.0; // Static friction compensation
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 0.0; // Proportional gain
+    tc.Slot0.kP = 200.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
     // for sim only
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-    tc.MotionMagic.MotionMagicAcceleration = 0.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 10.0;
+    tc.MotionMagic.MotionMagicAcceleration = 10.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
-    tc.CurrentLimits.StatorCurrentLimit = 0.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
+    tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 0.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio = 200.0 / 14.0; // Motor to output gear ratio
 
     tc.ClosedLoopGeneral.ContinuousWrap = ENABLE_WRAP;
 
     return MotorConfig.builder()
         .NAME("Turret Right")
-        .ID(0)
+        .ID(40)
         .BUS(new CANBus("Right Superstructure"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)

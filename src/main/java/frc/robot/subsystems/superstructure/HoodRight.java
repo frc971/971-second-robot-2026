@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.superstructure.*;
 
-public class HoodRight extends AngularSubsystem {
+public class HoodRight extends Hood {
   private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);
 
   public HoodRight() {
@@ -21,40 +21,41 @@ public class HoodRight extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.0; // Static friction compensation
+    tc.Slot0.kS = 0.35; // Static friction compensation
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 0.0; // Proportional gain
+    tc.Slot0.kP = 971.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
     // for sim only
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-    tc.MotionMagic.MotionMagicAcceleration = 0.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 10.0;
+    tc.MotionMagic.MotionMagicAcceleration = 10.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
-    tc.CurrentLimits.StatorCurrentLimit = 0.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
+    tc.CurrentLimits.StatorCurrentLimit = 50.0;
 
-    tc.Feedback.SensorToMechanismRatio = 0.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio =
+        (45.0 / 16.0) * (100.0 / 1.0); // Motor to output gear ratio
 
     return MotorConfig.builder()
         .NAME("Hood Right")
-        .ID(0)
+        .ID(41)
         .BUS(new CANBus("Right Superstructure"))
         .TALONFX_CONFIG(tc)
-        .LOG_UNIT(Degrees)
+        .LOG_UNIT(Inches)
         .build();
   }
 
   @Override
   public void setPosition(Angle goalPosition) {
     setFeedforward(calculatePositionFeedforward(goalPosition));
-    super.setPositionVoltage(goalPosition);
+    super.setPosition(goalPosition);
   }
 
   private Voltage calculatePositionFeedforward(Angle goalPosition) {
