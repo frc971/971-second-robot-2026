@@ -97,7 +97,7 @@ public class Superstructure {
 
   public void periodic() {
     if (DriverStation.isTeleop()) {
-      holdTeleopSafeState();
+      setGoal(SetpointGoal.NEUTRAL.getSetpoint());
 
       // Climber logic
       if (Controllers.CLIMB_RETRACT.getAsBoolean()) {
@@ -115,10 +115,8 @@ public class Superstructure {
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
         shooterGoal = ShooterGoal.MANUAL;
-      } else if (wantsShot) {
-        shooterGoal = ShooterGoal.TARGETING;
       } else {
-        shooterGoal = ShooterGoal.NONE;
+        shooterGoal = ShooterGoal.TARGETING;
       }
 
       shooterHandlerLeft.setUseTOF(!Controllers.DISABLE_OTF.getAsBoolean());
@@ -226,7 +224,7 @@ public class Superstructure {
         setGoal(SetpointGoal.OUTTAKE);
       }
 
-      // Killing turret logicb
+      // Killing turret logic
       if (Controllers.KILL_LEFT.toggled()) {
         setGoal(SetpointGoal.KILL_LEFT.getSetpoint());
       }
@@ -316,19 +314,6 @@ public class Superstructure {
 
   public void setGoal(SetpointGoal setpoint) {
     setGoal(setpoint.getSetpoint());
-  }
-
-  private void holdTeleopSafeState() {
-    flywheelLeft.setVelocity(RotationsPerSecond.zero());
-    flywheelRight.setVelocity(RotationsPerSecond.zero());
-
-    hoodLeft.setPosition(hoodLeft.getPosition());
-    hoodRight.setPosition(hoodRight.getPosition());
-    turretLeft.setPosition(turretLeft.getPosition());
-    turretRight.setPosition(turretRight.getPosition());
-
-    indexer.setVoltage(Volts.zero());
-    groundRollers.setVoltage(Volts.zero());
   }
 
   public void resetPositions() {
