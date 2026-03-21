@@ -21,20 +21,20 @@ public class GroundPivot extends AngularSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    tc.Slot0.kS = 0.0; // Static friction compensation
-    tc.Slot0.kV = 0.0; // Velocity feedforward
+    tc.Slot0.kS = 0.1; // Static friction compensation
+    tc.Slot0.kV = 5.5; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = 0.0; // Gravity compensation
+    tc.Slot0.kG = 0.2; // Gravity compensation
 
-    tc.Slot0.kP = 0.0; // Proportional gain
+    tc.Slot0.kP = 1.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
-    tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    tc.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
     // Motion Magic profile constraints
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-    tc.MotionMagic.MotionMagicAcceleration = 0.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 0.6;
+    tc.MotionMagic.MotionMagicAcceleration = 1.0;
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;

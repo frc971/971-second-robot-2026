@@ -190,49 +190,14 @@ public class Superstructure {
         case TUNE_RIGHT_SHOOTER -> {}
       }
 
-      // intake (will override outtake)
-      if (Controllers.INTAKE_PIVOT_EDGE.rising()) {
-        pivotAtPosition = false;
-        pivotTimerStarted = false;
+      if (Controllers.INTAKE_PIVOT.toggled()) {
+        setGoal(SetpointGoal.INTAKE_PIVOT);
+      } else {
+        groundPivot.setPosition(SetpointGoal.NEUTRAL.getSetpoint().getGroundPivot().get());
       }
 
-      if (!Controllers.INTAKE_PIVOT.toggled() || Controllers.OUTTAKE.getAsBoolean()) {
-        if (!pivotAtPosition) {
-          if (!pivotTimerStarted) {
-            pivotTimer.restart();
-            pivotTimerStarted = true;
-          }
-          if (pivotTimer.hasElapsed(2.5)) {
-            pivotAtPosition = true;
-            pivotTimerStarted = false;
-            groundPivot.setVoltage(Volts.of(0.0));
-            groundPivot.resetPosition(
-                SetpointGoal.INTAKE_PIVOT.getSetpoint().getGroundPivot().get());
-          } else {
-            groundPivot.setVoltage(Volts.of(-2.0));
-          }
-        }
-        if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
-          setGoal(SetpointGoal.INTAKE_ROLLERS);
-        }
-      } else {
-        if (!pivotAtPosition) {
-          if (!pivotTimerStarted) {
-            pivotTimer.restart();
-            pivotTimerStarted = true;
-          }
-          if (pivotTimer.hasElapsed(2.5)) {
-            pivotAtPosition = true;
-            pivotTimerStarted = false;
-            groundPivot.setVoltage(Volts.of(0.0));
-            groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
-          } else {
-            groundPivot.setVoltage(Volts.of(2.0));
-          }
-        }
-        if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
-          setGoal(SetpointGoal.INTAKE_ROLLERS);
-        }
+      if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
+        setGoal(SetpointGoal.INTAKE_ROLLERS);
       }
 
       if (wantsShot && DriverStation.isEnabled()) {
@@ -261,7 +226,7 @@ public class Superstructure {
         setGoal(SetpointGoal.OUTTAKE);
       }
 
-      // Killing turret logic
+      // Killing turret logicb 
       if (Controllers.KILL_LEFT.toggled()) {
         setGoal(SetpointGoal.KILL_LEFT.getSetpoint());
       }
