@@ -29,6 +29,7 @@ public class Limelight {
     AngularVelocity omega = RadiansPerSecond.of(Math.abs(driveState.Speeds.omegaRadiansPerSecond));
 
     for (String limelightName : LIMELIGHT_NAMES) {
+      LimelightHelpers.setPipelineIndex(limelightName, LIMELIGHT_LOCALIZATION_PIPELINE);
       LimelightHelpers.SetRobotOrientation(limelightName, heading.getDegrees(), 0, 0, 0, 0, 0);
 
       PoseEstimate llMeasurement =
