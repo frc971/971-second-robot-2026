@@ -18,9 +18,6 @@ public class Controllers {
   public static final Trigger CLIMB_EXTEND = TROY.y();
   public static final Trigger CLIMB_RETRACT = TROY.b();
 
-  // === Software's Controls
-  public static final Edge SUPERCHARGED = new Edge(TROY.rightBumper());
-
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
