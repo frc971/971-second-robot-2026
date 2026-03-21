@@ -34,7 +34,8 @@ public class TurretRight extends AngularSubsystem {
     tc.Slot0.kS = 0.0; // Static friction compensation
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    tc.Slot0.kP = 200.0; // Proportional gain
+    // tc.Slot0.kP = 200.0; // Proportional gain
+    tc.Slot0.kP = 0.0;
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 

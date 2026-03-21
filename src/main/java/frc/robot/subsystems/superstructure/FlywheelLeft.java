@@ -31,12 +31,15 @@ public class FlywheelLeft extends AngularSubsystem {
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
-    tc.Slot0.kS = 0.21;
-    tc.Slot0.kV = 0.125;
+    // tc.Slot0.kS = 0.21;
+    tc.Slot0.kS = 0.0;
+    // tc.Slot0.kV = 0.125;
+    tc.Slot0.kV = 0.0;
     tc.Slot0.kA = 0.0;
     tc.Slot0.kG = 0.0;
 
-    tc.Slot0.kP = 0.55;
+    // tc.Slot0.kP = 0.55;
+    tc.Slot0.kP = 0.0;
     tc.Slot0.kI = 0.0;
     tc.Slot0.kD = 0.0;
 
