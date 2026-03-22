@@ -12,17 +12,17 @@ import lombok.Getter;
 public enum SetpointGoal {
   RESET(
       Setpoint.builder()
-          .withLeftHoodDegrees(0.0)
+          .withLeftHoodInches(0.0)
           .withLeftTurretDegrees(105)
-          .withRightHoodDegrees(0.0)
+          .withRightHoodInches(0.0)
           .withRightTurretDegrees(107)
           .withGroundPivotDegrees(127.0)
           .withClimberMeters(0.0)),
   MANUAL_RESET(
       Setpoint.builder()
-          .withLeftHoodDegrees(0.0)
+          .withLeftHoodInches(0.0)
           .withLeftTurretDegrees(104)
-          .withRightHoodDegrees(0.0)
+          .withRightHoodInches(0.0)
           .withRightTurretDegrees(106)
           .withGroundPivotDegrees(90.0)
           .withClimberMeters(0.0)),
