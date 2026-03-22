@@ -30,14 +30,14 @@ public class Indexer extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
-    tc.CurrentLimits.StatorCurrentLimit = 0.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
+    tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
     tc.Feedback.SensorToMechanismRatio = 0.0;
 
     return MotorConfig.builder()
         .NAME("Indexer Lead")
-        .ID(0)
+        .ID(20)
         .BUS(new CANBus("Right Superstructure"))
         .TALONFX_CONFIG(tc)
         .build();
@@ -46,7 +46,7 @@ public class Indexer extends MotorSubsystem {
   public static MotorConfig getFollowerMotorConfig() {
     return getLeadMotorConfig().toBuilder()
         .NAME("Indexer Follower")
-        .ID(0)
+        .ID(21)
         .BUS(new CANBus("Right Superstructure"))
         .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
         .build();

@@ -45,7 +45,7 @@ public class HoodLeft extends Hood {
 
     return MotorConfig.builder()
         .NAME("Hood Left")
-        .ID(31)
+        .ID(33)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Inches)

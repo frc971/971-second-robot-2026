@@ -30,8 +30,8 @@ public class GroundRollers extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 10.0;
-    tc.CurrentLimits.StatorCurrentLimit = 10.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 20.0;
+    tc.CurrentLimits.StatorCurrentLimit = 50.0;
 
     return MotorConfig.builder()
         .NAME("Ground Roller Lead")

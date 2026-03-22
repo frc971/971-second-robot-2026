@@ -45,7 +45,7 @@ public class HoodRight extends Hood {
 
     return MotorConfig.builder()
         .NAME("Hood Right")
-        .ID(41)
+        .ID(43)
         .BUS(new CANBus("Right Superstructure"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Inches)
