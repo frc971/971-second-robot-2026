@@ -17,7 +17,7 @@ import org.littletonrobotics.junction.Logger;
 public class Limelight {
   public static String[] LIMELIGHT_NAMES = {"limelight-front"};
   public static Transform3d[] LIMELIGHT_EXTRINSICS = {
-    new Transform3d(0.307057, 0.020606, 0.467946, Rotation3d.kZero)
+    new Transform3d(0.296, 0.0, 0.28649, Rotation3d.kZero)
   };
   public static int LIMELIGHT_LOCALIZATION_PIPELINE = 0;
   public static AngularVelocity MAX_ANGULAR_SPEED = RotationsPerSecond.of(2.0);
