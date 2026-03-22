@@ -38,7 +38,7 @@ public class Indexer extends MotorSubsystem {
     return MotorConfig.builder()
         .NAME("Indexer Lead")
         .ID(20)
-        .BUS(new CANBus("Right Superstructure"))
+        .BUS(new CANBus("Drivetrain Bus"))
         .TALONFX_CONFIG(tc)
         .build();
   }
@@ -47,7 +47,7 @@ public class Indexer extends MotorSubsystem {
     return getLeadMotorConfig().toBuilder()
         .NAME("Indexer Follower")
         .ID(21)
-        .BUS(new CANBus("Right Superstructure"))
+        .BUS(new CANBus("Drivetrain Bus"))
         .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
         .build();
   }
