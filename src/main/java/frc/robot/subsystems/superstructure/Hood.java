@@ -10,8 +10,8 @@ import frc.robot.lib.superstructure.MotorConfig;
 import org.littletonrobotics.junction.Logger;
 
 public abstract class Hood extends LinearSubsystem {
-  public static final Distance UPPER_LIMIT = Inches.of(2.7);
-  public static final Distance LOWER_LIMIT = Inches.of(0.0);
+  public static final Distance UPPER_LIMIT = Inches.of(2.7); // TODO: not changed yet
+  public static final Distance LOWER_LIMIT = Inches.of(0.0); // TODO: not changed yet
 
   private static final double B = 4.200000;
   private static final double C = 4.966135;
