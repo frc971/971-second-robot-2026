@@ -15,26 +15,6 @@ public class Controllers {
   public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
 
   public static final Trigger SHOOT_REDUNDANCY = TROY.rightTrigger();
-  public static final Trigger CLIMB_EXTEND = TROY.y();
-  public static final Trigger CLIMB_RETRACT = TROY.b(); // TODO: add drivetrain controls
-
-  public static final Toggle MANUAL_RESET = new Toggle(TROY.a());
-
-  // === Software's Controls
-  public static final Toggle TUNING = new Toggle(TROY.start());
-  public static final Edge TOGGLE_HOOD_FLYWHEEL = new Edge(TROY.x());
-
-  // TODO: do we need autoalign? This is the only button that is potentially free
-  public static final Edge SUPERCHARGED = new Edge(TROY.rightBumper());
-  public static final Trigger INDEX = TROY.rightTrigger();
-
-  // score/save must be the same button, no space
-  public static final Edge SCORE = new Edge(TROY.a());
-
-  public static final Edge UNDERSHOOT = new Edge(TROY.povUp());
-  public static final Edge OVERSHOOT = new Edge(TROY.povDown());
-  public static final Edge REVERT = new Edge(TROY.povLeft());
-  public static final Edge HIT = new Edge(TROY.povRight());
 
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
@@ -60,7 +40,6 @@ public class Controllers {
   public static final Edge TURRET_LEFT = new Edge(ANDRE.povLeft());
   public static final Edge TURRET_RIGHT = new Edge(ANDRE.povRight());
 
-  // TODO: get a feel for what axis threshold is the best to congrol with
   // MANUAL Shooter Setpoints
   public static final Trigger MANUAL_SHOOT_UP = ANDRE.axisLessThan(1, -0.85);
   public static final Trigger MANUAL_SHOOT_DOWN = ANDRE.axisGreaterThan(1, 0.85);

@@ -43,7 +43,6 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Kicker kicker;
-  public final Climber climber;
 
   public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
@@ -55,9 +54,7 @@ public class Superstructure {
   private enum ShooterGoal {
     NONE,
     MANUAL,
-    TARGETING,
-    TUNE_LEFT_SHOOTER,
-    TUNE_RIGHT_SHOOTER,
+    TARGETING
   }
 
   public Superstructure(RobotContainer robotContainer) {
@@ -73,7 +70,6 @@ public class Superstructure {
     groundPivot = new GroundPivot();
     groundRollers = new GroundRollers();
     kicker = new Kicker();
-    climber = new Climber();
 
     shooterHandlerRight =
         new ShooterHandler(
@@ -93,8 +89,7 @@ public class Superstructure {
             ShooterConfigs.LEFT,
             ShooterHandler.Side.LEFT);
 
-    visualization =
-        new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber, groundPivot);
+    visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -103,13 +98,6 @@ public class Superstructure {
     if (DriverStation.isTeleop()) {
       setGoal(SetpointGoal.NEUTRAL);
 
-      // Climber logic
-      if (Controllers.CLIMB_RETRACT.getAsBoolean()) {
-        setGoal(SetpointGoal.RETRACT);
-      } else if (Controllers.CLIMB_EXTEND.getAsBoolean()) {
-        setGoal(SetpointGoal.EXTEND);
-      }
-
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
         shooterGoal = ShooterGoal.MANUAL;
@@ -117,8 +105,8 @@ public class Superstructure {
         shooterGoal = ShooterGoal.TARGETING;
       }
 
-      shooterHandlerLeft.setUseTOF(!Controllers.DISABLE_OTF.getAsBoolean());
-      shooterHandlerRight.setUseTOF(!Controllers.DISABLE_OTF.getAsBoolean());
+      shooterHandlerLeft.setUseOTF(!Controllers.DISABLE_OTF.getAsBoolean());
+      shooterHandlerRight.setUseOTF(!Controllers.DISABLE_OTF.getAsBoolean());
 
       shooterHandlerLeft.setTuningEnabled(Controllers.TUNE_LEFT.getAsBoolean());
       shooterHandlerRight.setTuningEnabled(Controllers.TUNE_RIGHT.getAsBoolean());
@@ -176,14 +164,8 @@ public class Superstructure {
             setpoint = SetpointGoal.MANUAL_SHUTTLE_RIGHT;
           }
 
-          if (Controllers.MANUAL_RESET.toggled()) {
-            setpoint = SetpointGoal.MANUAL_RESET;
-          }
-
           setGoal(setpoint);
         }
-        case TUNE_LEFT_SHOOTER -> {}
-        case TUNE_RIGHT_SHOOTER -> {}
       }
 
       // intake (will override outtake)
@@ -198,14 +180,14 @@ public class Superstructure {
             pivotTimer.restart();
             pivotTimerStarted = true;
           }
-          if (pivotTimer.hasElapsed(2.5)) {
+          if (pivotTimer.hasElapsed(1.5)) {
             pivotAtPosition = true;
             pivotTimerStarted = false;
             groundPivot.setVoltage(Volts.of(0.0));
             groundPivot.resetPosition(
                 SetpointGoal.INTAKE_PIVOT.getSetpoint().getGroundPivot().get());
           } else {
-            groundPivot.setVoltage(Volts.of(-2.0));
+            groundPivot.setVoltage(Volts.of(-4.0));
           }
         }
         if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
@@ -217,13 +199,13 @@ public class Superstructure {
             pivotTimer.restart();
             pivotTimerStarted = true;
           }
-          if (pivotTimer.hasElapsed(2.5)) {
+          if (pivotTimer.hasElapsed(1.5)) {
             pivotAtPosition = true;
             pivotTimerStarted = false;
             groundPivot.setVoltage(Volts.of(0.0));
             groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
           } else {
-            groundPivot.setVoltage(Volts.of(2.0));
+            groundPivot.setVoltage(Volts.of(4.0));
           }
         }
       }
@@ -276,11 +258,6 @@ public class Superstructure {
         setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
       }
 
-      if (Controllers.SUPERCHARGED.getAsBoolean()) {
-        setGoal(SetpointGoal.SUPERCHARGED);
-        shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-        shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-      }
     } else if (DriverStation.isAutonomous()) {
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
           && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
@@ -314,10 +291,11 @@ public class Superstructure {
     kicker.periodic();
     groundRollers.periodic();
     kicker.periodic();
-    climber.periodic();
 
     visualization.periodic();
   }
+
+  // MARK: Helper functions
 
   public void setGoal(Setpoint setpoint) {
     if (setpoint.getLeftIndexer().isPresent()) {
@@ -366,10 +344,6 @@ public class Superstructure {
     if (setpoint.getRightIndexer().isPresent()) {
       indexerRight.setVoltage(setpoint.getRightIndexer().get());
     }
-
-    if (setpoint.getClimber().isPresent()) {
-      climber.setPosition(setpoint.getClimber().get());
-    }
   }
 
   public void setGoal(SetpointGoal setpoint) {
@@ -382,8 +356,9 @@ public class Superstructure {
     hoodLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getLeftHood().get());
     turretLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getLeftTurret().get());
     groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
-    climber.resetPosition(SetpointGoal.RESET.getSetpoint().getClimber().get());
   }
+
+  // MARK: AUTO Commands
 
   public Command neutral() {
     return Commands.runOnce(

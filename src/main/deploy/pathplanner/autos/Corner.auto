@@ -5,6 +5,31 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "Corner Start"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Corner"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootSequence"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "race",
           "data": {
             "commands": [
@@ -17,7 +42,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.5
+                  "waitTime": 5.0
                 }
               }
             ]
@@ -28,35 +53,11 @@
           "data": {
             "name": "Neutral"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Center"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Depot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Climb"
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Benchmarks",
   "choreoAuto": false
 }

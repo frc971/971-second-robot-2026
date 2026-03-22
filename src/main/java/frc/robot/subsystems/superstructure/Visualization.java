@@ -31,7 +31,6 @@ public class Visualization {
   private TurretRight turretRight;
   private HoodRight hoodRight;
 
-  private Climber climber;
   private GroundPivot groundPivot;
 
   public Visualization(
@@ -39,7 +38,6 @@ public class Visualization {
       TurretRight turretRight,
       HoodLeft hoodLeft,
       HoodRight hoodRight,
-      Climber climber,
       GroundPivot groundPivot) {
     this.turretLeft = turretLeft;
     this.hoodLeft = hoodLeft;
@@ -47,7 +45,6 @@ public class Visualization {
     this.turretRight = turretRight;
     this.hoodRight = hoodRight;
 
-    this.climber = climber;
     this.groundPivot = groundPivot;
   }
 
@@ -64,7 +61,7 @@ public class Visualization {
             .plus(
                 new Transform3d(
                     Translation3d.kZero,
-                    new Rotation3d(0.0, hoodLeft.getPosition().in(Radians), 0.0)));
+                    new Rotation3d(0.0, 1.30959265358 - hoodLeft.getHoodAngle().in(Radians), 0.0)));
 
     Transform3d turretRightPose =
         robotToRightTurret.plus(
@@ -78,11 +75,8 @@ public class Visualization {
             .plus(
                 new Transform3d(
                     Translation3d.kZero,
-                    new Rotation3d(0.0, hoodRight.getPosition().in(Radians), 0.0)));
-
-    Transform3d climberPose =
-        new Transform3d(
-            new Translation3d(0.0, 0.0, climber.getLinearPosition().in(Meters)), Rotation3d.kZero);
+                    new Rotation3d(
+                        0.0, 1.30959265358 - hoodRight.getHoodAngle().in(Radians), 0.0)));
 
     Transform3d groundPivotPose =
         robotToGroundPivot.plus(
@@ -96,7 +90,6 @@ public class Visualization {
         hoodLeftPose,
         turretRightPose,
         hoodRightPose,
-        climberPose,
         groundPivotPose);
   }
 }

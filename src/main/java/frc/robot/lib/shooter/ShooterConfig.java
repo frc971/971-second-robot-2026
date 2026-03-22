@@ -23,15 +23,14 @@ public class ShooterConfig {
   @Builder
   @Getter
   public static class Physics {
-    @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
+    @Builder.Default private double GRAVITY = 9.807;
+    @Builder.Default private Angle VELOCITY_ANGLE_AT_TARGET = Degrees.of(-40.0);
     @Builder.Default private ShotTable SHUTTLE_TABLE = new ShotTable();
+    @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
+    @Builder.Default private ExitSpeedTable EXIT_SPEED_TABLE = new ExitSpeedTable();
 
-    public Time getTime(Distance distance) {
-      return SHOT_TABLE.getTime(distance);
-    }
-
-    public Time getShuttleTime(Distance distance) {
-      return SHUTTLE_TABLE.getTime(distance);
+    public AngularVelocity calcAngularVel(LinearVelocity speed) {
+      return EXIT_SPEED_TABLE.calcAngularVel(speed);
     }
   }
 
@@ -39,14 +38,14 @@ public class ShooterConfig {
   @Builder
   public static class Constraints {
     // low-priority constraints
-    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(0.5);
+    @Builder.Default private Distance MIN_SHOT_DISTANCE = Meters.of(0.01);
     @Builder.Default private Distance MAX_SHOT_DISTANCE = Meters.of(1000);
 
     // high-priority constraints
     @Builder.Default private AngularVelocity MIN_FLYWHEEL_SPEED = RotationsPerSecond.of(0);
     @Builder.Default private AngularVelocity MAX_FLYWHEEL_SPEED = RotationsPerSecond.of(1000);
-    @Builder.Default private Angle MIN_HOOD_ANGLE = Degrees.of(0);
-    @Builder.Default private Angle MAX_HOOD_ANGLE = Degrees.of(70);
+    @Builder.Default private Angle MIN_HOOD_ANGLE = Degrees.of(40);
+    @Builder.Default private Angle MAX_HOOD_ANGLE = Degrees.of(78);
   }
 
   @Getter
@@ -55,7 +54,7 @@ public class ShooterConfig {
     // ball related offsets (in meters!)
     // positive x is towards FRONT of the robot
     // positive y is towards PORT/LEFT side
-    @Builder.Default private Translation3d TURRET_XY_OFFSET = new Translation3d();
+    @Builder.Default private Translation3d TURRET_OFFSET = new Translation3d();
     @Builder.Default private Distance RADIUS_TO_BALL = Inches.of(0.0);
   }
 
@@ -68,8 +67,8 @@ public class ShooterConfig {
     @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(5.0);
 
     @Builder.Default private AngularVelocity FIRING_FLYWHEEL_ABORT = RotationsPerSecond.of(20.0);
-    @Builder.Default private Angle FIRING_ROTATION_THRESHOLD = Degrees.of(45.0);
-    @Builder.Default private Angle FIRING_HOOD_ANGLE_THRESHOLD = Degrees.of(15.0);
+    @Builder.Default private Angle FIRING_ROTATION_THRESHOLD = Degrees.of(25.0);
+    @Builder.Default private Angle FIRING_HOOD_ANGLE_THRESHOLD = Degrees.of(10.0);
 
     /*
      * Note: very important that the two thresholds (AIMING & SHOOTING) overlap

@@ -2,10 +2,12 @@ package frc.robot.lib.shooter;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.lib.shooter.ShotTable.ShooterData;
 
 public class ShooterPhysics {
@@ -24,7 +26,7 @@ public class ShooterPhysics {
    */
   public LaunchSolution stationaryInterpolation(
       ObjectState proj, ObjectState target, ShotTable table) {
-    Translation2d distance2d = target.minus(proj).position();
+    Translation2d distance2d = target.minus(proj).xyPos();
 
     ShooterData shooterData = table.getShooterData(Meters.of(distance2d.getNorm()));
     Rotation2d turretRotation = distance2d.getAngle();
@@ -32,58 +34,106 @@ public class ShooterPhysics {
     return new LaunchSolution(shooterData, turretRotation);
   }
 
-  /*
-   * Only works when robot not moving at insane speeds
-   * Uses a single iteration approach, approximating offset with time of flight
+  /**
+   * Vector based launch solver. https://ambcalc.com/docs/projectile.pdf
+   *
+   * @param proj current projectile ObjectState
+   * @param target target ObjectState
+   * @return LaunchSolution, or null if the shot is impossible
    */
-  public LaunchSolution simpleTimeSolve(ObjectState projectile, ObjectState target) {
+  public LaunchSolution twiceSolve(ObjectState proj, ObjectState target) {
 
-    Distance currentDistance =
-        Meters.of(projectile.minus(target).position().getNorm()); // double check if actually meters
+    Translation2d distance2d = target.minus(proj).xyPos();
+    double currentDistance = distance2d.getNorm();
 
-    // get time of flight from shot table
-    Time timeOfFlight = physicsConfig.getTime(currentDistance);
+    double targetAngle = physicsConfig.VELOCITY_ANGLE_AT_TARGET().in(Radians);
+    double shotAngle =
+        Math.atan(
+            2 * (target.position().getZ() - proj.position().getZ()) / currentDistance
+                - Math.tan(targetAngle));
 
-    // find future pose
-    // TODO: account for time delay in measuring pose & actual pose
-    ObjectState futureRobot = projectile.getFutureState(timeOfFlight);
+    double tanDiff = Math.tan(targetAngle) - Math.tan(shotAngle);
+    double exitSpeed =
+        (1.0 / Math.cos(shotAngle))
+            * Math.sqrt((physicsConfig.GRAVITY() * currentDistance) / Math.abs(tanDiff));
+    // checks if exit speed is finite and positive
+    if (!Double.isFinite(exitSpeed) || exitSpeed <= 0) return null;
 
-    return stationaryInterpolation(futureRobot, target, physicsConfig.SHOT_TABLE());
+    // resolves velocity vector into components
+    double vHoriz = exitSpeed * Math.cos(shotAngle);
+    double vVertical = exitSpeed * Math.sin(shotAngle);
+    // unit vector toward target
+    Translation2d horizUnit = distance2d.div(currentDistance);
+    Translation3d vShotField =
+        new Translation3d(vHoriz * horizUnit.getX(), vHoriz * horizUnit.getY(), vVertical);
+    Translation3d vRobot = new Translation3d(proj.velocity().getX(), proj.velocity().getY(), 0);
+    Translation3d vBall = vShotField.minus(vRobot);
+
+    Rotation2d turretRotation = new Rotation2d(vBall.getX(), vBall.getY());
+    Angle hoodAngle = Radians.of(Math.atan2(vBall.getZ(), Math.hypot(vBall.getX(), vBall.getY())));
+    AngularVelocity flywheelSpeed =
+        physicsConfig.EXIT_SPEED_TABLE().calcAngularVel(MetersPerSecond.of(vBall.getNorm()));
+
+    return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
   }
 
-  /**
-   * simpleTimeSolve but with multiple Iterations
-   *
-   * @param maxIterations number of iterations to do
-   */
-  public LaunchSolution iterativeTimeSolve(
-      ObjectState projectile, ObjectState target, int maxIterations, boolean shuttle) {
+  public LaunchSolution thriceSolve(ObjectState proj, ObjectState target) {
+    Translation2d distance2d = target.minus(proj).xyPos();
+    double currentDistance = distance2d.getNorm();
 
-    ShotTable table = shuttle ? physicsConfig.SHUTTLE_TABLE() : physicsConfig.SHOT_TABLE();
+    double h0 = proj.position().getZ();
+    double ht = target.position().getZ();
+    double H = MathUtil.clamp(h0 + (currentDistance * 0.3), h0 + 0.2, 3.5);
 
-    Distance currentDistance =
-        Meters.of(projectile.minus(target).position().getNorm()); // double check if actually meters
+    // compute helper terms
+    double deltaH = H - h0;
 
-    // get time of flight from shot table
-    Time timeOfFlight = table.getTime(currentDistance);
+    // check feasibility
+    if (deltaH <= 0 || H < ht) return null;
 
-    // iteratively update time of flight
-    for (int i = 0; i < maxIterations; i++) {
-      ObjectState futureRobot = projectile.getFutureState(timeOfFlight);
-      Distance interceptDistance =
-          Meters.of(
-              futureRobot.minus(target).position().getNorm()); // check that this is actually meters
+    // discriminant term
+    double sqrtTerm = Math.sqrt((H - ht) / deltaH);
 
-      Time newTimeOfFlight = table.getTime(interceptDistance);
+    // choose branch:
+    // "-" = lower trajectory (usually what you want)
+    // "+" = higher arc
+    double tanTheta = (2 * deltaH / currentDistance) * (1 + sqrtTerm);
 
-      // Quit early if already converged
-      if (Math.abs(newTimeOfFlight.in(Seconds) - timeOfFlight.in(Seconds)) < 0.01) {
-        break;
-      }
+    // compute angle
+    double shotAngle = Math.atan(tanTheta);
 
-      timeOfFlight = newTimeOfFlight;
-    }
+    // compute exit speed from apex constraint
+    double sinTheta = Math.sin(shotAngle);
+    if (Math.abs(sinTheta) < 1e-6) return null;
 
-    return stationaryInterpolation(projectile.getFutureState(timeOfFlight), target, table);
+    double exitSpeed = Math.sqrt(2 * physicsConfig.GRAVITY() * deltaH) / sinTheta;
+
+    // checks if exit speed is finite and positive
+    if (!Double.isFinite(exitSpeed) || exitSpeed <= 0) return null;
+
+    // resolves velocity vector into components
+    double vHoriz = exitSpeed * Math.cos(shotAngle);
+    double vVertical = exitSpeed * Math.sin(shotAngle);
+
+    // unit vector toward target
+    Translation2d horizUnit = distance2d.div(currentDistance);
+
+    Translation3d vShotField =
+        new Translation3d(vHoriz * horizUnit.getX(), vHoriz * horizUnit.getY(), vVertical);
+
+    // --- SAME COMPENSATION AS BEFORE ---
+    Translation3d vRobot = new Translation3d(proj.velocity().getX(), proj.velocity().getY(), 0);
+
+    Translation3d vBall = vShotField.minus(vRobot);
+
+    // aiming outputs
+    Rotation2d turretRotation = new Rotation2d(vBall.getX(), vBall.getY());
+
+    Angle hoodAngle = Radians.of(Math.atan2(vBall.getZ(), Math.hypot(vBall.getX(), vBall.getY())));
+
+    AngularVelocity flywheelSpeed =
+        physicsConfig.EXIT_SPEED_TABLE().calcAngularVel(MetersPerSecond.of(vBall.getNorm()));
+
+    return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
   }
 }
