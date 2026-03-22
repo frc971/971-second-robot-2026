@@ -15,8 +15,6 @@ public class Controllers {
   public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
 
   public static final Trigger SHOOT_REDUNDANCY = TROY.rightTrigger();
-  public static final Trigger CLIMB_EXTEND = TROY.y();
-  public static final Trigger CLIMB_RETRACT = TROY.b();
 
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();

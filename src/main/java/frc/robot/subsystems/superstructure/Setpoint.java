@@ -31,11 +31,6 @@ public class Setpoint {
     return this;
   }
 
-  public Setpoint withClimberMeters(double meters) {
-    this.climber = Optional.of(Meters.of(meters));
-    return this;
-  }
-
   public Setpoint withLeftFlywheelRPS(double rps) {
     this.leftFlywheel = Optional.of(RotationsPerSecond.of(rps));
     return this;

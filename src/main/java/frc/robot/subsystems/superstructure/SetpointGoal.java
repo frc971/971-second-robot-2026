@@ -26,6 +26,8 @@ public enum SetpointGoal {
           .withRightTurretDegrees(106)
           .withGroundPivotDegrees(90.0)
           .withClimberMeters(0.0)),
+          .withRightTurretDegrees(0.0)
+          .withGroundPivotDegrees(90.0)),
   NEUTRAL(
       Setpoint.builder()
           .withLeftFlywheelRPS(0.0)

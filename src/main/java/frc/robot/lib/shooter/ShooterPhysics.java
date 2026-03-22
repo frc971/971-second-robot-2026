@@ -8,8 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Time;
 import frc.robot.lib.shooter.ShotTable.ShooterData;
 
 public class ShooterPhysics {
@@ -34,61 +32,6 @@ public class ShooterPhysics {
     Rotation2d turretRotation = distance2d.getAngle();
 
     return new LaunchSolution(shooterData, turretRotation);
-  }
-
-  /*
-   * Only works when robot not moving at insane speeds
-   * Uses a single iteration approach, approximating offset with time of flight
-   */
-  public LaunchSolution simpleTimeSolve(ObjectState projectile, ObjectState target) {
-
-    Distance currentDistance =
-        Meters.of(projectile.minus(target).xyPos().getNorm()); // double check if actually meters
-
-    // get time of flight from shot table
-    Time timeOfFlight = physicsConfig.getTime(currentDistance);
-
-    // find future pose
-    // TODO: account for time delay in measuring pose & actual pose
-    ObjectState futureRobot = projectile.getFutureState(timeOfFlight);
-
-    return stationaryInterpolation(futureRobot, target, physicsConfig.SHOT_TABLE());
-  }
-
-  /**
-   * simpleTimeSolve but with multiple Iterations
-   *
-   * @param maxIterations number of iterations to do
-   */
-  public LaunchSolution iterativeTimeSolve(
-      ObjectState projectile, ObjectState target, int maxIterations, boolean shuttle) {
-
-    ShotTable table = shuttle ? physicsConfig.SHUTTLE_TABLE() : physicsConfig.SHOT_TABLE();
-
-    Distance currentDistance =
-        Meters.of(projectile.minus(target).xyPos().getNorm()); // double check if actually meters
-
-    // get time of flight from shot table
-    Time timeOfFlight = table.getTime(currentDistance);
-
-    // iteratively update time of flight
-    for (int i = 0; i < maxIterations; i++) {
-      ObjectState futureRobot = projectile.getFutureState(timeOfFlight);
-      Distance interceptDistance =
-          Meters.of(
-              futureRobot.minus(target).xyPos().getNorm()); // check that this is actually meters
-
-      Time newTimeOfFlight = table.getTime(interceptDistance);
-
-      // Quit early if already converged
-      if (Math.abs(newTimeOfFlight.in(Seconds) - timeOfFlight.in(Seconds)) < 0.01) {
-        break;
-      }
-
-      timeOfFlight = newTimeOfFlight;
-    }
-
-    return stationaryInterpolation(projectile.getFutureState(timeOfFlight), target, table);
   }
 
   /**
@@ -131,9 +74,7 @@ public class ShooterPhysics {
     AngularVelocity flywheelSpeed =
         physicsConfig.EXIT_SPEED_TABLE().calcAngularVel(MetersPerSecond.of(vBall.getNorm()));
 
-    // TODO: find a way to resolve tof thing
-    return new LaunchSolution(
-        new ShooterData(hoodAngle, flywheelSpeed, Seconds.of(0)), turretRotation);
+    return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
   }
 
   public LaunchSolution thriceSolve(ObjectState proj, ObjectState target) {
@@ -193,8 +134,6 @@ public class ShooterPhysics {
     AngularVelocity flywheelSpeed =
         physicsConfig.EXIT_SPEED_TABLE().calcAngularVel(MetersPerSecond.of(vBall.getNorm()));
 
-    // TODO: find a way to resolve tof thing
-    return new LaunchSolution(
-        new ShooterData(hoodAngle, flywheelSpeed, Seconds.of(0)), turretRotation);
+    return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
   }
 }

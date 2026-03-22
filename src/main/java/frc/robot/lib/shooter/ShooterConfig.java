@@ -29,14 +29,6 @@ public class ShooterConfig {
     @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
     @Builder.Default private ExitSpeedTable EXIT_SPEED_TABLE = new ExitSpeedTable();
 
-    public Time getTime(Distance distance) {
-      return SHOT_TABLE.getTime(distance);
-    }
-
-    public Time getShuttleTime(Distance distance) {
-      return SHUTTLE_TABLE.getTime(distance);
-    }
-
     public AngularVelocity calcAngularVel(LinearVelocity speed) {
       return EXIT_SPEED_TABLE.calcAngularVel(speed);
     }
