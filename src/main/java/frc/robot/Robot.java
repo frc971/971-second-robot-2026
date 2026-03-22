@@ -79,7 +79,7 @@ public class Robot extends LoggedRobot {
     HubShiftUtil.ShiftInfo info = HubShiftUtil.getOfficialShiftInfo();
 
     Logger.recordOutput("HubShift/Active", info.active());
-    Logger.recordOutput("HubShift/RemainingTime", info.remainingTime());
+    Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
 
     bos.updatePose();
@@ -122,7 +122,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
-      robotContainer.resetPositionForAuto();
+      robotContainer.resetPositionForAuto(limelight);
     }
     HubShiftUtil.initialize();
   }
