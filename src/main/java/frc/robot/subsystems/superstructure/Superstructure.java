@@ -279,9 +279,6 @@ public class Superstructure {
       turretRight.setPosition(
           setpoint.getRightTurret().get().plus(shooterHandlerRight.getTurretOffset()));
     }
-    if (setpoint.getRightIndexer().isPresent()) {
-      indexerRight.setVoltage(setpoint.getRightIndexer().get());
-    }
   }
 
   public void setGoal(SetpointGoal setpoint) {
