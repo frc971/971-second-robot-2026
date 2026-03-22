@@ -13,7 +13,7 @@ import java.util.TreeSet;
  * Uses separate interpolation tables for angle and speed
  */
 public class ExitSpeedTable {
-  // Immutable Data class to hold hood angle and flywheel speed and time of flight
+  // Maps exit linear speed (m/s) to flywheel angular velocity (rot/s)
   /*
    * Separate interpolation tables for hood angle and flywheel speed
    * Key: Linear Speed (in m/s)

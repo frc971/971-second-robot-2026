@@ -43,7 +43,6 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Kicker kicker;
-  public final Climber climber;
 
   public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
@@ -71,7 +70,6 @@ public class Superstructure {
     groundPivot = new GroundPivot();
     groundRollers = new GroundRollers();
     kicker = new Kicker();
-    climber = new Climber();
 
     shooterHandlerRight =
         new ShooterHandler(
@@ -91,8 +89,7 @@ public class Superstructure {
             ShooterConfigs.LEFT,
             ShooterHandler.Side.LEFT);
 
-    visualization =
-        new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber, groundPivot);
+    visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -100,13 +97,6 @@ public class Superstructure {
   public void periodic() {
     if (DriverStation.isTeleop()) {
       setGoal(SetpointGoal.NEUTRAL);
-
-      // Climber logic
-      if (Controllers.CLIMB_RETRACT.getAsBoolean()) {
-        setGoal(SetpointGoal.RETRACT);
-      } else if (Controllers.CLIMB_EXTEND.getAsBoolean()) {
-        setGoal(SetpointGoal.EXTEND);
-      }
 
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
@@ -301,7 +291,6 @@ public class Superstructure {
     kicker.periodic();
     groundRollers.periodic();
     kicker.periodic();
-    climber.periodic();
 
     visualization.periodic();
   }
@@ -355,10 +344,6 @@ public class Superstructure {
     if (setpoint.getRightIndexer().isPresent()) {
       indexerRight.setVoltage(setpoint.getRightIndexer().get());
     }
-
-    if (setpoint.getClimber().isPresent()) {
-      climber.setPosition(setpoint.getClimber().get());
-    }
   }
 
   public void setGoal(SetpointGoal setpoint) {
@@ -371,7 +356,6 @@ public class Superstructure {
     hoodLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getLeftHood().get());
     turretLeft.resetPosition(SetpointGoal.RESET.getSetpoint().getLeftTurret().get());
     groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
-    climber.resetPosition(SetpointGoal.RESET.getSetpoint().getClimber().get());
   }
 
   // MARK: AUTO Commands

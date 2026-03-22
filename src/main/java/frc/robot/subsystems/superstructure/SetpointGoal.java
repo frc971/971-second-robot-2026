@@ -17,8 +17,7 @@ public enum SetpointGoal {
           .withLeftTurretDegrees(0.0)
           .withRightHoodInches(0.0)
           .withRightTurretDegrees(0.0)
-          .withGroundPivotDegrees(90.0)
-          .withClimberMeters(0.0)),
+          .withGroundPivotDegrees(90.0)),
   NEUTRAL(
       Setpoint.builder()
           .withLeftFlywheelRPS(0.0)
@@ -44,8 +43,6 @@ public enum SetpointGoal {
           .withGroundRollersVolts(0.0)
           .withKickerVolts(0.0)),
   AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
-  EXTEND(Setpoint.builder().withClimberMeters(0.2)),
-  RETRACT(Setpoint.builder().withClimberMeters(0.0)),
   INDEX_BOTH(
       Setpoint.builder()
           .withLeftIndexerVolts(10.0)
