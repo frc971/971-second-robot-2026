@@ -26,6 +26,7 @@ import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.vision.Limelight;
 
 public class RobotContainer {
   public final Superstructure superstructure;
@@ -141,7 +142,7 @@ public class RobotContainer {
     return autoChooser.getSelected();
   }
 
-  public void resetPositionForAuto() {
+  public void resetPositionForAuto(Limelight limelight) {
     if (autoChooser.getSelected() instanceof PathPlannerAuto auto) {
       Pose2d startingPose = auto.getStartingPose();
       if (startingPose == null) return;
@@ -151,6 +152,7 @@ public class RobotContainer {
         startingPose = FlippingUtil.flipFieldPose(startingPose);
       }
 
+      limelight.resetHeading(startingPose.getRotation());
       drivetrain.resetPose(startingPose);
     }
   }
