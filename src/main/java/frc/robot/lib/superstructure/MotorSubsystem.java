@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import java.util.Optional;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class MotorSubsystem {
   protected final MotorIO io;
@@ -65,14 +64,6 @@ public class MotorSubsystem {
     }
 
     io.periodic();
-
-    if (goalPosition != null)
-      Logger.recordOutput(
-          name + "/Goal Position", UnitUtil.toDouble(goalPosition, io.getMotorConfig().LOG_UNIT()));
-    if (goalVelocity != null)
-      Logger.recordOutput(
-          name + "/Goal Velocity",
-          UnitUtil.toDouble(goalVelocity, io.getMotorConfig().LOG_UNIT().per(Seconds)));
   }
 
   public void setVoltage(Voltage goalVoltage) {

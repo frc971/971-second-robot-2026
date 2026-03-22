@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.RobotBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Visualization {
@@ -52,6 +53,10 @@ public class Visualization {
   }
 
   public void periodic() {
+    if (!RobotBase.isSimulation()) {
+      return;
+    }
+
     Transform3d turretLeftPose =
         robotToLeftTurret.plus(
             new Transform3d(

@@ -12,7 +12,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import org.littletonrobotics.junction.Logger;
 
 public class MotorWithFollowerTalonFX extends MotorTalonFX {
   protected final MotorConfig[] followerConfigs;
@@ -82,25 +81,6 @@ public class MotorWithFollowerTalonFX extends MotorTalonFX {
           followerSupplyCurrentSignals[i],
           followerStatorCurrentSignals[i],
           followerTemperatureSignals[i]);
-
-      Logger.recordOutput(
-          followerConfigs[i].NAME() + "/Position",
-          UnitUtil.toDouble(followerPositionSignals[i].getValue(), followerConfigs[i].LOG_UNIT()));
-      Logger.recordOutput(
-          followerConfigs[i].NAME() + "/Velocity",
-          UnitUtil.toDouble(
-              followerVelocitySignals[i].getValue(), followerConfigs[i].LOG_UNIT().per(Seconds)));
-      Logger.recordOutput(
-          followerConfigs[i].NAME() + "/Applied Voltage",
-          followerAppliedVoltageSignals[i].getValue());
-      Logger.recordOutput(
-          followerConfigs[i].NAME() + "/Supply Current",
-          followerSupplyCurrentSignals[i].getValue());
-      Logger.recordOutput(
-          followerConfigs[i].NAME() + "/Stator Current",
-          followerStatorCurrentSignals[i].getValue());
-      Logger.recordOutput(
-          followerConfigs[i].NAME() + "/Temperature", followerTemperatureSignals[i].getValue());
     }
   }
 
