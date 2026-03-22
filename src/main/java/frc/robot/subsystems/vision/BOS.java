@@ -46,7 +46,7 @@ public class BOS {
     for (DoubleArraySubscriber topic : tag_estimation_subscribers) {
       double[][] tagEstimations = topic.readQueueValues();
       if (tagEstimations.length == 0) {
-        return;
+        continue;
       }
       num_tags_per_control_loop_publisher.set(tagEstimations.length);
 
