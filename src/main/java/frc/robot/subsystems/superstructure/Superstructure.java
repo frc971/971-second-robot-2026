@@ -43,9 +43,6 @@ public class Superstructure {
 
   public final Climber climber;
 
-  public final ShooterTuner shooterTunerLeft;
-  public final ShooterTuner shooterTunerRight;
-
   public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
@@ -56,9 +53,7 @@ public class Superstructure {
   private enum ShooterGoal {
     NONE,
     MANUAL,
-    TARGETING,
-    TUNE_LEFT_SHOOTER,
-    TUNE_RIGHT_SHOOTER
+    TARGETING
   }
 
   public Superstructure(RobotContainer robotContainer) {
@@ -95,10 +90,6 @@ public class Superstructure {
     visualization =
         new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, climber, groundPivot);
 
-    shooterTunerLeft = new ShooterTuner(flywheelLeft, hoodLeft, turretLeft, shooterHandlerLeft);
-    shooterTunerRight =
-        new ShooterTuner(flywheelRight, hoodRight, turretRight, shooterHandlerRight);
-
     setGoal(SetpointGoal.NEUTRAL);
   }
 
@@ -122,10 +113,6 @@ public class Superstructure {
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
         shooterGoal = ShooterGoal.MANUAL;
-      } else if (Controllers.TUNE_LEFT_TURRET.toggled()) {
-        shooterGoal = ShooterGoal.TUNE_LEFT_SHOOTER;
-      } else if (Controllers.TUNE_RIGHT_TURRET.toggled()) {
-        shooterGoal = ShooterGoal.TUNE_RIGHT_SHOOTER;
       } else {
         shooterGoal = ShooterGoal.TARGETING;
       }
@@ -138,9 +125,6 @@ public class Superstructure {
 
       shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
       shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-
-      shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
-      shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
 
       switch (shooterGoal) {
         case NONE -> {}
@@ -194,24 +178,6 @@ public class Superstructure {
 
           setGoal(setpoint);
         }
-        case TUNE_LEFT_SHOOTER -> {
-          shooterTunerLeft.setGoal(ShooterTuner.Goal.ACTIVE);
-
-          if (shooterTunerLeft.isIndexing()) {
-            setGoal(SetpointGoal.INDEX_LEFT);
-          }
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-        }
-        case TUNE_RIGHT_SHOOTER -> {
-          shooterTunerRight.setGoal(ShooterTuner.Goal.ACTIVE);
-
-          if (shooterTunerRight.isIndexing()) {
-            setGoal(SetpointGoal.INDEX_RIGHT);
-          }
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-        }
       }
 
       if (Controllers.INTAKE_PIVOT.toggled()) {
@@ -258,11 +224,6 @@ public class Superstructure {
         setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
       }
 
-      if (Controllers.SUPERCHARGED.getAsBoolean()) {
-        setGoal(SetpointGoal.SUPERCHARGED);
-        shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-        shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-      }
     } else if (DriverStation.isAutonomous()) {
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
           && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
@@ -282,9 +243,6 @@ public class Superstructure {
 
     shooterHandlerLeft.periodic();
     shooterHandlerRight.periodic();
-
-    shooterTunerLeft.periodic();
-    shooterTunerRight.periodic();
 
     // subsystems
     flywheelRight.periodic();
