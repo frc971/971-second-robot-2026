@@ -18,21 +18,6 @@ public class Controllers {
   public static final Trigger CLIMB_EXTEND = TROY.y();
   public static final Trigger CLIMB_RETRACT = TROY.b();
 
-  // === Software's Controls
-  public static final Toggle TUNE_LEFT_TURRET = new Toggle(TROY.back());
-  public static final Toggle TUNE_RIGHT_TURRET = new Toggle(TROY.start());
-
-  public static final Edge SUPERCHARGED = new Edge(TROY.rightBumper());
-  public static final Trigger INDEX = TROY.rightTrigger();
-
-  // score/save must be the same button, no space
-  public static final Edge SCORE = new Edge(TROY.a());
-
-  public static final Edge UNDERSHOOT = new Edge(TROY.povUp());
-  public static final Edge OVERSHOOT = new Edge(TROY.povDown());
-  public static final Edge REVERT = new Edge(TROY.povLeft());
-  public static final Edge HIT = new Edge(TROY.povRight());
-
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
