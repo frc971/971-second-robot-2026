@@ -13,10 +13,10 @@ public abstract class Hood extends LinearSubsystem {
   public static final Distance UPPER_LIMIT = Inches.of(2.7);
   public static final Distance LOWER_LIMIT = Inches.of(0.0);
 
-  private static final double B = 4.8;
-  private static final double C = 6.181717;
-  private static final double ANGLE_OFFSET_RAD = 1.832;
-  private static final double SCREW_OFFSET_INCH = 3.0;
+  private static final double B = 4.200000;
+  private static final double C = 4.966135;
+  private static final double ANGLE_OFFSET_RAD = 1.832; // TODO: not changed yet
+  private static final double SCREW_OFFSET_INCH = 3.0; // TODO: not changed yet
 
   public Hood(MotorConfig motorConfig) {
     super(motorConfig);
