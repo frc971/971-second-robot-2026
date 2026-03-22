@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
@@ -45,10 +44,6 @@ public class Superstructure {
 
   public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
-
-  private boolean pivotAtPosition = false;
-  private final Timer pivotTimer = new edu.wpi.first.wpilibj.Timer();
-  private boolean pivotTimerStarted = false;
 
   private enum ShooterGoal {
     NONE,
