@@ -32,22 +32,4 @@ public class ShooterPhysicsTest {
     assertNotNull(solution);
     assertTrue(solution.flywheelSpeed().gt(RotationsPerSecond.of(0)));
   }
-
-  @Test
-  public void simpleTimeSolve_returnsValidSolution() {
-    ObjectState robot = new ObjectState(new Translation3d(0, 0, 0), new Translation3d(1.0, 0, 0));
-    ObjectState target = new ObjectState(new Translation3d(3.0, 0, 0), new Translation3d(0, 0, 0));
-    LaunchSolution solution = physics.simpleTimeSolve(robot, target);
-    assertNotNull(solution);
-    assertTrue(solution.flywheelSpeed().gt(RotationsPerSecond.of(0)));
-  }
-
-  @Test
-  public void iterativeTimeSolve_returnsValidSolution() {
-    ObjectState robot = new ObjectState(new Translation3d(0, 0, 0), new Translation3d(1.0, 0, 0));
-    ObjectState target = new ObjectState(new Translation3d(3.0, 0, 0), new Translation3d(0, 0, 0));
-    LaunchSolution solution = physics.iterativeTimeSolve(robot, target, 5, false);
-    assertNotNull(solution);
-    assertTrue(solution.flywheelSpeed().gt(RotationsPerSecond.of(0)));
-  }
 }

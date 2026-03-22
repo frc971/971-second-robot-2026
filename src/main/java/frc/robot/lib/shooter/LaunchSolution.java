@@ -1,6 +1,7 @@
 package frc.robot.lib.shooter;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
@@ -16,7 +17,7 @@ public class LaunchSolution {
   public final Rotation2d turretRotation;
 
   public LaunchSolution() {
-    this.shooterData = new ShooterData(Degrees.of(76), RotationsPerSecond.of(0.0), Seconds.of(0.0));
+    this.shooterData = new ShooterData(Degrees.of(76), RotationsPerSecond.of(0.0));
     this.turretRotation = new Rotation2d();
   }
 

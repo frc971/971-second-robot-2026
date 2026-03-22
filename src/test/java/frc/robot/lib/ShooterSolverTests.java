@@ -20,8 +20,8 @@ public class ShooterSolverTests {
   @BeforeEach
   public void setup() {
     ShotTable table = new ShotTable();
-    table.put(Meters.of(2.0), Degrees.of(60), RotationsPerSecond.of(10), Seconds.of(0.4));
-    table.put(Meters.of(5.0), Degrees.of(45), RotationsPerSecond.of(14), Seconds.of(0.6));
+    table.put(Meters.of(2.0), Degrees.of(60), RotationsPerSecond.of(10));
+    table.put(Meters.of(5.0), Degrees.of(45), RotationsPerSecond.of(14));
     config =
         ShooterConfig.builder()
             .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(table).build())
@@ -30,10 +30,11 @@ public class ShooterSolverTests {
   }
 
   @Test
-  public void iterativeTimeSolve_returnsFiniteSolution() {
+  public void stationaryInterpolation_returnsFiniteSolution() {
     ObjectState robot = new ObjectState(new Translation3d(0, 0, 0), new Translation3d(0.5, 0, 0));
     ObjectState target = new ObjectState(new Translation3d(5.0, 0, 0), new Translation3d());
-    LaunchSolution solution = physics.iterativeTimeSolve(robot, target, 3, false);
+    LaunchSolution solution =
+        physics.stationaryInterpolation(robot, target, config.PHYSICS().SHOT_TABLE());
     assertNotNull(solution);
     assertTrue(solution.flywheelSpeed().gt(RotationsPerSecond.of(0)));
   }

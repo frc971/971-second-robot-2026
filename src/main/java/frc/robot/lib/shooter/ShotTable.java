@@ -6,7 +6,6 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Time;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -15,17 +14,15 @@ import java.util.TreeSet;
  * Uses separate interpolation tables for angle and speed
  */
 public class ShotTable {
-  // Immutable Data class to hold hood angle and flywheel speed and time of flight
-  public record ShooterData(Angle hoodAngle, AngularVelocity flywheelSpeed, Time timeOfFlight) {}
+  public record ShooterData(Angle hoodAngle, AngularVelocity flywheelSpeed) {}
 
   /*
    * Separate interpolation tables for hood angle and flywheel speed
    * Key: distance to target (in meters)
-   * Value: hood angle (degrees) or flywheel speed (RPM) or time of flight (seconds)
+   * Value: hood angle (degrees) or flywheel speed (rot/s)
    */
   private final InterpolatingDoubleTreeMap hoodAngleTable = new InterpolatingDoubleTreeMap();
   private final InterpolatingDoubleTreeMap flywheelSpeedTable = new InterpolatingDoubleTreeMap();
-  private final InterpolatingDoubleTreeMap timeTable = new InterpolatingDoubleTreeMap();
 
   private final Set<Double> distances = new TreeSet<>();
 
@@ -43,12 +40,6 @@ public class ShotTable {
     flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RotationsPerSecond));
   }
 
-  public void put(Distance distance, Time timeOfFlight) {
-    double distanceMeters = distance.in(Meters);
-    distances.add(distanceMeters);
-    timeTable.put(distanceMeters, timeOfFlight.in(Seconds));
-  }
-
   public void put(Distance distance, Angle hoodAngle, AngularVelocity flywheelSpeed) {
     double distanceMeters = distance.in(Meters);
     distances.add(distanceMeters);
@@ -56,35 +47,17 @@ public class ShotTable {
     flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RotationsPerSecond));
   }
 
-  public void put(
-      Distance distance, Angle hoodAngle, AngularVelocity flywheelSpeed, Time timeOfFlight) {
-    double distanceMeters = distance.in(Meters);
-    distances.add(distanceMeters);
-    hoodAngleTable.put(distanceMeters, hoodAngle.in(Degrees));
-    flywheelSpeedTable.put(distanceMeters, flywheelSpeed.in(RotationsPerSecond));
-    timeTable.put(distanceMeters, timeOfFlight.in(Seconds));
-  }
-
   public ShooterData getShooterData(Distance distance) {
     double distanceMeters = distance.in(Meters);
     double hoodAngleDegrees = hoodAngleTable.get(distanceMeters);
     double flywheelSpeed = flywheelSpeedTable.get(distanceMeters);
-    double timeOfFlight = timeTable.get(distanceMeters);
-    return new ShooterData(
-        Degrees.of(hoodAngleDegrees),
-        RotationsPerSecond.of(flywheelSpeed),
-        Seconds.of(timeOfFlight));
-  }
-
-  public Time getTime(Distance distance) {
-    return Seconds.of(timeTable.get(distance.in(Meters)));
+    return new ShooterData(Degrees.of(hoodAngleDegrees), RotationsPerSecond.of(flywheelSpeed));
   }
 
   public void clear() {
     distances.clear();
     hoodAngleTable.clear();
     flywheelSpeedTable.clear();
-    timeTable.clear();
   }
 
   public String printSingleLine() {

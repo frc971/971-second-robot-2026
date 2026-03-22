@@ -10,7 +10,6 @@ import lombok.Getter;
 public class Setpoint {
   private Optional<Voltage> groundRollers = Optional.empty();
   private Optional<Angle> groundPivot = Optional.empty();
-  private Optional<Distance> climber = Optional.empty();
   private Optional<Voltage> kicker = Optional.empty();
 
   private Optional<Distance> rightHood = Optional.empty();
@@ -35,11 +34,6 @@ public class Setpoint {
 
   public Setpoint withKickerVolts(double volts) {
     this.kicker = Optional.of(Volts.of(volts));
-    return this;
-  }
-
-  public Setpoint withClimberMeters(double meters) {
-    this.climber = Optional.of(Meters.of(meters));
     return this;
   }
 
