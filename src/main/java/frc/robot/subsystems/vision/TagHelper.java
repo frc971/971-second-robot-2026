@@ -38,8 +38,7 @@ public class TagHelper {
     }
 
     if (closestTagId == -1) {
-      DriverStation.reportWarning(
-          "TagHelper: could not find any of the given AprilTag IDs", false);
+      DriverStation.reportWarning("TagHelper: could not find any of the given AprilTag IDs", false);
       return Optional.empty();
     }
 
