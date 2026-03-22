@@ -30,6 +30,10 @@ import frc.robot.subsystems.superstructure.Superstructure;
 public class RobotContainer {
   public final Superstructure superstructure;
 
+  private static final double SHOOTING_SPEED = 4.0;
+  private static final double SHOOTING_ANGULAR_RATE =
+      RotationsPerSecond.of(1.0).in(RadiansPerSecond);
+
   private static final double MAX_SPEED = 3.4;
   private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
 
@@ -37,6 +41,11 @@ public class RobotContainer {
   private static final double ROTATION_DEADBAND = 0.1;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric superchargedDrive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(SHOOTING_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(SHOOTING_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -46,6 +55,10 @@ public class RobotContainer {
 
   // Current values are placeholders and should be tuned for optimal robot control
   // Slew rate limit for translation (m/s^2)
+  private static final double SHOOTING_SLEW_TRANSLATE_LIMIT = 20.0;
+  // Slew rate limit for rotation (rad/s^2)
+  private static final double SHOOTING_SLEW_ROTATION_LIMIT = 5.0;
+
   private static final double SLEW_TRANSLATE_LIMIT = 1000.0;
   // Slew rate limit for rotation (rad/s^2)
   private static final double SLEW_ROTATION_LIMIT = 1000.0;
@@ -59,6 +72,13 @@ public class RobotContainer {
   private static final SlewRateLimiter X_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
   private static final SlewRateLimiter Y_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
   private static final SlewRateLimiter ROT_LIMITER = new SlewRateLimiter(SLEW_ROTATION_LIMIT);
+
+  private static final SlewRateLimiter SHOOTING_X_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHOOTING_Y_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHOOTING_ROT_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_ROTATION_LIMIT);
 
   private static final JoystickValues JOYSTICK_VALUES = new JoystickValues();
 
@@ -109,21 +129,51 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () -> {
-              JOYSTICK_VALUES
-                  .setValues(
-                      Controllers.TROY.getLeftY(),
-                      Controllers.TROY.getLeftX(),
-                      Controllers.TROY.getRightX())
-                  .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                  .scale(
-                      -MAX_SPEED, // Negative max speed and angular rate since
-                      -MAX_ANGULAR_RATE) // controller inputs are reversed
-                  .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
+              if (Controllers.SHOOT_EDGE.rising()) {
+                SHOOTING_X_LIMITER.reset(X_LIMITER.lastValue());
+                SHOOTING_Y_LIMITER.reset(Y_LIMITER.lastValue());
+                SHOOTING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
+              }
 
-              return drive
-                  .withVelocityX(JOYSTICK_VALUES.getX())
-                  .withVelocityY(JOYSTICK_VALUES.getY())
-                  .withRotationalRate(JOYSTICK_VALUES.getRot());
+              if (Controllers.SHOOT_EDGE.falling()) {
+                X_LIMITER.reset(SHOOTING_X_LIMITER.lastValue());
+                Y_LIMITER.reset(SHOOTING_Y_LIMITER.lastValue());
+                ROT_LIMITER.reset(SHOOTING_ROT_LIMITER.lastValue());
+              }
+
+              if (Controllers.SHOOT_EDGE.getAsBoolean()) {
+                JOYSTICK_VALUES
+                    .setValues(
+                        Controllers.TROY.getLeftY(),
+                        Controllers.TROY.getLeftX(),
+                        Controllers.TROY.getRightX())
+                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+                    .scale(
+                        -SHOOTING_SPEED, // Negative max speed and angular rate since
+                        -SHOOTING_ANGULAR_RATE) // controller inputs are reversed
+                    .slewRateLimit(SHOOTING_X_LIMITER, SHOOTING_Y_LIMITER, SHOOTING_ROT_LIMITER);
+                return superchargedDrive
+                    .withVelocityX(JOYSTICK_VALUES.getX())
+                    .withVelocityY(JOYSTICK_VALUES.getY())
+                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+
+              } else {
+                JOYSTICK_VALUES
+                    .setValues(
+                        Controllers.TROY.getLeftY(),
+                        Controllers.TROY.getLeftX(),
+                        Controllers.TROY.getRightX())
+                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+                    .scale(
+                        -MAX_SPEED, // Negative max speed and angular rate since
+                        -MAX_ANGULAR_RATE) // controller inputs are reversed
+                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
+
+                return drive
+                    .withVelocityX(JOYSTICK_VALUES.getX())
+                    .withVelocityY(JOYSTICK_VALUES.getY())
+                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+              }
             }));
 
     drivetrain.registerTelemetry(logger::telemeterize);

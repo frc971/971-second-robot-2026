@@ -15,6 +15,7 @@ public class Controllers {
   public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
 
   public static final Trigger SHOOT_REDUNDANCY = TROY.rightTrigger();
+  public static final Edge SHOOT_EDGE = new Edge(TROY.rightTrigger());
 
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
