@@ -64,7 +64,7 @@ public class Visualization {
             .plus(
                 new Transform3d(
                     Translation3d.kZero,
-                    new Rotation3d(0.0, hoodLeft.getPosition().in(Radians), 0.0)));
+                    new Rotation3d(0.0, 1.30959265358 - hoodLeft.getHoodAngle().in(Radians), 0.0)));
 
     Transform3d turretRightPose =
         robotToRightTurret.plus(
@@ -78,7 +78,8 @@ public class Visualization {
             .plus(
                 new Transform3d(
                     Translation3d.kZero,
-                    new Rotation3d(0.0, hoodRight.getPosition().in(Radians), 0.0)));
+                    new Rotation3d(
+                        0.0, 1.30959265358 - hoodRight.getHoodAngle().in(Radians), 0.0)));
 
     Transform3d climberPose =
         new Transform3d(

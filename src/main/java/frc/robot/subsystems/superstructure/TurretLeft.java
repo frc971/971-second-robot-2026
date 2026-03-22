@@ -37,25 +37,29 @@ public class TurretLeft extends AngularSubsystem {
     tc.Slot0.kD = 0.0; // Derivative gain
 
     // for sim only
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-    tc.MotionMagic.MotionMagicAcceleration = 0.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 10.0;
+    tc.MotionMagic.MotionMagicAcceleration = 10.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
-    tc.CurrentLimits.StatorCurrentLimit = 0.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
+    tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 0.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio = 200.0 / 14.0; // Motor to output gear ratio
 
     tc.ClosedLoopGeneral.ContinuousWrap = ENABLE_WRAP;
 
     return MotorConfig.builder()
         .NAME("Turret Left")
         .ID(30)
+<<<<<<< HEAD
         .BUS(new CANBus("Superstructure Bus"))
+=======
+        .BUS(new CANBus("rio"))
+>>>>>>> origin/main
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
         .build();

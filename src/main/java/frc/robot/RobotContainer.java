@@ -197,6 +197,7 @@ public class RobotContainer {
   public void resetPositionForAuto() {
     if (autoChooser.getSelected() instanceof PathPlannerAuto auto) {
       Pose2d startingPose = auto.getStartingPose();
+      if (startingPose == null) return;
 
       if (DriverStation.getAlliance().isPresent()
           && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {

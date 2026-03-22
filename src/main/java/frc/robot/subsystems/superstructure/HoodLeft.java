@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.superstructure.*;
 
-public class HoodLeft extends AngularSubsystem {
+public class HoodLeft extends Hood {
   private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);
 
   public HoodLeft() {
@@ -29,32 +29,33 @@ public class HoodLeft extends AngularSubsystem {
     tc.Slot0.kD = 0.0; // Derivative gain
 
     // for sim only
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-    tc.MotionMagic.MotionMagicAcceleration = 0.0;
+    tc.MotionMagic.MotionMagicCruiseVelocity = 10.0;
+    tc.MotionMagic.MotionMagicAcceleration = 10.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
-    tc.CurrentLimits.StatorCurrentLimit = 0.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
+    tc.CurrentLimits.StatorCurrentLimit = 50.0;
 
-    tc.Feedback.SensorToMechanismRatio = 0.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio =
+        (45.0 / 16.0) * (100.0 / 1.0); // Motor to output gear ratio
 
     return MotorConfig.builder()
         .NAME("Hood Left")
-        .ID(0)
+        .ID(31)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
-        .LOG_UNIT(Degrees)
+        .LOG_UNIT(Inches)
         .build();
   }
 
   @Override
   public void setPosition(Angle goalPosition) {
     setFeedforward(calculatePositionFeedforward(goalPosition));
-    super.setPositionVoltage(goalPosition);
+    super.setPosition(goalPosition);
   }
 
   private Voltage calculatePositionFeedforward(Angle goalPosition) {

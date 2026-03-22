@@ -12,11 +12,11 @@ public class Setpoint {
   private Optional<Angle> groundPivot = Optional.empty();
   private Optional<Distance> climber = Optional.empty();
 
-  private Optional<Angle> rightHood = Optional.empty();
+  private Optional<Distance> rightHood = Optional.empty();
   private Optional<Angle> rightTurret = Optional.empty();
   private Optional<AngularVelocity> rightFlywheel = Optional.empty();
 
-  private Optional<Angle> leftHood = Optional.empty();
+  private Optional<Distance> leftHood = Optional.empty();
   private Optional<Angle> leftTurret = Optional.empty();
   private Optional<AngularVelocity> leftFlywheel = Optional.empty();
   private Optional<Voltage> indexer = Optional.empty();
@@ -46,13 +46,13 @@ public class Setpoint {
     return this;
   }
 
-  public Setpoint withLeftHoodDegrees(double degrees) {
-    this.leftHood = Optional.of(Degrees.of(degrees));
+  public Setpoint withLeftHoodInches(double inches) {
+    this.leftHood = Optional.of(Inches.of(inches));
     return this;
   }
 
-  public Setpoint withRightHoodDegrees(double degrees) {
-    this.rightHood = Optional.of(Degrees.of(degrees));
+  public Setpoint withRightHoodInches(double inches) {
+    this.rightHood = Optional.of(Inches.of(inches));
     return this;
   }
 
