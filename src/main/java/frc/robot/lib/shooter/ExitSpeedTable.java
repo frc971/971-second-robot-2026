@@ -8,12 +8,8 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import java.util.Set;
 import java.util.TreeSet;
 
-/*
- * ShotTable class to manage shooter data (hood angle and flywheel speed) based on distance to target
- * Uses separate interpolation tables for angle and speed
- */
+// Maps exit linear speed (m/s) to flywheel angular velocity (rot/s)
 public class ExitSpeedTable {
-  // Maps exit linear speed (m/s) to flywheel angular velocity (rot/s)
   /*
    * Separate interpolation tables for hood angle and flywheel speed
    * Key: Linear Speed (in m/s)
