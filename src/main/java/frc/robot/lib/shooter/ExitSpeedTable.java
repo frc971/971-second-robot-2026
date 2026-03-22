@@ -8,7 +8,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import java.util.Set;
 import java.util.TreeSet;
 
-  // Maps exit linear speed (m/s) to flywheel angular velocity (rot/s)
+// Maps exit linear speed (m/s) to flywheel angular velocity (rot/s)
 public class ExitSpeedTable {
   /*
    * Separate interpolation tables for hood angle and flywheel speed
