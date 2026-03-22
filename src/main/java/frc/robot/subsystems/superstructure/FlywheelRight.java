@@ -62,7 +62,7 @@ public class FlywheelRight extends AngularSubsystem {
     return MotorConfig.builder()
         .NAME("Flywheel Right Lead")
         .ID(41)
-        .BUS(new CANBus("Right Superstructure"))
+        .BUS(new CANBus("Superstructure Bus"))
         .TALONFX_CONFIG(tc)
         .build();
   }

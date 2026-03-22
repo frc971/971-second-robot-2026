@@ -16,7 +16,7 @@ public enum SetpointGoal {
           .withLeftTurretDegrees(105)
           .withRightHoodInches(0.0)
           .withRightTurretDegrees(107)
-          .withGroundPivotDegrees(127.0)),
+          .withGroundPivotDegrees(-117.0)),
   MANUAL_RESET(
       Setpoint.builder()
           .withLeftHoodInches(0.0)
@@ -36,7 +36,7 @@ public enum SetpointGoal {
           .withRightTurretDegrees(0.0)
           .withGroundRollersVolts(0.0)
           .withIndexerVolts(0.0)
-          .withGroundPivotDegrees(0.0)),
+          .withGroundPivotDegrees(-110.0)),
   AUTO_NEUTRAL(
       Setpoint.builder()
           .withLeftFlywheelRPS(0.0)
@@ -60,7 +60,7 @@ public enum SetpointGoal {
   AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
   INDEX(Setpoint.builder().withIndexerVolts(10.0)),
   OUTTAKE(Setpoint.builder().withIndexerVolts(-10.0).withGroundRollersVolts(-12.0)),
-  INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(0.0)),
+  INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(10.0)),
   INTAKE_PIVOT_JUICE(Setpoint.builder().withGroundPivotDegrees(45.0)),
   AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(12.0)),
   INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),

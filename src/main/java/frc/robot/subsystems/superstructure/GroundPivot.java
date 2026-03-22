@@ -22,7 +22,7 @@ public class GroundPivot extends AngularSubsystem {
 
     // Motion Magic PID and feedforward gains
     tc.Slot0.kS = 0.12; // Static friction compensation
-    tc.Slot0.kV = 5.5; // Velocity feedforward
+    tc.Slot0.kV = 4.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
     tc.Slot0.kG = 0.08; // Gravity compensation
 
@@ -45,7 +45,8 @@ public class GroundPivot extends AngularSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 0.0;
     tc.CurrentLimits.StatorCurrentLimit = 0.0;
 
-    tc.Feedback.SensorToMechanismRatio = (36.0 / 1.0); // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio =
+        ((52 / 8) * (56 / 16.0) * (18.0 / 9.0)); // Motor to output gear ratio
 
     return MotorConfig.builder()
         .NAME("Ground Pivot")
