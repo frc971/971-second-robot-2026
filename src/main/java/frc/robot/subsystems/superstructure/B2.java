@@ -6,8 +6,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.lib.superstructure.*;
 
-public class RollerFloor extends MotorSubsystem {
-  public RollerFloor() {
+public class B2 extends MotorSubsystem {
+  public B2() {
     super(getMotorConfig());
   }
 
@@ -26,8 +26,8 @@ public class RollerFloor extends MotorSubsystem {
     tc.Feedback.SensorToMechanismRatio = 0.0;
 
     return MotorConfig.builder()
-        .NAME("Indexer Follower") // TODO: 3/29 CTRE
-        .ID(21)
+        .NAME("B2")
+        .ID(18)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();

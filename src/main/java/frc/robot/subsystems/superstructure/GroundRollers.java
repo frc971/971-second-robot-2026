@@ -26,8 +26,9 @@ public class GroundRollers extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: 3/29 CTRE
 
+    // TODO: 3/29 CTRE
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
     tc.CurrentLimits.SupplyCurrentLimit = 20.0;
