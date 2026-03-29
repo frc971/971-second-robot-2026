@@ -27,7 +27,7 @@ public class Kicker extends MotorSubsystem {
 
     return MotorConfig.builder()
         .NAME("Kicker")
-        .ID(3)
+        .ID(3) // TODO: 3/29 CTRE
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();
