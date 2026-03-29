@@ -30,7 +30,7 @@ public class Superstructure {
   public final HoodRight hoodRight;
   public final HoodLeft hoodLeft;
 
-  public final Indexer indexer;
+  public final RollerFloor indexer;
   public final GroundRollers groundRollers;
   public final GroundPivot groundPivot;
 
@@ -55,7 +55,7 @@ public class Superstructure {
     flywheelLeft = new FlywheelLeft();
     hoodRight = new HoodRight();
     hoodLeft = new HoodLeft();
-    indexer = new Indexer();
+    indexer = new RollerFloor();
     turretRight = new TurretRight();
     turretLeft = new TurretLeft();
     groundPivot = new GroundPivot();
@@ -245,8 +245,8 @@ public class Superstructure {
   // MARK: Helper functions
 
   public void setGoal(Setpoint setpoint) {
-    if (setpoint.getIndexer().isPresent()) {
-      indexer.setVoltage(setpoint.getIndexer().get());
+    if (setpoint.getRollerFloor().isPresent()) {
+      indexer.setVoltage(setpoint.getRollerFloor().get());
     }
 
     if (setpoint.getGroundPivot().isPresent()) {
