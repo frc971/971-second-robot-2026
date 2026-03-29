@@ -99,7 +99,7 @@ public class Superstructure {
               || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
 
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
-      if (Controllers.MANUAL.toggled()) {
+      if (!Controllers.MANUAL.toggled()) {
         shooterGoal = ShooterGoal.MANUAL;
       } else {
         shooterGoal = ShooterGoal.TARGETING;

@@ -26,13 +26,12 @@ public class GroundRollers extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: 3/29 CTRE
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    // TODO: 3/29 CTRE
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 20.0;
-    tc.CurrentLimits.StatorCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
+    tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
     return MotorConfig.builder()
         .NAME("Ground Roller Lead")
@@ -45,7 +44,7 @@ public class GroundRollers extends MotorSubsystem {
   public static MotorConfig getFollowerConfig() {
     return getMotorConfig().toBuilder()
         .NAME("Ground Roller Follower")
-        .ID(16)
+        .ID(15)
         .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Aligned)
         .build();
   }

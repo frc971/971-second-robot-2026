@@ -15,19 +15,18 @@ public class Kicker extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: 3/29 CTRE
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    // TODO: 3/29 CTRE
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
-    tc.CurrentLimits.StatorCurrentLimit = 80.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 70.0;
+    tc.CurrentLimits.StatorCurrentLimit = 120.0;
 
     tc.Feedback.SensorToMechanismRatio = 0.0;
 
     return MotorConfig.builder()
         .NAME("Kicker")
-        .ID(3) // TODO: 3/29 CTRE
+        .ID(16)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();
