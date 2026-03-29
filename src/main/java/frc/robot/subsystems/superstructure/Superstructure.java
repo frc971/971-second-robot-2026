@@ -238,6 +238,8 @@ public class Superstructure {
     hoodRight.periodic();
     hoodLeft.periodic();
     rollerFloor.periodic();
+    b2.periodic();
+    kicker.periodic();
     turretRight.periodic();
     turretLeft.periodic();
     groundPivot.periodic();
@@ -253,7 +255,7 @@ public class Superstructure {
       rollerFloor.setVoltage(setpoint.getRollerFloor().get());
     }
     if (setpoint.getB2().isPresent()) {
-      b2.setVoltage(setpoint.getRollerFloor().get());
+      b2.setVoltage(setpoint.getB2().get());
     }
     if (setpoint.getKicker().isPresent()) {
       kicker.setVoltage(setpoint.getKicker().get());

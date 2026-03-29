@@ -35,6 +35,8 @@ public enum SetpointGoal {
           .withRightTurretDegrees(0.0)
           .withGroundRollersVolts(0.0)
           .withRollerFloorVolts(0.0)
+          .withB2Volts(0.0)
+          .withKickerVolts(0.0)
           .withGroundPivotDegrees(130.0)),
   AUTO_NEUTRAL(
       Setpoint.builder()
