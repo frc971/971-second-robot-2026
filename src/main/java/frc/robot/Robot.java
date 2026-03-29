@@ -80,7 +80,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
 
     bos.updatePose();
-    
+
     CommandScheduler.getInstance().run();
   }
 
