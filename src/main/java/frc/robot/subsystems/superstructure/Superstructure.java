@@ -30,7 +30,7 @@ public class Superstructure {
   public final HoodRight hoodRight;
   public final HoodLeft hoodLeft;
 
-  public final RollerFloor indexer;
+  public final RollerFloor rollerFloor;
   public final GroundRollers groundRollers;
   public final GroundPivot groundPivot;
 
@@ -55,7 +55,7 @@ public class Superstructure {
     flywheelLeft = new FlywheelLeft();
     hoodRight = new HoodRight();
     hoodLeft = new HoodLeft();
-    indexer = new RollerFloor();
+    rollerFloor = new RollerFloor();
     turretRight = new TurretRight();
     turretLeft = new TurretLeft();
     groundPivot = new GroundPivot();
@@ -233,7 +233,7 @@ public class Superstructure {
     flywheelLeft.periodic();
     hoodRight.periodic();
     hoodLeft.periodic();
-    indexer.periodic();
+    rollerFloor.periodic();
     turretRight.periodic();
     turretLeft.periodic();
     groundPivot.periodic();
@@ -246,7 +246,7 @@ public class Superstructure {
 
   public void setGoal(Setpoint setpoint) {
     if (setpoint.getRollerFloor().isPresent()) {
-      indexer.setVoltage(setpoint.getRollerFloor().get());
+      rollerFloor.setVoltage(setpoint.getRollerFloor().get());
     }
 
     if (setpoint.getGroundPivot().isPresent()) {
