@@ -34,12 +34,12 @@ public class FlywheelRight extends AngularSubsystem {
     // tc.Slot0.kS = 0.44;
     tc.Slot0.kS = 0.0;
     // tc.Slot0.kV = 0.124;
-    tc.Slot0.kV = 0.0;
+    tc.Slot0.kV = 0.133;
     tc.Slot0.kA = 0.0;
     tc.Slot0.kG = 0.0;
 
     // tc.Slot0.kP = 0.55;
-    tc.Slot0.kP = 0.0;
+    tc.Slot0.kP = 0.4;
     tc.Slot0.kI = 0.0;
     tc.Slot0.kD = 0.0;
 
@@ -61,8 +61,8 @@ public class FlywheelRight extends AngularSubsystem {
 
     return MotorConfig.builder()
         .NAME("Flywheel Right Lead")
-        .ID(43)
-        .BUS(new CANBus("Right Superstructure"))
+        .ID(41)
+        .BUS(new CANBus("Superstructure Bus"))
         .TALONFX_CONFIG(tc)
         .build();
   }
@@ -70,7 +70,7 @@ public class FlywheelRight extends AngularSubsystem {
   public static MotorConfig getFollowerConfig() {
     return getMotorConfig().toBuilder()
         .NAME("Flywheel Right Follower")
-        .ID(44)
+        .ID(42)
         .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
         .build();
   }

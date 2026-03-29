@@ -10,17 +10,16 @@ import lombok.Getter;
 public class Setpoint {
   private Optional<Voltage> groundRollers = Optional.empty();
   private Optional<Angle> groundPivot = Optional.empty();
-  private Optional<Voltage> kicker = Optional.empty();
+  private Optional<Distance> climber = Optional.empty();
 
   private Optional<Distance> rightHood = Optional.empty();
   private Optional<Angle> rightTurret = Optional.empty();
-  private Optional<Voltage> rightIndexer = Optional.empty();
   private Optional<AngularVelocity> rightFlywheel = Optional.empty();
 
   private Optional<Distance> leftHood = Optional.empty();
   private Optional<Angle> leftTurret = Optional.empty();
-  private Optional<Voltage> leftIndexer = Optional.empty();
   private Optional<AngularVelocity> leftFlywheel = Optional.empty();
+  private Optional<Voltage> indexer = Optional.empty();
 
   public Setpoint withGroundRollersVolts(double volts) {
     this.groundRollers = Optional.of(Volts.of(volts));
@@ -29,11 +28,6 @@ public class Setpoint {
 
   public Setpoint withGroundPivotDegrees(double degrees) {
     this.groundPivot = Optional.of(Degrees.of(degrees));
-    return this;
-  }
-
-  public Setpoint withKickerVolts(double volts) {
-    this.kicker = Optional.of(Volts.of(volts));
     return this;
   }
 
@@ -67,13 +61,8 @@ public class Setpoint {
     return this;
   }
 
-  public Setpoint withLeftIndexerVolts(double volts) {
-    this.leftIndexer = Optional.of(Volts.of(volts));
-    return this;
-  }
-
-  public Setpoint withRightIndexerVolts(double volts) {
-    this.rightIndexer = Optional.of(Volts.of(volts));
+  public Setpoint withIndexerVolts(double volts) {
+    this.indexer = Optional.of(Volts.of(volts));
     return this;
   }
 

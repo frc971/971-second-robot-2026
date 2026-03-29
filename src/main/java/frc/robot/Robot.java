@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.vision.BOS;
+import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.TagHelper;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -27,6 +28,7 @@ public class Robot extends LoggedRobot {
   private final RobotContainer robotContainer;
 
   private final BOS bos;
+  private final Limelight limelight;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -60,6 +62,7 @@ public class Robot extends LoggedRobot {
 
     robotContainer = new RobotContainer();
     bos = new BOS(robotContainer.drivetrain);
+    limelight = new Limelight(robotContainer.drivetrain);
   }
 
   @Override
@@ -80,6 +83,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
 
     bos.updatePose();
+    limelight.updatePose();
 
     CommandScheduler.getInstance().run();
   }
@@ -118,7 +122,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
-      robotContainer.resetPositionForAuto();
+      robotContainer.resetPositionForAuto(limelight);
     }
     HubShiftUtil.initialize();
   }
