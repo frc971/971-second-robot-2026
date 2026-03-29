@@ -19,7 +19,10 @@ public class Setpoint {
   private Optional<Distance> leftHood = Optional.empty();
   private Optional<Angle> leftTurret = Optional.empty();
   private Optional<AngularVelocity> leftFlywheel = Optional.empty();
+
   private Optional<Voltage> rollerFloor = Optional.empty();
+  private Optional<Voltage> b2 = Optional.empty();
+  private Optional<Voltage> kicker = Optional.empty();
 
   public Setpoint withGroundRollersVolts(double volts) {
     this.groundRollers = Optional.of(Volts.of(volts));
@@ -63,6 +66,16 @@ public class Setpoint {
 
   public Setpoint withRollerFloorVolts(double volts) {
     this.rollerFloor = Optional.of(Volts.of(volts));
+    return this;
+  }
+
+  public Setpoint withB2Volts(double volts) {
+    this.b2 = Optional.of(Volts.of(volts));
+    return this;
+  }
+
+  public Setpoint withKickerVolts(double volts) {
+    this.kicker = Optional.of(Volts.of(volts));
     return this;
   }
 

@@ -2,7 +2,6 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,6 +30,9 @@ public class Superstructure {
   public final HoodLeft hoodLeft;
 
   public final RollerFloor rollerFloor;
+  public final B2 b2;
+  public final Kicker kicker;
+
   public final GroundRollers groundRollers;
   public final GroundPivot groundPivot;
 
@@ -55,11 +57,13 @@ public class Superstructure {
     flywheelLeft = new FlywheelLeft();
     hoodRight = new HoodRight();
     hoodLeft = new HoodLeft();
-    rollerFloor = new RollerFloor();
     turretRight = new TurretRight();
     turretLeft = new TurretLeft();
     groundPivot = new GroundPivot();
     groundRollers = new GroundRollers();
+    rollerFloor = new RollerFloor();
+    b2 = new B2();
+    kicker = new Kicker();
 
     shooterHandlerRight =
         new ShooterHandler(
@@ -247,6 +251,12 @@ public class Superstructure {
   public void setGoal(Setpoint setpoint) {
     if (setpoint.getRollerFloor().isPresent()) {
       rollerFloor.setVoltage(setpoint.getRollerFloor().get());
+    }
+    if (setpoint.getB2().isPresent()) {
+      b2.setVoltage(setpoint.getRollerFloor().get());
+    }
+    if (setpoint.getKicker().isPresent()) {
+      kicker.setVoltage(setpoint.getKicker().get());
     }
 
     if (setpoint.getGroundPivot().isPresent()) {

@@ -57,7 +57,11 @@ public enum SetpointGoal {
           .withGroundRollersVolts(0.0)
           .withRollerFloorVolts(0.0)),
   AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
-  INDEX(Setpoint.builder().withRollerFloorVolts(0.0)),
+  INDEX(
+      Setpoint.builder()
+          .withRollerFloorVolts(0.0)
+          .withB2Volts(0.0)
+          .withKickerVolts(0.0)), // TODO: 3/29 CTRE
   OUTTAKE(Setpoint.builder().withRollerFloorVolts(-10.0).withGroundRollersVolts(-12.0)),
   INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(0.0)),
   INTAKE_PIVOT_JUICE(Setpoint.builder().withGroundPivotDegrees(45.0)),
@@ -73,7 +77,6 @@ public enum SetpointGoal {
           .withLeftFlywheelRPS(0.0)
           .withLeftHoodInches(0.0)
           .withLeftTurretDegrees(0.0)),
-
   MANUAL_SHUTTLE_UP(Setpoint.builder()),
   MANUAL_SHUTTLE_DOWN(Setpoint.builder()),
   MANUAL_SHUTTLE_LEFT(Setpoint.builder()),
