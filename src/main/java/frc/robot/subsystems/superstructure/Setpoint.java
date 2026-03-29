@@ -11,6 +11,7 @@ public class Setpoint {
   private Optional<Voltage> groundRollers = Optional.empty();
   private Optional<Angle> groundPivot = Optional.empty();
   private Optional<Distance> climber = Optional.empty();
+  private Optional<Voltage> splitter = Optional.empty();
 
   private Optional<Distance> rightHood = Optional.empty();
   private Optional<Angle> rightTurret = Optional.empty();
@@ -63,6 +64,11 @@ public class Setpoint {
 
   public Setpoint withIndexerVolts(double volts) {
     this.indexer = Optional.of(Volts.of(volts));
+    return this;
+  }
+
+  public Setpoint withSplitterVolts(double volts) {
+    this.splitter = Optional.of(Volts.of(volts));
     return this;
   }
 

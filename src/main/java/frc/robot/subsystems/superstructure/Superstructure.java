@@ -31,6 +31,7 @@ public class Superstructure {
   public final HoodLeft hoodLeft;
 
   public final Indexer indexer;
+  public final Splitter splitter;
   public final GroundRollers groundRollers;
   public final GroundPivot groundPivot;
 
@@ -60,6 +61,7 @@ public class Superstructure {
     turretLeft = new TurretLeft();
     groundPivot = new GroundPivot();
     groundRollers = new GroundRollers();
+    splitter = new Splitter();
 
     shooterHandlerRight =
         new ShooterHandler(
