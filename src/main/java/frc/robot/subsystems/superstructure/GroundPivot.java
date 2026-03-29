@@ -51,7 +51,7 @@ public class GroundPivot extends AngularSubsystem {
     return MotorConfig.builder()
         .NAME("Ground Pivot")
         .ID(14)
-        .BUS(new CANBus("Drivetrain Bus"))
+        .BUS(new CANBus("rio"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
         .build();

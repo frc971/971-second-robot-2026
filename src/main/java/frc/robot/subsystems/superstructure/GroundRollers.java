@@ -36,7 +36,7 @@ public class GroundRollers extends MotorSubsystem {
     return MotorConfig.builder()
         .NAME("Ground Roller Lead")
         .ID(15)
-        .BUS(new CANBus("Drivetrain Bus"))
+        .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();
   }
