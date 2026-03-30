@@ -19,7 +19,7 @@ public class Controllers {
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
-  public static final Trigger SHOOT = ANDRE.rightTrigger();
+  // public static final Trigger SHOOT = ANDRE.rightTrigger();
 
   public static final Trigger OUTTAKE = ANDRE.leftTrigger();
 
