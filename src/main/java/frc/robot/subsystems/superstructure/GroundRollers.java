@@ -10,16 +10,7 @@ import frc.robot.lib.superstructure.*;
 
 public class GroundRollers extends MotorSubsystem {
   public GroundRollers() {
-    super(getIO());
-  }
-
-  private static MotorIO getIO() {
-    if (RobotBase.isReal()) {
-      return new MotorWithFollowerTalonFX(
-          getMotorConfig(), new MotorConfig[] {getFollowerConfig()});
-    } else {
-      return new MotorSim(getMotorConfig());
-    }
+    super(getMotorConfig());
   }
 
   public static MotorConfig getMotorConfig() {
@@ -38,14 +29,6 @@ public class GroundRollers extends MotorSubsystem {
         .ID(20)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
-        .build();
-  }
-
-  public static MotorConfig getFollowerConfig() {
-    return getMotorConfig().toBuilder()
-        .NAME("Ground Roller Follower")
-        .ID(15)
-        .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Aligned)
         .build();
   }
 }

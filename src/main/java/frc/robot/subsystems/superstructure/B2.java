@@ -15,7 +15,7 @@ public class B2 extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;

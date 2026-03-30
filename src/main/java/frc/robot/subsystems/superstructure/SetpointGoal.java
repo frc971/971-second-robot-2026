@@ -106,10 +106,10 @@ public enum SetpointGoal {
   MANUAL_DOWN( // up against the hub
       Setpoint.builder()
           .withLeftFlywheelRPS(40)
-          .withLeftHoodInches(0.0)
+          .withLeftHoodInches(1.0)
           .withLeftTurretDegrees(0.0)
           .withRightFlywheelRPS(30)
-          .withRightHoodInches(0.0)
+          .withRightHoodInches(1.0)
           .withRightTurretDegrees(0.0));
 
   private final Setpoint setpoint;
