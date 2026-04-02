@@ -16,6 +16,8 @@ public class Controllers {
 
   public static final Trigger SHOOT_REDUNDANCY = TROY.rightTrigger();
 
+  public static final Trigger JUICE = TROY.a();
+
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
