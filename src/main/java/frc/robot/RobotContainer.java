@@ -16,11 +16,16 @@ import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -39,11 +44,10 @@ public class RobotContainer {
 
   /* Setting up bindings for necessary control of the swerve drive platform */
 
-  private final SwerveRequest.FieldCentric drive =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
-          .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
+      .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   // Current values are placeholders and should be tuned for optimal robot control
   // Slew rate limit for translation (m/s^2)
@@ -68,6 +72,13 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
+  // test stuff for pathing
+  private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  private final DoubleSubscriber vxSub = inst.getDoubleTopic("/pathing/vx").subscribe(0.0);
+  private final DoubleSubscriber vySub = inst.getDoubleTopic("/pathing/vy").subscribe(0.0);
+  private final BooleanSubscriber pathingEnabled = inst.getBooleanTopic("/pathing/enabled").subscribe(false);
+  private final BooleanPublisher pathingEnabledPub = inst.getBooleanTopic("/pathing/enabled").publish();
+
   public RobotContainer() {
     superstructure = new Superstructure(this);
 
@@ -77,9 +88,8 @@ public class RobotContainer {
     AutoBuilder.getAllAutoNames().stream()
         .sorted()
         .forEach(
-            autoName ->
-                autoChooser.addOption(
-                    autoName + " (Mirrored)", new PathPlannerAuto(autoName, true)));
+            autoName -> autoChooser.addOption(
+                autoName + " (Mirrored)", new PathPlannerAuto(autoName, true)));
 
     SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -92,7 +102,8 @@ public class RobotContainer {
     // Warmup PathPlanner to avoid Java pauses
     CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
 
-    if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
+    if (Robot.isSimulation())
+      drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
   }
 
   private void registerNamedCommands() {
@@ -120,12 +131,23 @@ public class RobotContainer {
                       -MAX_SPEED, // Negative max speed and angular rate since
                       -MAX_ANGULAR_RATE) // controller inputs are reversed
                   .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
-
-              return drive
-                  .withVelocityX(JOYSTICK_VALUES.getX())
-                  .withVelocityY(JOYSTICK_VALUES.getY())
-                  .withRotationalRate(JOYSTICK_VALUES.getRot());
+              if (pathingEnabled.get()) {
+                return drive
+                    .withVelocityX(vxSub.get())
+                    .withVelocityY(vySub.get())
+                    .withRotationalRate(0);
+              } else {
+                return drive
+                    .withVelocityX(JOYSTICK_VALUES.getX())
+                    .withVelocityY(JOYSTICK_VALUES.getY())
+                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+              }
             }));
+
+    Controllers.TROY
+        .a()
+        .onTrue(Commands.runOnce(() -> pathingEnabledPub.set(true)))
+        .onFalse(Commands.runOnce(() -> pathingEnabledPub.set(false)));
 
     drivetrain.registerTelemetry(logger::telemeterize);
   }
@@ -145,7 +167,8 @@ public class RobotContainer {
   public void resetPositionForAuto(Limelight limelight) {
     if (autoChooser.getSelected() instanceof PathPlannerAuto auto) {
       Pose2d startingPose = auto.getStartingPose();
-      if (startingPose == null) return;
+      if (startingPose == null)
+        return;
 
       if (DriverStation.getAlliance().isPresent()
           && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
