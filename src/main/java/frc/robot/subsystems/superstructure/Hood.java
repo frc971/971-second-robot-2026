@@ -15,7 +15,7 @@ public abstract class Hood extends LinearSubsystem {
 
   private static final double B = 4.200000;
   private static final double C = 4.966135;
-  private static final double ANGLE_OFFSET_RAD = 0; // TODO: not changed yet
+  private static final double ANGLE_OFFSET_RAD = 2.01191398353;
   private static final double SCREW_OFFSET_INCH = 2.75;
 
   public Hood(MotorConfig motorConfig) {
