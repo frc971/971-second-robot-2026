@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,10 +45,11 @@ public class RobotContainer {
 
   /* Setting up bindings for necessary control of the swerve drive platform */
 
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
-      .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.FieldCentric drive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   // Current values are placeholders and should be tuned for optimal robot control
   // Slew rate limit for translation (m/s^2)
@@ -76,8 +78,12 @@ public class RobotContainer {
   private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private final DoubleSubscriber vxSub = inst.getDoubleTopic("/pathing/vx").subscribe(0.0);
   private final DoubleSubscriber vySub = inst.getDoubleTopic("/pathing/vy").subscribe(0.0);
-  private final BooleanSubscriber pathingEnabled = inst.getBooleanTopic("/pathing/enabled").subscribe(false);
-  private final BooleanPublisher pathingEnabledPub = inst.getBooleanTopic("/pathing/enabled").publish();
+  private final BooleanSubscriber pathingEnabled =
+      inst.getBooleanTopic("/pathing/enabled").subscribe(false);
+  private final BooleanPublisher pathingEnabledPub =
+      inst.getBooleanTopic("/pathing/enabled").publish();
+  private final StructPublisher<Pose2d> targetPub =
+      inst.getStructTopic("/pathing/target", Pose2d.struct).publish();
 
   public RobotContainer() {
     superstructure = new Superstructure(this);
@@ -88,12 +94,15 @@ public class RobotContainer {
     AutoBuilder.getAllAutoNames().stream()
         .sorted()
         .forEach(
-            autoName -> autoChooser.addOption(
-                autoName + " (Mirrored)", new PathPlannerAuto(autoName, true)));
+            autoName ->
+                autoChooser.addOption(
+                    autoName + " (Mirrored)", new PathPlannerAuto(autoName, true)));
 
     SmartDashboard.putData("Auto Mode", autoChooser);
 
     configureDrivetrain();
+
+    targetPub.set(new Pose2d(8.0, 4.0, Rotation2d.kZero));
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -102,8 +111,7 @@ public class RobotContainer {
     // Warmup PathPlanner to avoid Java pauses
     CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
 
-    if (Robot.isSimulation())
-      drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
+    if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
   }
 
   private void registerNamedCommands() {
@@ -167,8 +175,7 @@ public class RobotContainer {
   public void resetPositionForAuto(Limelight limelight) {
     if (autoChooser.getSelected() instanceof PathPlannerAuto auto) {
       Pose2d startingPose = auto.getStartingPose();
-      if (startingPose == null)
-        return;
+      if (startingPose == null) return;
 
       if (DriverStation.getAlliance().isPresent()
           && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
