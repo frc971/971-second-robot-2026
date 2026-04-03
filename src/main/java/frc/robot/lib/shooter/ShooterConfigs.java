@@ -51,7 +51,6 @@ public class ShooterConfigs {
     table.put(Meters.of(2.5), Degrees.of(41.6492543046), RotationsPerSecond.of(15.6753316472));
     table.put(Meters.of(3.0), Degrees.of(36.8586755743), RotationsPerSecond.of(16.6385620582));
 
-    table.put(Meters.of(1.0), Seconds.of(0)); // do not delete, would cause errors
     return table;
   }
 
@@ -68,17 +67,6 @@ public class ShooterConfigs {
     table.put(Meters.of(5.23), Degrees.of(41), RotationsPerSecond.of(64.0));
     table.put(Meters.of(5.69375), Degrees.of(48.4375), RotationsPerSecond.of(69.53125));
 
-    table.put(Meters.of(0.01), Seconds.of(0.0)); // do not delete, would cause errors
-    table.put(Meters.of(1.07), Seconds.of(1.15));
-    table.put(Meters.of(1.47), Seconds.of(1.15));
-    table.put(Meters.of(2.0), Seconds.of(1.28));
-    table.put(Meters.of(2.5), Seconds.of(1.1));
-    table.put(Meters.of(3.0), Seconds.of(1.0));
-    table.put(Meters.of(3.5), Seconds.of(1.2));
-    table.put(Meters.of(4.0), Seconds.of(1.1));
-    table.put(Meters.of(4.5), Seconds.of(1.28));
-    table.put(Meters.of(5.0), Seconds.of(1.383));
-    table.put(Meters.of(6.0), Seconds.of(1.3)); // 32% vibed
     return table;
   }
 
@@ -93,17 +81,6 @@ public class ShooterConfigs {
     table.put(Meters.of(3.74519), Degrees.of(31.25000), RotationsPerSecond.of(54.68750));
     table.put(Meters.of(5.50000), Degrees.of(40.62500), RotationsPerSecond.of(60.93750));
 
-    table.put(Meters.of(0.01), Seconds.of(0.0)); // do not delete, would cause errors
-    table.put(Meters.of(1.07), Seconds.of(1.15));
-    table.put(Meters.of(1.47), Seconds.of(1.15));
-    table.put(Meters.of(2.0), Seconds.of(1.28));
-    table.put(Meters.of(2.5), Seconds.of(1.1));
-    table.put(Meters.of(3.0), Seconds.of(1.0));
-    table.put(Meters.of(3.5), Seconds.of(1.2));
-    table.put(Meters.of(4.0), Seconds.of(1.1));
-    table.put(Meters.of(4.5), Seconds.of(1.28));
-    table.put(Meters.of(5.0), Seconds.of(1.383));
-    table.put(Meters.of(6.0), Seconds.of(1.3)); // 32% vibed
     return table;
   }
 
@@ -115,10 +92,6 @@ public class ShooterConfigs {
     table.put(Meters.of(5.0), Degrees.of(40.0), RotationsPerSecond.of(65));
     table.put(Meters.of(10.0), Degrees.of(40.0), RotationsPerSecond.of(70));
 
-    table.put(Meters.of(0.0), Seconds.of(0));
-    table.put(Meters.of(2.5), Seconds.of(0.4));
-    table.put(Meters.of(5.0), Seconds.of(0.5));
-    table.put(Meters.of(10.0), Seconds.of(0.8));
     return table;
   }
 

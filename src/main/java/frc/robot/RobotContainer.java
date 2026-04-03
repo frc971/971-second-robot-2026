@@ -30,10 +30,6 @@ import frc.robot.subsystems.superstructure.Superstructure;
 public class RobotContainer {
   public final Superstructure superstructure;
 
-  private static final double SUPERCHARGED_SPEED = 4.0;
-  private static final double SUPERCHARGED_ANGULAR_RATE =
-      RotationsPerSecond.of(1.0).in(RadiansPerSecond);
-
   private static final double MAX_SPEED = 3.4;
   private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
 
@@ -41,23 +37,12 @@ public class RobotContainer {
   private static final double ROTATION_DEADBAND = 0.1;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
-  private final SwerveRequest.FieldCentric superchargedDrive =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(SUPERCHARGED_SPEED * TRANSLATION_DEADBAND)
-          .withRotationalDeadband(SUPERCHARGED_ANGULAR_RATE * ROTATION_DEADBAND)
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
           .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
           .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
-  // Current values are placeholders and should be tuned for optimal robot control
-  // Slew rate limit for translation (m/s^2)
-  private static final double SUPERCHARGED_SLEW_TRANSLATE_LIMIT = 100.0;
-  // Slew rate limit for rotation (rad/s^2)
-  private static final double SUPERCHARGED_SLEW_ROTATION_LIMIT = 100.0;
 
   // Current values are placeholders and should be tuned for optimal robot control
   // Slew rate limit for translation (m/s^2)
@@ -74,13 +59,6 @@ public class RobotContainer {
   private static final SlewRateLimiter X_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
   private static final SlewRateLimiter Y_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
   private static final SlewRateLimiter ROT_LIMITER = new SlewRateLimiter(SLEW_ROTATION_LIMIT);
-
-  private static final SlewRateLimiter SUPERCHARGED_X_LIMITER =
-      new SlewRateLimiter(SUPERCHARGED_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SUPERCHARGED_Y_LIMITER =
-      new SlewRateLimiter(SUPERCHARGED_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SUPERCHARGED_ROT_LIMITER =
-      new SlewRateLimiter(SUPERCHARGED_SLEW_ROTATION_LIMIT);
 
   private static final JoystickValues JOYSTICK_VALUES = new JoystickValues();
 

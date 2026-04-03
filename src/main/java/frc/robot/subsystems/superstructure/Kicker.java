@@ -6,9 +6,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.lib.superstructure.*;
 
-// TODO: change the constants
 public class Kicker extends MotorSubsystem {
-  Kicker() {
+  public Kicker() {
     super(getMotorConfig());
   }
 
@@ -16,19 +15,19 @@ public class Kicker extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
-    tc.CurrentLimits.StatorCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 70.0;
+    tc.CurrentLimits.StatorCurrentLimit = 120.0;
 
-    tc.Feedback.SensorToMechanismRatio = 1.0 / 1.0; // Motor to output gear ratio (small rollers)
+    tc.Feedback.SensorToMechanismRatio = 0.0;
 
     return MotorConfig.builder()
         .NAME("Kicker")
-        .ID(16)
-        .BUS(new CANBus("Left Superstructure"))
+        .ID(15)
+        .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();
   }
