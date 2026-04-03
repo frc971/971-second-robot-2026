@@ -24,7 +24,7 @@ public class ShooterConfig {
   @Getter
   public static class Physics {
     @Builder.Default private double GRAVITY = 9.807;
-    @Builder.Default private Angle VELOCITY_ANGLE_AT_TARGET = Degrees.of(-40.0);
+    @Builder.Default private Angle VELOCITY_ANGLE_AT_TARGET = Degrees.of(-45.0);
     @Builder.Default private ShotTable SHUTTLE_TABLE = new ShotTable();
     @Builder.Default private ShotTable SHOT_TABLE = new ShotTable();
     @Builder.Default private ExitSpeedTable EXIT_SPEED_TABLE = new ExitSpeedTable();
