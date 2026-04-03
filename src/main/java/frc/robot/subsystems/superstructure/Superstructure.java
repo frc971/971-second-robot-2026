@@ -283,7 +283,7 @@ public class Superstructure {
     kicker.periodic();
     turretRight.periodic();
     turretLeft.periodic();
-    // groundPivot.periodic();
+    groundPivot.periodic();
     groundRollers.periodic();
 
     visualization.periodic();
