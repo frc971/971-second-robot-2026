@@ -365,12 +365,10 @@ public class Superstructure {
   }
 
   public Command intakePivotDownAuto() {
-    return Commands.race(
-        Commands.run(
-            () -> {
-              groundPivot.setVoltage(Volts.of(-4.0));
-            }),
-        Commands.waitSeconds(2));
+    return Commands.runOnce(
+        () -> {
+          setGoal(SetpointGoal.INTAKE_PIVOT);
+        });
   }
 
   public Command deployedAuto() {
