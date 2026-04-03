@@ -29,8 +29,12 @@ public class JoystickValues {
   }
 
   public JoystickValues clampVelocity(double maxSpeed, double maxRotation) {
-    x = MathUtil.clamp(x, -maxSpeed, maxSpeed);
-    y = MathUtil.clamp(y, -maxSpeed, maxSpeed);
+    double magnitude = Math.hypot(x, y);
+    if (magnitude > maxSpeed) {
+      double scale = maxSpeed / magnitude;
+      x *= scale;
+      y *= scale;
+    }
     rot = MathUtil.clamp(rot, -maxRotation, maxRotation);
     return this;
   }
