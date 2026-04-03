@@ -51,8 +51,6 @@ public class Superstructure {
     TARGETING
   }
 
-  @AutoLogOutput double bigH = 0;  
-
   public Superstructure(RobotContainer robotContainer) {
     drivetrain = robotContainer.drivetrain;
     flywheelRight = new FlywheelRight();
@@ -238,17 +236,6 @@ public class Superstructure {
     shooterHandlerLeft.periodic();
     shooterHandlerRight.periodic();
 
-    double step = 1.0/50.0;
-    if (Controllers.TROY.a().getAsBoolean()) bigH += step;
-    if (Controllers.TROY.b().getAsBoolean()) bigH -= step;
-    bigH = Math.min(3.3,Math.max(0, bigH));
-    hoodLeft.setPosition(Inches.of(bigH));
-    hoodRight.setPosition(Inches.of(bigH));
-    if (Controllers.TROY.rightTrigger().getAsBoolean()) {
-    flywheelLeft.setVelocity(RotationsPerSecond.of(50));
-    flywheelRight.setVelocity(RotationsPerSecond.of(50));
-    }
-
     // subsystems
     flywheelRight.periodic();
     flywheelLeft.periodic();
@@ -259,7 +246,7 @@ public class Superstructure {
     kicker.periodic();
     turretRight.periodic();
     turretLeft.periodic();
-    //groundPivot.periodic();
+    // groundPivot.periodic();
     groundRollers.periodic();
 
     visualization.periodic();
