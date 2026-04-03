@@ -33,11 +33,11 @@
     {
       "anchor": {
         "x": 8.225699346633185,
-        "y": 3.6022912016369046
+        "y": 4.025420862268518
       },
       "prevControl": {
         "x": 8.237781343005953,
-        "y": 3.902658807663691
+        "y": 4.325788468295305
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,36 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.4001822270471463,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "IntakePivotDown"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.8050558312655074,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.5,
     "maxAcceleration": 6.0,

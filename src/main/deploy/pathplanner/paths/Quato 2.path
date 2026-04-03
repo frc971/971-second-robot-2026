@@ -16,28 +16,28 @@
     },
     {
       "anchor": {
-        "x": 5.7809048316592255,
-        "y": 5.510125093005952
+        "x": 5.8031356870751525,
+        "y": 5.574541812043638
       },
       "prevControl": {
-        "x": 6.064500383649554,
-        "y": 5.513642636253722
+        "x": 6.086731239065481,
+        "y": 5.5780593552914075
       },
       "nextControl": {
-        "x": 4.7662604838685425,
-        "y": 5.497540074131676
+        "x": 4.7884913392844695,
+        "y": 5.561956793169362
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.1918910435267858,
-        "y": 5.510125093005952
+        "x": 3.1092436191343893,
+        "y": 5.574541812043638
       },
       "prevControl": {
-        "x": 3.9636604236421134,
-        "y": 5.482902367001487
+        "x": 3.881012999249717,
+        "y": 5.547319086039173
       },
       "nextControl": null,
       "isLocked": false,
@@ -52,14 +52,26 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.5183777915632755,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Deployed"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.5,
     "maxAcceleration": 6.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 540.0,
     "nominalVoltage": 12.0,
-    "unlimited": true
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
@@ -69,7 +81,7 @@
   "folder": "THRICE Rush",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }
