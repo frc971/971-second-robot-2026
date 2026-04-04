@@ -151,8 +151,8 @@ public class RobotContainer {
                         Controllers.TROY.getRightX())
                     .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
                     .scale(
-                        -MAX_SPEED, // Negative max speed and angular rate since
-                        -MAX_ANGULAR_RATE) // controller inputs are reversed
+                        -SHOOTING_SPEED, // Negative max speed and angular rate since
+                        -SHOOTING_ANGULAR_RATE) // controller inputs are reversed
                     .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
                     .slewRateLimit(SHOOTING_X_LIMITER, SHOOTING_Y_LIMITER, SHOOTING_ROT_LIMITER);
                 return shootingDrive
