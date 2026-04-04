@@ -6,8 +6,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.lib.superstructure.*;
 
-public class GroundRollers extends MotorSubsystem {
-  public GroundRollers() {
+public class RollerFloor extends MotorSubsystem {
+  public RollerFloor() {
     super(getMotorConfig());
   }
 
@@ -19,12 +19,14 @@ public class GroundRollers extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
-    tc.CurrentLimits.StatorCurrentLimit = 80.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
+    tc.CurrentLimits.StatorCurrentLimit = 50.0;
+
+    tc.Feedback.SensorToMechanismRatio = 0.0;
 
     return MotorConfig.builder()
-        .NAME("Ground Roller Lead")
-        .ID(20)
+        .NAME("Roller Floor")
+        .ID(21)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();

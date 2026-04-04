@@ -26,7 +26,7 @@ public class ShooterHandler {
   public static final class Targets {
     private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
     private static final double HUB_RADIUS = 14;
-    private static final double HUB_HEIGHT = 1.63254385;
+    private static final double HUB_HEIGHT = 1.430425;
 
     public static final ObjectState BLUE =
         new ObjectState(
