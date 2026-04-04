@@ -54,7 +54,7 @@ public class Superstructure {
   public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
-  private final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.3556);
+  private static final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.3556);
 
   private enum ShooterGoal {
     NONE,
@@ -153,6 +153,9 @@ public class Superstructure {
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                   ? ShooterHandler.Targets.BLUE
                   : ShooterHandler.Targets.RED;
+          
+          setHubTarget(); 
+          
           if (Controllers.SHUTTLE_LEFT.getAsBoolean()) {
             curTarget =
                 DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
@@ -165,6 +168,8 @@ public class Superstructure {
                     ? ShooterHandler.Targets.RIGHT_BLUE_SHUTTLE
                     : ShooterHandler.Targets.RIGHT_RED_SHUTTLE;
           }
+
+          
           shooterHandlerLeft.setTargetState(curTarget);
           shooterHandlerRight.setTargetState(curTarget);
         }
@@ -271,23 +276,6 @@ public class Superstructure {
       }
     }
 
-    ObjectState currentHub =
-        (DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue)
-            ? ShooterHandler.Targets.BLUE
-            : ShooterHandler.Targets.RED;
-
-    Translation2d goal2D =
-        getHubTargetPoint(
-            drivetrain.getState().Pose.getTranslation(),
-            currentHub.xyPos(),
-            CENTER_TO_BACK_HUB_OFFSET);
-    ObjectState goal3D =
-        new ObjectState(
-            new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
-            new Translation3d());
-
-    shooterHandlerLeft.setTargetState(goal3D);
-    shooterHandlerRight.setTargetState(goal3D);
 
     shooterHandlerLeft.periodic();
     shooterHandlerRight.periodic();
@@ -313,7 +301,7 @@ public class Superstructure {
 
   // MARK: Helper functions
 
-  public static Translation2d getHubTargetPoint(
+  private static Translation2d getHubTargetPoint(
       Translation2d robot, Translation2d center, Distance radius) {
 
     Translation2d centerToRobot = robot.minus(center);
@@ -322,6 +310,26 @@ public class Superstructure {
     Translation2d ans = center.minus(unitDir.times(radius.in(Meters)));
     Logger.recordOutput("Superstructure/Hub Target Point", new Pose2d(ans, Rotation2d.kZero));
     return ans;
+  }
+
+  private void setHubTarget() {
+      ObjectState currentHub
+              = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
+              ? ShooterHandler.Targets.BLUE
+              : ShooterHandler.Targets.RED;
+
+      Translation2d goal2D
+              = getHubTargetPoint(
+                      drivetrain.getState().Pose.getTranslation(),
+                      currentHub.xyPos(),
+                      CENTER_TO_BACK_HUB_OFFSET);
+      ObjectState goal3D
+              = new ObjectState(
+                      new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
+                      new Translation3d());
+
+      shooterHandlerLeft.setTargetState(goal3D);
+      shooterHandlerRight.setTargetState(goal3D);
   }
 
   public void setGoal(Setpoint setpoint) {
@@ -418,13 +426,7 @@ public class Superstructure {
   public Command shootAuto() {
     return Commands.runOnce(
         () -> {
-          ObjectState curTarget =
-              DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                  ? ShooterHandler.Targets.BLUE
-                  : ShooterHandler.Targets.RED;
-          shooterHandlerLeft.setTargetState(curTarget);
-          shooterHandlerRight.setTargetState(curTarget);
-
+          setHubTarget();
           shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
         });
@@ -433,12 +435,7 @@ public class Superstructure {
   public Command shootSequenceAuto() {
     return Commands.run(
         () -> {
-          ObjectState curTarget =
-              DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                  ? ShooterHandler.Targets.BLUE
-                  : ShooterHandler.Targets.RED;
-          shooterHandlerLeft.setTargetState(curTarget);
-          shooterHandlerRight.setTargetState(curTarget);
+          setHubTarget();
           shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
         });
