@@ -2,6 +2,8 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -225,6 +227,19 @@ public class Superstructure {
       }
     }
 
+    ObjectState currentHub =
+        (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
+            ? ShooterHandler.Targets.BLUE
+            : ShooterHandler.Targets.RED;
+
+    Translation2d goal2D = getHubTargetPoint(drivetrain.getState().Pose.getTranslation(), currentHub.xyPos(), 0.3556);
+    ObjectState goal3D = new ObjectState(
+            new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
+            new Translation3d());
+
+    shooterHandlerLeft.setTargetState(goal3D);
+    shooterHandlerRight.setTargetState(goal3D);
+
     shooterHandlerLeft.periodic();
     shooterHandlerRight.periodic();
 
@@ -243,6 +258,18 @@ public class Superstructure {
   }
 
   // MARK: Helper functions
+
+
+    public static Translation2d getHubTargetPoint(
+            Translation2d robot,
+            Translation2d center,
+            double radius) {
+
+        Translation2d centerToRobot = robot.minus(center);
+        double distance = centerToRobot.getNorm();
+        Translation2d unitDir = centerToRobot.div(distance);
+        return center.minus(unitDir.times(radius));
+    }
 
   public void setGoal(Setpoint setpoint) {
     if (setpoint.getIndexer().isPresent()) {
