@@ -14,7 +14,12 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -267,12 +272,14 @@ public class Superstructure {
     }
 
     ObjectState currentHub =
-        (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
+        (DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue)
             ? ShooterHandler.Targets.BLUE
             : ShooterHandler.Targets.RED;
 
-    Translation2d goal2D = getHubTargetPoint(drivetrain.getState().Pose.getTranslation(), currentHub.xyPos(), 0.3556);
-    ObjectState goal3D = new ObjectState(
+    Translation2d goal2D =
+        getHubTargetPoint(drivetrain.getState().Pose.getTranslation(), currentHub.xyPos(), 0.3556);
+    ObjectState goal3D =
+        new ObjectState(
             new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
             new Translation3d());
 
@@ -303,17 +310,16 @@ public class Superstructure {
 
   // MARK: Helper functions
 
+  public static Translation2d getHubTargetPoint(
+      Translation2d robot, Translation2d center, double radius) {
 
-    public static Translation2d getHubTargetPoint(
-            Translation2d robot,
-            Translation2d center,
-            double radius) {
-
-        Translation2d centerToRobot = robot.minus(center);
-        double distance = centerToRobot.getNorm();
-        Translation2d unitDir = centerToRobot.div(distance);
-        return center.minus(unitDir.times(radius));
-    }
+    Translation2d centerToRobot = robot.minus(center);
+    double distance = centerToRobot.getNorm();
+    Translation2d unitDir = centerToRobot.div(distance);
+    Translation2d ans = center.minus(unitDir.times(radius));
+    Logger.recordOutput("Superstructure/Hub Target Point", new Pose2d(ans, Rotation2d.kZero));
+    return ans;
+  }
 
   public void setGoal(Setpoint setpoint) {
     if (setpoint.getRollerFloor().isPresent()) {
