@@ -8,9 +8,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Time;
 import frc.robot.lib.shooter.ShotTable.ShooterData;
 
 public class ShooterPhysics {
+  private static final Time TURRET_VELOCITY_LOOKAHEAD = Milliseconds.of(20);
   private final ShooterConfig.Physics physicsConfig;
 
   public ShooterPhysics(ShooterConfig.Physics physicsConfig) {
@@ -25,6 +27,18 @@ public class ShooterPhysics {
    * - interpolation of angle + speed is close enough (aka ~linear)
    */
   public LaunchSolution stationaryInterpolation(
+      ObjectState proj, ObjectState target, ShotTable table) {
+    LaunchSolution current = stationaryInterpolationRaw(proj, target, table);
+    LaunchSolution future =
+        stationaryInterpolationRaw(
+            proj.getFutureState(TURRET_VELOCITY_LOOKAHEAD),
+            target.getFutureState(TURRET_VELOCITY_LOOKAHEAD),
+            table);
+
+    return withTurretVelocity(current, future);
+  }
+
+  private LaunchSolution stationaryInterpolationRaw(
       ObjectState proj, ObjectState target, ShotTable table) {
     Translation2d distance2d = target.minus(proj).xyPos();
 
@@ -42,7 +56,16 @@ public class ShooterPhysics {
    * @return LaunchSolution, or null if the shot is impossible
    */
   public LaunchSolution twiceSolve(ObjectState proj, ObjectState target) {
+    LaunchSolution current = twiceSolveRaw(proj, target);
+    LaunchSolution future =
+        twiceSolveRaw(
+            proj.getFutureState(TURRET_VELOCITY_LOOKAHEAD),
+            target.getFutureState(TURRET_VELOCITY_LOOKAHEAD));
 
+    return withTurretVelocity(current, future);
+  }
+
+  private LaunchSolution twiceSolveRaw(ObjectState proj, ObjectState target) {
     Translation2d distance2d = target.minus(proj).xyPos();
     double currentDistance = distance2d.getNorm();
 
@@ -78,6 +101,16 @@ public class ShooterPhysics {
   }
 
   public LaunchSolution thriceSolve(ObjectState proj, ObjectState target) {
+    LaunchSolution current = thriceSolveRaw(proj, target);
+    LaunchSolution future =
+        thriceSolveRaw(
+            proj.getFutureState(TURRET_VELOCITY_LOOKAHEAD),
+            target.getFutureState(TURRET_VELOCITY_LOOKAHEAD));
+
+    return withTurretVelocity(current, future);
+  }
+
+  private LaunchSolution thriceSolveRaw(ObjectState proj, ObjectState target) {
     Translation2d distance2d = target.minus(proj).xyPos();
     double currentDistance = distance2d.getNorm();
 
@@ -135,5 +168,18 @@ public class ShooterPhysics {
         physicsConfig.EXIT_SPEED_TABLE().calcAngularVel(MetersPerSecond.of(vBall.getNorm()));
 
     return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
+  }
+
+  private LaunchSolution withTurretVelocity(LaunchSolution current, LaunchSolution future) {
+    if (current == null) return null;
+    if (future == null) return current;
+
+    double turretOmega =
+        MathUtil.angleModulus(
+                future.turretRotation.getRadians() - current.turretRotation.getRadians())
+            / TURRET_VELOCITY_LOOKAHEAD.in(Seconds);
+
+    return new LaunchSolution(
+        current.shooterData, current.turretRotation, RadiansPerSecond.of(turretOmega));
   }
 }

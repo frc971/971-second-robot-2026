@@ -250,7 +250,7 @@ public class ShooterHandler {
       flywheel.setVelocity(desiredFlywheel);
 
       // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
-      turret.setPosition(desiredTurretRel);
+      turret.setPositionVoltage(desiredTurretRel, getRelativeTurretVelocity());
     }
 
     // ShooterHandler no longer commands hood here.
@@ -284,6 +284,12 @@ public class ShooterHandler {
         absolute.minus(Degrees.of(drivetrain.getState().Pose.getRotation().getDegrees()));
 
     return Radians.of(MathUtil.angleModulus(relative.in(Radians)));
+  }
+
+  public AngularVelocity getRelativeTurretVelocity() {
+    return RadiansPerSecond.of(
+        launchSolution.turretVelocity().in(RadiansPerSecond)
+            - drivetrain.getState().Speeds.omegaRadiansPerSecond);
   }
 
   private void logStates() {
