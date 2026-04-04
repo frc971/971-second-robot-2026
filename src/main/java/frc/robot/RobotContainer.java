@@ -36,10 +36,10 @@ public class RobotContainer {
   private static final double TRANSLATION_DEADBAND = 0.05;
   private static final double ROTATION_DEADBAND = 0.1;
 
-  private static final double SHOOTING_SPEED = 4.0;
-  private static final double SHOOTING_ANGULAR_RATE =
-      RotationsPerSecond.of(1.0).in(RadiansPerSecond);
   private static final double SHOOTING_FRACTION = 0.2;
+  private static final double SHOOTING_SPEED = MAX_SPEED * SHOOTING_FRACTION;
+  private static final double SHOOTING_ANGULAR_RATE =
+      RotationsPerSecond.of(1.0).in(RadiansPerSecond) * SHOOTING_FRACTION;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric shootingDrive =
@@ -130,19 +130,20 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () -> {
-              if (Controllers.SHOOT_EDGE.rising()) {
+              if (Controllers.SHOOT_EDGE.rising() || Controllers.SHOOT_REDUNDANCY_EDGE.rising()) {
                 SHOOTING_X_LIMITER.reset(X_LIMITER.lastValue());
                 SHOOTING_Y_LIMITER.reset(Y_LIMITER.lastValue());
                 SHOOTING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
               }
 
-              if (Controllers.SHOOT_EDGE.falling()) {
+              if (Controllers.SHOOT_EDGE.falling() || Controllers.SHOOT_REDUNDANCY_EDGE.falling()) {
                 X_LIMITER.reset(SHOOTING_X_LIMITER.lastValue());
                 Y_LIMITER.reset(SHOOTING_Y_LIMITER.lastValue());
                 ROT_LIMITER.reset(SHOOTING_ROT_LIMITER.lastValue());
               }
 
-              if (Controllers.SHOOT_REDUNDANCY.getAsBoolean()) {
+              if (Controllers.SHOOT_REDUNDANCY.getAsBoolean()
+                  || Controllers.SHOOT_EDGE.getAsBoolean()) {
                 JOYSTICK_VALUES
                     .setValues(
                         Controllers.TROY.getLeftY(),
@@ -153,8 +154,6 @@ public class RobotContainer {
                         -MAX_SPEED, // Negative max speed and angular rate since
                         -MAX_ANGULAR_RATE) // controller inputs are reversed
                     .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
-                    .clampVelocity(
-                        MAX_SPEED * SHOOTING_FRACTION, MAX_ANGULAR_RATE * SHOOTING_FRACTION)
                     .slewRateLimit(SHOOTING_X_LIMITER, SHOOTING_Y_LIMITER, SHOOTING_ROT_LIMITER);
                 return shootingDrive
                     .withVelocityX(JOYSTICK_VALUES.getX())

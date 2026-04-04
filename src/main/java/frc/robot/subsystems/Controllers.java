@@ -15,7 +15,7 @@ public class Controllers {
   public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
 
   public static final Trigger SHOOT_REDUNDANCY = TROY.axisGreaterThan(3, 0.9);
-  public static final Edge SHOOT_EDGE = new Edge(TROY.axisGreaterThan(3, 0.9));
+  public static final Edge SHOOT_REDUNDANCY_EDGE = new Edge(TROY.axisGreaterThan(3, 0.9));
 
   // === Software's Controls
   public static final Toggle TUNE_LEFT_TURRET = new Toggle(TROY.back());
@@ -36,6 +36,7 @@ public class Controllers {
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
   // public static final Trigger SHOOT = ANDRE.rightTrigger();
   public static final Trigger SHOOT = ANDRE.axisGreaterThan(3, 0.9);
+  public static final Edge SHOOT_EDGE = new Edge(TROY.axisGreaterThan(3, 0.9));
 
   public static final Trigger OUTTAKE = ANDRE.leftTrigger();
 
