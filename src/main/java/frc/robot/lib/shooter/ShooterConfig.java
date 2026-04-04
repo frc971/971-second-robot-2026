@@ -2,6 +2,7 @@ package frc.robot.lib.shooter;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.*;
 import lombok.Builder;
@@ -56,6 +57,7 @@ public class ShooterConfig {
     // positive y is towards PORT/LEFT side
     @Builder.Default private Translation3d TURRET_OFFSET = new Translation3d();
     @Builder.Default private Distance RADIUS_TO_BALL = Inches.of(0.0);
+    @Builder.Default private final Translation2d SHOOT_OFFSET = new Translation2d();
   }
 
   // AIMING thresholds (once below, will transition to SHOOTING)

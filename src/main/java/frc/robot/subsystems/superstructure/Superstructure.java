@@ -2,6 +2,8 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -294,9 +296,24 @@ public class Superstructure {
 
   private void setHubTarget() {
     shooterHandlerLeft.setTargetState(
-        ShooterHandler.Targets.getHubTargetPoint(drivetrain.getState().Pose));
+        shooterHandlerLeft.getHubTargetPoint(
+            drivetrain
+                .getState()
+                .Pose
+                .plus(
+                    new Transform2d(
+                        ShooterConfigs.LEFT.PHYSICAL_CONVERSION().SHOOT_OFFSET(),
+                        Rotation2d.kZero))));
+
     shooterHandlerRight.setTargetState(
-        ShooterHandler.Targets.getHubTargetPoint(drivetrain.getState().Pose));
+        shooterHandlerRight.getHubTargetPoint(
+            drivetrain
+                .getState()
+                .Pose
+                .plus(
+                    new Transform2d(
+                        ShooterConfigs.RIGHT.PHYSICAL_CONVERSION().SHOOT_OFFSET(),
+                        Rotation2d.kZero))));
   }
 
   public void setGoal(Setpoint setpoint) {
