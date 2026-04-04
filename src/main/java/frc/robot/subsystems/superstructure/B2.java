@@ -6,10 +6,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.lib.superstructure.*;
 
-// TODO: change the constant?
-
-public class SpindexerRight extends MotorSubsystem {
-  SpindexerRight() {
+public class B2 extends MotorSubsystem {
+  public B2() {
     super(getMotorConfig());
   }
 
@@ -17,19 +15,19 @@ public class SpindexerRight extends MotorSubsystem {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    tc.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
-    tc.CurrentLimits.StatorCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 70.0;
+    tc.CurrentLimits.StatorCurrentLimit = 120.0;
 
-    tc.Feedback.SensorToMechanismRatio = 1.0; // Motor to output gear ratio (small rollers)
+    tc.Feedback.SensorToMechanismRatio = 0.0;
 
     return MotorConfig.builder()
-        .NAME("Spindexer Right")
-        .ID(42)
-        .BUS(new CANBus("Right Superstructure"))
+        .NAME("B2")
+        .ID(18)
+        .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .build();
   }

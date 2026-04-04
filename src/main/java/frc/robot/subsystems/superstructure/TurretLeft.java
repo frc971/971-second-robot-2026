@@ -32,8 +32,7 @@ public class TurretLeft extends AngularSubsystem {
     tc.Slot0.kS = 0.0; // Static friction compensation
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    // tc.Slot0.kP = 200.0;
-    tc.Slot0.kP = 0.0; // Proportional gain
+    tc.Slot0.kP = 100.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
@@ -49,14 +48,15 @@ public class TurretLeft extends AngularSubsystem {
     tc.CurrentLimits.SupplyCurrentLimit = 50.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
-    tc.Feedback.SensorToMechanismRatio = 200.0 / 14.0; // Motor to output gear ratio
+    tc.Feedback.SensorToMechanismRatio =
+        (124.0 / 10.0) * (28.0 / 12.0); // Motor to output gear ratio
 
     tc.ClosedLoopGeneral.ContinuousWrap = ENABLE_WRAP;
 
     return MotorConfig.builder()
         .NAME("Turret Left")
         .ID(30)
-        .BUS(new CANBus("rio"))
+        .BUS(new CANBus("Superstructure Bus"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
         .build();

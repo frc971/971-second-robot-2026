@@ -10,13 +10,13 @@ import frc.robot.lib.superstructure.MotorConfig;
 import org.littletonrobotics.junction.Logger;
 
 public abstract class Hood extends LinearSubsystem {
-  public static final Distance UPPER_LIMIT = Inches.of(2.7);
+  public static final Distance UPPER_LIMIT = Inches.of(3.3);
   public static final Distance LOWER_LIMIT = Inches.of(0.0);
 
-  private static final double B = 4.8;
-  private static final double C = 6.181717;
-  private static final double ANGLE_OFFSET_RAD = 1.832;
-  private static final double SCREW_OFFSET_INCH = 3.0;
+  private static final double B = 4.200000;
+  private static final double C = 4.966135;
+  private static final double ANGLE_OFFSET_RAD = 2.01191398353;
+  private static final double SCREW_OFFSET_INCH = 2.75;
 
   public Hood(MotorConfig motorConfig) {
     super(motorConfig);

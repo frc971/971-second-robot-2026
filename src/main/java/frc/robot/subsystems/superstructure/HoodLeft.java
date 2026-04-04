@@ -21,12 +21,10 @@ public class HoodLeft extends Hood {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
     // Motion Magic PID and feedforward gains
-    // tc.Slot0.kS = 0.35;
     tc.Slot0.kS = 0.0; // Static friction compensation
     tc.Slot0.kG = 0.0; // Gravity compensation
 
-    // tc.Slot0.kP = 971.0;
-    tc.Slot0.kP = 0.0; // Proportional gain
+    tc.Slot0.kP = 971.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
@@ -47,8 +45,8 @@ public class HoodLeft extends Hood {
 
     return MotorConfig.builder()
         .NAME("Hood Left")
-        .ID(31)
-        .BUS(new CANBus("rio"))
+        .ID(33)
+        .BUS(new CANBus("Superstructure Bus"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Inches)
         .build();
