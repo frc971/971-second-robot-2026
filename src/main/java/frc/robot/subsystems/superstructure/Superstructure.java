@@ -102,16 +102,12 @@ public class Superstructure {
     if (DriverStation.isTeleop()) {
       setGoal(SetpointGoal.NEUTRAL.getSetpoint());
 
-      // boolean wantsShot =
-      //     Controllers.LEFT_SHUTTLE.getAsBoolean()
-      //         || Controllers.RIGHT_SHUTTLE.getAsBoolean()
-      //         || Controllers.SHOOT.getAsBoolean()
-      //         || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
-
       boolean wantsShot =
           Controllers.LEFT_SHUTTLE.getAsBoolean()
               || Controllers.RIGHT_SHUTTLE.getAsBoolean()
+              || Controllers.SHOOT.getAsBoolean()
               || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
+
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (!Controllers.MANUAL.toggled()) {
         shooterGoal = ShooterGoal.MANUAL;
@@ -365,10 +361,12 @@ public class Superstructure {
   }
 
   public Command intakePivotDownAuto() {
-    return Commands.runOnce(
-        () -> {
-          setGoal(SetpointGoal.INTAKE_PIVOT);
-        });
+    return Commands.race(
+        Commands.run(
+            () -> {
+              groundPivot.setVoltage(Volts.of(-4.0));
+            }),
+        Commands.waitSeconds(2));
   }
 
   public Command deployedAuto() {
