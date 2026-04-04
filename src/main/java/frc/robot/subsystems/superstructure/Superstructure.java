@@ -302,7 +302,7 @@ public class Superstructure {
             ? ShooterHandler.Targets.BLUE
             : ShooterHandler.Targets.RED;
 
-    ObjectState baseTarget = shooterHandlerLeft.getHubTargetPoint(drivetrain.getState().Pose);
+    ObjectState baseTarget = ShooterHandler.Targets.getHubTargetPoint(drivetrain.getState().Pose);
 
     double dx = baseTarget.xyPos().getX() - hub.xyPos().getX();
     double dy = baseTarget.xyPos().getY() - hub.xyPos().getY();

@@ -77,6 +77,30 @@ public class ShooterHandler {
                 FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.xyPos()).getY(),
                 LEFT_BLUE_SHUTTLE.position().getZ()),
             new Translation3d());
+
+    public static ObjectState getHubTargetPoint(Pose2d robotPose) {
+      Translation2d robot = robotPose.getTranslation();
+
+      ObjectState currentHub =
+          (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
+              ? ShooterHandler.Targets.BLUE
+              : ShooterHandler.Targets.RED;
+
+      Translation2d centerToRobot = robot.minus(currentHub.xyPos());
+      double distance = centerToRobot.getNorm();
+      Translation2d unitDir = centerToRobot.div(distance);
+      Translation2d goal2D =
+          currentHub.xyPos().minus(unitDir.times(Targets.CENTER_TO_BACK_HUB_OFFSET.in(Meters)));
+
+      ObjectState goal3D =
+          new ObjectState(
+              new Translation3d(goal2D.getX(), goal2D.getY(), Targets.BACKPLATE_Z),
+              new Translation3d());
+      Logger.recordOutput(
+          "Superstructure/Hub Target Point", new Pose3d(goal3D.position(), Rotation3d.kZero));
+
+      return goal3D;
+    }
   }
 
   public enum Side {
@@ -262,30 +286,6 @@ public class ShooterHandler {
 
     // ShooterHandler no longer commands hood here.
     // Superstructure applies hood via Optional<Angle> when indexing.
-  }
-
-  public ObjectState getHubTargetPoint(Pose2d robotPose) {
-    Translation2d robot = robotPose.getTranslation();
-
-    ObjectState currentHub =
-        (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
-            ? ShooterHandler.Targets.BLUE
-            : ShooterHandler.Targets.RED;
-
-    Translation2d centerToRobot = robot.minus(currentHub.xyPos());
-    double distance = centerToRobot.getNorm();
-    Translation2d unitDir = centerToRobot.div(distance);
-    Translation2d goal2D =
-        currentHub.xyPos().minus(unitDir.times(Targets.CENTER_TO_BACK_HUB_OFFSET.in(Meters)));
-
-    ObjectState goal3D =
-        new ObjectState(
-            new Translation3d(goal2D.getX(), goal2D.getY(), Targets.BACKPLATE_Z),
-            new Translation3d());
-    Logger.recordOutput(
-        name + "/Hub Target Point", new Pose3d(goal3D.position(), Rotation3d.kZero));
-
-    return goal3D;
   }
 
   private void liveTuning() {
