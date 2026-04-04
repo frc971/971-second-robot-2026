@@ -1,13 +1,21 @@
 {
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     {
-      "name": "C/C++ Runner: Debug Session",
-      "type": "lldb",
+      "type": "wpilib",
+      "name": "WPILib Desktop Debug",
       "request": "launch",
-      "args": [],
-      "cwd": "/Users/vibamohan/Downloads/Addadshashanammu/Almurbalarammi/Ashalmimilkala/Assurnabitashpi/Maelkashishi/Onnissiralis/Ularradallaku",
-      "program": "/Users/vibamohan/Downloads/Addadshashanammu/Almurbalarammi/Ashalmimilkala/Assurnabitashpi/Maelkashishi/Onnissiralis/Ularradallaku/build/Debug/outDebug"
+      "desktop": true,
+    },
+    {
+      "type": "wpilib",
+      "name": "WPILib roboRIO Debug",
+      "request": "launch",
+      "desktop": false,
     }
   ]
 }
