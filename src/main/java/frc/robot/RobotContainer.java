@@ -38,8 +38,7 @@ public class RobotContainer {
 
   private static final double SHOOTING_FRACTION = 0.2;
   private static final double SHOOTING_SPEED = MAX_SPEED * SHOOTING_FRACTION;
-  private static final double SHOOTING_ANGULAR_RATE =
-      RotationsPerSecond.of(1.0).in(RadiansPerSecond) * SHOOTING_FRACTION;
+  private static final double SHOOTING_ANGULAR_RATE = MAX_ANGULAR_RATE * SHOOTING_FRACTION;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric shootingDrive =
@@ -142,8 +141,7 @@ public class RobotContainer {
                 ROT_LIMITER.reset(SHOOTING_ROT_LIMITER.lastValue());
               }
 
-              if (Controllers.SHOOT_REDUNDANCY.getAsBoolean()
-                  || Controllers.SHOOT_EDGE.getAsBoolean()) {
+              if (Controllers.SHOOT_REDUNDANCY.getAsBoolean() || Controllers.SHOOT.getAsBoolean()) {
                 JOYSTICK_VALUES
                     .setValues(
                         Controllers.TROY.getLeftY(),
