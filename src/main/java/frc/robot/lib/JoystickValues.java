@@ -1,6 +1,5 @@
 package frc.robot.lib;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 
 public class JoystickValues {
@@ -25,17 +24,6 @@ public class JoystickValues {
     x = applyPowerCurve(x, translation_exp);
     y = applyPowerCurve(y, translation_exp);
     rot = applyPowerCurve(rot, rotation_exp);
-    return this;
-  }
-
-  public JoystickValues clampVelocity(double maxSpeed, double maxRotation) {
-    double magnitude = Math.hypot(x, y);
-    if (magnitude > maxSpeed) {
-      double scale = maxSpeed / magnitude;
-      x *= scale;
-      y *= scale;
-    }
-    rot = MathUtil.clamp(rot, -maxRotation, maxRotation);
     return this;
   }
 
