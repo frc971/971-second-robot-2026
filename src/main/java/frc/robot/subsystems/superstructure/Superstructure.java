@@ -56,6 +56,8 @@ public class Superstructure {
   public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
+  private final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.3556);
+
   private enum ShooterGoal {
     NONE,
     MANUAL,
@@ -277,7 +279,7 @@ public class Superstructure {
             : ShooterHandler.Targets.RED;
 
     Translation2d goal2D =
-        getHubTargetPoint(drivetrain.getState().Pose.getTranslation(), currentHub.xyPos(), 0.3556);
+        getHubTargetPoint(drivetrain.getState().Pose.getTranslation(), currentHub.xyPos(), CENTER_TO_BACK_HUB_OFFSET);
     ObjectState goal3D =
         new ObjectState(
             new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
@@ -311,12 +313,12 @@ public class Superstructure {
   // MARK: Helper functions
 
   public static Translation2d getHubTargetPoint(
-      Translation2d robot, Translation2d center, double radius) {
+      Translation2d robot, Translation2d center, Distance radius) {
 
     Translation2d centerToRobot = robot.minus(center);
     double distance = centerToRobot.getNorm();
     Translation2d unitDir = centerToRobot.div(distance);
-    Translation2d ans = center.minus(unitDir.times(radius));
+    Translation2d ans = center.minus(unitDir.times(radius.in(Meters)));
     Logger.recordOutput("Superstructure/Hub Target Point", new Pose2d(ans, Rotation2d.kZero));
     return ans;
   }
