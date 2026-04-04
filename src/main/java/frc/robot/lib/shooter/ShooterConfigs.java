@@ -112,14 +112,12 @@ public class ShooterConfigs {
 
     table.put(MetersPerSecond.of(0.00000), RotationsPerSecond.of(0.00000));
 
-    table.put(MetersPerSecond.of(5.76842), RotationsPerSecond.of(40.62500));
-    table.put(MetersPerSecond.of(6.19047), RotationsPerSecond.of(42.18750));
-    table.put(MetersPerSecond.of(6.68306), RotationsPerSecond.of(46.87500));
-    table.put(MetersPerSecond.of(6.97258), RotationsPerSecond.of(49.21875));
-    table.put(MetersPerSecond.of(7.01266), RotationsPerSecond.of(48.43750));
-    table.put(MetersPerSecond.of(7.21481), RotationsPerSecond.of(51.56250));
-    table.put(MetersPerSecond.of(8.02433), RotationsPerSecond.of(60.93750));
-    table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(117.557283));
+    table.put(MetersPerSecond.of(5.45568), RotationsPerSecond.of(36.71875));
+    table.put(MetersPerSecond.of(5.91819), RotationsPerSecond.of(40.62500));
+    table.put(MetersPerSecond.of(6.61531), RotationsPerSecond.of(45.70313));
+    table.put(MetersPerSecond.of(7.27521), RotationsPerSecond.of(50.00000));
+    table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813));
+    table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(89.3950053912));
 
     return table;
   }
