@@ -93,8 +93,7 @@ public class ShooterHandler {
 
       ObjectState goal3D =
           new ObjectState(
-              new Translation3d(goal2D.getX(), goal2D.getY(), HUB_HEIGHT),
-              new Translation3d());
+              new Translation3d(goal2D.getX(), goal2D.getY(), HUB_HEIGHT), new Translation3d());
       Logger.recordOutput(
           "Superstructure/Hub Target Point", new Pose3d(goal3D.position(), Rotation3d.kZero));
 
@@ -110,7 +109,7 @@ public class ShooterHandler {
   // config + physics model
   private ShooterConfig config;
   private ShooterPhysics physics;
-  private ObjectState projectileState;
+  private @Getter ObjectState projectileState;
   private @Setter @Getter ObjectState targetState;
   private final String name;
   private final Side side;
@@ -136,7 +135,7 @@ public class ShooterHandler {
   private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(2.0);
   private static final Angle TURRET_STEP = Degrees.of(2.0);
 
-  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.1);
+  public static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.1);
 
   // state machine
   public enum State {
@@ -205,18 +204,7 @@ public class ShooterHandler {
     if (isShuttle(targetState)) {
       launchSolution = physics.thriceSolve(projectileState, targetState);
     } else {
-      // use offset
-      Translation2d perpOffset =
-          new Translation2d(
-              PERPENDICULAR_TURRET_OFFSET.in(Meters),
-              new Rotation2d(
-                  targetState.minus(projectileState).xyPos().getAngle().getRadians()
-                      + ((side == Side.LEFT) ? Math.PI / 2 : -(Math.PI / 2))));
-
-      ObjectState adjustedTargetState =
-          targetState.plus(new Translation3d(perpOffset), new Translation3d());
-
-      launchSolution = physics.twiceSolve(projectileState, adjustedTargetState);
+      launchSolution = physics.twiceSolve(projectileState, targetState);
     }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled

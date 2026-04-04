@@ -2,7 +2,6 @@ package frc.robot.lib.shooter;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 public class ShooterConfigs {
@@ -19,7 +18,6 @@ public class ShooterConfigs {
               ShooterConfig.PhysicalConversion.builder()
                   .TURRET_OFFSET(
                       new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.44551))
-                  .SHOOT_OFFSET(new Translation2d(0, -0.2))
                   .build())
           .PHYSICS(
               ShooterConfig.Physics.builder()
@@ -35,7 +33,6 @@ public class ShooterConfigs {
               ShooterConfig.PhysicalConversion.builder()
                   .TURRET_OFFSET(
                       new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.44551))
-                  .SHOOT_OFFSET(new Translation2d(0, 0.2))
                   .build())
           .PHYSICS(
               ShooterConfig.Physics.builder()
