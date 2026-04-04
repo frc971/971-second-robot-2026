@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import java.util.Optional;
@@ -116,12 +117,22 @@ public class MotorTalonFX extends MotorIO {
 
   @Override
   public void setPositionVoltage(Angle goalPosition) {
-    setPositionVoltage(goalPosition.in(Rotations));
+    setPositionVoltage(goalPosition.in(Rotations), 0.0);
+  }
+
+  @Override
+  public void setPositionVoltage(Angle goalPosition, AngularVelocity goalVelocity) {
+    setPositionVoltage(goalPosition.in(Rotations), goalVelocity.in(RotationsPerSecond));
   }
 
   @Override
   public void setPositionVoltage(Distance goalPosition) {
-    setPositionVoltage(goalPosition.in(Meters));
+    setPositionVoltage(goalPosition.in(Meters), 0.0);
+  }
+
+  @Override
+  public void setPositionVoltage(Distance goalPosition, LinearVelocity goalVelocity) {
+    setPositionVoltage(goalPosition.in(Meters), goalVelocity.in(MetersPerSecond));
   }
 
   private void setDynamicMotionMagicPosition(double goalPosition) {
@@ -133,11 +144,12 @@ public class MotorTalonFX extends MotorIO {
             .withSlot(0));
   }
 
-  private void setPositionVoltage(double goalPosition) {
+  private void setPositionVoltage(double goalPosition, double goalVelocity) {
     motor.setControl(
         positionVoltageRequest
             .withPosition(goalPosition)
             .withFeedForward(feedforward)
+            .withVelocity(goalVelocity)
             .withEnableFOC(motorConfig.FOC())
             .withSlot(0));
   }

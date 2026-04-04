@@ -6,6 +6,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import java.util.Optional;
@@ -75,6 +76,8 @@ public abstract class MotorIO {
   /** Set angular goal position using PositionVoltage request */
   public abstract void setPositionVoltage(Angle goalPosition);
 
+  public abstract void setPositionVoltage(Angle goalPosition, AngularVelocity goalVelocity);
+
   /* Set linear goal position.
    *
    * Meant for elevators where gear ratio takes into account rotational to linear conversion.
@@ -83,6 +86,8 @@ public abstract class MotorIO {
 
   /** Set linear goal position using PositionVoltage request */
   public abstract void setPositionVoltage(Distance goalPosition);
+
+  public abstract void setPositionVoltage(Distance goalPosition, LinearVelocity goalVelocity);
 
   public abstract void resetPosition(Angle newPosition);
 

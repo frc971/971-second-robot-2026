@@ -6,6 +6,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
 
@@ -54,8 +55,18 @@ public class MotorSim extends MotorIO {
   }
 
   @Override
+  public void setPositionVoltage(Angle goalPosition, AngularVelocity goalVelocity) {
+    setPositionVoltage(goalPosition);
+  }
+
+  @Override
   public void setPositionVoltage(Distance goalPosition) {
     setPosition(goalPosition);
+  }
+
+  @Override
+  public void setPositionVoltage(Distance goalPosition, LinearVelocity goalVelocity) {
+    setPositionVoltage(goalPosition);
   }
 
   @Override
