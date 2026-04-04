@@ -203,7 +203,7 @@ public class Superstructure {
         }
       }
 
-      if (wantsShot && Controllers.INTAKE_ROLLERS.getAsBoolean()) {
+      if (wantsShot && !Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         groundPivot.setVoltage(Volts.of(3.0));
       } else if (Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);

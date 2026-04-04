@@ -30,8 +30,6 @@ public class Controllers {
   public static final Edge REVERT = new Edge(TROY.povLeft());
   public static final Edge HIT = new Edge(TROY.povRight());
 
-  public static final Trigger JUICE = TROY.a();
-
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
