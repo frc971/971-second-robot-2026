@@ -6,12 +6,15 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -26,6 +29,7 @@ public class ShooterHandler {
   public static final class Targets {
     private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
     private static final double HUB_HEIGHT = 1.430425;
+    private static final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.3556);
 
     public static final ObjectState BLUE =
         new ObjectState(
@@ -70,6 +74,28 @@ public class ShooterHandler {
                 FlippingUtil.flipFieldPosition(LEFT_BLUE_SHUTTLE.xyPos()).getY(),
                 LEFT_BLUE_SHUTTLE.position().getZ()),
             new Translation3d());
+
+    public static ObjectState getHubTargetPoint(Pose2d robotPose) {
+      Translation2d robot = robotPose.getTranslation();
+
+      ObjectState currentHub =
+          (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
+              ? ShooterHandler.Targets.BLUE
+              : ShooterHandler.Targets.RED;
+
+      Translation2d centerToRobot = robot.minus(currentHub.xyPos());
+      double distance = centerToRobot.getNorm();
+      Translation2d unitDir = centerToRobot.div(distance);
+      Translation2d goal2D =
+          currentHub.xyPos().minus(unitDir.times(CENTER_TO_BACK_HUB_OFFSET.in(Meters)));
+
+      ObjectState goal3D =
+          new ObjectState(
+              new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
+              new Translation3d());
+      Logger.recordOutput("Superstructure/Hub Target Point", new Pose2d(goal2D, Rotation2d.kZero));
+      return goal3D;
+    }
   }
 
   public enum Side {

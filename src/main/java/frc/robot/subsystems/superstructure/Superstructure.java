@@ -2,10 +2,6 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -17,7 +13,6 @@ import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -53,8 +48,6 @@ public class Superstructure {
 
   public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
-
-  private static final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.3556);
 
   private enum ShooterGoal {
     NONE,
@@ -299,35 +292,11 @@ public class Superstructure {
 
   // MARK: Helper functions
 
-  private static Translation2d getHubTargetPoint(
-      Translation2d robot, Translation2d center, Distance radius) {
-
-    Translation2d centerToRobot = robot.minus(center);
-    double distance = centerToRobot.getNorm();
-    Translation2d unitDir = centerToRobot.div(distance);
-    Translation2d ans = center.minus(unitDir.times(radius.in(Meters)));
-    Logger.recordOutput("Superstructure/Hub Target Point", new Pose2d(ans, Rotation2d.kZero));
-    return ans;
-  }
-
   private void setHubTarget() {
-    ObjectState currentHub =
-        (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
-            ? ShooterHandler.Targets.BLUE
-            : ShooterHandler.Targets.RED;
-
-    Translation2d goal2D =
-        getHubTargetPoint(
-            drivetrain.getState().Pose.getTranslation(),
-            currentHub.xyPos(),
-            CENTER_TO_BACK_HUB_OFFSET);
-    ObjectState goal3D =
-        new ObjectState(
-            new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
-            new Translation3d());
-
-    shooterHandlerLeft.setTargetState(goal3D);
-    shooterHandlerRight.setTargetState(goal3D);
+    shooterHandlerLeft.setTargetState(
+        ShooterHandler.Targets.getHubTargetPoint(drivetrain.getState().Pose));
+    shooterHandlerRight.setTargetState(
+        ShooterHandler.Targets.getHubTargetPoint(drivetrain.getState().Pose));
   }
 
   public void setGoal(Setpoint setpoint) {
