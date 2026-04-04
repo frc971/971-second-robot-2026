@@ -6,8 +6,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.lib.superstructure.*;
 
-public class B2 extends MotorSubsystem {
-  public B2() {
+public class Splitter extends MotorSubsystem {
+  public Splitter() {
     super(getMotorConfig());
   }
 
@@ -25,7 +25,7 @@ public class B2 extends MotorSubsystem {
     tc.Feedback.SensorToMechanismRatio = 0.0;
 
     return MotorConfig.builder()
-        .NAME("B2")
+        .NAME("Splitter")
         .ID(18)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)

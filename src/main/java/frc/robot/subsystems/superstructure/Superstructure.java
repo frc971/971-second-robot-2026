@@ -30,7 +30,7 @@ public class Superstructure {
   public final HoodLeft hoodLeft;
 
   public final RollerFloor rollerFloor;
-  public final B2 b2;
+  public final Splitter b2;
   public final Kicker kicker;
 
   public final GroundRollers groundRollers;
@@ -67,7 +67,7 @@ public class Superstructure {
     groundPivot = new GroundPivot();
     groundRollers = new GroundRollers();
     rollerFloor = new RollerFloor();
-    b2 = new B2();
+    b2 = new Splitter();
     kicker = new Kicker();
 
     shooterHandlerRight =
