@@ -1,9 +1,6 @@
 package frc.robot.lib.shooter;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Translation3d;
 
@@ -121,7 +118,8 @@ public class ShooterConfigs {
     table.put(MetersPerSecond.of(7.27521), RotationsPerSecond.of(50.00000));
     table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813));
     table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750));
-    table.put(MetersPerSecond.of(13.00000), RotationsPerSecond.of(89.39501));
+    table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(89.3950053912));
+
     return table;
   }
 
