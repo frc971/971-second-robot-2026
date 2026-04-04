@@ -164,8 +164,8 @@ public class Superstructure {
         }
       }
 
-      if (Controllers.JUICE.getAsBoolean()) {
-        groundPivot.setVoltage(Volts.of(-3.0));
+      if (wantsShot && Controllers.INTAKE_ROLLERS.getAsBoolean()) {
+        groundPivot.setVoltage(Volts.of(3.0));
       } else if (Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);
       } else {
@@ -224,7 +224,7 @@ public class Superstructure {
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
           || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
         if (groundPivot.getPosition().lt(Degrees.of(110))) {
-          groundPivot.setVoltage(Volts.of(-2.0));
+          groundPivot.setVoltage(Volts.of(2.0));
         }
         setGoal(SetpointGoal.INDEX);
       }
