@@ -2,8 +2,6 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -299,7 +297,10 @@ public class Superstructure {
   // MARK: Helper functions
 
   private void setHubTarget() {
-    ObjectState hub = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) ? ShooterHandler.Targets.BLUE : ShooterHandler.Targets.RED;
+    ObjectState hub =
+        (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
+            ? ShooterHandler.Targets.BLUE
+            : ShooterHandler.Targets.RED;
     ObjectState baseTarget = ShooterHandler.Targets.getHubTargetPoint(drivetrain.getState().Pose);
 
     double dx = baseTarget.xyPos().getX() - hub.xyPos().getX();
@@ -321,7 +322,7 @@ public class Superstructure {
                 baseTarget.position().getZ()),
             baseTarget.velocity());
 
-    double rightOffsetMagnitude = - ShooterHandler.PERPENDICULAR_TURRET_OFFSET.in(Meter);
+    double rightOffsetMagnitude = -ShooterHandler.PERPENDICULAR_TURRET_OFFSET.in(Meter);
     ObjectState rightTarget =
         new ObjectState(
             new Translation3d(
