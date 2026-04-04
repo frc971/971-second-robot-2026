@@ -14,7 +14,10 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+
 import org.littletonrobotics.junction.AutoLogOutput;
+
+import edu.wpi.first.math.geometry.Translation3d;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -149,8 +152,6 @@ public class Superstructure {
                   ? ShooterHandler.Targets.BLUE
                   : ShooterHandler.Targets.RED;
 
-          setHubTarget();
-
           if (Controllers.SHUTTLE_LEFT.getAsBoolean()) {
             curTarget =
                 DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
@@ -166,6 +167,10 @@ public class Superstructure {
 
           shooterHandlerLeft.setTargetState(curTarget);
           shooterHandlerRight.setTargetState(curTarget);
+
+            if (!Controllers.SHUTTLE_LEFT.getAsBoolean() && !Controllers.SHUTTLE_RIGHT.getAsBoolean()) {
+                setHubTarget();
+            }
         }
         case MANUAL -> {
           SetpointGoal setpoint = SetpointGoal.NEUTRAL;
@@ -295,25 +300,43 @@ public class Superstructure {
   // MARK: Helper functions
 
   private void setHubTarget() {
-    shooterHandlerLeft.setTargetState(
-        shooterHandlerLeft.getHubTargetPoint(
-            drivetrain
-                .getState()
-                .Pose
-                .plus(
-                    new Transform2d(
-                        ShooterConfigs.LEFT.PHYSICAL_CONVERSION().SHOOT_OFFSET(),
-                        Rotation2d.kZero))));
+      ObjectState hub
+              = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+              ? ShooterHandler.Targets.BLUE
+              : ShooterHandler.Targets.RED;
 
-    shooterHandlerRight.setTargetState(
-        shooterHandlerRight.getHubTargetPoint(
-            drivetrain
-                .getState()
-                .Pose
-                .plus(
-                    new Transform2d(
-                        ShooterConfigs.RIGHT.PHYSICAL_CONVERSION().SHOOT_OFFSET(),
-                        Rotation2d.kZero))));
+      ObjectState baseTarget = shooterHandlerLeft.getHubTargetPoint(drivetrain.getState().Pose);
+
+      double dx = baseTarget.xyPos().getX() - hub.xyPos().getX();
+      double dy = baseTarget.xyPos().getY() - hub.xyPos().getY();
+      double distance = Math.sqrt(dx * dx + dy * dy);
+
+      double dirX = dx / distance;
+      double dirY = dy / distance;
+
+      double perpX = -dirY;
+      double perpY = dirX;
+
+      double leftOffsetMagnitude = ShooterConfigs.LEFT.PHYSICAL_CONVERSION().SHOOT_OFFSET().getY();
+      ObjectState leftTarget
+              = new ObjectState(
+                      new Translation3d(
+                              baseTarget.xyPos().getX() + perpX * leftOffsetMagnitude,
+                              baseTarget.xyPos().getY() + perpY * leftOffsetMagnitude,
+                              baseTarget.position().getZ()),
+                      baseTarget.velocity());
+
+      double rightOffsetMagnitude = ShooterConfigs.RIGHT.PHYSICAL_CONVERSION().SHOOT_OFFSET().getY();
+      ObjectState rightTarget
+              = new ObjectState(
+                      new Translation3d(
+                              baseTarget.xyPos().getX() + perpX * rightOffsetMagnitude,
+                              baseTarget.xyPos().getY() + perpY * rightOffsetMagnitude,
+                              baseTarget.position().getZ()),
+                      baseTarget.velocity());
+
+      shooterHandlerLeft.setTargetState(leftTarget);
+      shooterHandlerRight.setTargetState(rightTarget);
   }
 
   public void setGoal(Setpoint setpoint) {
