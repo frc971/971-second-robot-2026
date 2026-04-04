@@ -10,37 +10,40 @@ import edu.wpi.first.math.geometry.Translation3d;
 public class ShooterConfigs {
   public static final ShooterConfig ALL_DEFAULTS = ShooterConfig.builder().build();
 
-  public static final ShooterConfig TEST_CONFIG = ShooterConfig.builder()
-      .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(testShotTable()).build())
-      .build();
-  public static final ShooterConfig RIGHT = ShooterConfig.builder()
-      .name("Shooter Right")
-      .PHYSICAL_CONVERSION(
-          ShooterConfig.PhysicalConversion.builder()
-              .TURRET_OFFSET(
-                  new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.44551))
-              .build())
-      .PHYSICS(
-          ShooterConfig.Physics.builder()
-              .EXIT_SPEED_TABLE(rightExitSpeedTable())
-              .SHOT_TABLE(shotTableRight())
-              .SHUTTLE_TABLE(shuttleTable())
-              .build())
-      .build();
-  public static final ShooterConfig LEFT = ShooterConfig.builder()
-      .name("Shooter Left")
-      .PHYSICAL_CONVERSION(
-          ShooterConfig.PhysicalConversion.builder()
-              .TURRET_OFFSET(
-                  new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.44551))
-              .build())
-      .PHYSICS(
-          ShooterConfig.Physics.builder()
-              .EXIT_SPEED_TABLE(leftExitSpeedTable())
-              .SHOT_TABLE(shotTableLeft())
-              .SHUTTLE_TABLE(shuttleTable())
-              .build())
-      .build();
+  public static final ShooterConfig TEST_CONFIG =
+      ShooterConfig.builder()
+          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(testShotTable()).build())
+          .build();
+  public static final ShooterConfig RIGHT =
+      ShooterConfig.builder()
+          .name("Shooter Right")
+          .PHYSICAL_CONVERSION(
+              ShooterConfig.PhysicalConversion.builder()
+                  .TURRET_OFFSET(
+                      new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.44551))
+                  .build())
+          .PHYSICS(
+              ShooterConfig.Physics.builder()
+                  .EXIT_SPEED_TABLE(rightExitSpeedTable())
+                  .SHOT_TABLE(shotTableRight())
+                  .SHUTTLE_TABLE(shuttleTable())
+                  .build())
+          .build();
+  public static final ShooterConfig LEFT =
+      ShooterConfig.builder()
+          .name("Shooter Left")
+          .PHYSICAL_CONVERSION(
+              ShooterConfig.PhysicalConversion.builder()
+                  .TURRET_OFFSET(
+                      new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.44551))
+                  .build())
+          .PHYSICS(
+              ShooterConfig.Physics.builder()
+                  .EXIT_SPEED_TABLE(leftExitSpeedTable())
+                  .SHOT_TABLE(shotTableLeft())
+                  .SHUTTLE_TABLE(shuttleTable())
+                  .build())
+          .build();
 
   private static ShotTable testShotTable() {
     ShotTable table = new ShotTable();

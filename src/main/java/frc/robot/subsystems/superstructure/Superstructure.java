@@ -1,9 +1,5 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.Volts;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,6 +9,7 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
