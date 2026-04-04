@@ -299,32 +299,39 @@ public class Superstructure {
   // MARK: Helper functions
 
   private void setHubTarget() {
+    ObjectState hub = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) ? ShooterHandler.Targets.BLUE : ShooterHandler.Targets.RED;
     ObjectState baseTarget = ShooterHandler.Targets.getHubTargetPoint(drivetrain.getState().Pose);
-    Translation2d leftPerpOffset =
-        new Translation2d(
-            ShooterHandler.PERPENDICULAR_TURRET_OFFSET.in(Meters),
-            new Rotation2d(
-                Math.PI / 2
-                    + baseTarget
-                        .minus(shooterHandlerLeft.getProjectileState())
-                        .xyPos()
-                        .getAngle()
-                        .getRadians()));
 
-    Translation2d rightPerpOffset =
-        new Translation2d(
-            ShooterHandler.PERPENDICULAR_TURRET_OFFSET.in(Meters),
-            new Rotation2d(
-                -(Math.PI / 2)
-                    + baseTarget
-                        .minus(shooterHandlerLeft.getProjectileState())
-                        .xyPos()
-                        .getAngle()
-                        .getRadians()));
-    shooterHandlerLeft.setTargetState(
-        baseTarget.plus(new Translation3d(leftPerpOffset), new Translation3d()));
-    shooterHandlerRight.setTargetState(
-        baseTarget.plus(new Translation3d(rightPerpOffset), new Translation3d()));
+    double dx = baseTarget.xyPos().getX() - hub.xyPos().getX();
+    double dy = baseTarget.xyPos().getY() - hub.xyPos().getY();
+    double distance = Math.sqrt(dx * dx + dy * dy);
+
+    double dirX = dx / distance;
+    double dirY = dy / distance;
+
+    double perpX = -dirY;
+    double perpY = dirX;
+
+    double leftOffsetMagnitude = ShooterHandler.PERPENDICULAR_TURRET_OFFSET.in(Meter);
+    ObjectState leftTarget =
+        new ObjectState(
+            new Translation3d(
+                baseTarget.xyPos().getX() + perpX * leftOffsetMagnitude,
+                baseTarget.xyPos().getY() + perpY * leftOffsetMagnitude,
+                baseTarget.position().getZ()),
+            baseTarget.velocity());
+
+    double rightOffsetMagnitude = - ShooterHandler.PERPENDICULAR_TURRET_OFFSET.in(Meter);
+    ObjectState rightTarget =
+        new ObjectState(
+            new Translation3d(
+                baseTarget.xyPos().getX() + perpX * rightOffsetMagnitude,
+                baseTarget.xyPos().getY() + perpY * rightOffsetMagnitude,
+                baseTarget.position().getZ()),
+            baseTarget.velocity());
+
+    shooterHandlerLeft.setTargetState(leftTarget);
+    shooterHandlerRight.setTargetState(rightTarget);
   }
 
   public void setGoal(Setpoint setpoint) {
