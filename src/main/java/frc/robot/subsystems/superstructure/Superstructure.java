@@ -1,6 +1,8 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Volts;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -11,7 +13,6 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -361,12 +362,10 @@ public class Superstructure {
   }
 
   public Command intakePivotDownAuto() {
-    return Commands.race(
-        Commands.run(
-            () -> {
-              groundPivot.setVoltage(Volts.of(-4.0));
-            }),
-        Commands.waitSeconds(2));
+    return Commands.runOnce(
+        () -> {
+          setGoal(SetpointGoal.INTAKE_PIVOT);
+        });
   }
 
   public Command deployedAuto() {
