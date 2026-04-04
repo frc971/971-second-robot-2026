@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.pathplanner.lib.util.FlippingUtil;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,17 +20,24 @@ import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+
 import java.util.Optional;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 
 public class ShooterHandler {
   public static final class Targets {
     private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
     private static final double HUB_HEIGHT = 1.430425;
-    private static final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.3556);
+    private static final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.52);
+    private static final double BACKPLATE_Z = 1.7324;
 
     public static final ObjectState BLUE =
         new ObjectState(
@@ -91,9 +99,10 @@ public class ShooterHandler {
 
       ObjectState goal3D =
           new ObjectState(
-              new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
+              new Translation3d(goal2D.getX(), goal2D.getY(), BACKPLATE_Z),
               new Translation3d());
-      Logger.recordOutput("Superstructure/Hub Target Point", new Pose2d(goal2D, Rotation2d.kZero));
+      Logger.recordOutput("Superstructure/Hub Target Point", new Pose3d(goal3D.position(), Rotation3d.kZero));
+
       return goal3D;
     }
   }
