@@ -2,6 +2,8 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.*;
@@ -14,12 +16,8 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -279,7 +277,10 @@ public class Superstructure {
             : ShooterHandler.Targets.RED;
 
     Translation2d goal2D =
-        getHubTargetPoint(drivetrain.getState().Pose.getTranslation(), currentHub.xyPos(), CENTER_TO_BACK_HUB_OFFSET);
+        getHubTargetPoint(
+            drivetrain.getState().Pose.getTranslation(),
+            currentHub.xyPos(),
+            CENTER_TO_BACK_HUB_OFFSET);
     ObjectState goal3D =
         new ObjectState(
             new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
