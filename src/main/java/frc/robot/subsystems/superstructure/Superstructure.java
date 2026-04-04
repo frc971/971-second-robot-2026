@@ -153,9 +153,9 @@ public class Superstructure {
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                   ? ShooterHandler.Targets.BLUE
                   : ShooterHandler.Targets.RED;
-          
-          setHubTarget(); 
-          
+
+          setHubTarget();
+
           if (Controllers.SHUTTLE_LEFT.getAsBoolean()) {
             curTarget =
                 DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
@@ -169,7 +169,6 @@ public class Superstructure {
                     : ShooterHandler.Targets.RIGHT_RED_SHUTTLE;
           }
 
-          
           shooterHandlerLeft.setTargetState(curTarget);
           shooterHandlerRight.setTargetState(curTarget);
         }
@@ -276,7 +275,6 @@ public class Superstructure {
       }
     }
 
-
     shooterHandlerLeft.periodic();
     shooterHandlerRight.periodic();
 
@@ -313,23 +311,23 @@ public class Superstructure {
   }
 
   private void setHubTarget() {
-      ObjectState currentHub
-              = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
-              ? ShooterHandler.Targets.BLUE
-              : ShooterHandler.Targets.RED;
+    ObjectState currentHub =
+        (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
+            ? ShooterHandler.Targets.BLUE
+            : ShooterHandler.Targets.RED;
 
-      Translation2d goal2D
-              = getHubTargetPoint(
-                      drivetrain.getState().Pose.getTranslation(),
-                      currentHub.xyPos(),
-                      CENTER_TO_BACK_HUB_OFFSET);
-      ObjectState goal3D
-              = new ObjectState(
-                      new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
-                      new Translation3d());
+    Translation2d goal2D =
+        getHubTargetPoint(
+            drivetrain.getState().Pose.getTranslation(),
+            currentHub.xyPos(),
+            CENTER_TO_BACK_HUB_OFFSET);
+    ObjectState goal3D =
+        new ObjectState(
+            new Translation3d(goal2D.getX(), goal2D.getY(), currentHub.position().getZ()),
+            new Translation3d());
 
-      shooterHandlerLeft.setTargetState(goal3D);
-      shooterHandlerRight.setTargetState(goal3D);
+    shooterHandlerLeft.setTargetState(goal3D);
+    shooterHandlerRight.setTargetState(goal3D);
   }
 
   public void setGoal(Setpoint setpoint) {
