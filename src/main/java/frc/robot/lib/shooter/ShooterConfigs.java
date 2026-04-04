@@ -1,46 +1,46 @@
 package frc.robot.lib.shooter;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Translation3d;
 
 public class ShooterConfigs {
   public static final ShooterConfig ALL_DEFAULTS = ShooterConfig.builder().build();
 
-  public static final ShooterConfig TEST_CONFIG =
-      ShooterConfig.builder()
-          .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(testShotTable()).build())
-          .build();
-  public static final ShooterConfig RIGHT =
-      ShooterConfig.builder()
-          .name("Shooter Right")
-          .PHYSICAL_CONVERSION(
-              ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_OFFSET(
-                      new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.44551))
-                  .build())
-          .PHYSICS(
-              ShooterConfig.Physics.builder()
-                  .EXIT_SPEED_TABLE(rightExitSpeedTable())
-                  .SHOT_TABLE(shotTableRight())
-                  .SHUTTLE_TABLE(shuttleTable())
-                  .build())
-          .build();
-  public static final ShooterConfig LEFT =
-      ShooterConfig.builder()
-          .name("Shooter Left")
-          .PHYSICAL_CONVERSION(
-              ShooterConfig.PhysicalConversion.builder()
-                  .TURRET_OFFSET(
-                      new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.44551))
-                  .build())
-          .PHYSICS(
-              ShooterConfig.Physics.builder()
-                  .EXIT_SPEED_TABLE(leftExitSpeedTable())
-                  .SHOT_TABLE(shotTableLeft())
-                  .SHUTTLE_TABLE(shuttleTable())
-                  .build())
-          .build();
+  public static final ShooterConfig TEST_CONFIG = ShooterConfig.builder()
+      .PHYSICS(ShooterConfig.Physics.builder().SHOT_TABLE(testShotTable()).build())
+      .build();
+  public static final ShooterConfig RIGHT = ShooterConfig.builder()
+      .name("Shooter Right")
+      .PHYSICAL_CONVERSION(
+          ShooterConfig.PhysicalConversion.builder()
+              .TURRET_OFFSET(
+                  new Translation3d(0.1624076 - 0.0144525, -0.195097 - 0.0144525, 0.44551))
+              .build())
+      .PHYSICS(
+          ShooterConfig.Physics.builder()
+              .EXIT_SPEED_TABLE(rightExitSpeedTable())
+              .SHOT_TABLE(shotTableRight())
+              .SHUTTLE_TABLE(shuttleTable())
+              .build())
+      .build();
+  public static final ShooterConfig LEFT = ShooterConfig.builder()
+      .name("Shooter Left")
+      .PHYSICAL_CONVERSION(
+          ShooterConfig.PhysicalConversion.builder()
+              .TURRET_OFFSET(
+                  new Translation3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.44551))
+              .build())
+      .PHYSICS(
+          ShooterConfig.Physics.builder()
+              .EXIT_SPEED_TABLE(leftExitSpeedTable())
+              .SHOT_TABLE(shotTableLeft())
+              .SHUTTLE_TABLE(shuttleTable())
+              .build())
+      .build();
 
   private static ShotTable testShotTable() {
     ShotTable table = new ShotTable();
@@ -117,8 +117,8 @@ public class ShooterConfigs {
     table.put(MetersPerSecond.of(6.61531), RotationsPerSecond.of(45.70313));
     table.put(MetersPerSecond.of(7.27521), RotationsPerSecond.of(50.00000));
     table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813));
-    table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(89.3950053912));
-
+    table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750));
+    table.put(MetersPerSecond.of(13.00000), RotationsPerSecond.of(89.39501));
     return table;
   }
 
@@ -132,6 +132,7 @@ public class ShooterConfigs {
     table.put(MetersPerSecond.of(6.61531), RotationsPerSecond.of(45.70313));
     table.put(MetersPerSecond.of(7.27521), RotationsPerSecond.of(50.00000));
     table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813));
+    table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750));
     table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(89.3950053912));
 
     return table;
