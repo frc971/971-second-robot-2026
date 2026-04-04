@@ -31,8 +31,7 @@ public class ShooterHandler {
   public static final class Targets {
     private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
     private static final double HUB_HEIGHT = 1.430425;
-    private static final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.52);
-    private static final double BACKPLATE_Z = 1.7324;
+    private static final Distance CENTER_TO_BACK_HUB_OFFSET = Meters.of(0.2582565552);
 
     public static final ObjectState BLUE =
         new ObjectState(
@@ -94,7 +93,7 @@ public class ShooterHandler {
 
       ObjectState goal3D =
           new ObjectState(
-              new Translation3d(goal2D.getX(), goal2D.getY(), Targets.BACKPLATE_Z),
+              new Translation3d(goal2D.getX(), goal2D.getY(), HUB_HEIGHT),
               new Translation3d());
       Logger.recordOutput(
           "Superstructure/Hub Target Point", new Pose3d(goal3D.position(), Rotation3d.kZero));
