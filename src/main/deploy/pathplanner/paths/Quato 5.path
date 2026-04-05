@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 2.9288176412856615,
-        "y": 5.5709425636574075
+        "x": 2.929,
+        "y": 5.571
       },
       "prevControl": {
-        "x": 3.7036124184847345,
-        "y": 5.578159722222223
+        "x": 3.7039663406432277,
+        "y": 5.57822294054002
       },
       "nextControl": null,
       "isLocked": false,
@@ -78,7 +78,7 @@
     "rotation": -45.0
   },
   "reversed": false,
-  "folder": "THRICE Rush",
+  "folder": "Quato",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.0
