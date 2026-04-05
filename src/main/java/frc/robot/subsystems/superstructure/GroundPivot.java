@@ -24,13 +24,13 @@ public class GroundPivot extends AngularSubsystem {
     tc.Slot0.kS = 0.37; // Static friction compensation
     tc.Slot0.kV = 5.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = 0.0; // Gravity compensation
+    tc.Slot0.kG = -0.05; // Gravity compensation
 
     tc.Slot0.kP = 2.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
     tc.Slot0.kD = 0.0; // Derivative gain
 
-    tc.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Motion Magic profile constraints
     tc.MotionMagic.MotionMagicCruiseVelocity = .8;

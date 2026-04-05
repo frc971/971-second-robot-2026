@@ -396,6 +396,7 @@ public class Superstructure {
   public Command shootSequenceAuto() {
     return Commands.run(
         () -> {
+          groundPivot.setVoltage(Volts.of(2.0));
           ObjectState curTarget =
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                   ? ShooterHandler.Targets.BLUE
