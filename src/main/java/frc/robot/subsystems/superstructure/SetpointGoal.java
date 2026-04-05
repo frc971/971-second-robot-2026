@@ -81,36 +81,36 @@ public enum SetpointGoal {
   MANUAL_SHUTTLE_RIGHT(Setpoint.builder()),
   MANUAL_UP( // shuttling demo
       Setpoint.builder()
-          .withLeftFlywheelRPS(10)
-          .withRightFlywheelRPS(10)
-          .withLeftHoodInches(0.0)
-          .withRightHoodInches(0.0)
-          .withLeftTurretDegrees(0)
-          .withRightTurretDegrees(0)),
-  MANUAL_RIGHT( // right side
+          .withLeftFlywheelRPS(46.061)
+          .withRightFlywheelRPS(46.038)
+          .withLeftHoodInches(0.998)
+          .withRightHoodInches(0.997)
+          .withLeftTurretDegrees(-2.928)
+          .withRightTurretDegrees(1.751)),
+  MANUAL_RIGHT( // left side [DONE]
       Setpoint.builder()
-          .withLeftFlywheelRPS(20)
-          .withLeftHoodInches(0.0)
-          .withLeftTurretDegrees(-40.527)
-          .withRightFlywheelRPS(20)
-          .withRightHoodInches(0.0)
-          .withRightTurretDegrees(-43.925)),
-  MANUAL_LEFT( // left side
+          .withLeftFlywheelRPS(59.526)
+          .withLeftHoodInches(1.237)
+          .withLeftTurretDegrees(-44.187)
+          .withRightFlywheelRPS(58.233)
+          .withRightHoodInches(1.221)
+          .withRightTurretDegrees(-43.045)),
+  MANUAL_LEFT( // right side [DONE]
       Setpoint.builder()
-          .withLeftFlywheelRPS(30)
-          .withLeftHoodInches(0.0)
-          .withLeftTurretDegrees(40.933 - 7.0)
-          .withRightFlywheelRPS(30)
-          .withRightHoodInches(0.0)
-          .withRightTurretDegrees(44.268 - 7.0)),
+          .withLeftFlywheelRPS(58.159)
+          .withLeftHoodInches(1.22)
+          .withLeftTurretDegrees(42.604)
+          .withRightFlywheelRPS(59.444)
+          .withRightHoodInches(1.236)
+          .withRightTurretDegrees(43.774)),
   MANUAL_DOWN( // up against the hub
       Setpoint.builder()
-          .withLeftFlywheelRPS(40)
-          .withLeftHoodInches(1.0)
-          .withLeftTurretDegrees(0.0)
-          .withRightFlywheelRPS(30)
-          .withRightHoodInches(1.0)
-          .withRightTurretDegrees(0.0));
+          .withLeftFlywheelRPS(38.533)
+          .withLeftHoodInches(0.735)
+          .withLeftTurretDegrees(-5.276)
+          .withRightFlywheelRPS(38.486)
+          .withRightHoodInches(0.732)
+          .withRightTurretDegrees(2.905));
 
   private final Setpoint setpoint;
 
