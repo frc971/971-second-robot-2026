@@ -21,7 +21,7 @@ public class Setpoint {
   private Optional<AngularVelocity> leftFlywheel = Optional.empty();
 
   private Optional<Voltage> rollerFloor = Optional.empty();
-  private Optional<Voltage> b2 = Optional.empty();
+  private Optional<Voltage> splitter = Optional.empty();
   private Optional<Voltage> kicker = Optional.empty();
 
   public Setpoint withGroundRollersVolts(double volts) {
@@ -69,8 +69,8 @@ public class Setpoint {
     return this;
   }
 
-  public Setpoint withB2Volts(double volts) {
-    this.b2 = Optional.of(Volts.of(volts));
+  public Setpoint withSplitterVolts(double volts) {
+    this.splitter = Optional.of(Volts.of(volts));
     return this;
   }
 

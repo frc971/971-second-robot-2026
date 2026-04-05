@@ -291,8 +291,8 @@ public class Superstructure {
     if (setpoint.getRollerFloor().isPresent()) {
       rollerFloor.setVoltage(setpoint.getRollerFloor().get());
     }
-    if (setpoint.getB2().isPresent()) {
-      splitter.setVoltage(setpoint.getB2().get());
+    if (setpoint.getSplitter().isPresent()) {
+      splitter.setVoltage(setpoint.getSplitter().get());
     }
     if (setpoint.getKicker().isPresent()) {
       kicker.setVoltage(setpoint.getKicker().get());
