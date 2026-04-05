@@ -61,7 +61,7 @@ public enum SetpointGoal {
   AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
   INDEX(Setpoint.builder().withRollerFloorVolts(8.0).withB2Volts(8.0).withKickerVolts(10.0)),
   OUTTAKE(Setpoint.builder().withRollerFloorVolts(-10.0).withGroundRollersVolts(-12.0)),
-  INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(0.0)),
+  INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(-3.0)),
   INTAKE_PIVOT_JUICE(Setpoint.builder().withGroundPivotDegrees(45.0)),
   AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(12.0)),
   INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
