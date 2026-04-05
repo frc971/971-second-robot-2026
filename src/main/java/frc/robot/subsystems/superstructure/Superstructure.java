@@ -30,7 +30,7 @@ public class Superstructure {
   public final HoodLeft hoodLeft;
 
   public final RollerFloor rollerFloor;
-  public final Splitter b2;
+  public final Splitter splitter;
   public final Kicker kicker;
 
   public final GroundRollers groundRollers;
@@ -67,7 +67,7 @@ public class Superstructure {
     groundPivot = new GroundPivot();
     groundRollers = new GroundRollers();
     rollerFloor = new RollerFloor();
-    b2 = new Splitter();
+    splitter = new Splitter();
     kicker = new Kicker();
 
     shooterHandlerRight =
@@ -275,7 +275,7 @@ public class Superstructure {
     hoodRight.periodic();
     hoodLeft.periodic();
     rollerFloor.periodic();
-    b2.periodic();
+    splitter.periodic();
     kicker.periodic();
     turretRight.periodic();
     turretLeft.periodic();
@@ -292,7 +292,7 @@ public class Superstructure {
       rollerFloor.setVoltage(setpoint.getRollerFloor().get());
     }
     if (setpoint.getB2().isPresent()) {
-      b2.setVoltage(setpoint.getB2().get());
+      splitter.setVoltage(setpoint.getB2().get());
     }
     if (setpoint.getKicker().isPresent()) {
       kicker.setVoltage(setpoint.getKicker().get());
