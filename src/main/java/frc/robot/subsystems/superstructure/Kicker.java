@@ -19,8 +19,8 @@ public class Kicker extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 70.0;
-    tc.CurrentLimits.StatorCurrentLimit = 120.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
+    tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
     tc.Feedback.SensorToMechanismRatio = 0.0;
 

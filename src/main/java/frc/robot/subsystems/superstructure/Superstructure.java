@@ -237,6 +237,8 @@ public class Superstructure {
         setGoal(SetpointGoal.INDEX);
       } else if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
+      } else if (Controllers.UNJAM.getAsBoolean()) {
+        setGoal(SetpointGoal.UNJAM);
       }
 
       // Killing turret logic
