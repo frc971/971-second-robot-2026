@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Quato 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Quato 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Quato 3 6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kev 4 "
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kev 5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Quato 3 6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Quato 4 7"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
