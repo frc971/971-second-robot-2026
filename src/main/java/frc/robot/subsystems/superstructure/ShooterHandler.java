@@ -249,7 +249,8 @@ public class ShooterHandler {
     if (shooterState != State.NOT_READY) {
       flywheel.setVelocity(desiredFlywheel);
 
-      // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
+      // turret has its own hard-stop clamp in TurretLeft/Right.setPositionVoltage()
+      // (with setPosition() delegating to it)
       turret.setPositionVoltage(desiredTurretRel, getRelativeTurretVelocity());
     }
 
