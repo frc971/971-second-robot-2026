@@ -17,9 +17,21 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Quato 3 6"
+            "pathName": "Kev 3 6"
           }
         },
         {
@@ -35,9 +47,21 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Quato 3 6"
+            "pathName": "Kev 3 6"
           }
         },
         {
