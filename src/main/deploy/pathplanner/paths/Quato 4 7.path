@@ -97,6 +97,17 @@
     },
     {
       "name": "cosmetic field",
+      "waypointRelativePos": 0.1485732787433155,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "ReverseShooters"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
       "waypointRelativePos": 1.334619261786601,
       "endWaypointRelativePos": null,
       "command": {

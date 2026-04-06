@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8604527013000265,
-        "y": 6.944514967671372
+        "x": 2.931112607758621,
+        "y": 6.743814394466074
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 7.4220781250000005
       },
       "prevControl": {
-        "x": 3.4126554542824077,
-        "y": 7.459213686342593
+        "x": 2.4718272038375977,
+        "y": 7.287555660803671
       },
       "nextControl": null,
       "isLocked": false,
@@ -79,7 +79,7 @@
   },
   "goalEndState": {
     "velocity": 0.5,
-    "rotation": -165.2855085771946
+    "rotation": -172.18634978439363
   },
   "reversed": false,
   "folder": "THRICE Rush",
