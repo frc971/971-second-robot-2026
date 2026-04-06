@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.9748064959490748,
+        "x": 3.975,
         "y": 7.439005642361111
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.30273411429366,
+        "x": 5.302927618344585,
         "y": 7.591328776765852
       },
       "isLocked": false,
@@ -131,7 +131,7 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": "THRICE Rush",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -179.76427232184568
