@@ -64,12 +64,6 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "cosmetic field",
       "waypointRelativePos": 0.4001822270471463,
       "endWaypointRelativePos": null,
       "command": {
@@ -104,7 +98,7 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": "THRICE Rush",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.0

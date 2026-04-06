@@ -31,23 +31,48 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.20156075223713674,
-      "rotationDegrees": -29.999999999999996
+      "rotationDegrees": 157.15711026937538
     },
     {
       "waypointRelativePos": 0.5,
-      "rotationDegrees": -59.99999999999999
+      "rotationDegrees": 105.63256338685336
     },
     {
       "waypointRelativePos": 0.7032997762863527,
-      "rotationDegrees": -100.0
+      "rotationDegrees": 72.36330469292663
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.24415629177807469,
+      "maxWaypointRelativePos": 0.9911482703877003,
+      "constraints": {
+        "maxVelocity": 3.5,
+        "maxAcceleration": 6.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 540.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 0.0361434273097826,
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.0818484709224599,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "IntakePivotDown"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.16798963903743316,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -67,13 +92,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -19.029618195451977
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 178.98538233381336
   },
   "useDefaultConstraints": true
 }
