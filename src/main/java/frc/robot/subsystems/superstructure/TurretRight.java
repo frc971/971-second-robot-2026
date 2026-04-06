@@ -13,8 +13,8 @@ import frc.robot.lib.superstructure.*;
 
 // TODO: change the constants...
 public class TurretRight extends AngularSubsystem {
-  public static final Angle UPPER_LIMIT = Degrees.of(104.0);
-  public static final Angle LOWER_LIMIT = Degrees.of(-100.0);
+  public static final Angle UPPER_LIMIT = Degrees.of(90.0);
+  public static final Angle LOWER_LIMIT = Degrees.of(-90.0);
   public static final boolean ENABLE_WRAP = false;
 
   private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);

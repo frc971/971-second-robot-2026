@@ -79,10 +79,10 @@
   },
   "goalEndState": {
     "velocity": 0.5,
-    "rotation": -172.18634978439363
+    "rotation": -160.186
   },
   "reversed": false,
-  "folder": "THRICE Rush",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0.0,
     "rotation": -45.0
