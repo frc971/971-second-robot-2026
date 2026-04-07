@@ -20,8 +20,8 @@
         "y": 7.422
       },
       "prevControl": {
-        "x": 2.4720701870551895,
-        "y": 7.28747753580367
+        "x": 3.681559092368343,
+        "y": 7.508818551179139
       },
       "nextControl": null,
       "isLocked": false,
@@ -59,7 +59,31 @@
     },
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.5988515378548896,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ShootSequence"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakePivotDown"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.9199650039432176,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
