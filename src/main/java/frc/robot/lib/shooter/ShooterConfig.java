@@ -63,11 +63,11 @@ public class ShooterConfig {
   @Builder
   public static class Threshold {
     @Builder.Default private AngularVelocity AIMING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(5.0);
-    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(10.0);
+    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(7.0);
     @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(5.0);
 
     @Builder.Default private AngularVelocity FIRING_FLYWHEEL_ABORT = RotationsPerSecond.of(20.0);
-    @Builder.Default private Angle FIRING_ROTATION_THRESHOLD = Degrees.of(20.0);
+    @Builder.Default private Angle FIRING_ROTATION_THRESHOLD = Degrees.of(12.0);
     @Builder.Default private Angle FIRING_HOOD_ANGLE_THRESHOLD = Degrees.of(10.0);
 
     /*
