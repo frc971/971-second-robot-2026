@@ -50,7 +50,6 @@ public class Superstructure {
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private final Timer juiceTimer = new Timer();
-  private final Timer jamAutoTimer = new Timer();
 
   private enum ShooterGoal {
     NONE,
@@ -270,15 +269,6 @@ public class Superstructure {
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
           || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
         setGoal(SetpointGoal.INDEX);
-      }
-
-      if (rollerFloor.getSupplyCurrent().gt(Amps.of(5.0))) {
-        jamAutoTimer.reset();
-        jamAutoTimer.start();
-      }
-
-      if (jamAutoTimer.get() < 2.0) {
-        setGoal(SetpointGoal.OUTTAKE);
       }
 
       setGoal(SetpointGoal.INTAKE_ROLLERS);
