@@ -13,8 +13,8 @@ import frc.robot.lib.superstructure.*;
 
 // TODO: change the constants...
 public class TurretRight extends AngularSubsystem {
-  public static final Angle UPPER_LIMIT = Degrees.of(90.0);
-  public static final Angle LOWER_LIMIT = Degrees.of(-90.0);
+  public static final Angle UPPER_LIMIT = Degrees.of(100.0);
+  public static final Angle LOWER_LIMIT = Degrees.of(-100.0);
   public static final boolean ENABLE_WRAP = false;
 
   private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);
@@ -92,7 +92,8 @@ public class TurretRight extends AngularSubsystem {
     }
 
     // Because something is off with turrets, 100 irl reads 107 in code
-    clampedGoalPosition.times(100 / 107);
+    clampedGoalPosition = clampedGoalPosition.times(96.0f / 90.0f);
+
 
     setFeedforward(calculatePositionFeedforward(clampedGoalPosition));
     super.setPositionVoltage(clampedGoalPosition);

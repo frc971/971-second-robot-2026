@@ -11,8 +11,8 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.lib.superstructure.*;
 
 public class TurretLeft extends AngularSubsystem {
-  public static final Angle UPPER_LIMIT = Degrees.of(90.0);
-  public static final Angle LOWER_LIMIT = Degrees.of(-90.0);
+  public static final Angle UPPER_LIMIT = Degrees.of(100.0);
+  public static final Angle LOWER_LIMIT = Degrees.of(-100.0);
   public static final boolean ENABLE_WRAP = false;
 
   private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);
@@ -90,8 +90,10 @@ public class TurretLeft extends AngularSubsystem {
       }
     }
 
-    // Because something is off with turrets, 100 irl reads 107 in code
-    clampedGoalPosition.times(100 / 107);
+    // Because something is off with turrets 90 irl 96 in code
+    clampedGoalPosition = clampedGoalPosition.times(96.0f / 90.0f);
+    System.out.println("CLAMPED goal: " + clampedGoalPosition);
+    
 
     setFeedforward(calculatePositionFeedforward(clampedGoalPosition));
     super.setPositionVoltage(clampedGoalPosition);

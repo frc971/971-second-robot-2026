@@ -257,15 +257,6 @@ public class Superstructure {
         juiceTimer.restart();
       }
 
-      if (rollerFloor.getSupplyCurrent().gt(Amps.of(10.0))) {
-        jamTimer.restart();
-      }
-
-      if (jamTimer.get() < 0.5) {
-        setGoal(SetpointGoal.OUTTAKE);
-      }
-      
-
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
           && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
         hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
@@ -279,6 +270,14 @@ public class Superstructure {
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
           || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
         setGoal(SetpointGoal.INDEX);
+      }
+
+      if (rollerFloor.getSupplyCurrent().gt(Amps.of(30.0))) {
+        jamTimer.restart();
+      }
+
+      if (jamTimer.get() < 0.5) {
+        setGoal(SetpointGoal.OUTTAKE);
       }
 
       setGoal(SetpointGoal.INTAKE_ROLLERS);

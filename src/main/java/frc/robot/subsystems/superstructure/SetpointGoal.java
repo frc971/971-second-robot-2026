@@ -87,9 +87,9 @@ public enum SetpointGoal {
           .withLeftHoodInches(0.0)
           .withLeftTurretDegrees(0.0)),
   MANUAL_SHUTTLE_UP(Setpoint.builder().withRightTurretDegrees(90)),
-  MANUAL_SHUTTLE_DOWN(Setpoint.builder().withLeftTurretDegrees(90)),
-  MANUAL_SHUTTLE_LEFT(Setpoint.builder()),
-  MANUAL_SHUTTLE_RIGHT(Setpoint.builder()),
+  MANUAL_SHUTTLE_DOWN(Setpoint.builder().withRightTurretDegrees(-90)),
+  MANUAL_SHUTTLE_LEFT(Setpoint.builder().withLeftTurretDegrees(90)),
+  MANUAL_SHUTTLE_RIGHT(Setpoint.builder().withLeftTurretDegrees(-90)),
   MANUAL_UP( // shuttling demo
       Setpoint.builder()
           .withLeftFlywheelRPS(10)
