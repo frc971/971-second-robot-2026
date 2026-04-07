@@ -50,6 +50,7 @@ public class Superstructure {
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private final Timer juiceTimer = new Timer();
+  private final Timer jamTimer = new Timer();
 
   private enum ShooterGoal {
     NONE,
@@ -256,6 +257,15 @@ public class Superstructure {
         juiceTimer.restart();
       }
 
+      if (rollerFloor.getSupplyCurrent().gt(Amps.of(10.0))) {
+        jamTimer.restart();
+      }
+
+      if (jamTimer.get() < 0.5) {
+        setGoal(SetpointGoal.OUTTAKE);
+      }
+      
+
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
           && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
         hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
@@ -442,18 +452,16 @@ public class Superstructure {
   }
 
   public Command shootOnceAuto() {
-      return Commands.runOnce(
-              () -> {
-                  groundPivot.setVoltage(Volts.of(2.0));
-                  ObjectState curTarget
-                  = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+    return Commands.runOnce(
+        () -> {
+          ObjectState curTarget =
+              DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                   ? ShooterHandler.Targets.BLUE
                   : ShooterHandler.Targets.RED;
-                  shooterHandlerLeft.setTargetState(curTarget);
-                  shooterHandlerRight.setTargetState(curTarget);
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-              });
+          shooterHandlerLeft.setTargetState(curTarget);
+          shooterHandlerRight.setTargetState(curTarget);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+        });
   }
-
 }
