@@ -94,7 +94,6 @@ public class TurretRight extends AngularSubsystem {
     // Because something is off with turrets, 100 irl reads 107 in code
     clampedGoalPosition = clampedGoalPosition.times(96.0f / 90.0f);
 
-
     setFeedforward(calculatePositionFeedforward(clampedGoalPosition));
     super.setPositionVoltage(clampedGoalPosition);
   }

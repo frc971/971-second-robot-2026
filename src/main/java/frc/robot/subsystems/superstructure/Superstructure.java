@@ -278,7 +278,6 @@ public class Superstructure {
 
       // if (jamTimer.get() < 0.5) {
       //   setGoal(SetpointGoal.OUTTAKE);
-       
 
       setGoal(SetpointGoal.INTAKE_ROLLERS);
     }
