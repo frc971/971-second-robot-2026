@@ -68,7 +68,7 @@
             {
               "type": "named",
               "data": {
-                "name": "ShootSequence"
+                "name": "ShootOnce"
               }
             },
             {

@@ -441,4 +441,19 @@ public class Superstructure {
         });
   }
 
+  public Command shootOnceAuto() {
+      return Commands.runOnce(
+              () -> {
+                  groundPivot.setVoltage(Volts.of(2.0));
+                  ObjectState curTarget
+                  = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                  ? ShooterHandler.Targets.BLUE
+                  : ShooterHandler.Targets.RED;
+                  shooterHandlerLeft.setTargetState(curTarget);
+                  shooterHandlerRight.setTargetState(curTarget);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+              });
+  }
+
 }

@@ -102,6 +102,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("ReverseShooters", superstructure.reverseShooters());
     NamedCommands.registerCommand("ShootSequence", superstructure.shootSequenceAuto());
     NamedCommands.registerCommand("Neutral", superstructure.neutral());
+    NamedCommands.registerCommand("ShootOnce", superstructure.shootOnceAuto());
   }
 
   private void configureDrivetrain() {
