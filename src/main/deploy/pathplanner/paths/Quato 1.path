@@ -64,7 +64,7 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.4001822270471463,
+      "waypointRelativePos": 0.10819404069767459,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -75,7 +75,7 @@
     },
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.8050558312655074,
+      "waypointRelativePos": 0.6409156976744187,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

@@ -40,10 +40,10 @@ public class GroundPivot extends AngularSubsystem {
     tc.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tc.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    tc.CurrentLimits.SupplyCurrentLimitEnable = false;
-    tc.CurrentLimits.StatorCurrentLimitEnable = false;
-    tc.CurrentLimits.SupplyCurrentLimit = 0.0;
-    tc.CurrentLimits.StatorCurrentLimit = 0.0;
+    tc.CurrentLimits.SupplyCurrentLimitEnable = true;
+    tc.CurrentLimits.StatorCurrentLimitEnable = true;
+    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
+    tc.CurrentLimits.StatorCurrentLimit = 60.0;
 
     tc.Feedback.SensorToMechanismRatio =
         ((52 / 8) * (56 / 16.0) * (18.0 / 9.0)); // Motor to output gear ratio
