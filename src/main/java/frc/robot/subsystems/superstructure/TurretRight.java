@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.superstructure.*;
 
@@ -76,6 +77,11 @@ public class TurretRight extends AngularSubsystem {
 
   @Override
   public void setPosition(Angle goalPosition) {
+    setPositionVoltage(goalPosition, RotationsPerSecond.of(0.0));
+  }
+
+  @Override
+  public void setPositionVoltage(Angle goalPosition, AngularVelocity goalVelocity) {
     Angle clampedGoalPosition;
     if (ENABLE_WRAP) {
       clampedGoalPosition = limitAngle(goalPosition);
@@ -91,7 +97,7 @@ public class TurretRight extends AngularSubsystem {
       }
     }
     setFeedforward(calculatePositionFeedforward(clampedGoalPosition));
-    super.setPositionVoltage(clampedGoalPosition);
+    super.setPositionVoltage(clampedGoalPosition, goalVelocity);
   }
 
   private Voltage calculatePositionFeedforward(Angle goalPosition) {

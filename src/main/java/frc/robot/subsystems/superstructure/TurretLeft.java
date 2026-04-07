@@ -74,6 +74,11 @@ public class TurretLeft extends AngularSubsystem {
 
   @Override
   public void setPosition(Angle goalPosition) {
+    setPositionVoltage(goalPosition, RotationsPerSecond.of(0.0));
+  }
+
+  @Override
+  public void setPositionVoltage(Angle goalPosition, AngularVelocity goalVelocity) {
     Angle clampedGoalPosition;
     if (ENABLE_WRAP) {
       clampedGoalPosition = limitAngle(goalPosition);
@@ -89,7 +94,7 @@ public class TurretLeft extends AngularSubsystem {
       }
     }
     setFeedforward(calculatePositionFeedforward(clampedGoalPosition));
-    super.setPositionVoltage(clampedGoalPosition);
+    super.setPositionVoltage(clampedGoalPosition, goalVelocity);
   }
 
   private Voltage calculatePositionFeedforward(Angle goalPosition) {

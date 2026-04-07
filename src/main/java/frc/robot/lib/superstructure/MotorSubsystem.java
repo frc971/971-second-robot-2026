@@ -36,6 +36,8 @@ public class MotorSubsystem {
 
   @Getter protected AngularVelocity goalVelocity;
 
+  @Getter protected AngularVelocity positionVoltageGoalVelocity = RotationsPerSecond.of(0.0);
+
   @Getter protected Angle goalPosition;
 
   public MotorSubsystem(MotorIO io) {
@@ -59,7 +61,7 @@ public class MotorSubsystem {
       case VOLTAGE -> io.setVoltage(goalVoltage);
       case VELOCITY -> io.setVelocity(goalVelocity);
       case POSITION -> io.setPosition(goalPosition);
-      case POSITION_VOLTAGE -> io.setPositionVoltage(goalPosition);
+      case POSITION_VOLTAGE -> io.setPositionVoltage(goalPosition, positionVoltageGoalVelocity);
       case COAST -> io.setCoast();
       case NONE -> {}
     }
@@ -90,13 +92,21 @@ public class MotorSubsystem {
     this.controlMode = Mode.POSITION;
   }
 
+  public void setPositionVoltage(Angle goalPosition, AngularVelocity goalVelocity) {
+    this.goalPosition = goalPosition;
+    this.positionVoltageGoalVelocity = goalVelocity;
+    this.controlMode = Mode.POSITION_VOLTAGE;
+  }
+
   public void setPositionVoltage(Angle goalPosition) {
     this.goalPosition = goalPosition;
+    this.positionVoltageGoalVelocity = RotationsPerSecond.of(0.0);
     this.controlMode = Mode.POSITION_VOLTAGE;
   }
 
   public void setPositionVoltage(Distance goalPosition) {
     this.goalPosition = Rotations.of(goalPosition.in(Meters));
+    this.positionVoltageGoalVelocity = RotationsPerSecond.of(0.0);
     this.controlMode = Mode.POSITION_VOLTAGE;
   }
 
