@@ -83,7 +83,7 @@
     },
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.9199650039432176,
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
