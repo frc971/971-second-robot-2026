@@ -79,7 +79,7 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.4420851437165776,
       "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",

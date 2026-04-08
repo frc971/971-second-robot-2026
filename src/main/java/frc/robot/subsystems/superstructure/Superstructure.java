@@ -47,7 +47,6 @@ public class Superstructure {
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private final Timer juiceTimer = new Timer();
-  private final Timer jamTimer = new Timer();
 
   private enum ShooterGoal {
     NONE,
@@ -103,7 +102,7 @@ public class Superstructure {
               || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
 
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
-      if (!Controllers.MANUAL.toggled()) {
+      if (Controllers.MANUAL.toggled()) {
         shooterGoal = ShooterGoal.MANUAL;
       } else {
         shooterGoal = ShooterGoal.TARGETING;
@@ -220,14 +219,6 @@ public class Superstructure {
     } else if (DriverStation.isAutonomous()) {
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
-      }
-
-      if (rollerFloor.getSupplyCurrent().gt(Amps.of(10.0))) {
-        jamTimer.restart();
-      }
-
-      if (jamTimer.get() < 0.5) {
-        setGoal(SetpointGoal.OUTTAKE);
       }
 
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE

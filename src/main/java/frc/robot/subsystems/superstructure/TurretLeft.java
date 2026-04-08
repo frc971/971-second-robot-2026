@@ -48,7 +48,7 @@ public class TurretLeft extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
     tc.Feedback.SensorToMechanismRatio =
@@ -62,6 +62,7 @@ public class TurretLeft extends AngularSubsystem {
         .BUS(new CANBus("Superstructure Bus"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
+        .FOC(false)
         .build();
   }
 

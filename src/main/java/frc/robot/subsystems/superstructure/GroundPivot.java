@@ -42,8 +42,8 @@ public class GroundPivot extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 35.0;
-    tc.CurrentLimits.StatorCurrentLimit = 80.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 20.0;
+    tc.CurrentLimits.StatorCurrentLimit = 60.0;
 
     tc.Feedback.SensorToMechanismRatio =
         ((52 / 8) * (56 / 16.0) * (18.0 / 9.0)); // Motor to output gear ratio
@@ -54,6 +54,7 @@ public class GroundPivot extends AngularSubsystem {
         .BUS(new CANBus("rio"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
+        .FOC(false)
         .build();
   }
 }
