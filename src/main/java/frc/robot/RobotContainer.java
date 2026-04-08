@@ -127,7 +127,6 @@ public class RobotContainer {
                   .withVelocityY(JOYSTICK_VALUES.getY())
                   .withRotationalRate(JOYSTICK_VALUES.getRot());
             }));
-
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
