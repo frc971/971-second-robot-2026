@@ -90,10 +90,6 @@ public class TurretLeft extends AngularSubsystem {
       }
     }
 
-    // Because something is off with turrets 90 irl 96 in code
-    clampedGoalPosition = clampedGoalPosition.times(96.0f / 90.0f);
-    System.out.println("CLAMPED goal: " + clampedGoalPosition);
-
     setFeedforward(calculatePositionFeedforward(clampedGoalPosition));
     super.setPositionVoltage(clampedGoalPosition);
   }
