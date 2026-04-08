@@ -12,7 +12,6 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public abstract class MotorIO {
   protected final String name;
@@ -55,13 +54,7 @@ public abstract class MotorIO {
     this.name = config.NAME();
   }
 
-  public void periodic() {
-    Logger.recordOutput(name + "/Position", UnitUtil.toDouble(position, motorConfig.LOG_UNIT()));
-    Logger.recordOutput(
-        name + "/Absolute Position", UnitUtil.toDouble(absolutePosition, motorConfig.LOG_UNIT()));
-    Logger.recordOutput(
-        name + "/Velocity", UnitUtil.toDouble(velocity, motorConfig.LOG_UNIT().per(Seconds)));
-  }
+  public void periodic() {}
 
   /** Set goal voltage */
   public abstract void setVoltage(Voltage goalVoltage);

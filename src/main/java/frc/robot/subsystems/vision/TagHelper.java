@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class TagHelper {
     }
 
     if (closestTagId == -1) {
-      System.out.println("Warning: could not find april tag ids. This shouldn't happen");
+      DriverStation.reportWarning("TagHelper: could not find any of the given AprilTag IDs", false);
       return Optional.empty();
     }
 

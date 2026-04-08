@@ -7,7 +7,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.lib.superstructure.LinearSubsystem;
 import frc.robot.lib.superstructure.MotorConfig;
-import org.littletonrobotics.junction.Logger;
 
 public abstract class Hood extends LinearSubsystem {
   public static final Distance UPPER_LIMIT = Inches.of(3.3);
@@ -20,20 +19,6 @@ public abstract class Hood extends LinearSubsystem {
 
   public Hood(MotorConfig motorConfig) {
     super(motorConfig);
-  }
-
-  @Override
-  public void periodic() {
-    super.periodic();
-    Logger.recordOutput(
-        name + "/Angular Position (Deg)",
-        leadScrewInchesToHoodAngle(Meters.of(io.getPosition().in(Rotations))).in(Degrees));
-
-    if (goalPosition != null) {
-      Logger.recordOutput(
-          name + "/Goal Angular Position (Deg)",
-          leadScrewInchesToHoodAngle(Meters.of(goalPosition.in(Rotations))).in(Degrees));
-    }
   }
 
   @Override

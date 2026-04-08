@@ -73,12 +73,6 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     robotContainer.periodic();
 
-    HubShiftUtil.ShiftInfo info = HubShiftUtil.getOfficialShiftInfo();
-
-    Logger.recordOutput("HubShift/Active", info.active());
-    Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
-    Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
-
     bos.updatePose();
 
     CommandScheduler.getInstance().run();

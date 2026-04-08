@@ -45,6 +45,10 @@ public class Telemetry {
 
     // Put the field on SmartDashboard
     SmartDashboard.putData("FieldWithAuto", field);
+
+    for (int i = 0; i < 4; ++i) {
+      SmartDashboard.putData("Module " + i, moduleMechanisms[i]);
+    }
   }
 
   /* What to publish over networktables for telemetry */
@@ -118,7 +122,7 @@ public class Telemetry {
   private final double[] moduleStatesArray = new double[8];
   private final double[] moduleTargetsArray = new double[8];
 
-  /** Accept the swerve drive state and telemeterize it to SmartDashboard and SignalLogger. */
+  /** Accept the swerve drive state and telemeterize it to SmartDashboard and NetworkTables. */
   public void telemeterize(SwerveDriveState state) {
     /* Telemeterize the swerve drive state */
     drivePose.set(state.Pose);
@@ -143,12 +147,6 @@ public class Telemetry {
       moduleTargetsArray[i * 2 + 1] = state.ModuleTargets[i].speedMetersPerSecond;
     }
 
-    SignalLogger.writeDoubleArray("DriveState/Pose", poseArray);
-    SignalLogger.writeDoubleArray("DriveState/ModuleStates", moduleStatesArray);
-    SignalLogger.writeDoubleArray("DriveState/ModuleTargets", moduleTargetsArray);
-    SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
-    SignalLogger.writeInteger("DriveState/FailedDaqs", state.FailedDaqs);
-
     /* Telemeterize the pose to a Field2d */
     robotPose.setPose(state.Pose);
     fieldTypePub.set("Field2d");
@@ -159,8 +157,6 @@ public class Telemetry {
       moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
       moduleDirections[i].setAngle(state.ModuleStates[i].angle);
       moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
-
-      SmartDashboard.putData("Module " + i, moduleMechanisms[i]);
     }
   }
 

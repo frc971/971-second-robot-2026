@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class ShooterHandler {
   public static final class Targets {
@@ -243,8 +241,6 @@ public class ShooterHandler {
       desiredTurretRel = turretGoalRel;
     }
 
-    logStates();
-
     // set output
     if (shooterState != State.NOT_READY) {
       flywheel.setVelocity(desiredFlywheel);
@@ -284,34 +280,6 @@ public class ShooterHandler {
         absolute.minus(Degrees.of(drivetrain.getState().Pose.getRotation().getDegrees()));
 
     return Radians.of(MathUtil.angleModulus(relative.in(Radians)));
-  }
-
-  private void logStates() {
-    if (launchSolution != null) {
-      Logger.recordOutput(
-          name + "/LaunchGoals/Flywheel (rps)",
-          launchSolution.flywheelSpeed().in(RotationsPerSecond));
-      Logger.recordOutput(
-          name + "/LaunchGoals/Turret (deg)",
-          Radians.of(launchSolution.turretRotation.getRadians()).in(Degrees));
-      Logger.recordOutput(
-          name + "/LaunchGoals/Turret Rel (deg)", getRelativeTurretAngle().in(Degrees));
-      Logger.recordOutput(name + "/LaunchGoals/Hood (deg)", launchSolution.hoodAngle().in(Degrees));
-      Translation2d distance2d = targetState.minus(projectileState).xyPos();
-      Logger.recordOutput(name + "/Distance/1D", distance2d.getNorm());
-
-      Logger.recordOutput(
-          name + "/Error/Flywheel (rps)", flywheelSpeedAbsDiff().in(RotationsPerSecond));
-      Logger.recordOutput(name + "/Error/Turret (deg)", turretRotationAbsDiff().in(Degrees));
-      Logger.recordOutput(name + "/Error/Hood (physics deg)", hoodAngleAbsDiff().in(Degrees));
-    }
-
-    if (projectileState != null) {
-      Logger.recordOutput(name + "/Projectile Position", projectileState.position());
-      Logger.recordOutput(name + "/Projectile Velocity", projectileState.velocity());
-      Logger.recordOutput(name + "/Target Position", targetState.position());
-      Logger.recordOutput(name + "/Target Velocity", targetState.velocity());
-    }
   }
 
   @AutoLogOutput(key = "{name}/canTransitionToReady")
@@ -376,7 +344,6 @@ public class ShooterHandler {
   @AutoLogOutput(key = "{name}/satisfiesConstraints")
   public boolean satisfiesConstraints() {
     if (launchSolution == null) {
-      DataLogManager.log("WARNING: Launch solution is null");
       return false;
     }
 
