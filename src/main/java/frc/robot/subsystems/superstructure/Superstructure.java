@@ -245,13 +245,6 @@ public class Superstructure {
         setGoal(SetpointGoal.INDEX);
       }
 
-      // if (rollerFloor.getSupplyCurrent().gt(Amps.of(30.0))) {
-      //   jamTimer.restart();
-      // }
-
-      // if (jamTimer.get() < 0.5) {
-      //   setGoal(SetpointGoal.OUTTAKE);
-
       setGoal(SetpointGoal.INTAKE_ROLLERS);
     }
 
