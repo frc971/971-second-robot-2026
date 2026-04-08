@@ -119,6 +119,9 @@ public class ShooterConfigs {
     table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813));
     table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750));
     table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(89.3950053912));
+    table.put(
+        MetersPerSecond.of(17.14286),
+        RotationsPerSecond.of(120.0)); // Max point for shuttling extrapolation
 
     return table;
   }
@@ -135,6 +138,9 @@ public class ShooterConfigs {
     table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813));
     table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750));
     table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(89.3950053912));
+    table.put(
+        MetersPerSecond.of(17.14286),
+        RotationsPerSecond.of(120.0)); // Max point for shuttling extrapolation
 
     return table;
   }

@@ -222,6 +222,14 @@ public class Superstructure {
         juiceTimer.restart();
       }
 
+      if (rollerFloor.getSupplyCurrent().gt(Amps.of(10.0))) {
+        jamTimer.restart();
+      }
+
+      if (jamTimer.get() < 0.5) {
+        setGoal(SetpointGoal.OUTTAKE);
+      }
+
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
           && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
         hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
