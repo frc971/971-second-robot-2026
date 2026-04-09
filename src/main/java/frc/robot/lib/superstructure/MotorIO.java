@@ -61,10 +61,6 @@ public abstract class MotorIO {
         name + "/Absolute Position", UnitUtil.toDouble(absolutePosition, motorConfig.LOG_UNIT()));
     Logger.recordOutput(
         name + "/Velocity", UnitUtil.toDouble(velocity, motorConfig.LOG_UNIT().per(Seconds)));
-
-    if (appliedVoltage != null && supplyCurrent != null) {
-      Logger.recordOutput(name + "/Power", appliedVoltage.times(supplyCurrent).in(Watts));
-    }
   }
 
   /** Set goal voltage */
