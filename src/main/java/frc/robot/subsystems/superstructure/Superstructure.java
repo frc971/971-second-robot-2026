@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
@@ -42,18 +43,15 @@ public class Superstructure {
   public final TurretRight turretRight;
   public final TurretLeft turretLeft;
 
-  public final ShooterTuner shooterTunerLeft;
-  public final ShooterTuner shooterTunerRight;
-
   public final Visualization visualization;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
+
+  private final Timer juiceTimer = new Timer();
 
   private enum ShooterGoal {
     NONE,
     MANUAL,
-    TARGETING,
-    TUNE_LEFT_SHOOTER,
-    TUNE_RIGHT_SHOOTER
+    TARGETING
   }
 
   public Superstructure(RobotContainer robotContainer) {
@@ -88,11 +86,6 @@ public class Superstructure {
             ShooterConfigs.LEFT,
             ShooterHandler.Side.LEFT);
 
-    shooterTunerLeft =
-        new ShooterTuner(flywheelLeft, flywheelRight, hoodLeft, turretLeft, shooterHandlerLeft);
-    shooterTunerRight =
-        new ShooterTuner(flywheelRight, flywheelLeft, hoodRight, turretRight, shooterHandlerRight);
-
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
 
     setGoal(SetpointGoal.NEUTRAL);
@@ -100,7 +93,10 @@ public class Superstructure {
 
   public void periodic() {
     if (DriverStation.isTeleop()) {
-      setGoal(SetpointGoal.NEUTRAL.getSetpoint());
+      if (!juiceTimer.isRunning()) {
+        juiceTimer.restart();
+      }
+      setGoal(SetpointGoal.NEUTRAL);
 
       boolean wantsShot =
           Controllers.LEFT_SHUTTLE.getAsBoolean()
@@ -109,12 +105,8 @@ public class Superstructure {
               || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
 
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
-      if (!Controllers.MANUAL.toggled()) {
+      if (Controllers.MANUAL.toggled()) {
         shooterGoal = ShooterGoal.MANUAL;
-      } else if (Controllers.TUNE_LEFT_TURRET.toggled()) {
-        shooterGoal = ShooterGoal.TUNE_LEFT_SHOOTER;
-      } else if (Controllers.TUNE_RIGHT_TURRET.toggled()) {
-        shooterGoal = ShooterGoal.TUNE_RIGHT_SHOOTER;
       } else {
         shooterGoal = ShooterGoal.TARGETING;
       }
@@ -127,9 +119,6 @@ public class Superstructure {
 
       shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
       shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-
-      shooterTunerLeft.setGoal(ShooterTuner.Goal.NONE);
-      shooterTunerRight.setGoal(ShooterTuner.Goal.NONE);
 
       switch (shooterGoal) {
         case NONE -> {}
@@ -183,30 +172,18 @@ public class Superstructure {
 
           setGoal(setpoint);
         }
-        case TUNE_LEFT_SHOOTER -> {
-          shooterTunerLeft.setGoal(ShooterTuner.Goal.ACTIVE);
-
-          if (shooterTunerLeft.isIndexing()) {
-            setGoal(SetpointGoal.INDEX);
-          }
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-        }
-        case TUNE_RIGHT_SHOOTER -> {
-          shooterTunerRight.setGoal(ShooterTuner.Goal.ACTIVE);
-
-          if (shooterTunerRight.isIndexing()) {
-            setGoal(SetpointGoal.INDEX);
-          }
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-        }
       }
 
       if (Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);
-      } else {
-        groundPivot.setPosition(SetpointGoal.NEUTRAL.getSetpoint().getGroundPivot().get());
+
+        if (Controllers.JUICE.getAsBoolean()) {
+          int t = (int) (juiceTimer.get() * 100);
+
+          if (t % 100 < 50) {
+            setGoal(SetpointGoal.INTAKE_PIVOT_JUICE);
+          }
+        }
       }
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
@@ -237,6 +214,8 @@ public class Superstructure {
         setGoal(SetpointGoal.INDEX);
       } else if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
+      } else if (Controllers.UNJAM.getAsBoolean()) {
+        setGoal(SetpointGoal.UNJAM);
       }
 
       // Killing turret logic
@@ -247,6 +226,10 @@ public class Superstructure {
         setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
       }
     } else if (DriverStation.isAutonomous()) {
+      if (!juiceTimer.isRunning()) {
+        juiceTimer.restart();
+      }
+
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
           && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
         hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
@@ -261,13 +244,12 @@ public class Superstructure {
           || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
         setGoal(SetpointGoal.INDEX);
       }
+
+      setGoal(SetpointGoal.INTAKE_ROLLERS);
     }
 
     shooterHandlerLeft.periodic();
     shooterHandlerRight.periodic();
-
-    shooterTunerLeft.periodic();
-    shooterTunerRight.periodic();
 
     // subsystems
     flywheelRight.periodic();
@@ -361,12 +343,10 @@ public class Superstructure {
   }
 
   public Command intakePivotDownAuto() {
-    return Commands.race(
-        Commands.run(
-            () -> {
-              groundPivot.setVoltage(Volts.of(-4.0));
-            }),
-        Commands.waitSeconds(2));
+    return Commands.runOnce(
+        () -> {
+          setGoal(SetpointGoal.INTAKE_PIVOT);
+        });
   }
 
   public Command deployedAuto() {
@@ -378,23 +358,62 @@ public class Superstructure {
         });
   }
 
+  public Command reverseShooters() {
+    return Commands.run(
+            () -> {
+              setGoal(SetpointGoal.REVERSE_SHOOTERS);
+            })
+        .withTimeout(1)
+        .andThen(
+            () -> {
+              setGoal(SetpointGoal.AUTO_NEUTRAL);
+            })
+        .withTimeout(1);
+  }
+
   public Command shootAuto() {
-    return Commands.runOnce(
+    return Commands.parallel(
+        Commands.runOnce(
+            () -> {
+              ObjectState curTarget =
+                  DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                      ? ShooterHandler.Targets.BLUE
+                      : ShooterHandler.Targets.RED;
+              shooterHandlerLeft.setTargetState(curTarget);
+              shooterHandlerRight.setTargetState(curTarget);
+
+              shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+              shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+            }),
+        Commands.run(
+            () -> {
+              int t = (int) (juiceTimer.get() * 100);
+
+              if (t % 100 < 50) {
+                setGoal(SetpointGoal.INTAKE_PIVOT);
+              } else {
+                setGoal(SetpointGoal.INTAKE_PIVOT_JUICE);
+              }
+            }));
+  }
+
+  public Command shootSequenceAuto() {
+    return Commands.run(
         () -> {
+          groundPivot.setVoltage(Volts.of(2.0));
           ObjectState curTarget =
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                   ? ShooterHandler.Targets.BLUE
                   : ShooterHandler.Targets.RED;
           shooterHandlerLeft.setTargetState(curTarget);
           shooterHandlerRight.setTargetState(curTarget);
-
           shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
         });
   }
 
-  public Command shootSequenceAuto() {
-    return Commands.run(
+  public Command shootOnceAuto() {
+    return Commands.runOnce(
         () -> {
           ObjectState curTarget =
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue

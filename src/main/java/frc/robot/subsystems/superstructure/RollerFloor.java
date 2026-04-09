@@ -19,8 +19,8 @@ public class RollerFloor extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
-    tc.CurrentLimits.StatorCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
+    tc.CurrentLimits.StatorCurrentLimit = 60.0;
 
     tc.Feedback.SensorToMechanismRatio = 0.0;
 
@@ -29,6 +29,7 @@ public class RollerFloor extends MotorSubsystem {
         .ID(21)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
+        .FOC(false)
         .build();
   }
 }
