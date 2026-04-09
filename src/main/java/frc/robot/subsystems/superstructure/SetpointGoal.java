@@ -59,7 +59,7 @@ public enum SetpointGoal {
           .withGroundRollersVolts(0.0)
           .withRollerFloorVolts(0.0)),
   AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
-  INDEX(Setpoint.builder().withRollerFloorVolts(8.0).withB2Volts(8.0).withKickerVolts(10.0)),
+  INDEX(Setpoint.builder().withRollerFloorVolts(7.0).withB2Volts(7.0).withKickerVolts(8.0)),
   OUTTAKE(
       Setpoint.builder()
           .withRollerFloorVolts(-10.0)
