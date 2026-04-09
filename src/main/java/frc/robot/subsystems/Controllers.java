@@ -11,6 +11,7 @@ public class Controllers {
 
   // === Troy's Controls
   public static final Toggle INTAKE_PIVOT = new Toggle(TROY.leftBumper());
+  public static final Trigger JUICE = TROY.a();
   public static final Edge INTAKE_PIVOT_EDGE = new Edge(TROY.leftBumper());
   public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
   public static final Trigger UNJAM = ANDRE.rightStick();

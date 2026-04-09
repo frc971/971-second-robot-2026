@@ -93,7 +93,10 @@ public class Superstructure {
 
   public void periodic() {
     if (DriverStation.isTeleop()) {
-      setGoal(SetpointGoal.NEUTRAL.getSetpoint());
+      if (!juiceTimer.isRunning()) {
+        juiceTimer.restart();
+      }
+      setGoal(SetpointGoal.NEUTRAL);
 
       boolean wantsShot =
           Controllers.LEFT_SHUTTLE.getAsBoolean()
@@ -173,8 +176,14 @@ public class Superstructure {
 
       if (Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);
-      } else {
-        groundPivot.setPosition(SetpointGoal.NEUTRAL.getSetpoint().getGroundPivot().get());
+
+        if (Controllers.JUICE.getAsBoolean()) {
+          int t = (int) (juiceTimer.get() * 100);
+
+          if (t % 100 < 50) {
+            setGoal(SetpointGoal.INTAKE_PIVOT_JUICE);
+          }
+        }
       }
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {

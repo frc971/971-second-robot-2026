@@ -29,6 +29,7 @@ public class Kicker extends MotorSubsystem {
         .ID(15)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
+        .FOC(false)
         .build();
   }
 }
