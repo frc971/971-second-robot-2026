@@ -19,6 +19,8 @@ public class Controllers {
   public static final Trigger SHOOT_REDUNDANCY = TROY.axisGreaterThan(3, 0.9);
   public static final Trigger INDEX = TROY.rightTrigger();
 
+  public static final Trigger ODOMETRY_RESET = TROY.y();
+
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();

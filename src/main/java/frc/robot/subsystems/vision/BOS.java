@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class BOS {
@@ -19,6 +20,8 @@ public class BOS {
 
   DoubleArraySubscriber[] tag_estimation_subscribers =
       new DoubleArraySubscriber[CAMERA_NAMES.length];
+
+  Pose2d lastVisionPose = new Pose2d(0, 0, new Rotation2d());
 
   public BOS(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -59,15 +62,25 @@ public class BOS {
         if (tagEstimations[i][0] == -1) {
           continue;
         }
-        drivetrain.addVisionMeasurement(
+
+        Pose2d estimate =
             new Pose2d(
-                tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2])),
-            tagEstimations[i][4],
+                tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
+
+        drivetrain.addVisionMeasurement(
+            estimate,
+            Timer.getFPGATimestamp(),
             VecBuilder.fill(
                 tagEstimations[i][3] / 4.0,
                 tagEstimations[i][3] / 4.0,
                 tagEstimations[i][3] * 2.0 / 3.0));
+
+        lastVisionPose = estimate;
       }
     }
+  }
+
+  public Pose2d getLastVisionPose() {
+    return lastVisionPose;
   }
 }

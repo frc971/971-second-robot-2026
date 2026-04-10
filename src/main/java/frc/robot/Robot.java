@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.vision.BOS;
 import frc.robot.subsystems.vision.TagHelper;
@@ -80,6 +81,10 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
 
     bos.updatePose();
+
+    if (Controllers.ODOMETRY_RESET.getAsBoolean()) {
+      robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
+    }
 
     CommandScheduler.getInstance().run();
   }
