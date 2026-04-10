@@ -28,8 +28,8 @@ public class HubShiftUtil {
   private static final double[] SHIFT_END = {10.0, 35.0, 60.0, 85.0, 110.0, 140.0};
 
   // Whether the auto-LOSER's hub is active each shift
-  // TRANSITION=true, SHIFT1=true, SHIFT2=false, SHIFT3=true, SHIFT4=false, ENDGAME=true
   private static final boolean[] LOSER_ACTIVE = {true, true, false, true, false, true};
+  private static final boolean[] BOTH_ACTIVE = {true, false, false, false, false, true};
 
   public static final double AUTO_DURATION = 20.0;
   public static final double TELEOP_DURATION = 140.0;
@@ -76,10 +76,11 @@ public class HubShiftUtil {
 
   /** Returns whether our hub is active in the given shift index. */
   private static boolean isOurHubActive(int shiftIndex) {
+    if (BOTH_ACTIVE[shiftIndex]) return true;
+
     Alliance self = DriverStation.getAlliance().orElse(Alliance.Blue);
     Alliance autoLoser = getAutoLoserAlliance();
     boolean loserIsUs = (autoLoser == self);
-
     // LOSER_ACTIVE[i] tells us if the loser's hub is active in shift i
     return loserIsUs ? LOSER_ACTIVE[shiftIndex] : !LOSER_ACTIVE[shiftIndex];
   }
@@ -118,7 +119,7 @@ public class HubShiftUtil {
     double elapsed = currentTime - SHIFT_START[idx];
     double remaining = SHIFT_END[idx] - currentTime;
 
-    ShiftEnum shift = ShiftEnum.values()[idx + 1]; // +1 because TRANSITION is index 1 in enum
+    ShiftEnum shift = ShiftEnum.values()[idx];
     boolean active = isOurHubActive(idx);
 
     return new ShiftInfo(shift, elapsed, remaining, active);
