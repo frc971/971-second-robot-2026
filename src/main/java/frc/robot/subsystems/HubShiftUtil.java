@@ -21,7 +21,11 @@ public class HubShiftUtil {
   }
 
   public record ShiftInfo(
-      ShiftEnum currentShift, double elapsedTime, double remainingTime, boolean hubActive) {}
+      ShiftEnum currentShift,
+      ShiftEnum nextShift,
+      double elapsedTime,
+      double remainingTime,
+      boolean hubActive) {}
 
   // Shift boundaries (seconds elapsed since teleop start)
   private static final double[] SHIFT_START = {0.0, 10.0, 35.0, 60.0, 85.0, 110.0};
@@ -88,11 +92,12 @@ public class HubShiftUtil {
   public static ShiftInfo getShiftInfo() {
     if (DriverStation.isAutonomousEnabled()) {
       double elapsed = shiftTimer.get();
-      return new ShiftInfo(ShiftEnum.AUTO, elapsed, AUTO_DURATION - elapsed, true);
+      return new ShiftInfo(
+          ShiftEnum.AUTO, ShiftEnum.TRANSITION, elapsed, AUTO_DURATION - elapsed, true);
     }
 
     if (!DriverStation.isEnabled()) {
-      return new ShiftInfo(ShiftEnum.DISABLED, 0.0, 0.0, false);
+      return new ShiftInfo(ShiftEnum.DISABLED, ShiftEnum.DISABLED, 0.0, 0.0, false);
     }
 
     // Sync timer to FMS match time if drift exceeds threshold
@@ -118,10 +123,11 @@ public class HubShiftUtil {
 
     double elapsed = currentTime - SHIFT_START[idx];
     double remaining = SHIFT_END[idx] - currentTime;
-
     ShiftEnum shift = ShiftEnum.values()[idx];
+    ShiftEnum nextShift =
+        (idx + 1 < SHIFT_START.length) ? ShiftEnum.values()[idx + 1] : ShiftEnum.DISABLED;
     boolean active = isOurHubActive(idx);
 
-    return new ShiftInfo(shift, elapsed, remaining, active);
+    return new ShiftInfo(shift, nextShift, elapsed, remaining, active);
   }
 }
