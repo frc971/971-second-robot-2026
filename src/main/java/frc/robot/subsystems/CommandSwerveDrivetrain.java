@@ -304,9 +304,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               + module.getSteerMotor().getSupplyCurrent().getValueAsDouble();
 
       totalDriveSupplyCurrentAbs +=
-          Math.abs(
-              module.getDriveMotor().getSupplyCurrent().getValueAsDouble()
-                  + module.getSteerMotor().getSupplyCurrent().getValueAsDouble());
+          Math.abs(module.getDriveMotor().getSupplyCurrent().getValueAsDouble())
+              + Math.abs(module.getSteerMotor().getSupplyCurrent().getValueAsDouble());
     }
     double batteryVoltage = RobotController.getBatteryVoltage();
     double totalDrivePower = totalDriveSupplyCurrent * batteryVoltage;
