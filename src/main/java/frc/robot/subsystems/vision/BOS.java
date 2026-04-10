@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -8,7 +9,6 @@ import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class BOS {
@@ -69,7 +69,7 @@ public class BOS {
 
         drivetrain.addVisionMeasurement(
             estimate,
-            Timer.getFPGATimestamp(),
+            Utils.fpgaToCurrentTime(tagEstimations[i][4]),
             VecBuilder.fill(
                 tagEstimations[i][3] / 4.0,
                 tagEstimations[i][3] / 4.0,
