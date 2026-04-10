@@ -1,6 +1,6 @@
 package frc.robot.subsystems.vision;
 
-import com.ctre.phoenix6.Utils;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -69,7 +69,7 @@ public class BOS {
 
         drivetrain.addVisionMeasurement(
             estimate,
-            Utils.fpgaToCurrentTime(tagEstimations[i][4]),
+            tagEstimations[i][4],
             VecBuilder.fill(
                 tagEstimations[i][3] / 4.0,
                 tagEstimations[i][3] / 4.0,

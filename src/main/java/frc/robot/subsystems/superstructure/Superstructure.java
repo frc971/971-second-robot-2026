@@ -188,7 +188,7 @@ public class Superstructure {
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE_ROLLERS);
-        groundPivot.setFeedforward(Volts.of(-0.5));
+        groundPivot.setFeedforward(Volts.of(-0.4));
       } else {
         groundPivot.setFeedforward(Volts.of(0.0));
       }
