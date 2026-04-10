@@ -24,7 +24,7 @@ public class GroundPivot extends AngularSubsystem {
     tc.Slot0.kS = 0.37; // Static friction compensation
     tc.Slot0.kV = 5.0; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
-    tc.Slot0.kG = -0.05; // Gravity compensation
+    tc.Slot0.kG = -0.1; // Gravity compensation
 
     tc.Slot0.kP = 2.0; // Proportional gain
     tc.Slot0.kI = 0.0; // Integral gain
