@@ -78,7 +78,6 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("HubShift/Active", info.hubActive());
     Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
-    Logger.recordOutput("HubShift/NextShift", info.nextShift().toString());
 
     bos.updatePose();
 
