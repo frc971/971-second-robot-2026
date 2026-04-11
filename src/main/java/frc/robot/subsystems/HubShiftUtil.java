@@ -1,3 +1,5 @@
+// Based on HubShiftUtil.java by FRC Team 6328 (Mechanical Advantage)
+// https://github.com/Mechanical-Advantage/RobotCode2026Public/blob/main/src/main/java/org/littletonrobotics/frc2026/util/HubShiftUtil.java
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DriverStation;
