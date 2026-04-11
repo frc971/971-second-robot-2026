@@ -43,7 +43,7 @@ public class ShooterHandler {
             new Translation3d());
 
     // offset from the corner
-    private static final Translation3d SHUTTLE_OFFSET = new Translation3d(0.8, 1.3, 0.0);
+    private static final Translation3d SHUTTLE_OFFSET = new Translation3d(0.8, 1.7, 0.0);
 
     public static final ObjectState RIGHT_BLUE_SHUTTLE =
         new ObjectState(SHUTTLE_OFFSET, new Translation3d());
