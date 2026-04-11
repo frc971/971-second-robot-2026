@@ -59,12 +59,6 @@ public class HubShiftUtil {
    * hub active first.
    */
   public static Alliance getAutoLoserAlliance() {
-
-    // use for testing
-    // if (true) {
-    //   return Alliance.Blue;
-    // }
-
     Alliance self = DriverStation.getAlliance().orElse(Alliance.Blue);
 
     // Manual override: true = we won auto, false = we lost auto
