@@ -21,7 +21,11 @@ public class HubShiftUtil {
   }
 
   public record ShiftInfo(
-      ShiftEnum currentShift, double elapsedTime, double remainingTime, boolean hubActive) {}
+      ShiftEnum currentShift,
+      double elapsedTime,
+      double remainingTime,
+      boolean hubActive,
+      double timeUntilHubStateChange) {}
 
   // Shift boundaries (seconds elapsed since teleop start)
   private static final double[] SHIFT_START = {0.0, 10.0, 35.0, 60.0, 85.0, 110.0};
@@ -53,6 +57,12 @@ public class HubShiftUtil {
    * hub active first.
    */
   public static Alliance getAutoLoserAlliance() {
+
+    // use for testing
+    // if (true) {
+    //   return Alliance.Blue;
+    // }
+
     Alliance self = DriverStation.getAlliance().orElse(Alliance.Blue);
 
     // Manual override: true = we won auto, false = we lost auto
@@ -88,11 +98,12 @@ public class HubShiftUtil {
   public static ShiftInfo getShiftInfo() {
     if (DriverStation.isAutonomousEnabled()) {
       double elapsed = shiftTimer.get();
-      return new ShiftInfo(ShiftEnum.AUTO, elapsed, AUTO_DURATION - elapsed, true);
+      return new ShiftInfo(
+          ShiftEnum.AUTO, elapsed, AUTO_DURATION - elapsed, true, AUTO_DURATION - elapsed);
     }
 
     if (!DriverStation.isEnabled()) {
-      return new ShiftInfo(ShiftEnum.DISABLED, 0.0, 0.0, false);
+      return new ShiftInfo(ShiftEnum.DISABLED, 0.0, 0.0, false, 0.0);
     }
 
     // Sync timer to FMS match time if drift exceeds threshold
@@ -118,10 +129,22 @@ public class HubShiftUtil {
 
     double elapsed = currentTime - SHIFT_START[idx];
     double remaining = SHIFT_END[idx] - currentTime;
-
     ShiftEnum shift = ShiftEnum.values()[idx];
     boolean active = isOurHubActive(idx);
 
-    return new ShiftInfo(shift, elapsed, remaining, active);
+    // Scan forward to find when hub active state next flips
+    double timeUntilHubStateChange = remaining;
+    for (int i = idx + 1; i < SHIFT_START.length; i++) {
+      if (isOurHubActive(i) != active) {
+        // State flips at the start of shift i
+        timeUntilHubStateChange = SHIFT_START[i] - currentTime;
+        break;
+      } else {
+        // Same state continues; extend to end of this shift
+        timeUntilHubStateChange = SHIFT_END[i] - currentTime;
+      }
+    }
+
+    return new ShiftInfo(shift, elapsed, remaining, active, timeUntilHubStateChange);
   }
 }
