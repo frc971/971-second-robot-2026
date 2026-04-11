@@ -67,7 +67,7 @@ public class ShooterConfig {
     @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(5.0);
 
     @Builder.Default private AngularVelocity FIRING_FLYWHEEL_ABORT = RotationsPerSecond.of(20.0);
-    @Builder.Default private Angle FIRING_ROTATION_THRESHOLD = Degrees.of(8.0);
+    @Builder.Default private Angle FIRING_ROTATION_THRESHOLD = Degrees.of(10.0);
     @Builder.Default private Angle FIRING_HOOD_ANGLE_THRESHOLD = Degrees.of(10.0);
 
     /*
@@ -79,7 +79,7 @@ public class ShooterConfig {
     @Builder.Default
     private AngularVelocity SHUTTLING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(20.0);
 
-    @Builder.Default private Angle SHUTTLING_ROTATION_THRESHOLD = Degrees.of(8.0);
+    @Builder.Default private Angle SHUTTLING_ROTATION_THRESHOLD = Degrees.of(10.0);
     @Builder.Default private Angle SHUTTLING_HOOD_ANGLE_THRESHOLD = Degrees.of(10.0);
   }
 }
