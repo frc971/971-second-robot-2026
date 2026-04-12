@@ -188,10 +188,10 @@ public class Superstructure {
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE_ROLLERS);
-        groundPivot.setFeedforward(Volts.of(-0.4));
-      } else {
-        groundPivot.setFeedforward(Volts.of(0.0));
-      }
+        // groundPivot.setFeedforward(Volts.of(-0.4));
+      } /*else {
+          groundPivot.setFeedforward(Volts.of(0.0));
+        }*/
 
       if (wantsShot && DriverStation.isEnabled()) {
         if (!Controllers.KILL_LEFT.toggled()
