@@ -22,7 +22,7 @@ public class GroundPivot extends AngularSubsystem {
 
     // Motion Magic PID and feedforward gains
     tc.Slot0.kS = 0.37; // Static friction compensation
-    tc.Slot0.kV = 5.0; // Velocity feedforward
+    tc.Slot0.kV = 4.5; // Velocity feedforward
     tc.Slot0.kA = 0.0; // Acceleration feedforward
     tc.Slot0.kG = 0.0; // Gravity compensation
 
