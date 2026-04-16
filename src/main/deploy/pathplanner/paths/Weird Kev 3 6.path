@@ -3,44 +3,39 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.2804615444878038,
-        "y": 6.0
+        "x": 2.622,
+        "y": 5.571
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2881152868782815,
-        "y": 6.055794621924389
+        "x": 2.6850901155399427,
+        "y": 6.358057543080006
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.0604736496842122,
-        "y": 4.713454420076414
+        "x": 3.916,
+        "y": 7.422
       },
       "prevControl": {
-        "x": 1.0604736496842122,
-        "y": 4.418252567209015
+        "x": 3.115374131944445,
+        "y": 7.530138671874999
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.35,
-      "rotationDegrees": -90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 0.5,
+        "maxVelocity": 0.45,
         "maxAcceleration": 6.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 540.0,
@@ -53,12 +48,47 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.5517020781637717,
+      "waypointRelativePos": 0.2533741694352159,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "Neutral"
+          "name": "Shoot"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.5988515378548896,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ShootOnce"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakePivotDown"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Deployed"
         }
       }
     }
@@ -72,14 +102,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -90.0
+    "velocity": 0.5,
+    "rotation": -160.0
   },
   "reversed": false,
-  "folder": "Hitchhiker",
+  "folder": null,
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 0.5,
+    "rotation": -45.0
   },
   "useDefaultConstraints": true
 }

@@ -3,37 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.2804615444878038,
-        "y": 6.0
+        "x": 2.873,
+        "y": 5.59648096882878
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2881152868782815,
-        "y": 6.055794621924389
+        "x": 2.931121421648712,
+        "y": 6.743814742663956
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.0604736496842122,
-        "y": 4.713454420076414
+        "x": 3.916,
+        "y": 7.422
       },
       "prevControl": {
-        "x": 1.0604736496842122,
-        "y": 4.418252567209015
+        "x": 2.4720701870551895,
+        "y": 7.28747753580367
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.35,
-      "rotationDegrees": -90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
@@ -53,12 +48,23 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.5517020781637717,
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "Neutral"
+          "name": "Shoot"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Deployed"
         }
       }
     }
@@ -72,14 +78,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -90.0
+    "velocity": 0.5,
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Hitchhiker",
+  "folder": null,
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 0.0,
+    "rotation": -45.0
   },
   "useDefaultConstraints": true
 }

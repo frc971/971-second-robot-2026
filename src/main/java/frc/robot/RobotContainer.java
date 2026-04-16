@@ -119,8 +119,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("IntakePivotDown", superstructure.intakePivotDownAuto());
     NamedCommands.registerCommand("Deployed", superstructure.deployedAuto());
     NamedCommands.registerCommand("Shoot", superstructure.shootAuto());
+    NamedCommands.registerCommand("ReverseShooters", superstructure.reverseShooters());
     NamedCommands.registerCommand("ShootSequence", superstructure.shootSequenceAuto());
     NamedCommands.registerCommand("Neutral", superstructure.neutral());
+    NamedCommands.registerCommand("ShootOnce", superstructure.shootOnceAuto());
   }
 
   private void configureDrivetrain() {
@@ -176,7 +178,6 @@ public class RobotContainer {
                     .withRotationalRate(JOYSTICK_VALUES.getRot());
               }
             }));
-
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 

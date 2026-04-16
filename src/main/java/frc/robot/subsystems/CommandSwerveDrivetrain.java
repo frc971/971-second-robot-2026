@@ -290,6 +290,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
     Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
     Logger.recordOutput("Drive/MeasuredSpeeds", getState().Speeds);
+
+    // Sum currents across all drive motors
+    double totalDriveStatorCurrent = 0;
+    double totalDriveSupplyCurrent = 0;
+    double totalDriveSupplyCurrentAbs = 0;
+    for (var module : getModules()) {
+      totalDriveStatorCurrent += module.getDriveMotor().getStatorCurrent().getValueAsDouble();
+      totalDriveSupplyCurrent += module.getDriveMotor().getSupplyCurrent().getValueAsDouble();
+      totalDriveSupplyCurrentAbs +=
+          Math.abs(module.getDriveMotor().getSupplyCurrent().getValueAsDouble());
+    }
+    double batteryVoltage = RobotController.getBatteryVoltage();
+    double totalDrivePower = totalDriveSupplyCurrent * batteryVoltage;
+
+    Logger.recordOutput("Drive/TotalDriveStatorCurrent", totalDriveStatorCurrent);
+    Logger.recordOutput("Drive/TotalDriveSupplyCurrent", totalDriveSupplyCurrent);
+    Logger.recordOutput("Drive/TotalDriveSupplyCurrentAbs", totalDriveSupplyCurrentAbs);
+    Logger.recordOutput("Drive/TotalDrivePower", totalDrivePower);
   }
 
   private void startSimThread() {

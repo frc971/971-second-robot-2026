@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.2804615444878038,
-        "y": 6.0
+        "x": 3.916,
+        "y": 7.422
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2881152868782815,
-        "y": 6.055794621924389
+        "x": 10.507628671057235,
+        "y": 8.403479727520821
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.0604736496842122,
-        "y": 4.713454420076414
+        "x": 6.1400852864583335,
+        "y": 3.366559895833334
       },
       "prevControl": {
-        "x": 1.0604736496842122,
-        "y": 4.418252567209015
+        "x": 8.731176432291667,
+        "y": 1.3596649305555566
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,17 +30,25 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.35,
-      "rotationDegrees": -90.0
+      "waypointRelativePos": 0.3236620621980674,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 100.633
+    },
+    {
+      "waypointRelativePos": 0.7032997762863527,
+      "rotationDegrees": 72.36330469292663
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 0.24415629177807469,
+      "maxWaypointRelativePos": 0.9911482703877003,
       "constraints": {
-        "maxVelocity": 0.5,
+        "maxVelocity": 3.5,
         "maxAcceleration": 6.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 540.0,
@@ -53,12 +61,34 @@
   "eventMarkers": [
     {
       "name": "cosmetic field",
-      "waypointRelativePos": 0.5517020781637717,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "Neutral"
+          "name": "IntakePivotDown"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.04485774253731352,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "ReverseShooters"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.11,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake"
         }
       }
     }
@@ -72,11 +102,11 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 1.33,
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Hitchhiker",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

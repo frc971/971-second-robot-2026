@@ -11,8 +11,11 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.lib.superstructure.*;
 
 public class TurretLeft extends AngularSubsystem {
-  public static final Angle UPPER_LIMIT = Degrees.of(104.0);
-  public static final Angle LOWER_LIMIT = Degrees.of(-100.0);
+
+  // 98 was max on Apr 7
+  public static final Angle UPPER_LIMIT = Degrees.of(95);
+  // - 100 found on Apr 7
+  public static final Angle LOWER_LIMIT = Degrees.of(-95.0);
   public static final boolean ENABLE_WRAP = false;
 
   private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);
@@ -45,7 +48,7 @@ public class TurretLeft extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 50.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
     tc.Feedback.SensorToMechanismRatio =
@@ -59,6 +62,7 @@ public class TurretLeft extends AngularSubsystem {
         .BUS(new CANBus("Superstructure Bus"))
         .LOG_UNIT(Degrees)
         .TALONFX_CONFIG(tc)
+        .FOC(false)
         .build();
   }
 
@@ -74,6 +78,7 @@ public class TurretLeft extends AngularSubsystem {
 
   @Override
   public void setPosition(Angle goalPosition) {
+
     Angle clampedGoalPosition;
     if (ENABLE_WRAP) {
       clampedGoalPosition = limitAngle(goalPosition);
@@ -88,6 +93,7 @@ public class TurretLeft extends AngularSubsystem {
                     goalPosition.in(Degrees), LOWER_LIMIT.in(Degrees), UPPER_LIMIT.in(Degrees)));
       }
     }
+
     setFeedforward(calculatePositionFeedforward(clampedGoalPosition));
     super.setPositionVoltage(clampedGoalPosition);
   }

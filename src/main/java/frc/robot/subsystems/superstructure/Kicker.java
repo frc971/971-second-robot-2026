@@ -19,8 +19,8 @@ public class Kicker extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 70.0;
-    tc.CurrentLimits.StatorCurrentLimit = 120.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 32.0;
+    tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
     tc.Feedback.SensorToMechanismRatio = 0.0;
 
@@ -29,6 +29,7 @@ public class Kicker extends MotorSubsystem {
         .ID(15)
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
+        .FOC(false)
         .build();
   }
 }

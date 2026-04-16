@@ -11,8 +11,10 @@ public class Controllers {
 
   // === Troy's Controls
   public static final Toggle INTAKE_PIVOT = new Toggle(TROY.leftBumper());
+  public static final Trigger JUICE = TROY.a();
   public static final Edge INTAKE_PIVOT_EDGE = new Edge(TROY.leftBumper());
   public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
+  public static final Trigger UNJAM = ANDRE.rightStick();
 
   public static final Trigger SHOOT_REDUNDANCY = TROY.axisGreaterThan(3, 0.9);
   public static final Edge SHOOT_REDUNDANCY_EDGE = new Edge(SHOOT_REDUNDANCY);
@@ -23,18 +25,9 @@ public class Controllers {
 
   public static final Trigger INDEX = TROY.rightTrigger();
 
-  // score/save must be the same button, no space
-  public static final Edge SCORE = new Edge(TROY.a());
-
-  public static final Edge UNDERSHOOT = new Edge(TROY.povUp());
-  public static final Edge OVERSHOOT = new Edge(TROY.povDown());
-  public static final Edge REVERT = new Edge(TROY.povLeft());
-  public static final Edge HIT = new Edge(TROY.povRight());
-
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
-  // public static final Trigger SHOOT = ANDRE.rightTrigger();
   public static final Trigger SHOOT = ANDRE.axisGreaterThan(3, 0.9);
   public static final Edge SHOOT_EDGE = new Edge(SHOOT);
 

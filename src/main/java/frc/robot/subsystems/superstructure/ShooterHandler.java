@@ -106,7 +106,7 @@ public class ShooterHandler {
   private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(2.0);
   private static final Angle TURRET_STEP = Degrees.of(2.0);
 
-  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.1);
+  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.05);
 
   // state machine
   public enum State {
