@@ -315,6 +315,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
       moduleIndex++;
     }
+    Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
+    Logger.recordOutput("Drive/MeasuredSpeeds", getState().Speeds);
+    Logger.recordOutput("Drive/MeasuredSpeeds", getState().Speeds);
 
     double batteryVoltage = RobotController.getBatteryVoltage();
     double totalDrivePower = totalDriveSupplyCurrent * batteryVoltage;
@@ -323,12 +326,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Logger.recordOutput("Drive/TotalDriveSupplyCurrent", totalDriveSupplyCurrent);
     Logger.recordOutput("Drive/TotalDriveSupplyCurrentAbs", totalDriveSupplyCurrentAbs);
     Logger.recordOutput("Drive/TotalDrivePower", totalDrivePower);
-    m_telemetry.telemeterize(
-        getState(),
-        totalDriveStatorCurrent,
-        totalDriveSupplyCurrent,
-        totalDriveSupplyCurrentAbs,
-        totalDrivePower);
   }
 
   private void startSimThread() {
