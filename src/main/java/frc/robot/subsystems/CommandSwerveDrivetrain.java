@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -336,7 +335,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void resetPose(Pose2d pose) {
     if (this.mapleSimSwerveDrivetrain != null)
       mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
-    Timer.delay(0.1); // wait for simulation to update
     super.resetPose(pose);
   }
 
