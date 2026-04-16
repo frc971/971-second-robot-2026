@@ -67,7 +67,7 @@ public enum SetpointGoal {
           .withKickerVolts(-10)
           .withB2Volts(-8.0)),
   UNJAM(Setpoint.builder().withRollerFloorVolts(-10.0).withB2Volts(-8.0).withKickerVolts(-10)),
-  INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(-7.0)),
+  INTAKE_PIVOT(Setpoint.builder().withGroundPivotDegrees(-2.0)),
   INTAKE_PIVOT_JUICE(Setpoint.builder().withGroundPivotDegrees(50)),
   REVERSE_SHOOTERS(
       Setpoint.builder()
@@ -75,8 +75,8 @@ public enum SetpointGoal {
           .withRightFlywheelRPS(-5.0)
           .withB2Volts(-5.0)
           .withKickerVolts(-5.0)),
-  AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(12.0)),
-  INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
+  AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
+  INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(9.0)),
   KILL_RIGHT(
       Setpoint.builder()
           .withRightFlywheelRPS(0.0)

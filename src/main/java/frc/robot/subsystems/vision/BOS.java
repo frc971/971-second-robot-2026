@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import org.littletonrobotics.junction.Logger;
 
 public class BOS {
   private final CommandSwerveDrivetrain drivetrain;
@@ -19,6 +21,8 @@ public class BOS {
 
   DoubleArraySubscriber[] tag_estimation_subscribers =
       new DoubleArraySubscriber[CAMERA_NAMES.length];
+
+  Pose2d lastVisionPose = new Pose2d(0, 0, new Rotation2d());
 
   public BOS(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -59,15 +63,26 @@ public class BOS {
         if (tagEstimations[i][0] == -1) {
           continue;
         }
-        drivetrain.addVisionMeasurement(
+
+        Pose2d estimate =
             new Pose2d(
-                tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2])),
+                tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
+
+        drivetrain.addVisionMeasurement(
+            estimate,
             tagEstimations[i][4],
             VecBuilder.fill(
-                tagEstimations[i][3] / 3.0,
-                tagEstimations[i][3] / 3.0,
+                tagEstimations[i][3] / 4.0,
+                tagEstimations[i][3] / 4.0,
                 tagEstimations[i][3] * 2.0 / 3.0));
+
+        lastVisionPose = estimate;
+        Logger.recordOutput("Orin/AltTS", Utils.fpgaToCurrentTime(tagEstimations[i][4]));
       }
     }
+  }
+
+  public Pose2d getLastVisionPose() {
+    return lastVisionPose;
   }
 }
