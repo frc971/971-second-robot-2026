@@ -289,18 +289,33 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Logger.recordOutput("BatteryVoltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
     Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
-    Logger.recordOutput("Drive/MeasuredSpeeds", getState().Speeds);
-
-    // Sum currents across all drive motors
     double totalDriveStatorCurrent = 0;
     double totalDriveSupplyCurrent = 0;
     double totalDriveSupplyCurrentAbs = 0;
+
+    String[] moduleNames = {"FrontLeft", "FrontRight", "BackLeft", "BackRight"};
+    int moduleIndex = 0;
+
     for (var module : getModules()) {
-      totalDriveStatorCurrent += module.getDriveMotor().getStatorCurrent().getValueAsDouble();
-      totalDriveSupplyCurrent += module.getDriveMotor().getSupplyCurrent().getValueAsDouble();
-      totalDriveSupplyCurrentAbs +=
-          Math.abs(module.getDriveMotor().getSupplyCurrent().getValueAsDouble());
+      String moduleName = moduleNames[moduleIndex];
+
+      double driveStatorCurrent = module.getDriveMotor().getStatorCurrent().getValueAsDouble();
+      double driveSupplyCurrent = module.getDriveMotor().getSupplyCurrent().getValueAsDouble();
+      double steerStatorCurrent = module.getSteerMotor().getStatorCurrent().getValueAsDouble();
+      double steerSupplyCurrent = module.getSteerMotor().getSupplyCurrent().getValueAsDouble();
+
+      totalDriveStatorCurrent += driveStatorCurrent;
+      totalDriveSupplyCurrent += driveSupplyCurrent;
+      totalDriveSupplyCurrentAbs += Math.abs(driveSupplyCurrent);
+
+      Logger.recordOutput("Drive/" + moduleName + "/DriveStatorCurrent", driveStatorCurrent);
+      Logger.recordOutput("Drive/" + moduleName + "/DriveSupplyCurrent", driveSupplyCurrent);
+      Logger.recordOutput("Drive/" + moduleName + "/SteerStatorCurrent", steerStatorCurrent);
+      Logger.recordOutput("Drive/" + moduleName + "/SteerSupplyCurrent", steerSupplyCurrent);
+
+      moduleIndex++;
     }
+
     double batteryVoltage = RobotController.getBatteryVoltage();
     double totalDrivePower = totalDriveSupplyCurrent * batteryVoltage;
 
@@ -308,6 +323,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Logger.recordOutput("Drive/TotalDriveSupplyCurrent", totalDriveSupplyCurrent);
     Logger.recordOutput("Drive/TotalDriveSupplyCurrentAbs", totalDriveSupplyCurrentAbs);
     Logger.recordOutput("Drive/TotalDrivePower", totalDrivePower);
+    m_telemetry.telemeterize(
+        getState(),
+        totalDriveStatorCurrent,
+        totalDriveSupplyCurrent,
+        totalDriveSupplyCurrentAbs,
+        totalDrivePower);
   }
 
   private void startSimThread() {

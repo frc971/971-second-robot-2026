@@ -71,6 +71,14 @@ public class Telemetry {
   private final IntegerPublisher driveFailedDaqs =
       driveStateTable.getIntegerTopic("FailedDaqs").publish();
 
+  private final DoublePublisher totalDriveStatorCurrent =
+      driveStateTable.getDoubleTopic("TotalDriveStatorCurrent").publish();
+  private final DoublePublisher totalDriveSupplyCurrent =
+      driveStateTable.getDoubleTopic("TotalDriveSupplyCurrent").publish();
+  private final DoublePublisher totalDriveSupplyCurrentAbs =
+      driveStateTable.getDoubleTopic("TotalDriveSupplyCurrentAbs").publish();
+  private final DoublePublisher totalDrivePower =
+      driveStateTable.getDoubleTopic("TotalDrivePower").publish();
   /* Robot pose for field positioning */
   private final NetworkTable table = inst.getTable("Pose");
   private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
@@ -121,6 +129,7 @@ public class Telemetry {
   /** Accept the swerve drive state and telemeterize it to SmartDashboard and SignalLogger. */
   public void telemeterize(SwerveDriveState state) {
     /* Telemeterize the swerve drive state */
+
     drivePose.set(state.Pose);
     driveSpeeds.set(state.Speeds);
     driveModuleStates.set(state.ModuleStates);
@@ -131,6 +140,10 @@ public class Telemetry {
     driveSuccessfulDaqs.set(state.SuccessfulDaqs);
     driveFailedDaqs.set(state.FailedDaqs);
 
+    this.totalDriveStatorCurrent.set(totalDriveStatorCurrent);
+    this.totalDriveSupplyCurrent.set(totalDriveSupplyCurrent);
+    this.totalDriveSupplyCurrentAbs.set(totalDriveSupplyCurrentAbs);
+    this.totalDrivePower.set(totalDrivePower);
     /* Also write to log file */
     poseArray[0] = state.Pose.getX();
     poseArray[1] = state.Pose.getY();
@@ -148,8 +161,8 @@ public class Telemetry {
     SignalLogger.writeDoubleArray("DriveState/ModuleTargets", moduleTargetsArray);
     SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
     SignalLogger.writeInteger("DriveState/FailedDaqs", state.FailedDaqs);
-
     /* Telemeterize the pose to a Field2d */
+
     robotPose.setPose(state.Pose);
     fieldTypePub.set("Field2d");
     fieldPub.set(poseArray);
