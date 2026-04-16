@@ -319,10 +319,15 @@ public class ShooterHandler {
     if (launchSolution == null) {
       return false;
     }
-
-    return flywheelSpeedAbsDiff().lt(config.THRESHOLD().AIMING_FLYWHEEL_THRESHOLD())
-        && turretRotationAbsDiff().lt(config.THRESHOLD().AIMING_ROTATION_THRESHOLD())
-        && hoodAngleAbsDiff().lt(config.THRESHOLD().AIMING_HOOD_ANGLE_THRESHOLD());
+    if (targetState == Targets.BLUE || targetState == Targets.RED) {
+      return flywheelSpeedAbsDiff().lt(config.THRESHOLD().AIMING_FLYWHEEL_THRESHOLD())
+          && turretRotationAbsDiff().lt(config.THRESHOLD().AIMING_ROTATION_THRESHOLD())
+          && hoodAngleAbsDiff().lt(config.THRESHOLD().AIMING_HOOD_ANGLE_THRESHOLD());
+    } else {
+      return flywheelSpeedAbsDiff().lt(config.THRESHOLD().SHUTTLING_AIMING_FLYWHEEL_THRESHOLD())
+          && turretRotationAbsDiff().lt(config.THRESHOLD().SHUTTLING_AIMING_ROTATION_THRESHOLD())
+          && hoodAngleAbsDiff().lt(config.THRESHOLD().SHUTTLING_AIMING_HOOD_ANGLE_THRESHOLD());
+    }
   }
 
   @AutoLogOutput(key = "{name}/canTransitionToNotReady")
@@ -336,9 +341,9 @@ public class ShooterHandler {
           || turretRotationAbsDiff().gt(config.THRESHOLD().FIRING_ROTATION_THRESHOLD())
           || hoodAngleAbsDiff().gt(config.THRESHOLD().FIRING_HOOD_ANGLE_THRESHOLD());
     } else {
-      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHUTTLING_FLYWHEEL_THRESHOLD())
-          || turretRotationAbsDiff().gt(config.THRESHOLD().SHUTTLING_ROTATION_THRESHOLD())
-          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHUTTLING_HOOD_ANGLE_THRESHOLD());
+      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHUTTLING_FIRING_FLYWHEEL_THRESHOLD())
+          || turretRotationAbsDiff().gt(config.THRESHOLD().SHUTTLING_FIRING_ROTATION_THRESHOLD())
+          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHUTTLING_FIRING_HOOD_ANGLE_THRESHOLD());
     }
   }
 
