@@ -88,7 +88,7 @@ public class Superstructure {
 
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
 
-    setGoal(SetpointGoal.NEUTRAL);
+    setGoal(SetpointGoal.INTAKE_PIVOT);
   }
 
   public void periodic() {
@@ -96,7 +96,7 @@ public class Superstructure {
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
       }
-      setGoal(SetpointGoal.NEUTRAL);
+      setGoal(SetpointGoal.INTAKE_PIVOT);
 
       boolean wantsShot =
           Controllers.LEFT_SHUTTLE.getAsBoolean()
@@ -150,7 +150,7 @@ public class Superstructure {
           shooterHandlerRight.setTargetState(curTarget);
         }
         case MANUAL -> {
-          SetpointGoal setpoint = SetpointGoal.NEUTRAL;
+          SetpointGoal setpoint = SetpointGoal.INTAKE_PIVOT;
 
           if (Controllers.MANUAL_SHOOT_UP.getAsBoolean()) {
             setpoint = SetpointGoal.MANUAL_UP;
