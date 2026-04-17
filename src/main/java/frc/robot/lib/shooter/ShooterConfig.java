@@ -62,26 +62,14 @@ public class ShooterConfig {
   @Getter
   @Builder
   public static class Threshold {
-    @Builder.Default
-    private AngularVelocity AIMING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(100.0);
-
-    @Builder.Default private Angle AIMING_ROTATION_THRESHOLD = Degrees.of(2.5);
-    @Builder.Default private Angle AIMING_HOOD_ANGLE_THRESHOLD = Degrees.of(100.0);
-
-    @Builder.Default private AngularVelocity FIRING_FLYWHEEL_ABORT = RotationsPerSecond.of(100.0);
-    @Builder.Default private Angle FIRING_ROTATION_THRESHOLD = Degrees.of(100.0);
-    @Builder.Default private Angle FIRING_HOOD_ANGLE_THRESHOLD = Degrees.of(100.0);
-
-    /*
-     * Note: very important that the two thresholds (AIMING & SHOOTING) overlap
-     * So that robot doesn't flicker between the two states when near threshold boundary
-     * (aka, shooter thresholds must be larger/greater than aiming thresholds)
-     */
+    @Builder.Default private AngularVelocity HUB_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(100.0);
+    @Builder.Default private Angle HUB_TURRET_THRESHOLD = Degrees.of(2.5);
+    @Builder.Default private Angle HUB_HOOD_THRESHOLD = Degrees.of(100.0);
 
     @Builder.Default
-    private AngularVelocity SHUTTLING_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(100.0);
+    private AngularVelocity SHUTTLE_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(100.0);
 
-    @Builder.Default private Angle SHUTTLING_ROTATION_THRESHOLD = Degrees.of(100.0);
-    @Builder.Default private Angle SHUTTLING_HOOD_ANGLE_THRESHOLD = Degrees.of(100.0);
+    @Builder.Default private Angle SHUTTLE_TURRET_THRESHOLD = Degrees.of(100.0);
+    @Builder.Default private Angle SHUTTLE_HOOD_THRESHOLD = Degrees.of(100.0);
   }
 }
