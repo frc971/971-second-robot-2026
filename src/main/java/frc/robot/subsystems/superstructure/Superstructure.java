@@ -124,10 +124,12 @@ public class Superstructure {
         case NONE -> {}
         case TARGETING -> {
           if (!Controllers.KILL_LEFT.toggled()) {
-            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+            shooterHandlerLeft.setShooterGoal(
+                wantsShot ? ShooterHandler.Goal.ACTIVE : ShooterHandler.Goal.NONE);
           }
           if (!Controllers.KILL_RIGHT.toggled()) {
-            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+            shooterHandlerRight.setShooterGoal(
+                wantsShot ? ShooterHandler.Goal.ACTIVE : ShooterHandler.Goal.NONE);
           }
 
           ObjectState curTarget =
