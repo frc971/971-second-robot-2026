@@ -48,6 +48,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean hasAppliedOperatorPerspective = false;
 
+  private final double BUMP_TILT_THRESHOLD_DEGREES = 5.0;
+
   /** Swerve request to apply during robot-centric path following */
   private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
       new SwerveRequest.ApplyRobotSpeeds();
@@ -336,6 +338,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (this.mapleSimSwerveDrivetrain != null)
       mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
     super.resetPose(pose);
+  }
+
+  public boolean isRobotOnBump() {
+    // use the hypotenuse of pitch and roll to account for cases if the robot is tilted diagonally
+    return Math.hypot(getPigeon2().getPitch().getValue().in(Degrees), getPigeon2().getRoll().getValue().in(Degrees)) >= BUMP_TILT_THRESHOLD_DEGREES;
   }
 
   /**
