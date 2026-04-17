@@ -17,7 +17,6 @@ public class Controllers {
   public static final Trigger UNJAM = ANDRE.rightStick();
 
   public static final Trigger SHOOT_REDUNDANCY = TROY.axisGreaterThan(3, 0.9);
-
   public static final Trigger INDEX = TROY.rightTrigger();
 
   public static final Trigger ODOMETRY_RESET = TROY.y();
