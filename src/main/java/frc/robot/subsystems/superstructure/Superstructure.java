@@ -124,12 +124,10 @@ public class Superstructure {
         case NONE -> {}
         case TARGETING -> {
           if (!Controllers.KILL_LEFT.toggled()) {
-            shooterHandlerLeft.setShooterGoal(
-                wantsShot ? ShooterHandler.Goal.ACTIVE : ShooterHandler.Goal.ALIGN_ONLY);
+            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
           }
           if (!Controllers.KILL_RIGHT.toggled()) {
-            shooterHandlerRight.setShooterGoal(
-                wantsShot ? ShooterHandler.Goal.ACTIVE : ShooterHandler.Goal.ALIGN_ONLY);
+            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
           }
 
           ObjectState curTarget =
@@ -196,14 +194,32 @@ public class Superstructure {
       }
 
       if (DriverStation.isEnabled()) {
-        if (!Controllers.KILL_LEFT.toggled()
-            && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
-          hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+        if (!Controllers.KILL_LEFT.toggled()) {
+          if (shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
+            hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+          }
+
+          if (wantsShot) {
+            flywheelLeft.setVelocity(
+                shooterHandlerLeft.getFlywheelSpeed().plus(shooterHandlerLeft.getFlywheelOffset()));
+          } else {
+            flywheelLeft.setVelocity(RotationsPerSecond.of(0.0));
+          }
         }
 
-        if (!Controllers.KILL_RIGHT.toggled()
-            && shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
-          hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+        if (!Controllers.KILL_RIGHT.toggled()) {
+          if (shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
+            hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+          }
+
+          if (wantsShot) {
+            flywheelRight.setVelocity(
+                shooterHandlerRight
+                    .getFlywheelSpeed()
+                    .plus(shooterHandlerRight.getFlywheelOffset()));
+          } else {
+            flywheelRight.setVelocity(RotationsPerSecond.of(0.0));
+          }
         }
       }
 
