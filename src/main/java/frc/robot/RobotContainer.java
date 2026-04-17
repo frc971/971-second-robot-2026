@@ -52,6 +52,8 @@ public class RobotContainer {
           .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
   // Slew rate limit for translation (m/s^2)
   private static final double SLEW_TRANSLATE_LIMIT = 1000.0;
   // Slew rate limit for rotation (rad/s^2)
@@ -118,6 +120,10 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () -> {
+              if (Controllers.DRIVE_LOCK.getAsBoolean()) {
+                return brake;
+              }
+
               boolean shooting =
                   Controllers.SHOOT_REDUNDANCY.getAsBoolean() || Controllers.SHOOT.getAsBoolean();
 
