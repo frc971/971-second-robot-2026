@@ -174,7 +174,7 @@ public class Superstructure {
         }
       }
 
-      if (Controllers.INTAKE_PIVOT.toggled()) {
+      if (!Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);
 
         if (Controllers.JUICE.getAsBoolean()) {
