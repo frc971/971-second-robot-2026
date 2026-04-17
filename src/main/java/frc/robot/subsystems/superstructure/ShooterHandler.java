@@ -117,6 +117,7 @@ public class ShooterHandler {
 
   public enum Goal {
     NONE,
+    ALIGN_ONLY,
     ACTIVE
   }
 
@@ -247,10 +248,14 @@ public class ShooterHandler {
 
     // set output
     if (shooterState != State.NOT_READY) {
-      flywheel.setVelocity(desiredFlywheel);
-
       // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
       turret.setPosition(desiredTurretRel);
+
+        if (shooterGoal == Goal.ACTIVE) {
+            flywheel.setVelocity(desiredFlywheel);
+        } else {
+            flywheel.setVelocity(RotationsPerSecond.of(0.0));
+        }
     }
 
     // ShooterHandler no longer commands hood here.

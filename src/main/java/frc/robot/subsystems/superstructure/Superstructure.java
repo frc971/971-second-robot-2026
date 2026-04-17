@@ -125,11 +125,11 @@ public class Superstructure {
         case TARGETING -> {
           if (!Controllers.KILL_LEFT.toggled()) {
             shooterHandlerLeft.setShooterGoal(
-                wantsShot ? ShooterHandler.Goal.ACTIVE : ShooterHandler.Goal.NONE);
+                wantsShot ? ShooterHandler.Goal.ACTIVE : ShooterHandler.Goal.ALIGN_ONLY);
           }
           if (!Controllers.KILL_RIGHT.toggled()) {
             shooterHandlerRight.setShooterGoal(
-                wantsShot ? ShooterHandler.Goal.ACTIVE : ShooterHandler.Goal.NONE);
+                wantsShot ? ShooterHandler.Goal.ACTIVE : ShooterHandler.Goal.ALIGN_ONLY);
           }
 
           ObjectState curTarget =
@@ -195,7 +195,7 @@ public class Superstructure {
         groundPivot.setFeedforward(Volts.of(0.0));
       }
 
-      if (wantsShot && DriverStation.isEnabled()) {
+      if (DriverStation.isEnabled()) {
         if (!Controllers.KILL_LEFT.toggled()
             && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
           hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
