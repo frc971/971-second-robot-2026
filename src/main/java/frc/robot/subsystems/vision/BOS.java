@@ -72,9 +72,9 @@ public class BOS {
             estimate,
             tagEstimations[i][4],
             VecBuilder.fill(
-                tagEstimations[i][3] / 8.0,
-                tagEstimations[i][3] / 8.0,
-                tagEstimations[i][3] / 3.0));
+                tagEstimations[i][3] / 4.0,
+                tagEstimations[i][3] / 4.0,
+                tagEstimations[i][3] * 2 / 3.0));
 
         lastVisionPose = estimate;
         Logger.recordOutput("Orin/AltTS", Utils.fpgaToCurrentTime(tagEstimations[i][4]));
