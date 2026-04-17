@@ -62,9 +62,9 @@ public class ShooterConfig {
   @Getter
   @Builder
   public static class Threshold {
-    @Builder.Default private AngularVelocity HUB_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(15.0);
+    @Builder.Default private AngularVelocity HUB_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(100.0);
     @Builder.Default private Angle HUB_TURRET_THRESHOLD = Degrees.of(2.5);
-    @Builder.Default private Angle HUB_HOOD_THRESHOLD = Degrees.of(10.0);
+    @Builder.Default private Angle HUB_HOOD_THRESHOLD = Degrees.of(100.0);
 
     @Builder.Default
     private AngularVelocity SHUTTLE_FLYWHEEL_THRESHOLD = RotationsPerSecond.of(100.0);
