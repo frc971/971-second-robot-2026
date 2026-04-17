@@ -284,6 +284,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       super.resetPose(simPose);
     }
 
+    Logger.recordOutput("Gyro", getPigeon2().getRotation2d());
+
     Logger.recordOutput("Drive/Pose", getState().Pose);
 
     Logger.recordOutput("BatteryVoltage", RobotController.getBatteryVoltage());
