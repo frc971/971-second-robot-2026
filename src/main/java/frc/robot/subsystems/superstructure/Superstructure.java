@@ -174,7 +174,7 @@ public class Superstructure {
         }
       }
 
-      if (Controllers.INTAKE_PIVOT.toggled()) {
+      if (!Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);
 
         if (Controllers.JUICE.getAsBoolean()) {
@@ -188,6 +188,9 @@ public class Superstructure {
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE_ROLLERS);
+        groundPivot.setFeedforward(Volts.of(-0.4));
+      } else {
+        groundPivot.setFeedforward(Volts.of(0.0));
       }
 
       if (wantsShot && DriverStation.isEnabled()) {

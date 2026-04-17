@@ -1,0 +1,124 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.421831694756555,
+        "y": 7.434082640839575
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.993934895833333,
+        "y": 7.431263599537037
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.703597921301446,
+        "y": 5.730107584816462
+      },
+      "prevControl": {
+        "x": 7.712746389751189,
+        "y": 7.171700049826597
+      },
+      "nextControl": {
+        "x": 7.695203568200778,
+        "y": 4.407346704671858
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.282430000347608,
+        "y": 5.391968854282536
+      },
+      "prevControl": {
+        "x": 6.546238576245676,
+        "y": 5.225029282336603
+      },
+      "nextControl": {
+        "x": 5.829292573345382,
+        "y": 5.678716803392658
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.622,
+        "y": 5.571
+      },
+      "prevControl": {
+        "x": 2.998109792130145,
+        "y": 5.502790079254728
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 89.57427155360277
+    },
+    {
+      "waypointRelativePos": 0.9644616168478255,
+      "rotationDegrees": 88.18599608801958
+    },
+    {
+      "waypointRelativePos": 2.0070694633152164,
+      "rotationDegrees": -31.000700566805893
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.4420851437165776,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakePivotDown"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 6.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 540.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.5,
+    "rotation": -46.505325650150375
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 4.0,
+    "rotation": 89.1816358611711
+  },
+  "useDefaultConstraints": false
+}

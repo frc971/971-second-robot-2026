@@ -54,7 +54,7 @@ public class FlywheelRight extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 35.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
     tc.Feedback.SensorToMechanismRatio = 1.0 / 1.0; // Motor to output gear ratio

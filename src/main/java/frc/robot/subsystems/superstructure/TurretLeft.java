@@ -48,8 +48,8 @@ public class TurretLeft extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
-    tc.CurrentLimits.StatorCurrentLimit = 100.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
+    tc.CurrentLimits.StatorCurrentLimit = 70.0;
 
     tc.Feedback.SensorToMechanismRatio =
         (124.0 / 10.0) * (28.0 / 12.0); // Motor to output gear ratio
