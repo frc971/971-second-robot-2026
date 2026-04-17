@@ -284,7 +284,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       super.resetPose(simPose);
     }
 
-    Logger.recordOutput("Gyro", getPigeon2().getRotation2d());
+    Logger.recordOutput("Drive/GyroYaw", getPigeon2().getYaw().getValueAsDouble());
+    Logger.recordOutput("Drive/GyroPitch", getPigeon2().getPitch().getValueAsDouble());
+    Logger.recordOutput("Drive/GyroRoll", getPigeon2().getRoll().getValueAsDouble());
+    Logger.recordOutput("Drive/GyroRotation", getPigeon2().getRotation2d());
 
     Logger.recordOutput("Drive/Pose", getState().Pose);
 
