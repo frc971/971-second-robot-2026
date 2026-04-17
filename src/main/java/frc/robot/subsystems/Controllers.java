@@ -19,10 +19,6 @@ public class Controllers {
   public static final Trigger SHOOT_REDUNDANCY = TROY.axisGreaterThan(3, 0.9);
   public static final Edge SHOOT_REDUNDANCY_EDGE = new Edge(SHOOT_REDUNDANCY);
 
-  // === Software's Controls
-  public static final Toggle TUNE_LEFT_TURRET = new Toggle(TROY.back());
-  public static final Toggle TUNE_RIGHT_TURRET = new Toggle(TROY.start());
-
   public static final Trigger INDEX = TROY.rightTrigger();
 
   // === Andre's Controls
