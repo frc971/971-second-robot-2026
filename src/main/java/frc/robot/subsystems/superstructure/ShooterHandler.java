@@ -16,6 +16,8 @@ import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
@@ -166,6 +168,8 @@ public class ShooterHandler {
   public void periodic() {
     projectileState = getProjectileState();
 
+    logStates();
+    logReadableShotStatus();
     // clear robot velocity if not using OTF
     if (!useOTF) {
       projectileState = new ObjectState(projectileState.position(), new Translation3d());
@@ -308,6 +312,106 @@ public class ShooterHandler {
       Logger.recordOutput(name + "/Target Position", targetState.position());
       Logger.recordOutput(name + "/Target Velocity", targetState.velocity());
     }
+  }
+
+  // readable log stuff starts here
+  private void logReadableShotStatus() {
+    // whether or not we are trying to shoot
+    boolean tryingToShoot = shooterGoal != Goal.NONE;
+
+    // hub or shuttle
+    String shotMode;
+    if (targetState == Targets.BLUE || targetState == Targets.RED) {
+      shotMode = "HUB";
+    } else if (targetState == Targets.LEFT_BLUE_SHUTTLE
+        || targetState == Targets.LEFT_RED_SHUTTLE) {
+      shotMode = "LEFT_SHUTTLE";
+    } else if (targetState == Targets.RIGHT_BLUE_SHUTTLE
+        || targetState == Targets.RIGHT_RED_SHUTTLE) {
+      shotMode = "RIGHT_SHUTTLE";
+    } else {
+      shotMode = "UNKNOWN";
+    }
+
+    // checks whether the shot is reachable
+    // if not reachable, which constraint is affecting it
+    String feasibility = "REACHABLE";
+    if (launchSolution == null) {
+      feasibility = "NO_LAUNCH_SOLUTION";
+    } else {
+      AngularVelocity speed = launchSolution.flywheelSpeed();
+      if (speed.lt(config.CONSTRAINTS().MIN_FLYWHEEL_SPEED())
+          || speed.gt(config.CONSTRAINTS().MAX_FLYWHEEL_SPEED())) {
+        feasibility = "UNREACHABLE_FLYWHEEL";
+      } else {
+        Angle angle = launchSolution.hoodAngle();
+        if (angle.lt(config.CONSTRAINTS().MIN_HOOD_ANGLE())
+            || angle.gt(config.CONSTRAINTS().MAX_HOOD_ANGLE())) {
+          feasibility = "UNREACHABLE_HOOD";
+        } else {
+          Distance targetDistance =
+              Meters.of(targetState.xyPos().minus(projectileState.xyPos()).getNorm());
+          if (targetDistance.lt(config.CONSTRAINTS().MIN_SHOT_DISTANCE())
+              || targetDistance.gt(config.CONSTRAINTS().MAX_SHOT_DISTANCE())) {
+            feasibility = "UNREACHABLE_DISTANCE";
+          }
+        }
+      }
+    }
+
+    // checks which subsystem thresholds are outside of the margin
+    List<String> outOfThreshold = new ArrayList<>();
+    if (launchSolution != null) {
+      if (flywheelSpeedAbsDiff()
+          .gte(
+              isShuttle(targetState)
+                  ? config.THRESHOLD().SHUTTLE_FLYWHEEL_THRESHOLD()
+                  : config.THRESHOLD().HUB_FLYWHEEL_THRESHOLD())) {
+        outOfThreshold.add("flywheel");
+      }
+
+      if (turretRotationAbsDiff()
+          .gte(
+              isShuttle(targetState)
+                  ? config.THRESHOLD().SHUTTLE_TURRET_THRESHOLD()
+                  : config.THRESHOLD().HUB_TURRET_THRESHOLD())) {
+        outOfThreshold.add("turret");
+      }
+
+      if (hoodAngleAbsDiff()
+          .gte(
+              isShuttle(targetState)
+                  ? config.THRESHOLD().SHUTTLE_HOOD_THRESHOLD()
+                  : config.THRESHOLD().HUB_HOOD_THRESHOLD())) {
+        outOfThreshold.add("hood");
+      }
+    }
+
+    String thresholdStatus = outOfThreshold.isEmpty() ? "READY" : String.join(", ", outOfThreshold);
+
+    // this actual log -> simplified + readable info
+    String summary;
+    if (!tryingToShoot) {
+      summary = "Not trying to shoot.";
+    } else if (!feasibility.equals("REACHABLE")) {
+      summary = "Trying to shoot " + shotMode + ". Not reachable: " + feasibility + ".";
+    } else if (outOfThreshold.isEmpty()) {
+      summary = "Trying to shoot " + shotMode + ". Reachable. Ready to fire.";
+    } else {
+      summary =
+          "Trying to shoot "
+              + shotMode
+              + ". Reachable. Not ready: "
+              + thresholdStatus
+              + " out of threshold.";
+    }
+
+    // logging
+    Logger.recordOutput(name + "/ShotStatus/TryingToShoot", tryingToShoot);
+    Logger.recordOutput(name + "/ShotStatus/Mode", shotMode);
+    Logger.recordOutput(name + "/ShotStatus/Feasibility", feasibility);
+    Logger.recordOutput(name + "/ShotStatus/ThresholdStatus", thresholdStatus);
+    Logger.recordOutput(name + "/ShotStatus/Summary", summary);
   }
 
   @AutoLogOutput(key = "{name}/canTransitionToReady")
