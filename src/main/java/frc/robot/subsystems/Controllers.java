@@ -26,8 +26,11 @@ public class Controllers {
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
   public static final Trigger SHOOT = ANDRE.axisGreaterThan(3, 0.9);
+  public static final Trigger SHOOTING = SHOOT_REDUNDANCY.or(SHOOT);
+  public static final Trigger SHUTTLING = LEFT_SHUTTLE.or(RIGHT_SHUTTLE).and(SHOOTING.negate());
 
-  public static final Edge SHOOT_EDGE = new Edge(SHOOT_REDUNDANCY.or(SHOOT));
+  public static final Edge SHOOT_EDGE = new Edge(SHOOTING);
+  public static final Edge SHUTTLE_EDGE = new Edge(SHUTTLING);
 
   public static final Trigger OUTTAKE = ANDRE.leftTrigger();
 
