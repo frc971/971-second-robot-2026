@@ -20,7 +20,6 @@ public class FlywheelRight extends AngularSubsystem {
   private static final double MAX_PROFILED_ACCELERATION_RPS_PER_SEC = 240.0;
   private static final double MAX_PROFILED_VELOCITY_RPS = 120.0;
 
-  private boolean profileActive = false;
   private AngularVelocity profiledVelocity = RotationsPerSecond.zero();
 
   public FlywheelRight() {
@@ -96,25 +95,25 @@ public class FlywheelRight extends AngularSubsystem {
 
   @Override
   public void setVelocity(AngularVelocity goalVelocity) {
-    if (goalVelocity.isNear(RotationsPerSecond.zero(), STARTUP_DEADBAND)) {
-      profileActive = false;
+    if (goalVelocity.in(RotationsPerSecond) == 0.0) {
       profiledVelocity = RotationsPerSecond.zero();
       setCoast();
       this.goalVelocity = RotationsPerSecond.zero();
       return;
     }
 
-    if (!profileActive) {
-      profiledVelocity = getVelocity();
-      profileActive = true;
+    double startingVelocity = profiledVelocity.in(RotationsPerSecond);
+    if (startingVelocity == 0.0
+        && !getVelocity().isNear(RotationsPerSecond.zero(), STARTUP_DEADBAND)) {
+      startingVelocity = getVelocity().in(RotationsPerSecond);
     }
 
     double maxDelta = MAX_PROFILED_ACCELERATION_RPS_PER_SEC * Constants.UPDATE_PERIOD.in(Seconds);
     double nextProfiledVelocity =
         MathUtil.clamp(
             goalVelocity.in(RotationsPerSecond),
-            profiledVelocity.in(RotationsPerSecond) - maxDelta,
-            profiledVelocity.in(RotationsPerSecond) + maxDelta);
+            startingVelocity - maxDelta,
+            startingVelocity + maxDelta);
     profiledVelocity = RotationsPerSecond.of(nextProfiledVelocity);
 
     if (getVelocity().isNear(RotationsPerSecond.zero(), STARTUP_DEADBAND)
