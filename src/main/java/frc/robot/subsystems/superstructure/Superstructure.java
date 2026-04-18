@@ -12,6 +12,7 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.superstructure.ShooterHandler.State;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
@@ -188,7 +189,7 @@ public class Superstructure {
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE_ROLLERS);
-        groundPivot.setFeedforward(Volts.of(-0.4));
+        groundPivot.setFeedforward(Volts.of(-1.0));
       } else {
         groundPivot.setFeedforward(Volts.of(0.0));
       }
@@ -216,6 +217,14 @@ public class Superstructure {
 
       // Indexer Logic
       // Driver has to say we can shoot AND we need to be ready to shoot
+      if (!wantsShot && shooterHandlerLeft.getShooterState() == State.FIRING) {
+        shooterHandlerLeft.setStateAiming();
+      }
+
+      if (!wantsShot && shooterHandlerRight.getShooterState() == State.FIRING) {
+        shooterHandlerRight.setStateAiming();
+      }
+
       boolean indexing =
           wantsShot
               && ((shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
