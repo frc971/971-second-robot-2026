@@ -243,13 +243,21 @@ public class Superstructure {
       }
 
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
-        hoodLeft.setPosition(shooterHandlerLeft.getHoodAngle());
-        flywheelLeft.setVelocity(shooterHandlerLeft.getFlywheelSpeed());
+        shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
+        shooterHandlerLeft
+            .getFlywheelSpeed()
+            .ifPresent(
+                speed ->
+                    flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
       }
 
       if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
-        hoodRight.setPosition(shooterHandlerRight.getHoodAngle());
-        flywheelRight.setVelocity(shooterHandlerRight.getFlywheelSpeed());
+        shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
+        shooterHandlerRight
+            .getFlywheelSpeed()
+            .ifPresent(
+                speed ->
+                    flywheelRight.setVelocity(speed.plus(shooterHandlerRight.getFlywheelOffset())));
       }
 
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
