@@ -193,33 +193,17 @@ public class Superstructure {
         groundPivot.setFeedforward(Volts.of(0.0));
       }
 
-      if (DriverStation.isEnabled()) {
+      if (wantsShot && DriverStation.isEnabled()) {
         if (!Controllers.KILL_LEFT.toggled()) {
-          if (shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
-            hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
-          }
-
-          if (wantsShot) {
-            flywheelLeft.setVelocity(
-                shooterHandlerLeft.getFlywheelSpeed().plus(shooterHandlerLeft.getFlywheelOffset()));
-          } else {
-            flywheelLeft.setVelocity(RotationsPerSecond.of(0.0));
-          }
+          hoodLeft.setPosition(shooterHandlerLeft.getHoodAngle());
+          flywheelLeft.setVelocity(
+              shooterHandlerLeft.getFlywheelSpeed().plus(shooterHandlerLeft.getFlywheelOffset()));
         }
 
         if (!Controllers.KILL_RIGHT.toggled()) {
-          if (shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
-            hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
-          }
-
-          if (wantsShot) {
-            flywheelRight.setVelocity(
-                shooterHandlerRight
-                    .getFlywheelSpeed()
-                    .plus(shooterHandlerRight.getFlywheelOffset()));
-          } else {
-            flywheelRight.setVelocity(RotationsPerSecond.of(0.0));
-          }
+          hoodRight.setPosition(shooterHandlerRight.getHoodAngle());
+          flywheelRight.setVelocity(
+              shooterHandlerRight.getFlywheelSpeed().plus(shooterHandlerRight.getFlywheelOffset()));
         }
       }
 
@@ -251,14 +235,14 @@ public class Superstructure {
         juiceTimer.restart();
       }
 
-      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
-          && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
-        hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+        hoodLeft.setPosition(shooterHandlerLeft.getHoodAngle());
+        flywheelLeft.setVelocity(shooterHandlerLeft.getFlywheelSpeed());
       }
 
-      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE
-          && shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
-        hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+        hoodRight.setPosition(shooterHandlerRight.getHoodAngle());
+        flywheelRight.setVelocity(shooterHandlerRight.getFlywheelSpeed());
       }
 
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
