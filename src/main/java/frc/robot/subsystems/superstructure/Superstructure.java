@@ -12,6 +12,7 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.superstructure.ShooterHandler.State;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
@@ -188,25 +189,42 @@ public class Superstructure {
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE_ROLLERS);
-        groundPivot.setFeedforward(Volts.of(-0.4));
+        groundPivot.setFeedforward(Volts.of(-1.0));
       } else {
         groundPivot.setFeedforward(Volts.of(0.0));
       }
 
       if (wantsShot && DriverStation.isEnabled()) {
-        if (!Controllers.KILL_LEFT.toggled()
-            && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
-          hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+        if (!Controllers.KILL_LEFT.toggled()) {
+          shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
+          shooterHandlerLeft
+              .getFlywheelSpeed()
+              .ifPresent(
+                  speed ->
+                      flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
         }
 
-        if (!Controllers.KILL_RIGHT.toggled()
-            && shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
-          hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+        if (!Controllers.KILL_RIGHT.toggled()) {
+          shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
+          shooterHandlerRight
+              .getFlywheelSpeed()
+              .ifPresent(
+                  speed ->
+                      flywheelRight.setVelocity(
+                          speed.plus(shooterHandlerRight.getFlywheelOffset())));
         }
       }
 
       // Indexer Logic
       // Driver has to say we can shoot AND we need to be ready to shoot
+      if (!wantsShot && shooterHandlerLeft.getShooterState() == State.FIRING) {
+        shooterHandlerLeft.setStateAiming();
+      }
+
+      if (!wantsShot && shooterHandlerRight.getShooterState() == State.FIRING) {
+        shooterHandlerRight.setStateAiming();
+      }
+
       boolean indexing =
           wantsShot
               && ((shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
@@ -233,14 +251,22 @@ public class Superstructure {
         juiceTimer.restart();
       }
 
-      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
-          && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
-        hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+        shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
+        shooterHandlerLeft
+            .getFlywheelSpeed()
+            .ifPresent(
+                speed ->
+                    flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
       }
 
-      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE
-          && shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
-        hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+        shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
+        shooterHandlerRight
+            .getFlywheelSpeed()
+            .ifPresent(
+                speed ->
+                    flywheelRight.setVelocity(speed.plus(shooterHandlerRight.getFlywheelOffset())));
       }
 
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING

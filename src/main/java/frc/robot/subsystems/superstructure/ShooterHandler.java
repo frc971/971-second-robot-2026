@@ -98,8 +98,6 @@ public class ShooterHandler {
   @Getter
   private Angle turretOffset = Degrees.of(0.0);
 
-  private AngularVelocity desiredFlywheel = RotationsPerSecond.of(0.0);
-
   @AutoLogOutput(key = "{name}/desiredTurret")
   private Angle desiredTurretRel = Degrees.of(0.0);
 
@@ -216,11 +214,10 @@ public class ShooterHandler {
 
     // --- compute tuned + clamped desired goals (used for outputs AND error) ---
     if (launchSolution == null || shooterState == State.NOT_READY) {
-      desiredFlywheel = RotationsPerSecond.of(0.0);
       desiredTurretRel = Degrees.of(0.0);
     } else {
       // Base goals from physics
-      AngularVelocity flywheelGoal = getFlywheelSpeed(); // includes fudge factor
+      AngularVelocity flywheelGoal = launchSolution.flywheelSpeed();
       Angle turretGoalRel = getRelativeTurretAngle();
 
       // Apply live-tuning offsets TO THE GOALS
@@ -235,7 +232,6 @@ public class ShooterHandler {
                   config.CONSTRAINTS().MIN_FLYWHEEL_SPEED().in(RadiansPerSecond),
                   config.CONSTRAINTS().MAX_FLYWHEEL_SPEED().in(RadiansPerSecond)));
 
-      desiredFlywheel = flywheelGoal;
       desiredTurretRel = turretGoalRel;
     }
 
@@ -243,8 +239,6 @@ public class ShooterHandler {
 
     // set output
     if (shooterState != State.NOT_READY) {
-      flywheel.setVelocity(desiredFlywheel);
-
       // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
       turret.setPosition(desiredTurretRel);
     }
@@ -262,16 +256,12 @@ public class ShooterHandler {
     if (Controllers.TURRET_RIGHT.rising()) turretOffset = turretOffset.minus(TURRET_STEP);
   }
 
-  public Optional<Angle> getDesiredHoodAngle() {
-    if (launchSolution == null || shooterState == State.NOT_READY) {
-      return Optional.empty();
-    }
-
-    return Optional.of(launchSolution.hoodAngle());
+  public Optional<Angle> getHoodAngle() {
+    return Optional.ofNullable(launchSolution).map(LaunchSolution::hoodAngle);
   }
 
-  public AngularVelocity getFlywheelSpeed() {
-    return launchSolution.flywheelSpeed();
+  public Optional<AngularVelocity> getFlywheelSpeed() {
+    return Optional.ofNullable(launchSolution).map(LaunchSolution::flywheelSpeed);
   }
 
   public Angle getRelativeTurretAngle() {
@@ -329,7 +319,7 @@ public class ShooterHandler {
   // --- Threshold helper functions ---
   private AngularVelocity flywheelSpeedAbsDiff() {
     return RadiansPerSecond.of(
-        getFlywheelSpeed().minus(flywheel.getVelocity()).abs(RadiansPerSecond));
+        launchSolution.flywheelSpeed().minus(flywheel.getVelocity()).abs(RadiansPerSecond));
   }
 
   private Angle turretRotationAbsDiff() {
@@ -439,5 +429,9 @@ public class ShooterHandler {
 
   public ShooterConfig getConfig() {
     return config;
+  }
+
+  public void setStateAiming() {
+    shooterState = shooterState.AIMING;
   }
 }
