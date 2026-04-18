@@ -194,14 +194,16 @@ public class Superstructure {
       }
 
       if (wantsShot && DriverStation.isEnabled()) {
-        if (!Controllers.KILL_LEFT.toggled()
-            && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
-          hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+        if (!Controllers.KILL_LEFT.toggled()) {
+          hoodLeft.setPosition(shooterHandlerLeft.getHoodAngle());
+          flywheelLeft.setVelocity(
+              shooterHandlerLeft.getFlywheelSpeed().plus(shooterHandlerLeft.getFlywheelOffset()));
         }
 
-        if (!Controllers.KILL_RIGHT.toggled()
-            && shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
-          hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+        if (!Controllers.KILL_RIGHT.toggled()) {
+          hoodRight.setPosition(shooterHandlerRight.getHoodAngle());
+          flywheelRight.setVelocity(
+              shooterHandlerRight.getFlywheelSpeed().plus(shooterHandlerRight.getFlywheelOffset()));
         }
       }
 
@@ -233,14 +235,14 @@ public class Superstructure {
         juiceTimer.restart();
       }
 
-      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
-          && shooterHandlerLeft.getDesiredHoodAngle().isPresent()) {
-        hoodLeft.setPosition(shooterHandlerLeft.getDesiredHoodAngle().get());
+      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+        hoodLeft.setPosition(shooterHandlerLeft.getHoodAngle());
+        flywheelLeft.setVelocity(shooterHandlerLeft.getFlywheelSpeed());
       }
 
-      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE
-          && shooterHandlerRight.getDesiredHoodAngle().isPresent()) {
-        hoodRight.setPosition(shooterHandlerRight.getDesiredHoodAngle().get());
+      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+        hoodRight.setPosition(shooterHandlerRight.getHoodAngle());
+        flywheelRight.setVelocity(shooterHandlerRight.getFlywheelSpeed());
       }
 
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING

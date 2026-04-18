@@ -16,7 +16,6 @@ import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -243,8 +242,6 @@ public class ShooterHandler {
 
     // set output
     if (shooterState != State.NOT_READY) {
-      flywheel.setVelocity(desiredFlywheel);
-
       // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
       turret.setPosition(desiredTurretRel);
     }
@@ -262,12 +259,8 @@ public class ShooterHandler {
     if (Controllers.TURRET_RIGHT.rising()) turretOffset = turretOffset.minus(TURRET_STEP);
   }
 
-  public Optional<Angle> getDesiredHoodAngle() {
-    if (launchSolution == null || shooterState == State.NOT_READY) {
-      return Optional.empty();
-    }
-
-    return Optional.of(launchSolution.hoodAngle());
+  public Angle getHoodAngle() {
+    return launchSolution.hoodAngle();
   }
 
   public AngularVelocity getFlywheelSpeed() {
