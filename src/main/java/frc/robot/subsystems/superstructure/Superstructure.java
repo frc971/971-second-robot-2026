@@ -131,6 +131,16 @@ public class Superstructure {
             shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.AIM);
           }
 
+          if (wantsShot && DriverStation.isEnabled()) {
+            if (!Controllers.KILL_LEFT.toggled()) {
+              shooterHandlerLeft.setShooterGoal(Goal.FIRE);
+            }
+
+            if (!Controllers.KILL_RIGHT.toggled()) {
+              shooterHandlerRight.setShooterGoal(Goal.FIRE);
+            }
+          }
+
           ObjectState curTarget =
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                   ? ShooterHandler.Targets.BLUE
@@ -192,16 +202,6 @@ public class Superstructure {
         groundPivot.setFeedforward(Volts.of(-0.4));
       } else {
         groundPivot.setFeedforward(Volts.of(0.0));
-      }
-
-      if (wantsShot && DriverStation.isEnabled()) {
-        if (!Controllers.KILL_LEFT.toggled()) {
-          shooterHandlerLeft.setShooterGoal(Goal.FIRE);
-        }
-
-        if (!Controllers.KILL_RIGHT.toggled()) {
-          shooterHandlerRight.setShooterGoal(Goal.FIRE);
-        }
       }
 
       // Indexer Logic
