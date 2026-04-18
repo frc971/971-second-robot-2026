@@ -55,12 +55,13 @@ public class Robot extends LoggedRobot {
 
     Logger.start();
 
-    // IMPORTANT: DO NOT DELETE OR EXPENSIVE FILE READING WILL FREEZE WHEN FIRST TAG HELPER FUNCTION
+    // IMPORTANT: DO NOT DELETE OR EXPENSIVE FILE READING WILL FREEZE WHEN FIRST TAG
+    // HELPER FUNCTION
     // IS CALLED
     TagHelper.init();
 
     robotContainer = new RobotContainer();
-    bos = new BOS(robotContainer.drivetrain);
+    bos = new BOS(robotContainer.drivetrain, true);
   }
 
   @Override

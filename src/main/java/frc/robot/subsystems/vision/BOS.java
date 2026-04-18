@@ -17,6 +17,10 @@ public class BOS {
   public static final String[] CAMERA_NAMES = {
     "PoseEstimate/Right/", "PoseEstimate/Left/", "PoseEstimate/Front/"
   };
+  private static final double FIELD_LENGTH_X = 16.54,
+      FIELD_LENGTH_Y = 8.07,
+      BAD_ODOMETRY_TOLERANCE = 0.5;
+  private final boolean overrideBadOdemetry;
   IntegerPublisher num_tags_per_control_loop_publisher;
 
   DoubleArraySubscriber[] tag_estimation_subscribers =
@@ -24,8 +28,9 @@ public class BOS {
 
   Pose2d lastVisionPose = new Pose2d(0, 0, new Rotation2d());
 
-  public BOS(CommandSwerveDrivetrain drivetrain) {
+  public BOS(CommandSwerveDrivetrain drivetrain, boolean overrideBadOdemetry) {
     this.drivetrain = drivetrain;
+    this.overrideBadOdemetry = overrideBadOdemetry;
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     NetworkTable table = instance.getTable("Orin");
@@ -68,13 +73,17 @@ public class BOS {
             new Pose2d(
                 tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
 
-        drivetrain.addVisionMeasurement(
-            estimate,
-            tagEstimations[i][4],
-            VecBuilder.fill(
-                tagEstimations[i][3] / 4.0,
-                tagEstimations[i][3] / 4.0,
-                tagEstimations[i][3] * 2.0 / 3.0));
+        if (overrideBadOdemetry && poseOffField(drivetrain.getState().Pose)) {
+          drivetrain.resetPose(estimate);
+        } else {
+          drivetrain.addVisionMeasurement(
+              estimate,
+              tagEstimations[i][4],
+              VecBuilder.fill(
+                  tagEstimations[i][3] / 4.0,
+                  tagEstimations[i][3] / 4.0,
+                  tagEstimations[i][3] * 2.0 / 3.0));
+        }
 
         lastVisionPose = estimate;
         Logger.recordOutput("Orin/AltTS", Utils.fpgaToCurrentTime(tagEstimations[i][4]));
@@ -84,5 +93,12 @@ public class BOS {
 
   public Pose2d getLastVisionPose() {
     return lastVisionPose;
+  }
+
+  public static boolean poseOffField(Pose2d pose) {
+    return pose.getX() < -BAD_ODOMETRY_TOLERANCE
+        || pose.getY() < -BAD_ODOMETRY_TOLERANCE
+        || pose.getX() > FIELD_LENGTH_X + BAD_ODOMETRY_TOLERANCE
+        || pose.getY() > FIELD_LENGTH_Y + BAD_ODOMETRY_TOLERANCE;
   }
 }
