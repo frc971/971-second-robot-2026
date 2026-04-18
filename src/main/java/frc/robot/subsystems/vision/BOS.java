@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
 public class BOS {
   private final CommandSwerveDrivetrain drivetrain;
   public static final String[] CAMERA_NAMES = {
-      "PoseEstimate/Right/", "PoseEstimate/Left/", "PoseEstimate/Front/"
+    "PoseEstimate/Right/", "PoseEstimate/Left/", "PoseEstimate/Front/"
   };
   private static final double FIELD_LENGTH_X = 16.54,
       FIELD_LENGTH_Y = 8.07,
@@ -23,7 +23,8 @@ public class BOS {
   private final boolean overrideBadOdemetry;
   IntegerPublisher num_tags_per_control_loop_publisher;
 
-  DoubleArraySubscriber[] tag_estimation_subscribers = new DoubleArraySubscriber[CAMERA_NAMES.length];
+  DoubleArraySubscriber[] tag_estimation_subscribers =
+      new DoubleArraySubscriber[CAMERA_NAMES.length];
 
   Pose2d lastVisionPose = new Pose2d(0, 0, new Rotation2d());
 
@@ -34,16 +35,17 @@ public class BOS {
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     NetworkTable table = instance.getTable("Orin");
 
-    double[] blank = { -1 };
+    double[] blank = {-1};
 
     for (int i = 0; i < CAMERA_NAMES.length; i++) {
-      tag_estimation_subscribers[i] = table
-          .getDoubleArrayTopic(CAMERA_NAMES[i] + "TagEstimation")
-          .subscribe(
-              blank,
-              PubSubOption.keepDuplicates(true),
-              PubSubOption.sendAll(true),
-              PubSubOption.pollStorage(200));
+      tag_estimation_subscribers[i] =
+          table
+              .getDoubleArrayTopic(CAMERA_NAMES[i] + "TagEstimation")
+              .subscribe(
+                  blank,
+                  PubSubOption.keepDuplicates(true),
+                  PubSubOption.sendAll(true),
+                  PubSubOption.pollStorage(200));
     }
 
     num_tags_per_control_loop_publisher = table.getIntegerTopic("NumTagsPerControlLoop").publish();
@@ -67,10 +69,13 @@ public class BOS {
           continue;
         }
 
-        Pose2d estimate = new Pose2d(
-            tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
+        Pose2d estimate =
+            new Pose2d(
+                tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
 
-        if (overrideBadOdemetry && poseOffField(drivetrain.getState().Pose) && !poseOffField(estimate)) {
+        if (overrideBadOdemetry
+            && poseOffField(drivetrain.getState().Pose)
+            && !poseOffField(estimate)) {
           drivetrain.resetPose(estimate);
         } else {
           drivetrain.addVisionMeasurement(
