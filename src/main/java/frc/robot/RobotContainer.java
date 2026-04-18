@@ -8,19 +8,10 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -103,22 +94,8 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MAX_SPEED);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  private final SendableChooser<Command> autoChooser;
-
   public RobotContainer() {
     superstructure = new Superstructure(this);
-
-    registerNamedCommands();
-
-    autoChooser = AutoBuilder.buildAutoChooser("Outpost Side");
-    AutoBuilder.getAllAutoNames().stream()
-        .sorted()
-        .forEach(
-            autoName ->
-                autoChooser.addOption(
-                    autoName + " (Mirrored)", new PathPlannerAuto(autoName, true)));
-
-    SmartDashboard.putData("Auto Mode", autoChooser);
 
     configureDrivetrain();
 
@@ -126,21 +103,7 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    // Warmup PathPlanner to avoid Java pauses
-    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
-
     if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
-  }
-
-  private void registerNamedCommands() {
-    NamedCommands.registerCommand("Intake", superstructure.intakeAuto());
-    NamedCommands.registerCommand("IntakePivotDown", superstructure.intakePivotDownAuto());
-    NamedCommands.registerCommand("Deployed", superstructure.deployedAuto());
-    NamedCommands.registerCommand("Shoot", superstructure.shootAuto());
-    NamedCommands.registerCommand("ReverseShooters", superstructure.reverseShooters());
-    NamedCommands.registerCommand("ShootSequence", superstructure.shootSequenceAuto());
-    NamedCommands.registerCommand("Neutral", superstructure.neutral());
-    NamedCommands.registerCommand("ShootOnce", superstructure.shootOnceAuto());
   }
 
   private void configureDrivetrain() {
@@ -239,24 +202,6 @@ public class RobotContainer {
 
   public void resetSuperstructure() {
     superstructure.resetPositions();
-  }
-
-  public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
-  }
-
-  public void resetPositionForAuto() {
-    if (autoChooser.getSelected() instanceof PathPlannerAuto auto) {
-      Pose2d startingPose = auto.getStartingPose();
-      if (startingPose == null) return;
-
-      if (DriverStation.getAlliance().isPresent()
-          && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-        startingPose = FlippingUtil.flipFieldPose(startingPose);
-      }
-
-      drivetrain.resetPose(startingPose);
-    }
   }
 
   public Telemetry getTelemetry() {
