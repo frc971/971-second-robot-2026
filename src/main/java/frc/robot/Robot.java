@@ -86,6 +86,10 @@ public class Robot extends LoggedRobot {
       robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
     }
 
+    if (Controllers.DISABLE_OTF.getAsBoolean()) {
+      robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
+    }
+
     CommandScheduler.getInstance().run();
   }
 

@@ -283,6 +283,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       super.resetPose(simPose);
     }
 
+    // IMU is rotated 90 deg relative to robot, and coordinates are relative to imu
+    Logger.recordOutput("Drive/IMU/GyroYaw", getPigeon2().getYaw().getValueAsDouble());
+    Logger.recordOutput("Drive/IMU/GyroPitch", getPigeon2().getPitch().getValueAsDouble());
+    Logger.recordOutput("Drive/IMU/GyroRoll", getPigeon2().getRoll().getValueAsDouble());
+    Logger.recordOutput(
+        "Drive/IMU/AccelerometerX", getPigeon2().getAccelerationX().getValueAsDouble());
+    Logger.recordOutput(
+        "Drive/IMU/AccelerometerY", getPigeon2().getAccelerationY().getValueAsDouble());
+    Logger.recordOutput(
+        "Drive/IMU/AccelerometerZ", getPigeon2().getAccelerationZ().getValueAsDouble());
+
     Logger.recordOutput("Drive/Pose", getState().Pose);
 
     Logger.recordOutput("BatteryVoltage", RobotController.getBatteryVoltage());

@@ -16,7 +16,6 @@ import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -211,11 +210,7 @@ public class ShooterHandler {
           shooterState = State.FIRING;
         }
       }
-      case FIRING -> {
-        if (canTransitionToNotReady()) {
-          shooterState = State.AIMING;
-        }
-      }
+      case FIRING -> {}
     }
 
     // --- compute tuned + clamped desired goals (used for outputs AND error) ---
@@ -313,26 +308,14 @@ public class ShooterHandler {
     if (launchSolution == null) {
       return false;
     }
-
-    return flywheelSpeedAbsDiff().lt(config.THRESHOLD().AIMING_FLYWHEEL_THRESHOLD())
-        && turretRotationAbsDiff().lt(config.THRESHOLD().AIMING_ROTATION_THRESHOLD())
-        && hoodAngleAbsDiff().lt(config.THRESHOLD().AIMING_HOOD_ANGLE_THRESHOLD());
-  }
-
-  @AutoLogOutput(key = "{name}/canTransitionToNotReady")
-  private boolean canTransitionToNotReady() {
-    if (launchSolution == null) {
-      return true;
-    }
-
     if (targetState == Targets.BLUE || targetState == Targets.RED) {
-      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().FIRING_FLYWHEEL_ABORT())
-          || turretRotationAbsDiff().gt(config.THRESHOLD().FIRING_ROTATION_THRESHOLD())
-          || hoodAngleAbsDiff().gt(config.THRESHOLD().FIRING_HOOD_ANGLE_THRESHOLD());
+      return flywheelSpeedAbsDiff().lt(config.THRESHOLD().HUB_FLYWHEEL_THRESHOLD())
+          && turretRotationAbsDiff().lt(config.THRESHOLD().HUB_TURRET_THRESHOLD())
+          && hoodAngleAbsDiff().lt(config.THRESHOLD().HUB_HOOD_THRESHOLD());
     } else {
-      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHUTTLING_FLYWHEEL_THRESHOLD())
-          || turretRotationAbsDiff().gt(config.THRESHOLD().SHUTTLING_ROTATION_THRESHOLD())
-          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHUTTLING_HOOD_ANGLE_THRESHOLD());
+      return flywheelSpeedAbsDiff().lt(config.THRESHOLD().SHUTTLE_FLYWHEEL_THRESHOLD())
+          && turretRotationAbsDiff().lt(config.THRESHOLD().SHUTTLE_TURRET_THRESHOLD())
+          && hoodAngleAbsDiff().lt(config.THRESHOLD().SHUTTLE_HOOD_THRESHOLD());
     }
   }
 

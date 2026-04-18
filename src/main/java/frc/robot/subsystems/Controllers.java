@@ -20,11 +20,17 @@ public class Controllers {
   public static final Trigger INDEX = TROY.rightTrigger();
 
   public static final Trigger ODOMETRY_RESET = TROY.y();
+  public static final Trigger DRIVE_LOCK = TROY.x();
 
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = ANDRE.rightBumper();
   public static final Trigger SHOOT = ANDRE.axisGreaterThan(3, 0.9);
+  public static final Trigger SHOOTING = SHOOT_REDUNDANCY.or(SHOOT);
+  public static final Trigger SHUTTLING = LEFT_SHUTTLE.or(RIGHT_SHUTTLE).and(SHOOTING.negate());
+
+  public static final Edge SHOOT_EDGE = new Edge(SHOOTING);
+  public static final Edge SHUTTLE_EDGE = new Edge(SHUTTLING);
 
   public static final Trigger OUTTAKE = ANDRE.leftTrigger();
 

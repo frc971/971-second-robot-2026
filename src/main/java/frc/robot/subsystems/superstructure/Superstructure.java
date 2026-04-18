@@ -174,7 +174,7 @@ public class Superstructure {
         }
       }
 
-      if (Controllers.INTAKE_PIVOT.toggled()) {
+      if (!Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);
 
         if (Controllers.JUICE.getAsBoolean()) {
@@ -199,7 +199,8 @@ public class Superstructure {
           shooterHandlerLeft
               .getFlywheelSpeed()
               .ifPresent(
-                  speed -> flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
+                  speed ->
+                      flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
         }
 
         if (!Controllers.KILL_RIGHT.toggled()) {
@@ -208,7 +209,8 @@ public class Superstructure {
               .getFlywheelSpeed()
               .ifPresent(
                   speed ->
-                      flywheelRight.setVelocity(speed.plus(shooterHandlerRight.getFlywheelOffset())));
+                      flywheelRight.setVelocity(
+                          speed.plus(shooterHandlerRight.getFlywheelOffset())));
         }
       }
 
@@ -241,13 +243,13 @@ public class Superstructure {
       }
 
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
-        shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
-        shooterHandlerLeft.getFlywheelSpeed().ifPresent(flywheelLeft::setVelocity);
+        hoodLeft.setPosition(shooterHandlerLeft.getHoodAngle());
+        flywheelLeft.setVelocity(shooterHandlerLeft.getFlywheelSpeed());
       }
 
       if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
-        shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
-        shooterHandlerRight.getFlywheelSpeed().ifPresent(flywheelRight::setVelocity);
+        hoodRight.setPosition(shooterHandlerRight.getHoodAngle());
+        flywheelRight.setVelocity(shooterHandlerRight.getFlywheelSpeed());
       }
 
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
