@@ -196,12 +196,21 @@ public class Superstructure {
       if (wantsShot && DriverStation.isEnabled()) {
         if (!Controllers.KILL_LEFT.toggled()) {
           shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
-          shooterHandlerLeft.getFlywheelSpeed().ifPresent(flywheelLeft::setVelocity);
+          shooterHandlerLeft
+              .getFlywheelSpeed()
+              .ifPresent(
+                  speed ->
+                      flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
         }
 
         if (!Controllers.KILL_RIGHT.toggled()) {
           shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
-          shooterHandlerRight.getFlywheelSpeed().ifPresent(flywheelRight::setVelocity);
+          shooterHandlerRight
+              .getFlywheelSpeed()
+              .ifPresent(
+                  speed ->
+                      flywheelRight.setVelocity(
+                          speed.plus(shooterHandlerRight.getFlywheelOffset())));
         }
       }
 
