@@ -196,6 +196,10 @@ public class ShooterHandler {
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
     if (shooterGoal == Goal.NONE) {
       shooterState = State.NOT_READY;
+      desiredFlywheel = RotationsPerSecond.of(0.0);
+      desiredTurretRel = Degrees.of(0.0);
+      logStates();
+      logReadableShotStatus();
       return;
     }
 
@@ -286,6 +290,22 @@ public class ShooterHandler {
     return Radians.of(MathUtil.angleModulus(relative.in(Radians)));
   }
 
+  private boolean turretGoalWithinLimits() {
+    if (launchSolution == null) {
+      return false;
+    }
+
+    double turretGoalDegrees = getRelativeTurretAngle().plus(turretOffset).in(Degrees);
+
+    if (side == Side.LEFT) {
+      return turretGoalDegrees >= TurretLeft.LOWER_LIMIT.in(Degrees)
+          && turretGoalDegrees <= TurretLeft.UPPER_LIMIT.in(Degrees);
+    }
+
+    return turretGoalDegrees >= TurretRight.LOWER_LIMIT.in(Degrees)
+        && turretGoalDegrees <= TurretRight.UPPER_LIMIT.in(Degrees);
+  }
+
   private void logStates() {
     if (launchSolution != null) {
       Logger.recordOutput(
@@ -314,12 +334,10 @@ public class ShooterHandler {
     }
   }
 
-  // readable log stuff starts here
   private void logReadableShotStatus() {
-    // whether or not we are trying to shoot
     boolean tryingToShoot = shooterGoal != Goal.NONE;
+    boolean shuttleShot = isShuttle(targetState);
 
-    // hub or shuttle
     String shotMode;
     if (targetState == Targets.BLUE || targetState == Targets.RED) {
       shotMode = "HUB";
@@ -333,38 +351,47 @@ public class ShooterHandler {
       shotMode = "UNKNOWN";
     }
 
-    // checks whether the shot is reachable
-    // if not reachable, which constraint is affecting it
     String feasibility = "REACHABLE";
+    List<String> unreachableConstraints = new ArrayList<>();
+
     if (launchSolution == null) {
       feasibility = "NO_LAUNCH_SOLUTION";
     } else {
       AngularVelocity speed = launchSolution.flywheelSpeed();
       if (speed.lt(config.CONSTRAINTS().MIN_FLYWHEEL_SPEED())
           || speed.gt(config.CONSTRAINTS().MAX_FLYWHEEL_SPEED())) {
-        feasibility = "UNREACHABLE_FLYWHEEL";
-      } else {
-        Angle angle = launchSolution.hoodAngle();
-        if (angle.lt(config.CONSTRAINTS().MIN_HOOD_ANGLE())
-            || angle.gt(config.CONSTRAINTS().MAX_HOOD_ANGLE())) {
-          feasibility = "UNREACHABLE_HOOD";
-        } else {
-          Distance targetDistance =
-              Meters.of(targetState.xyPos().minus(projectileState.xyPos()).getNorm());
-          if (targetDistance.lt(config.CONSTRAINTS().MIN_SHOT_DISTANCE())
-              || targetDistance.gt(config.CONSTRAINTS().MAX_SHOT_DISTANCE())) {
-            feasibility = "UNREACHABLE_DISTANCE";
-          }
-        }
+        unreachableConstraints.add("flywheel");
+      }
+
+      Angle angle = launchSolution.hoodAngle();
+      if (angle.lt(config.CONSTRAINTS().MIN_HOOD_ANGLE())
+          || angle.gt(config.CONSTRAINTS().MAX_HOOD_ANGLE())) {
+        unreachableConstraints.add("hood");
+      }
+
+      Distance targetDistance =
+          Meters.of(targetState.xyPos().minus(projectileState.xyPos()).getNorm());
+      if (targetDistance.lt(config.CONSTRAINTS().MIN_SHOT_DISTANCE())
+          || targetDistance.gt(config.CONSTRAINTS().MAX_SHOT_DISTANCE())) {
+        unreachableConstraints.add("distance");
+      }
+
+      if (!turretGoalWithinLimits()) {
+        unreachableConstraints.add("turret limit");
+      }
+
+      if (!unreachableConstraints.isEmpty()) {
+        feasibility = String.join(", ", unreachableConstraints);
       }
     }
 
-    // checks which subsystem thresholds are outside of the margin
     List<String> outOfThreshold = new ArrayList<>();
+    String thresholdStatus = "NO_SOLUTION";
+
     if (launchSolution != null) {
       if (flywheelSpeedAbsDiff()
           .gte(
-              isShuttle(targetState)
+              shuttleShot
                   ? config.THRESHOLD().SHUTTLE_FLYWHEEL_THRESHOLD()
                   : config.THRESHOLD().HUB_FLYWHEEL_THRESHOLD())) {
         outOfThreshold.add("flywheel");
@@ -372,7 +399,7 @@ public class ShooterHandler {
 
       if (turretRotationAbsDiff()
           .gte(
-              isShuttle(targetState)
+              shuttleShot
                   ? config.THRESHOLD().SHUTTLE_TURRET_THRESHOLD()
                   : config.THRESHOLD().HUB_TURRET_THRESHOLD())) {
         outOfThreshold.add("turret");
@@ -380,16 +407,15 @@ public class ShooterHandler {
 
       if (hoodAngleAbsDiff()
           .gte(
-              isShuttle(targetState)
+              shuttleShot
                   ? config.THRESHOLD().SHUTTLE_HOOD_THRESHOLD()
                   : config.THRESHOLD().HUB_HOOD_THRESHOLD())) {
         outOfThreshold.add("hood");
       }
+
+      thresholdStatus = outOfThreshold.isEmpty() ? "READY" : String.join(", ", outOfThreshold);
     }
 
-    String thresholdStatus = outOfThreshold.isEmpty() ? "READY" : String.join(", ", outOfThreshold);
-
-    // this actual log -> simplified + readable info
     String summary;
     if (!tryingToShoot) {
       summary = "Not trying to shoot.";
@@ -406,7 +432,6 @@ public class ShooterHandler {
               + " out of threshold.";
     }
 
-    // logging
     Logger.recordOutput(name + "/ShotStatus/TryingToShoot", tryingToShoot);
     Logger.recordOutput(name + "/ShotStatus/Mode", shotMode);
     Logger.recordOutput(name + "/ShotStatus/Feasibility", feasibility);
