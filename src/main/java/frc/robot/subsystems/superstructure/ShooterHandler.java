@@ -16,6 +16,7 @@ import frc.robot.lib.shooter.*;
 import frc.robot.lib.superstructure.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -219,7 +220,7 @@ public class ShooterHandler {
       desiredTurretRel = Degrees.of(0.0);
     } else {
       // Base goals from physics
-      AngularVelocity flywheelGoal = getFlywheelSpeed(); // includes fudge factor
+      AngularVelocity flywheelGoal = launchSolution.flywheelSpeed();
       Angle turretGoalRel = getRelativeTurretAngle();
 
       // Apply live-tuning offsets TO THE GOALS
@@ -259,12 +260,12 @@ public class ShooterHandler {
     if (Controllers.TURRET_RIGHT.rising()) turretOffset = turretOffset.minus(TURRET_STEP);
   }
 
-  public Angle getHoodAngle() {
-    return launchSolution.hoodAngle();
+  public Optional<Angle> getHoodAngle() {
+    return Optional.ofNullable(launchSolution).map(LaunchSolution::hoodAngle);
   }
 
-  public AngularVelocity getFlywheelSpeed() {
-    return launchSolution.flywheelSpeed();
+  public Optional<AngularVelocity> getFlywheelSpeed() {
+    return Optional.ofNullable(launchSolution).map(LaunchSolution::flywheelSpeed);
   }
 
   public Angle getRelativeTurretAngle() {
@@ -322,7 +323,7 @@ public class ShooterHandler {
   // --- Threshold helper functions ---
   private AngularVelocity flywheelSpeedAbsDiff() {
     return RadiansPerSecond.of(
-        getFlywheelSpeed().minus(flywheel.getVelocity()).abs(RadiansPerSecond));
+        launchSolution.flywheelSpeed().minus(flywheel.getVelocity()).abs(RadiansPerSecond));
   }
 
   private Angle turretRotationAbsDiff() {
