@@ -1,5 +1,6 @@
 package frc.robot.subsystems.auto;
 
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -211,6 +212,7 @@ public class AutoHandler {
                 () ->
                     robotContainer.drivetrain.setControl(
                         new SwerveRequest.ApplyRobotSpeeds()
+                            .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
                             .withSpeeds(
                                 robotContainer
                                     .drivetrain
