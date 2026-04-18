@@ -9,7 +9,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.0,
-      "lib_key": "shoot"
+      "lib_key": "Shoot"
     },
     {
       "type": "rotation",
