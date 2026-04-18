@@ -304,7 +304,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // Sum currents across all drive motors
     double totalDriveStatorCurrent = 0;
     double totalDriveSupplyCurrent = 0;
-    
+
     int i = 0;
     for (var module : getModules()) {
       double stator = module.getDriveMotor().getStatorCurrent().getValueAsDouble();
