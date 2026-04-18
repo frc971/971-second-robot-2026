@@ -12,6 +12,7 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.superstructure.ShooterHandler.Goal;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
@@ -124,10 +125,10 @@ public class Superstructure {
         case NONE -> {}
         case TARGETING -> {
           if (!Controllers.KILL_LEFT.toggled()) {
-            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.AIM);
           }
           if (!Controllers.KILL_RIGHT.toggled()) {
-            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.AIM);
           }
 
           ObjectState curTarget =
@@ -195,22 +196,11 @@ public class Superstructure {
 
       if (wantsShot && DriverStation.isEnabled()) {
         if (!Controllers.KILL_LEFT.toggled()) {
-          shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
-          shooterHandlerLeft
-              .getFlywheelSpeed()
-              .ifPresent(
-                  speed ->
-                      flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
+          shooterHandlerLeft.setShooterGoal(Goal.FIRE);
         }
 
         if (!Controllers.KILL_RIGHT.toggled()) {
-          shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
-          shooterHandlerRight
-              .getFlywheelSpeed()
-              .ifPresent(
-                  speed ->
-                      flywheelRight.setVelocity(
-                          speed.plus(shooterHandlerRight.getFlywheelOffset())));
+          shooterHandlerRight.setShooterGoal(Goal.FIRE);
         }
       }
 
@@ -240,24 +230,6 @@ public class Superstructure {
     } else if (DriverStation.isAutonomous()) {
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
-      }
-
-      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
-        shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
-        shooterHandlerLeft
-            .getFlywheelSpeed()
-            .ifPresent(
-                speed ->
-                    flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
-      }
-
-      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
-        shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
-        shooterHandlerRight
-            .getFlywheelSpeed()
-            .ifPresent(
-                speed ->
-                    flywheelRight.setVelocity(speed.plus(shooterHandlerRight.getFlywheelOffset())));
       }
 
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
@@ -402,8 +374,8 @@ public class Superstructure {
               shooterHandlerLeft.setTargetState(curTarget);
               shooterHandlerRight.setTargetState(curTarget);
 
-              shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-              shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+              shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.FIRE);
+              shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.FIRE);
             }),
         Commands.run(
             () -> {
@@ -427,8 +399,8 @@ public class Superstructure {
                   : ShooterHandler.Targets.RED;
           shooterHandlerLeft.setTargetState(curTarget);
           shooterHandlerRight.setTargetState(curTarget);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.FIRE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.FIRE);
         });
   }
 
@@ -441,8 +413,8 @@ public class Superstructure {
                   : ShooterHandler.Targets.RED;
           shooterHandlerLeft.setTargetState(curTarget);
           shooterHandlerRight.setTargetState(curTarget);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.FIRE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.FIRE);
         });
   }
 }
