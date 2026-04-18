@@ -48,7 +48,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean hasAppliedOperatorPerspective = false;
 
-  private final double BUMP_TILT_THRESHOLD_DEGREES = 10.0; // probably need to tune
+  private final double BUMP_TILT_THRESHOLD_DEGREES = 5.0; // probably need to tune
 
   /** Swerve request to apply during robot-centric path following */
   private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
