@@ -406,9 +406,9 @@ public class Superstructure {
             () -> {
               if (!drivetrain.isRobotOnBump()) {
                 ObjectState curTarget =
-                  DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                      ? ShooterHandler.Targets.BLUE
-                      : ShooterHandler.Targets.RED;
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterHandler.Targets.BLUE
+                        : ShooterHandler.Targets.RED;
                 shooterHandlerLeft.setTargetState(curTarget);
                 shooterHandlerRight.setTargetState(curTarget);
 
@@ -448,9 +448,9 @@ public class Superstructure {
         () -> {
           if (!drivetrain.isRobotOnBump()) {
             ObjectState curTarget =
-              DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                  ? ShooterHandler.Targets.BLUE
-                  : ShooterHandler.Targets.RED;
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterHandler.Targets.BLUE
+                    : ShooterHandler.Targets.RED;
             shooterHandlerLeft.setTargetState(curTarget);
             shooterHandlerRight.setTargetState(curTarget);
             shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);

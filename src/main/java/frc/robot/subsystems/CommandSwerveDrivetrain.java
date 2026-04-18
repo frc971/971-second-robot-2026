@@ -353,7 +353,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   public boolean isRobotOnBump() {
     // use the hypotenuse of pitch and roll to account for cases if the robot is tilted diagonally
-    return Math.hypot(getPigeon2().getPitch().getValue().in(Degrees), getPigeon2().getRoll().getValue().in(Degrees)) >= BUMP_TILT_THRESHOLD_DEGREES;
+    return Math.hypot(
+            getPigeon2().getPitch().getValue().in(Degrees),
+            getPigeon2().getRoll().getValue().in(Degrees))
+        >= BUMP_TILT_THRESHOLD_DEGREES;
   }
 
   /**
