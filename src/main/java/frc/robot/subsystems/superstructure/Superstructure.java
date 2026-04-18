@@ -378,15 +378,17 @@ public class Superstructure {
     return Commands.parallel(
         Commands.runOnce(
             () -> {
-              ObjectState curTarget =
+              if (!drivetrain.isRobotOnBump()) {
+                ObjectState curTarget =
                   DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                       ? ShooterHandler.Targets.BLUE
                       : ShooterHandler.Targets.RED;
-              shooterHandlerLeft.setTargetState(curTarget);
-              shooterHandlerRight.setTargetState(curTarget);
+                shooterHandlerLeft.setTargetState(curTarget);
+                shooterHandlerRight.setTargetState(curTarget);
 
-              shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-              shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+              }
             }),
         Commands.run(
             () -> {
@@ -418,14 +420,16 @@ public class Superstructure {
   public Command shootOnceAuto() {
     return Commands.runOnce(
         () -> {
-          ObjectState curTarget =
+          if (!drivetrain.isRobotOnBump()) {
+            ObjectState curTarget =
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                   ? ShooterHandler.Targets.BLUE
                   : ShooterHandler.Targets.RED;
-          shooterHandlerLeft.setTargetState(curTarget);
-          shooterHandlerRight.setTargetState(curTarget);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+            shooterHandlerLeft.setTargetState(curTarget);
+            shooterHandlerRight.setTargetState(curTarget);
+            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+          }
         });
   }
 }
