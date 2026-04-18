@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.BLine.*;
 import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
@@ -104,6 +105,8 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
 
     if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
+
+    FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
   }
 
   private void configureDrivetrain() {

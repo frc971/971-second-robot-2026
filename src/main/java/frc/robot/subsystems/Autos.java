@@ -31,7 +31,8 @@ public class Autos {
             .withPoseReset(drivetrain::resetPose); // reset odometry at each path's start pose
 
     chooser = new SendableChooser<>();
-    chooser.setDefaultOption("example_a", "example_a");
+    chooser.setDefaultOption("bumblebee", "bumblebee");
+    chooser.addOption("example_a", "example_a");
     chooser.addOption("example_b", "example_b");
 
     SmartDashboard.putData("Auto Mode", chooser);
