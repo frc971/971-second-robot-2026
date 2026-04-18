@@ -94,7 +94,7 @@ public class Robot extends LoggedRobot {
     if (Controllers.DISABLE_OTF.getAsBoolean()) {
       robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
     }
-    
+
     CommandScheduler.getInstance().run();
   }
 
@@ -130,9 +130,9 @@ public class Robot extends LoggedRobot {
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     if (autonomousCommand != null) {
-        if (autonomousCommand instanceof PausableAuto pausableAuto) {
-            autoHandler.onAutoStart(pausableAuto);
-        }
+      if (autonomousCommand instanceof PausableAuto pausableAuto) {
+        autoHandler.onAutoStart(pausableAuto);
+      }
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
       robotContainer.resetPositionForAuto();
@@ -141,19 +141,19 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-    public void autonomousPeriodic() {
+  public void autonomousPeriodic() {
 
-        autoHandler.periodic();
-    }
+    autoHandler.periodic();
+  }
 
   @Override
-    public void autonomousExit() {
-        autoHandler.onAutoEnd();
-    }
+  public void autonomousExit() {
+    autoHandler.onAutoEnd();
+  }
 
   @Override
   public void teleopInit() {
-      autoHandler.onAutoEnd();
+    autoHandler.onAutoEnd();
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }

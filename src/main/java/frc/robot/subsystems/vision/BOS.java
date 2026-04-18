@@ -67,7 +67,6 @@ public class BOS {
         Pose2d estimate =
             new Pose2d(
                 tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
-            
 
         drivetrain.addVisionMeasurement(
             estimate,

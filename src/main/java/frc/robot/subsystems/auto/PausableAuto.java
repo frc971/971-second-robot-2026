@@ -1,8 +1,6 @@
 package frc.robot.subsystems.auto;
 
-import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
 import lombok.Getter;
 import lombok.Setter;
