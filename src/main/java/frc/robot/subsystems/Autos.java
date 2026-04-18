@@ -47,4 +47,14 @@ public class Autos {
 
     return pathBuilder.build(new Path(selectedAuto));
   }
+
+  public Path getAutonomousPath() {
+    String selectedAuto = chooser.getSelected();
+
+    if (selectedAuto == null) {
+      return null;
+    }
+
+    return new Path(selectedAuto);
+  }
 }
