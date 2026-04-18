@@ -21,7 +21,7 @@ import frc.robot.subsystems.superstructure.Superstructure;
 public class RobotContainer {
   public final Superstructure superstructure;
 
-  private static final double MAX_SPEED = 3.5;
+  private static final double MAX_SPEED = 3.8;
   private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
 
   private static final double TRANSLATION_DEADBAND = 0.05;
@@ -56,11 +56,11 @@ public class RobotContainer {
   // Slew rate limit for translation (m/s^2)
   private static final double SHOOTING_SLEW_TRANSLATE_LIMIT = 10.0;
   // Slew rate limit for rotation (rad/s^2)
-  private static final double SHOOTING_SLEW_ROTATION_LIMIT = 5.0;
+  private static final double SHOOTING_SLEW_ROTATION_LIMIT = 100.0;
   // Slew rate limit for translation (m/s^2)
   private static final double SHUTTLING_SLEW_TRANSLATE_LIMIT = 20.0;
   // Slew rate limit for rotation (rad/s^2)
-  private static final double SHUTTLING_SLEW_ROTATION_LIMIT = 5.0;
+  private static final double SHUTTLING_SLEW_ROTATION_LIMIT = 100.0;
 
   private static final double SLEW_TRANSLATE_LIMIT = 1000.0;
   // Slew rate limit for rotation (rad/s^2)
