@@ -218,13 +218,9 @@ public class ShooterHandler {
     logStates();
 
     // set output
-    switch (shooterState) {
-      case NOT_READY -> {}
-      case AIMING -> {
-        turret.setPosition(getRelativeTurretAngle().plus(turretOffset));
-      }
-      case FIRING -> {
-        turret.setPosition(getRelativeTurretAngle().plus(turretOffset));
+    if (shooterState == State.AIMING || shooterState == State.FIRING) {
+      turret.setPosition(getRelativeTurretAngle().plus(turretOffset));
+      if (shooterGoal == Goal.FIRE) {
         flywheel.setVelocity(launchSolution.flywheelSpeed().plus(flywheelOffset));
         hood.setPosition(launchSolution.hoodAngle());
       }
