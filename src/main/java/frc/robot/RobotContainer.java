@@ -25,6 +25,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.auto.PausableAuto;
 import frc.robot.subsystems.superstructure.Superstructure;
 
 public class RobotContainer {
@@ -241,8 +242,8 @@ public class RobotContainer {
     superstructure.resetPositions();
   }
 
-  public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+  public PausableAuto getAutonomousCommand() {
+    return new PausableAuto(autoChooser.getSelected());
   }
 
   public void resetPositionForAuto() {
