@@ -26,6 +26,14 @@ public class BOS {
   private static final double ROBOT_WIDTH = 0.919;
   private static final double ROBOT_LENGTH = 0.795;
 
+  private static final Translation2d[] CORNER_OFFSETS =
+        new Translation2d[] {
+          new Translation2d(ROBOT_LENGTH / 2, ROBOT_WIDTH / 2), // front left
+          new Translation2d(-ROBOT_LENGTH / 2, ROBOT_WIDTH / 2), // front right
+          new Translation2d(ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2), // back left
+          new Translation2d(-ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2), // back right
+        };
+
   IntegerPublisher num_tags_per_control_loop_publisher;
 
   DoubleArraySubscriber[] tag_estimation_subscribers =
@@ -101,16 +109,8 @@ public class BOS {
   }
 
   public static boolean poseOffField(Pose2d pose) {
-    Translation2d[] cornerOffsets =
-        new Translation2d[] {
-          new Translation2d(ROBOT_LENGTH / 2, ROBOT_WIDTH / 2), // front left
-          new Translation2d(-ROBOT_LENGTH / 2, ROBOT_WIDTH / 2), // front right
-          new Translation2d(ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2), // back left
-          new Translation2d(-ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2), // back right
-        };
-
     // If any corner is off the field, return true
-    for (Translation2d cornerOffset : cornerOffsets) {
+    for (Translation2d cornerOffset : CORNER_OFFSETS) {
       // rotate the offset by the robot's rotation to account for when the robot is rotated
       Translation2d adjustedOffset = cornerOffset.rotateBy(pose.getRotation());
 
