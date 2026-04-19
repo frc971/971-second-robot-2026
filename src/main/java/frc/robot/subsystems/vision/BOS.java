@@ -17,8 +17,10 @@ public class BOS {
   };
   private static final double FIELD_LENGTH_X = 16.54,
       FIELD_LENGTH_Y = 8.07,
-      BAD_ODOMETRY_TOLERANCE = 0.5;
-  private final boolean overrideBadOdemetry;
+      BAD_ODOMETRY_TOLERANCE = 0.02;
+
+  private static final boolean OVERRIDE_BAD_ODOM = true;
+
   IntegerPublisher num_tags_per_control_loop_publisher;
 
   DoubleArraySubscriber[] tag_estimation_subscribers =
@@ -26,9 +28,8 @@ public class BOS {
 
   Pose2d lastVisionPose = new Pose2d(0, 0, new Rotation2d());
 
-  public BOS(CommandSwerveDrivetrain drivetrain, boolean overrideBadOdemetry) {
+  public BOS(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
-    this.overrideBadOdemetry = overrideBadOdemetry;
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     NetworkTable table = instance.getTable("Orin");
@@ -71,7 +72,7 @@ public class BOS {
             new Pose2d(
                 tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
 
-        if (overrideBadOdemetry
+        if (OVERRIDE_BAD_ODOM
             && poseOffField(drivetrain.getState().Pose)
             && !poseOffField(estimate)) {
           drivetrain.resetPose(estimate);
