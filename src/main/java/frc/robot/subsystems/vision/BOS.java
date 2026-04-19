@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -10,7 +9,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import org.littletonrobotics.junction.Logger;
 
 public class BOS {
   private final CommandSwerveDrivetrain drivetrain;
@@ -88,7 +86,6 @@ public class BOS {
         }
 
         lastVisionPose = estimate;
-        Logger.recordOutput("Orin/AltTS", Utils.fpgaToCurrentTime(tagEstimations[i][4]));
       }
     }
   }

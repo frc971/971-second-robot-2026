@@ -98,8 +98,6 @@ public class ShooterHandler {
   @Getter
   private Angle turretOffset = Degrees.of(0.0);
 
-  private AngularVelocity desiredFlywheel = RotationsPerSecond.of(0.0);
-
   @AutoLogOutput(key = "{name}/desiredTurret")
   private Angle desiredTurretRel = Degrees.of(0.0);
 
@@ -216,7 +214,6 @@ public class ShooterHandler {
 
     // --- compute tuned + clamped desired goals (used for outputs AND error) ---
     if (launchSolution == null || shooterState == State.NOT_READY) {
-      desiredFlywheel = RotationsPerSecond.of(0.0);
       desiredTurretRel = Degrees.of(0.0);
     } else {
       // Base goals from physics
@@ -235,7 +232,6 @@ public class ShooterHandler {
                   config.CONSTRAINTS().MIN_FLYWHEEL_SPEED().in(RadiansPerSecond),
                   config.CONSTRAINTS().MAX_FLYWHEEL_SPEED().in(RadiansPerSecond)));
 
-      desiredFlywheel = flywheelGoal;
       desiredTurretRel = turretGoalRel;
     }
 
@@ -433,5 +429,9 @@ public class ShooterHandler {
 
   public ShooterConfig getConfig() {
     return config;
+  }
+
+  public void setStateAiming() {
+    shooterState = shooterState.AIMING;
   }
 }
