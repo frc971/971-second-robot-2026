@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,12 +33,12 @@ public class Autos {
   private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
       new SwerveRequest.ApplyRobotSpeeds();
 
-  @Getter private final SendableChooser<AutoPathOption> chooser;
+  @Getter private final SendableChooser<AutoPathOption> chooser = new SendableChooser<>();
+
   private final FollowPath.Builder pathBuilder;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
 
-    chooser = new SendableChooser<>();
     chooser.setDefaultOption("bumblebee", new AutoPathOption("bumblebee", false));
 
     // Build chooser FIRST so builder can reference it
@@ -92,13 +93,17 @@ public class Autos {
     return pathBuilder.build(new Path(selected.name));
   }
 
-  public Path getAutonomousPath() {
-    String selectedAuto = chooser.getSelected();
+  public Pose2d getAutonomousStartPose() {
+    AutoPathOption selected = chooser.getSelected();
 
-    if (selectedAuto == null) {
+    if (selected == null) {
       return null;
     }
 
-    return new Path(selectedAuto);
+    Path path = new Path(selected.name);
+
+    if (selected.mirrored) path.mirror();
+
+    return path.getStartPose();
   }
 }

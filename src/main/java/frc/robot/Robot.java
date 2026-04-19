@@ -103,18 +103,16 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    Path autoPath = autos.getAutonomousPath();
+    Pose2d startPose = autos.getAutonomousStartPose();
 
-    if (autoPath != null) {
-      Pose2d autoInitPose = autoPath.getStartPose();
-
+    if (startPose != null) {
       if (DriverStation.getAlliance().isPresent()
           && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-        autoInitPose = FlippingUtil.flipFieldPose(autoInitPose);
+        startPose = FlippingUtil.flipFieldPose(startPose);
       }
 
       // Update the field visualization with the auto start pose
-      robotContainer.getTelemetry().setAutoStartPose(autoInitPose);
+      robotContainer.getTelemetry().setAutoStartPose(startPose);
     }
     // TODO: Log the autonomous starting pose
   }
