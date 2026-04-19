@@ -124,12 +124,8 @@ public class Superstructure {
       switch (shooterGoal) {
         case NONE -> {}
         case TARGETING -> {
-          if (!Controllers.KILL_LEFT.toggled()) {
-            shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          }
-          if (!Controllers.KILL_RIGHT.toggled()) {
-            shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          }
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
 
           ObjectState curTarget =
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
@@ -195,24 +191,19 @@ public class Superstructure {
       }
 
       if (wantsShot && DriverStation.isEnabled()) {
-        if (!Controllers.KILL_LEFT.toggled()) {
-          shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
-          shooterHandlerLeft
-              .getFlywheelSpeed()
-              .ifPresent(
-                  speed ->
-                      flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
-        }
+        shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
+        shooterHandlerLeft
+            .getFlywheelSpeed()
+            .ifPresent(
+                speed ->
+                    flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
 
-        if (!Controllers.KILL_RIGHT.toggled()) {
-          shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
-          shooterHandlerRight
-              .getFlywheelSpeed()
-              .ifPresent(
-                  speed ->
-                      flywheelRight.setVelocity(
-                          speed.plus(shooterHandlerRight.getFlywheelOffset())));
-        }
+        shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
+        shooterHandlerRight
+            .getFlywheelSpeed()
+            .ifPresent(
+                speed ->
+                    flywheelRight.setVelocity(speed.plus(shooterHandlerRight.getFlywheelOffset())));
       }
 
       // Indexer Logic
@@ -239,13 +230,6 @@ public class Superstructure {
         setGoal(SetpointGoal.UNJAM);
       }
 
-      // Killing turret logic
-      if (Controllers.KILL_LEFT.toggled()) {
-        setGoal(SetpointGoal.KILL_LEFT.getSetpoint());
-      }
-      if (Controllers.KILL_RIGHT.toggled()) {
-        setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
-      }
     } else if (DriverStation.isAutonomous()) {
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();

@@ -34,8 +34,6 @@ public class Controllers {
 
   public static final Trigger OUTTAKE = ANDRE.leftTrigger();
 
-  public static final Toggle KILL_LEFT = new Toggle(ANDRE.x());
-  public static final Toggle KILL_RIGHT = new Toggle(ANDRE.b());
   public static final Toggle MANUAL = new Toggle(ANDRE.y());
   public static final Trigger DISABLE_OTF = ANDRE.a();
 

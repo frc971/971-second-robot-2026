@@ -77,16 +77,6 @@ public enum SetpointGoal {
           .withKickerVolts(-5.0)),
   AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
   INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(9.0)),
-  KILL_RIGHT(
-      Setpoint.builder()
-          .withRightFlywheelRPS(0.0)
-          .withRightHoodInches(0.0)
-          .withRightTurretDegrees(0.0)),
-  KILL_LEFT(
-      Setpoint.builder()
-          .withLeftFlywheelRPS(0.0)
-          .withLeftHoodInches(0.0)
-          .withLeftTurretDegrees(0.0)),
   MANUAL_SHUTTLE_UP(Setpoint.builder()),
   MANUAL_SHUTTLE_DOWN(Setpoint.builder()),
   MANUAL_SHUTTLE_LEFT(Setpoint.builder()),
