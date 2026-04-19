@@ -3,8 +3,8 @@ package frc.robot.subsystems.vision;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -108,26 +108,27 @@ public class BOS {
   // }
 
   public static boolean poseOffField(Pose2d pose) {
-    Translation2d[] cornerOffsets = new Translation2d[]{
-      new Translation2d(ROBOT_LENGTH/2, ROBOT_WIDTH/2), // front left
-      new Translation2d(-ROBOT_LENGTH/2, ROBOT_WIDTH/2), // front right
-      new Translation2d(ROBOT_LENGTH/2, -ROBOT_WIDTH/2), // back left
-      new Translation2d(-ROBOT_LENGTH/2, -ROBOT_WIDTH/2), // back right
-    };
+    Translation2d[] cornerOffsets =
+        new Translation2d[] {
+          new Translation2d(ROBOT_LENGTH / 2, ROBOT_WIDTH / 2), // front left
+          new Translation2d(-ROBOT_LENGTH / 2, ROBOT_WIDTH / 2), // front right
+          new Translation2d(ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2), // back left
+          new Translation2d(-ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2), // back right
+        };
 
     // If any corner is off the field, return true
     for (Translation2d cornerOffset : cornerOffsets) {
       // rotate the offset by the robot's rotation to account for when the robot is rotated
       Translation2d adjustedOffset = cornerOffset.rotateBy(pose.getRotation());
-      
+
       Translation2d cornerPos = pose.getTranslation().plus(adjustedOffset);
 
       if (cornerPos.getX() < -BAD_ODOMETRY_TOLERANCE
-         || cornerPos.getY() < -BAD_ODOMETRY_TOLERANCE
-         || cornerPos.getX() > FIELD_LENGTH_X + BAD_ODOMETRY_TOLERANCE
-         || cornerPos.getY() > FIELD_LENGTH_Y + BAD_ODOMETRY_TOLERANCE) {
-          return true;
-         }
+          || cornerPos.getY() < -BAD_ODOMETRY_TOLERANCE
+          || cornerPos.getX() > FIELD_LENGTH_X + BAD_ODOMETRY_TOLERANCE
+          || cornerPos.getY() > FIELD_LENGTH_Y + BAD_ODOMETRY_TOLERANCE) {
+        return true;
+      }
     }
 
     return false;
