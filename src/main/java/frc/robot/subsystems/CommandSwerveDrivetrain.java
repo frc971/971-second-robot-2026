@@ -51,6 +51,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private final double BUMP_TILT_THRESHOLD_DEGREES = 5.0; // probably need to tune
 
+  private static final String[] MODULES = {"Front Left", "Front Right", "Back Left", "Back Right"};
+
   /** Swerve request to apply during robot-centric path following */
   private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
       new SwerveRequest.ApplyRobotSpeeds();
@@ -307,19 +309,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // Sum currents across all drive motors
     double totalDriveStatorCurrent = 0;
     double totalDriveSupplyCurrent = 0;
-    double totalDriveSupplyCurrentAbs = 0;
+
+    int i = 0;
     for (var module : getModules()) {
-      totalDriveStatorCurrent += module.getDriveMotor().getStatorCurrent().getValueAsDouble();
-      totalDriveSupplyCurrent += module.getDriveMotor().getSupplyCurrent().getValueAsDouble();
-      totalDriveSupplyCurrentAbs +=
-          Math.abs(module.getDriveMotor().getSupplyCurrent().getValueAsDouble());
+      double stator = module.getDriveMotor().getStatorCurrent().getValueAsDouble();
+      double supply = module.getDriveMotor().getSupplyCurrent().getValueAsDouble();
+      totalDriveStatorCurrent += stator;
+      totalDriveSupplyCurrent += supply;
+      Logger.recordOutput("Drive/Currents/" + MODULES[i] + " Drive Motor/StatorCurrent", stator);
+      Logger.recordOutput("Drive/Currents/" + MODULES[i] + " Drive Motor/SupplyCurrent", supply);
+      i++;
     }
     double batteryVoltage = RobotController.getBatteryVoltage();
     double totalDrivePower = totalDriveSupplyCurrent * batteryVoltage;
 
     Logger.recordOutput("Drive/TotalDriveStatorCurrent", totalDriveStatorCurrent);
     Logger.recordOutput("Drive/TotalDriveSupplyCurrent", totalDriveSupplyCurrent);
-    Logger.recordOutput("Drive/TotalDriveSupplyCurrentAbs", totalDriveSupplyCurrentAbs);
     Logger.recordOutput("Drive/TotalDrivePower", totalDrivePower);
   }
 
