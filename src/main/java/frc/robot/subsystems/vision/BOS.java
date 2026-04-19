@@ -100,13 +100,6 @@ public class BOS {
     return lastVisionPose;
   }
 
-  // public static boolean poseOffField(Pose2d pose) {
-  //   return pose.getX() < -BAD_ODOMETRY_TOLERANCE
-  //       || pose.getY() < -BAD_ODOMETRY_TOLERANCE
-  //       || pose.getX() > FIELD_LENGTH_X + BAD_ODOMETRY_TOLERANCE
-  //       || pose.getY() > FIELD_LENGTH_Y + BAD_ODOMETRY_TOLERANCE;
-  // }
-
   public static boolean poseOffField(Pose2d pose) {
     Translation2d[] cornerOffsets =
         new Translation2d[] {
