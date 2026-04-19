@@ -109,7 +109,6 @@ public class RobotContainer {
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
     FollowPath.registerEventTrigger("neutral", superstructure.neutral());
     FollowPath.registerEventTrigger("intakeDown", superstructure.intakePivotDownAuto());
-    FollowPath.registerEventTrigger("intake", superstructure.intakeAuto());
   }
 
   private void configureDrivetrain() {

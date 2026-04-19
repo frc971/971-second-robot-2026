@@ -48,6 +48,7 @@ public class Superstructure {
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private final Timer juiceTimer = new Timer();
+  private boolean juiceAuto = false;
 
   private enum ShooterGoal {
     NONE,
@@ -235,6 +236,16 @@ public class Superstructure {
         juiceTimer.restart();
       }
 
+      if (juiceAuto) {
+        int t = (int) (juiceTimer.get() * 100);
+
+        if (t % 100 < 50) {
+          setGoal(SetpointGoal.INTAKE_PIVOT);
+        } else {
+          setGoal(SetpointGoal.INTAKE_PIVOT_JUICE);
+        }
+      }
+
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
         shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
         shooterHandlerLeft
@@ -348,26 +359,11 @@ public class Superstructure {
         });
   }
 
-  public Command intakeAuto() {
-    return Commands.runOnce(
-        () -> {
-          setGoal(SetpointGoal.AUTO_INTAKE_ROLLERS);
-        });
-  }
-
   public Command intakePivotDownAuto() {
     return Commands.runOnce(
         () -> {
+          juiceAuto = false;
           setGoal(SetpointGoal.INTAKE_PIVOT);
-        });
-  }
-
-  public Command deployedAuto() {
-    return Commands.runOnce(
-        () -> {
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-          setGoal(SetpointGoal.AUTO_NEUTRAL);
         });
   }
 
@@ -385,31 +381,22 @@ public class Superstructure {
   }
 
   public Command shootAuto() {
-    return Commands.parallel(
-        Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-            .andThen(
-                Commands.runOnce(
-                    () -> {
-                      ObjectState curTarget =
-                          DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                              ? ShooterHandler.Targets.BLUE
-                              : ShooterHandler.Targets.RED;
-                      shooterHandlerLeft.setTargetState(curTarget);
-                      shooterHandlerRight.setTargetState(curTarget);
+    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  ObjectState curTarget =
+                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                          ? ShooterHandler.Targets.BLUE
+                          : ShooterHandler.Targets.RED;
+                  shooterHandlerLeft.setTargetState(curTarget);
+                  shooterHandlerRight.setTargetState(curTarget);
 
-                      shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                      shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                    })),
-        Commands.run(
-            () -> {
-              int t = (int) (juiceTimer.get() * 100);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
 
-              if (t % 100 < 50) {
-                setGoal(SetpointGoal.INTAKE_PIVOT);
-              } else {
-                setGoal(SetpointGoal.INTAKE_PIVOT_JUICE);
-              }
-            }));
+                  juiceAuto = true;
+                }));
   }
 
   public Command shootSequenceAuto() {
