@@ -123,6 +123,7 @@ public class BOS {
 
       Translation2d cornerPos = pose.getTranslation().plus(adjustedOffset);
 
+      
       if (cornerPos.getX() < -BAD_ODOMETRY_TOLERANCE
           || cornerPos.getY() < -BAD_ODOMETRY_TOLERANCE
           || cornerPos.getX() > FIELD_LENGTH_X + BAD_ODOMETRY_TOLERANCE
