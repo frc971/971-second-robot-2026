@@ -34,6 +34,7 @@ public class Autos {
     chooser.setDefaultOption("bumblebee", "bumblebee");
     chooser.addOption("example_a", "example_a");
     chooser.addOption("example_b", "example_b");
+    chooser.addOption("test_events", "test_events");
 
     SmartDashboard.putData("Auto Mode", chooser);
   }
