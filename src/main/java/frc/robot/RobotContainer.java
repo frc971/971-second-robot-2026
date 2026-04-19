@@ -22,7 +22,7 @@ import frc.robot.subsystems.superstructure.Superstructure;
 public class RobotContainer {
   public final Superstructure superstructure;
 
-  private static final double MAX_SPEED = 3.8;
+  private static final double MAX_SPEED = 3.5;
   private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
 
   private static final double TRANSLATION_DEADBAND = 0.05;
@@ -106,9 +106,10 @@ public class RobotContainer {
 
     if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
 
-    FollowPath.registerEventTrigger("Shoot", superstructure.shootAuto());
-    FollowPath.registerEventTrigger("IntakePivotDown", superstructure.intakePivotDownAuto());
-    FollowPath.registerEventTrigger("Intake", superstructure.intakeAuto());
+    FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
+    FollowPath.registerEventTrigger("neutral", superstructure.neutral());
+    FollowPath.registerEventTrigger("intakeDown", superstructure.intakePivotDownAuto());
+    FollowPath.registerEventTrigger("intake", superstructure.intakeAuto());
   }
 
   private void configureDrivetrain() {
