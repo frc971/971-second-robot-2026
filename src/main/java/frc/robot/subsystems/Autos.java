@@ -91,4 +91,14 @@ public class Autos {
 
     return pathBuilder.build(new Path(selected.name));
   }
+
+  public Path getAutonomousPath() {
+    String selectedAuto = chooser.getSelected();
+
+    if (selectedAuto == null) {
+      return null;
+    }
+
+    return new Path(selectedAuto);
+  }
 }
