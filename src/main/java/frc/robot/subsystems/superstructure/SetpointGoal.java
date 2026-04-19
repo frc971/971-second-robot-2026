@@ -76,7 +76,7 @@ public enum SetpointGoal {
           .withB2Volts(-5.0)
           .withKickerVolts(-5.0)),
   AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
-  INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(9.0)),
+  INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
   MANUAL_SHUTTLE_UP(Setpoint.builder()),
   MANUAL_SHUTTLE_DOWN(Setpoint.builder()),
   MANUAL_SHUTTLE_LEFT(Setpoint.builder()),
