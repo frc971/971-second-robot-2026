@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,8 +16,8 @@ public class BOS {
   public static final String[] CAMERA_NAMES = {
     "PoseEstimate/Right/", "PoseEstimate/Left/", "PoseEstimate/Front/"
   };
-  private static final double FIELD_LENGTH_X = 16.54,
-      FIELD_LENGTH_Y = 8.07,
+  private static final double FIELD_LENGTH_X = FlippingUtil.fieldSizeX,
+      FIELD_LENGTH_Y = FlippingUtil.fieldSizeY,
       BAD_ODOMETRY_TOLERANCE = 0.02;
 
   private static final boolean OVERRIDE_BAD_ODOM = true;

@@ -61,7 +61,7 @@ public class Robot extends LoggedRobot {
     TagHelper.init();
 
     robotContainer = new RobotContainer();
-    bos = new BOS(robotContainer.drivetrain, true);
+    bos = new BOS(robotContainer.drivetrain);
   }
 
   @Override
