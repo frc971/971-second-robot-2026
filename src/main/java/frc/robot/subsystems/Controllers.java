@@ -11,7 +11,7 @@ public class Controllers {
 
   // === Troy's Controls
   public static final Toggle INTAKE_PIVOT = new Toggle(TROY.leftBumper());
-  public static final Trigger JUICE = TROY.a();
+  public static final Trigger JUICE = ANDRE.a();
   public static final Edge INTAKE_PIVOT_EDGE = new Edge(TROY.leftBumper());
   public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
   public static final Trigger UNJAM = ANDRE.rightStick();
@@ -20,7 +20,7 @@ public class Controllers {
   public static final Trigger INDEX = TROY.rightTrigger();
 
   public static final Trigger ODOMETRY_RESET = TROY.y();
-  public static final Trigger DRIVE_LOCK = TROY.x();
+  public static final Trigger DRIVE_LOCK = TROY.a();
 
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();
@@ -34,10 +34,8 @@ public class Controllers {
 
   public static final Trigger OUTTAKE = ANDRE.leftTrigger();
 
-  public static final Toggle KILL_LEFT = new Toggle(ANDRE.x());
-  public static final Toggle KILL_RIGHT = new Toggle(ANDRE.b());
   public static final Toggle MANUAL = new Toggle(ANDRE.y());
-  public static final Trigger DISABLE_OTF = ANDRE.a();
+  public static final Trigger DISABLE_OTF = ANDRE.x();
 
   public static final Trigger SHUTTLE_LEFT = ANDRE.leftBumper();
   public static final Trigger SHUTTLE_RIGHT = ANDRE.rightBumper();
