@@ -29,6 +29,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -351,6 +353,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     super.resetPose(pose);
   }
 
+  @AutoLogOutput(key = "Drive/OnBump")
   public boolean isRobotOnBump() {
     // use the hypotenuse of pitch and roll to account for cases if the robot is tilted diagonally
     return Math.hypot(
