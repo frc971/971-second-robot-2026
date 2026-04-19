@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +16,12 @@ public class BOS {
   public static final String[] CAMERA_NAMES = {
     "PoseEstimate/Right/", "PoseEstimate/Left/", "PoseEstimate/Front/"
   };
+  private static final double FIELD_LENGTH_X = FlippingUtil.fieldSizeX,
+      FIELD_LENGTH_Y = FlippingUtil.fieldSizeY,
+      BAD_ODOMETRY_TOLERANCE = 0.02;
+
+  private static final boolean OVERRIDE_BAD_ODOM = true;
+
   IntegerPublisher num_tags_per_control_loop_publisher;
 
   DoubleArraySubscriber[] tag_estimation_subscribers =
@@ -66,13 +73,19 @@ public class BOS {
             new Pose2d(
                 tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
 
-        drivetrain.addVisionMeasurement(
-            estimate,
-            tagEstimations[i][4],
-            VecBuilder.fill(
-                tagEstimations[i][3] / 4.0,
-                tagEstimations[i][3] / 4.0,
-                tagEstimations[i][3] * 2.0 / 3.0));
+        if (OVERRIDE_BAD_ODOM
+            && poseOffField(drivetrain.getState().Pose)
+            && !poseOffField(estimate)) {
+          drivetrain.resetPose(estimate);
+        } else {
+          drivetrain.addVisionMeasurement(
+              estimate,
+              tagEstimations[i][4],
+              VecBuilder.fill(
+                  tagEstimations[i][3] / 4.0,
+                  tagEstimations[i][3] / 4.0,
+                  tagEstimations[i][3] * 2.0 / 3.0));
+        }
 
         lastVisionPose = estimate;
       }
@@ -81,5 +94,12 @@ public class BOS {
 
   public Pose2d getLastVisionPose() {
     return lastVisionPose;
+  }
+
+  public static boolean poseOffField(Pose2d pose) {
+    return pose.getX() < -BAD_ODOMETRY_TOLERANCE
+        || pose.getY() < -BAD_ODOMETRY_TOLERANCE
+        || pose.getX() > FIELD_LENGTH_X + BAD_ODOMETRY_TOLERANCE
+        || pose.getY() > FIELD_LENGTH_Y + BAD_ODOMETRY_TOLERANCE;
   }
 }
