@@ -246,6 +246,10 @@ public class Superstructure {
       if (Controllers.KILL_RIGHT.toggled()) {
         setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
       }
+
+      if (shooterGoal == ShooterGoal.MANUAL) {
+        setGoal(SetpointGoal.FLYWHEEL_OFF);
+      }
     } else if (DriverStation.isAutonomous()) {
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
