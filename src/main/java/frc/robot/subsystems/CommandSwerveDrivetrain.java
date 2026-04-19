@@ -29,6 +29,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -47,6 +48,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private static final Rotation2d RED_ALLIANCE_PERSPECTIVE_ROTATION = Rotation2d.k180deg;
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean hasAppliedOperatorPerspective = false;
+
+  private final double BUMP_TILT_THRESHOLD_DEGREES = 5.0; // probably need to tune
 
   /** Swerve request to apply during robot-centric path following */
   private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
@@ -347,6 +350,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (this.mapleSimSwerveDrivetrain != null)
       mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
     super.resetPose(pose);
+  }
+
+  @AutoLogOutput(key = "Drive/OnBump")
+  public boolean isRobotOnBump() {
+    // use the hypotenuse of pitch and roll to account for cases if the robot is tilted diagonally
+    return Math.hypot(
+            getPigeon2().getPitch().getValue().in(Degrees),
+            getPigeon2().getRoll().getValue().in(Degrees))
+        >= BUMP_TILT_THRESHOLD_DEGREES;
   }
 
   /**

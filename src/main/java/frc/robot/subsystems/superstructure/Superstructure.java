@@ -402,18 +402,20 @@ public class Superstructure {
 
   public Command shootAuto() {
     return Commands.parallel(
-        Commands.runOnce(
-            () -> {
-              ObjectState curTarget =
-                  DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                      ? ShooterHandler.Targets.BLUE
-                      : ShooterHandler.Targets.RED;
-              shooterHandlerLeft.setTargetState(curTarget);
-              shooterHandlerRight.setTargetState(curTarget);
+        Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      ObjectState curTarget =
+                          DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                              ? ShooterHandler.Targets.BLUE
+                              : ShooterHandler.Targets.RED;
+                      shooterHandlerLeft.setTargetState(curTarget);
+                      shooterHandlerRight.setTargetState(curTarget);
 
-              shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-              shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-            }),
+                      shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                      shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                    })),
         Commands.run(
             () -> {
               int t = (int) (juiceTimer.get() * 100);
@@ -442,16 +444,19 @@ public class Superstructure {
   }
 
   public Command shootOnceAuto() {
-    return Commands.runOnce(
-        () -> {
-          ObjectState curTarget =
-              DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                  ? ShooterHandler.Targets.BLUE
-                  : ShooterHandler.Targets.RED;
-          shooterHandlerLeft.setTargetState(curTarget);
-          shooterHandlerRight.setTargetState(curTarget);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-        });
+    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  ObjectState curTarget =
+                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                          ? ShooterHandler.Targets.BLUE
+                          : ShooterHandler.Targets.RED;
+                  shooterHandlerLeft.setTargetState(curTarget);
+                  shooterHandlerRight.setTargetState(curTarget);
+
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                }));
   }
 }
