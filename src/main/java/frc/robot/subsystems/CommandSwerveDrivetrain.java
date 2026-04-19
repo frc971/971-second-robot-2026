@@ -29,7 +29,6 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
