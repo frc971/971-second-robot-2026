@@ -51,6 +51,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private final double BUMP_TILT_THRESHOLD_DEGREES = 5.0; // probably need to tune
 
+  private static final String[] MODULES = {"Front Left", "Front Right", "Back Left", "Back Right"};
+
   /** Swerve request to apply during robot-centric path following */
   private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
       new SwerveRequest.ApplyRobotSpeeds();
@@ -314,8 +316,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       double supply = module.getDriveMotor().getSupplyCurrent().getValueAsDouble();
       totalDriveStatorCurrent += stator;
       totalDriveSupplyCurrent += supply;
-      Logger.recordOutput("Drive/Currents/Module" + i + "/StatorCurrent", stator);
-      Logger.recordOutput("Drive/Currents/Module" + i + "/SupplyCurrent", supply);
+      Logger.recordOutput("Drive/Currents/" + MODULES[i] + " Drive Motor/StatorCurrent", stator);
+      Logger.recordOutput("Drive/Currents/" + MODULES[i] + " Drive Motor/SupplyCurrent", supply);
       i++;
     }
     double batteryVoltage = RobotController.getBatteryVoltage();
