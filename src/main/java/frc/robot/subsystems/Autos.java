@@ -3,17 +3,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
-
 import lombok.Getter;
 
 public class Autos {
@@ -70,18 +67,14 @@ public class Autos {
   }
 
   private void populateChooser() {
-    File pathsDir = new File(Filesystem.getDeployDirectory(), "autos/paths");
-    File[] files = pathsDir.listFiles((dir, name) -> name.endsWith(".json"));
+    if (COMPOSED_AUTOS != null && COMPOSED_AUTOS.size() > 0) {
 
-    if (files != null && files.length > 0) {
-      for (File file : files) {
-        String baseName = file.getName().replace(".json", "");
+      for (String fullAutoName : COMPOSED_AUTOS.keySet()) {
+        AutoPathOption normal = new AutoPathOption(fullAutoName, false);
+        AutoPathOption mirrored = new AutoPathOption(fullAutoName, true);
 
-        AutoPathOption normal = new AutoPathOption(baseName, false);
-        AutoPathOption mirrored = new AutoPathOption(baseName, true);
-
-        chooser.addOption(baseName, normal);
-        chooser.addOption(baseName + " (Mirrored)", mirrored);
+        chooser.addOption(fullAutoName, normal);
+        chooser.addOption(fullAutoName + " (Mirrored)", mirrored);
       }
     }
   }
@@ -93,18 +86,17 @@ public class Autos {
       return Commands.none();
     }
 
-    // FOR MY SPECIAL CHAINING AUTO
-    if (selected.name.equals("L_swipe_start") || selected.name.equals("L_swipe_start (Mirrored)")) {
-      return pathBuilder
-          // .build(new Path("L_swipe_start"))
-          .build(new Path("test_shoot"))
-          // .andThen(pathBuilder.build(new Path("test_shoot")))
-          .andThen(pathBuilder.build(new Path("L_swipe")))
-          .andThen(pathBuilder.build(new Path("test_shoot")))
-          .andThen(pathBuilder.build(new Path("L_swipe")));
+    Command fullAuto = null;
+    for (int i = 0; i < COMPOSED_AUTOS.get(selected).size(); i++) {
+      if (i == 0) {
+        fullAuto = pathBuilder.build(new Path(COMPOSED_AUTOS.get(selected).get(0)));
+      } else {
+        fullAuto =
+            fullAuto.andThen(pathBuilder.build((new Path(COMPOSED_AUTOS.get(selected).get(i)))));
+      }
     }
 
-    return pathBuilder.build(new Path(selected.name));
+    return fullAuto;
   }
 
   public Pose2d getAutonomousStartPose() {
@@ -122,9 +114,9 @@ public class Autos {
   }
 
   // IMPORTANT: all autos must be defined here
-    public static final Map<String, List<String>> COMPOSED_AUTOS = Map.of(
-        "Fruits", List.of("Apple", "Banana", "Cherry"),
-        "Vegetables", List.of("Carrot", "Broccoli")
-    );
-
+  // Map auto name (as displayed for user) to list of composed autos (IN ORDER)
+  public static final Map<String, List<String>> COMPOSED_AUTOS =
+      Map.of(
+          "L_swipe", List.of("L_swipe_start", "C_shoot", "L_swipe", "C_shoot", "L_swipe"),
+          "Kev", List.of("Kev"));
 }
