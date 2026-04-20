@@ -39,7 +39,7 @@ public class Autos {
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
 
-    chooser.setDefaultOption("bumblebee", new AutoPathOption("bumblebee", false));
+    chooser.setDefaultOption("None", null);
 
     // Build chooser FIRST so builder can reference it
     populateChooser();
