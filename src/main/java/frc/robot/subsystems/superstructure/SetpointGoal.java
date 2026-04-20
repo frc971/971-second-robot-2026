@@ -59,6 +59,9 @@ public enum SetpointGoal {
           .withGroundRollersVolts(0.0)
           .withRollerFloorVolts(0.0)),
   AUTO_FLYWHEEL(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
+  AUTO_INDEX(Setpoint.builder().withRollerFloorVolts(11.0).withB2Volts(11.0).withKickerVolts(11.0)),
+  AUTO_STOP_INDEXING(
+      Setpoint.builder().withRollerFloorVolts(0.0).withKickerVolts(0.0).withB2Volts(0.0)),
   INDEX(Setpoint.builder().withRollerFloorVolts(9.0).withB2Volts(9.0).withKickerVolts(8.0)),
   OUTTAKE(
       Setpoint.builder()
@@ -75,7 +78,7 @@ public enum SetpointGoal {
           .withRightFlywheelRPS(-5.0)
           .withB2Volts(-5.0)
           .withKickerVolts(-5.0)),
-  AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
+  AUTO_INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(11.0)),
   INTAKE_ROLLERS(Setpoint.builder().withGroundRollersVolts(10.0)),
   MANUAL_SHUTTLE_UP(Setpoint.builder()),
   MANUAL_SHUTTLE_DOWN(Setpoint.builder()),

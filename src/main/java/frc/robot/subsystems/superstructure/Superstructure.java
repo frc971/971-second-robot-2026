@@ -266,10 +266,12 @@ public class Superstructure {
 
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
           || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
-        setGoal(SetpointGoal.INDEX);
+        setGoal(SetpointGoal.AUTO_INDEX);
+      } else {
+        setGoal(SetpointGoal.AUTO_STOP_INDEXING);
       }
 
-      setGoal(SetpointGoal.INTAKE_ROLLERS);
+      setGoal(SetpointGoal.AUTO_INTAKE_ROLLERS);
     }
 
     shooterHandlerLeft.periodic();
