@@ -353,6 +353,7 @@ public class Superstructure {
   public Command neutral() {
     return Commands.runOnce(
         () -> {
+          juiceAuto = false;
           shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
           setGoal(SetpointGoal.AUTO_NEUTRAL);
