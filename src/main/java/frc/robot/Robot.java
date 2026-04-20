@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
+import frc.robot.subsystems.auto.AutoHandler;
+import frc.robot.subsystems.auto.PausableAuto;
 import frc.robot.subsystems.vision.BOS;
 import frc.robot.subsystems.vision.TagHelper;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -28,6 +30,8 @@ public class Robot extends LoggedRobot {
   private final RobotContainer robotContainer;
 
   private final BOS bos;
+
+  private final AutoHandler autoHandler;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -61,6 +65,7 @@ public class Robot extends LoggedRobot {
 
     robotContainer = new RobotContainer();
     bos = new BOS(robotContainer.drivetrain);
+    autoHandler = new AutoHandler(robotContainer);
   }
 
   @Override
@@ -125,6 +130,9 @@ public class Robot extends LoggedRobot {
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     if (autonomousCommand != null) {
+      if (autonomousCommand instanceof PausableAuto pausableAuto) {
+        autoHandler.onAutoStart(pausableAuto);
+      }
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
       robotContainer.resetPositionForAuto();
@@ -133,13 +141,19 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+
+    autoHandler.periodic();
+  }
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+    autoHandler.onAutoEnd();
+  }
 
   @Override
   public void teleopInit() {
+    autoHandler.onAutoEnd();
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }

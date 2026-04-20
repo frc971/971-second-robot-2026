@@ -29,6 +29,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
 import java.util.function.Supplier;
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -38,6 +39,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
   private MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
+  private @Getter PPHolonomicDriveController autoController = null;
 
   private static final double SIM_LOOP_PERIOD = 0.002; // 2 ms
   private Notifier simNotifier = null;
@@ -203,6 +205,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private void configureAutoBuilder() {
     try {
       var config = RobotConfig.fromGUISettings();
+      autoController =
+          new PPHolonomicDriveController(
+              // PID constants for translation
+              new PIDConstants(10, 0, 0),
+              // PID constants for rotation
+              new PIDConstants(7, 0, 0));
       AutoBuilder.configure(
           () -> getState().Pose, // Supplier of current robot pose
           this::resetPose, // Consumer for seeding pose against auto
@@ -214,11 +222,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                       .withSpeeds(speeds)
                       .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                       .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-          new PPHolonomicDriveController(
-              // PID constants for translation
-              new PIDConstants(10, 0, 0),
-              // PID constants for rotation
-              new PIDConstants(7, 0, 0)),
+          autoController,
           config,
           // Assume the path needs to be flipped for Red vs Blue, this is normally the case
           () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
