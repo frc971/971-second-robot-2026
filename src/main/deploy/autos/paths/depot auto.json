@@ -14,7 +14,7 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.4899999999999999,
+      "t_ratio": 0.1,
       "lib_key": "intakeDown"
     },
     {
@@ -279,7 +279,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.75,
-      "lib_key": "neutral"
+      "lib_key": "shootNoJuice"
     },
     {
       "type": "waypoint",
