@@ -1,0 +1,25 @@
+{
+  "path_elements": [
+    {
+      "type": "translation",
+      "x_meters": 1.0,
+      "y_meters": 7.5
+    },
+    {
+      "type": "translation",
+      "x_meters": 5.0,
+      "y_meters": 6.0
+    },
+    {
+      "type": "rotation",
+      "rotation_radians": 1.2,
+      "t_ratio": 0.5,
+      "profiled_rotation": true
+    },
+    {
+      "type": "translation",
+      "x_meters": 12.5,
+      "y_meters": 3.0
+    }
+  ]
+}
