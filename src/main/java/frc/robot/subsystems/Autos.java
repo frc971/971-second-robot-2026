@@ -10,23 +10,32 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 
 public class Autos {
 
+  /**
+   * @param displayLabel what driverstation displays as the auto's name
+   * @param pathNames what paths (in order) make up the auto
+   */
+  public record AutoRoutine(String displayLabel, List<String> pathNames) {
+    public AutoRoutine {
+      pathNames = List.copyOf(pathNames);
+    }
+  }
+
   private static class AutoPathOption {
-    public final String name;
+    public final AutoRoutine routine;
     public final boolean mirrored;
 
-    public AutoPathOption(String name, boolean mirrored) {
-      this.name = name;
+    public AutoPathOption(AutoRoutine routine, boolean mirrored) {
+      this.routine = routine;
       this.mirrored = mirrored;
     }
 
     @Override
     public String toString() {
-      return name + (mirrored ? " (Mirrored)" : "");
+      return routine.displayLabel() + (mirrored ? " (Mirrored)" : "");
     }
   }
 
@@ -67,15 +76,9 @@ public class Autos {
   }
 
   private void populateChooser() {
-    if (COMPOSED_AUTOS != null && COMPOSED_AUTOS.size() > 0) {
-
-      for (String fullAutoName : COMPOSED_AUTOS.keySet()) {
-        AutoPathOption normal = new AutoPathOption(fullAutoName, false);
-        AutoPathOption mirrored = new AutoPathOption(fullAutoName, true);
-
-        chooser.addOption(fullAutoName, normal);
-        chooser.addOption(fullAutoName + " (Mirrored)", mirrored);
-      }
+    for (AutoRoutine routine : AUTO_ROUTINES) {
+      chooser.addOption(routine.displayLabel(), new AutoPathOption(routine, false));
+      chooser.addOption(routine.displayLabel() + " (Mirrored)", new AutoPathOption(routine, true));
     }
   }
 
@@ -86,18 +89,11 @@ public class Autos {
       return Commands.none();
     }
 
-    String lookupName = selected.name.replace(" (Mirrored)", "");
-    List<String> sequence = COMPOSED_AUTOS.get(lookupName);
-
-    if (sequence != null) {
-      Command auto = Commands.none();
-      for (String name : sequence) {
-        auto = auto.andThen(pathBuilder.build(new Path(name)));
-      }
-      return auto;
+    Command auto = Commands.none();
+    for (String segment : selected.routine.pathNames()) {
+      auto = auto.andThen(pathBuilder.build(new Path(segment)));
     }
-
-    return pathBuilder.build(new Path(selected.name));
+    return auto;
   }
 
   public Pose2d getAutonomousStartPose() {
@@ -107,7 +103,12 @@ public class Autos {
       return null;
     }
 
-    Path path = new Path(selected.name);
+    List<String> segments = selected.routine.pathNames();
+    if (segments.isEmpty()) {
+      return null;
+    }
+
+    Path path = new Path(segments.get(0));
 
     if (selected.mirrored) path.mirror();
 
@@ -115,10 +116,12 @@ public class Autos {
   }
 
   // IMPORTANT: all autos must be defined here
-  // Map auto name (as displayed for user) to list of composed autos (IN ORDER)
-  public static final Map<String, List<String>> COMPOSED_AUTOS =
-      Map.of(
-        "Niko", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Depot"),
-          "L_swipe", List.of("C_shoot", "L_swipe", "C_shoot", "L_swipe"),
-          "Kev", List.of("Kev"));
+  // list JSON names (without .json), in order
+  public static final List<AutoRoutine> AUTO_ROUTINES =
+      List.of(
+          new AutoRoutine("Niko", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Depot")),
+          new AutoRoutine(
+              "Niko No-depot", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Normal")),
+          new AutoRoutine("L_swipe", List.of("C_shoot", "L_swipe", "C_shoot", "L_swipe")),
+          new AutoRoutine("Kev", List.of("Kev")));
 }
