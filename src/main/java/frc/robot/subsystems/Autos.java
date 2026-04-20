@@ -90,6 +90,17 @@ public class Autos {
       return Commands.none();
     }
 
+    // FOR MY SPECIAL CHAINING AUTO
+    if (selected.name.equals("L_swipe_start") || selected.name.equals("L_swipe_start (Mirrored)")) {
+      return pathBuilder
+          // .build(new Path("L_swipe_start"))
+          .build(new Path("test_shoot"))
+          // .andThen(pathBuilder.build(new Path("test_shoot")))
+          .andThen(pathBuilder.build(new Path("L_swipe")))
+          .andThen(pathBuilder.build(new Path("test_shoot")))
+          .andThen(pathBuilder.build(new Path("L_swipe")));
+    }
+
     return pathBuilder.build(new Path(selected.name));
   }
 
