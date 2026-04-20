@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import java.io.File;
+import java.util.List;
+import java.util.Map;
+
 import lombok.Getter;
 
 public class Autos {
@@ -117,4 +120,11 @@ public class Autos {
 
     return path.getStartPose();
   }
+
+  // IMPORTANT: all autos must be defined here
+    public static final Map<String, List<String>> COMPOSED_AUTOS = Map.of(
+        "Fruits", List.of("Apple", "Banana", "Cherry"),
+        "Vegetables", List.of("Carrot", "Broccoli")
+    );
+
 }
