@@ -172,7 +172,7 @@ public class Superstructure {
         }
       }
 
-      if (!Controllers.INTAKE_PIVOT.toggled()) {
+      if (Controllers.INTAKE_PIVOT.toggled()) {
         setGoal(SetpointGoal.INTAKE_PIVOT);
 
         if (Controllers.JUICE.getAsBoolean()) {
@@ -399,6 +399,25 @@ public class Superstructure {
                   shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
 
                   juiceAuto = true;
+                }));
+  }
+
+  public Command shootAutoNoJuice() {
+    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  ObjectState curTarget =
+                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                          ? ShooterHandler.Targets.BLUE
+                          : ShooterHandler.Targets.RED;
+                  shooterHandlerLeft.setTargetState(curTarget);
+                  shooterHandlerRight.setTargetState(curTarget);
+
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+
+                  juiceAuto = false;
                 }));
   }
 

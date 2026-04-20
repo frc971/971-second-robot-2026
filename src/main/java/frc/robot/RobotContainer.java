@@ -107,6 +107,7 @@ public class RobotContainer {
     if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
 
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
+    FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
     FollowPath.registerEventTrigger("neutral", superstructure.neutral());
     FollowPath.registerEventTrigger("intakeDown", superstructure.intakePivotDownAuto());
   }
