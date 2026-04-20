@@ -118,6 +118,7 @@ public class Autos {
   // Map auto name (as displayed for user) to list of composed autos (IN ORDER)
   public static final Map<String, List<String>> COMPOSED_AUTOS =
       Map.of(
+        "Niko", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Depot"),
           "L_swipe", List.of("C_shoot", "L_swipe", "C_shoot", "L_swipe"),
           "Kev", List.of("Kev"));
 }
