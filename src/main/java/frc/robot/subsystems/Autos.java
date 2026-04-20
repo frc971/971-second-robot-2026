@@ -86,17 +86,18 @@ public class Autos {
       return Commands.none();
     }
 
-    Command fullAuto = null;
-    for (int i = 0; i < COMPOSED_AUTOS.get(selected).size(); i++) {
-      if (i == 0) {
-        fullAuto = pathBuilder.build(new Path(COMPOSED_AUTOS.get(selected).get(0)));
-      } else {
-        fullAuto =
-            fullAuto.andThen(pathBuilder.build((new Path(COMPOSED_AUTOS.get(selected).get(i)))));
+    String lookupName = selected.name.replace(" (Mirrored)", "");
+    List<String> sequence = COMPOSED_AUTOS.get(lookupName);
+
+    if (sequence != null) {
+      Command auto = Commands.none();
+      for (String name : sequence) {
+        auto = auto.andThen(pathBuilder.build(new Path(name)));
       }
+      return auto;
     }
 
-    return fullAuto;
+    return pathBuilder.build(new Path(selected.name));
   }
 
   public Pose2d getAutonomousStartPose() {
@@ -117,6 +118,6 @@ public class Autos {
   // Map auto name (as displayed for user) to list of composed autos (IN ORDER)
   public static final Map<String, List<String>> COMPOSED_AUTOS =
       Map.of(
-          "L_swipe", List.of("L_swipe_start", "C_shoot", "L_swipe", "C_shoot", "L_swipe"),
+          "L_swipe", List.of("C_shoot", "L_swipe", "C_shoot", "L_swipe"),
           "Kev", List.of("Kev"));
 }
