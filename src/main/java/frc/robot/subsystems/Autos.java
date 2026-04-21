@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import java.util.List;
-import java.util.function.Consumer;
 import lombok.Getter;
 
 public class Autos {
@@ -55,14 +54,13 @@ public class Autos {
     // Build chooser FIRST so builder can reference it
     populateChooser();
 
-    pathBuilderWithStartPoseReset = newPathBuilder(drivetrain, drivetrain::resetPose);
-    pathBuilderContinuation = newPathBuilder(drivetrain, pose -> {});
+    pathBuilderWithStartPoseReset = newPathBuilder(drivetrain).withPoseReset(drivetrain::resetPose);
+    pathBuilderContinuation = newPathBuilder(drivetrain);
 
     SmartDashboard.putData("Auto Mode", chooser);
   }
 
-  private FollowPath.Builder newPathBuilder(
-      CommandSwerveDrivetrain drivetrain, Consumer<Pose2d> poseReset) {
+  private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
     return new FollowPath.Builder(
             drivetrain,
             () -> drivetrain.getState().Pose,
@@ -76,8 +74,7 @@ public class Autos {
               AutoPathOption selected = chooser.getSelected();
               return selected != null && selected.mirrored;
             })
-        .withDefaultShouldFlip()
-        .withPoseReset(poseReset);
+        .withDefaultShouldFlip();
   }
 
   private void populateChooser() {
