@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -123,8 +122,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
-
     autonomousCommand = autos.getAutonomousCommand();
 
     if (autonomousCommand != null) {
@@ -138,14 +135,10 @@ public class Robot extends LoggedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {
-    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Coast);
-  }
+  public void autonomousExit() {}
 
   @Override
   public void teleopInit() {
-    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
-
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -160,8 +153,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testInit() {
-    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
-
     CommandScheduler.getInstance().cancelAll();
   }
 
