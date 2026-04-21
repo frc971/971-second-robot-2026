@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -201,6 +202,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
    */
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
     return run(() -> this.setControl(requestSupplier.get()));
+  }
+
+  public void setModuleNeutralMode(NeutralModeValue neutralMode) {
+    Logger.recordOutput("Drive/NeutralModeValue", neutralMode);
+    for (var module : getModules()) {
+      module.getDriveMotor().setNeutralMode(neutralMode);
+      module.getSteerMotor().setNeutralMode(neutralMode);
+    }
   }
 
   /**
