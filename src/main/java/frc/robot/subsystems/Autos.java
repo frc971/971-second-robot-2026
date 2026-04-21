@@ -123,5 +123,8 @@ public class Autos {
           new AutoRoutine(
               "Niko No-depot", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Normal")),
           new AutoRoutine("L_swipe", List.of("C_shoot", "L_swipe", "C_shoot", "L_swipe")),
-          new AutoRoutine("Kev", List.of("Kev")));
+          new AutoRoutine("Kev", List.of("Kev")),
+          new AutoRoutine(
+              "Test Continuity",
+              List.of("test_A", "test_B", "test_C", "test_D", "test_A", "test_B", "test_A")));
 }
