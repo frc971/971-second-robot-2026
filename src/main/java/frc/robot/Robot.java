@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,6 +31,8 @@ public class Robot extends LoggedRobot {
   private final BOS bos;
 
   private final Autos autos;
+
+  private boolean coastSwerveOnNextDisable = false;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -98,6 +101,11 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
+    if (coastSwerveOnNextDisable) {
+      robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Coast);
+      coastSwerveOnNextDisable = false;
+    }
+
     HubShiftUtil.initialize();
   }
 
@@ -122,6 +130,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    coastSwerveOnNextDisable = true;
+    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
+
     autonomousCommand = autos.getAutonomousCommand();
 
     if (autonomousCommand != null) {
@@ -139,6 +150,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    coastSwerveOnNextDisable = false;
+    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
+
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -153,6 +167,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testInit() {
+    coastSwerveOnNextDisable = false;
+    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
+
     CommandScheduler.getInstance().cancelAll();
   }
 
