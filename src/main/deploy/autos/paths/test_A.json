@@ -13,6 +13,11 @@
       }
     },
     {
+      "type": "event_trigger",
+      "t_ratio": 0.0005563429990685162,
+      "lib_key": "intakeDown"
+    },
+    {
       "type": "waypoint",
       "translation_target": {
         "x_meters": 0.8202158273381297,

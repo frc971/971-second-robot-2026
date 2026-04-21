@@ -7,6 +7,11 @@
       "intermediate_handoff_radius_meters": 0.25
     },
     {
+      "type": "event_trigger",
+      "t_ratio": 0.2657520071225717,
+      "lib_key": "neutral"
+    },
+    {
       "type": "rotation",
       "rotation_radians": 1.5707963267948966,
       "t_ratio": 0.4332061875718925,
