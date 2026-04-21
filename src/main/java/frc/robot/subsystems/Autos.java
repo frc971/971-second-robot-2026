@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import java.util.List;
+import java.util.function.Consumer;
 import lombok.Getter;
 
 public class Autos {
@@ -44,7 +45,8 @@ public class Autos {
 
   @Getter private final SendableChooser<AutoPathOption> chooser = new SendableChooser<>();
 
-  private final FollowPath.Builder pathBuilder;
+  private final FollowPath.Builder pathBuilderWithStartPoseReset;
+  private final FollowPath.Builder pathBuilderContinuation;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
 
@@ -53,26 +55,29 @@ public class Autos {
     // Build chooser FIRST so builder can reference it
     populateChooser();
 
-    pathBuilder =
-        new FollowPath.Builder(
-                drivetrain,
-                () -> drivetrain.getState().Pose,
-                () -> drivetrain.getState().Speeds,
-                speeds -> drivetrain.setControl(pathApplyRobotSpeeds.withSpeeds(speeds)),
-                new PIDController(5.0, 0.0, 0.0),
-                new PIDController(3.0, 0.0, 0.0),
-                new PIDController(2.0, 0.0, 0.0))
-            // Custom mirror (left/right)
-            .withShouldMirror(
-                () -> {
-                  AutoPathOption selected = chooser.getSelected();
-                  return selected != null && selected.mirrored;
-                })
-            // Optional: keep alliance flip (remove if undesired)
-            .withDefaultShouldFlip()
-            .withPoseReset(drivetrain::resetPose);
+    pathBuilderWithStartPoseReset = newPathBuilder(drivetrain, drivetrain::resetPose);
+    pathBuilderContinuation = newPathBuilder(drivetrain, pose -> {});
 
     SmartDashboard.putData("Auto Mode", chooser);
+  }
+
+  private FollowPath.Builder newPathBuilder(
+      CommandSwerveDrivetrain drivetrain, Consumer<Pose2d> poseReset) {
+    return new FollowPath.Builder(
+            drivetrain,
+            () -> drivetrain.getState().Pose,
+            () -> drivetrain.getState().Speeds,
+            speeds -> drivetrain.setControl(pathApplyRobotSpeeds.withSpeeds(speeds)),
+            new PIDController(5.0, 0.0, 0.0),
+            new PIDController(3.0, 0.0, 0.0),
+            new PIDController(2.0, 0.0, 0.0))
+        .withShouldMirror(
+            () -> {
+              AutoPathOption selected = chooser.getSelected();
+              return selected != null && selected.mirrored;
+            })
+        .withDefaultShouldFlip()
+        .withPoseReset(poseReset);
   }
 
   private void populateChooser() {
@@ -90,8 +95,10 @@ public class Autos {
     }
 
     Command auto = Commands.none();
-    for (String segment : selected.routine.pathNames()) {
-      auto = auto.andThen(pathBuilder.build(new Path(segment)));
+    List<String> segments = selected.routine.pathNames();
+    for (int i = 0; i < segments.size(); i++) {
+      FollowPath.Builder builder = i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
+      auto = auto.andThen(builder.build(new Path(segments.get(i))));
     }
     return auto;
   }
