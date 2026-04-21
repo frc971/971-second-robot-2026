@@ -205,6 +205,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public void setModuleNeutralMode(NeutralModeValue neutralMode) {
+    Logger.recordOutput("Drive/NeutralModeValue", neutralMode);
     for (var module : getModules()) {
       module.getDriveMotor().setNeutralMode(neutralMode);
       module.getSteerMotor().setNeutralMode(neutralMode);

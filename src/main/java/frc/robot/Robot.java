@@ -32,8 +32,6 @@ public class Robot extends LoggedRobot {
 
   private final Autos autos;
 
-  private boolean coastSwerveOnNextDisable = false;
-
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
     Logger.recordMetadata("TeamNumber", "971");
@@ -101,11 +99,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    if (coastSwerveOnNextDisable) {
-      robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Coast);
-      coastSwerveOnNextDisable = false;
-    }
-
     HubShiftUtil.initialize();
   }
 
@@ -130,7 +123,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    coastSwerveOnNextDisable = true;
     robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
 
     autonomousCommand = autos.getAutonomousCommand();
@@ -146,11 +138,12 @@ public class Robot extends LoggedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Coast);
+  }
 
   @Override
   public void teleopInit() {
-    coastSwerveOnNextDisable = false;
     robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
 
     if (autonomousCommand != null) {
@@ -167,7 +160,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testInit() {
-    coastSwerveOnNextDisable = false;
     robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Brake);
 
     CommandScheduler.getInstance().cancelAll();
