@@ -152,5 +152,5 @@ public class Autos {
               true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
 
           // Middle Depot
-          new AutoRoutine(true, "Bum", List.of()));
+          new AutoRoutine(false, "Bum", List.of("MiddleDepot2")));
 }
