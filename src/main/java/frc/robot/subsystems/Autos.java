@@ -121,6 +121,12 @@ public class Autos {
 
   // IMPORTANT: all autos must be defined here
   // list JSON names (without .json), in order
+  // KEY:
+  // S_ = START
+  // F_ = FUEL, sweep and intaking
+  // H_ = HUB, shooting fuel
+  // D_ = Depot
+  // Most paths are S, H, F, H/D
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
           new AutoRoutine("Depot", List.of("S_Depot", "H_Depot1", "F_Depot", "H_Depot2")),
