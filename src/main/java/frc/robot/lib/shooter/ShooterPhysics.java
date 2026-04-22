@@ -77,13 +77,14 @@ public class ShooterPhysics {
     return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
   }
 
+  //** Fixed Height Constraint */
   public LaunchSolution thriceSolve(ObjectState proj, ObjectState target) {
     Translation2d distance2d = target.minus(proj).xyPos();
     double currentDistance = distance2d.getNorm();
 
     double h0 = proj.position().getZ();
     double ht = target.position().getZ();
-    double H = MathUtil.clamp(h0 + (currentDistance * 0.3), h0 + 0.2, 100);
+    double H = MathUtil.clamp(h0 + (currentDistance * 0.1), h0 + 0.2, 100);
 
     // compute helper terms
     double deltaH = H - h0;
