@@ -18,7 +18,7 @@ public class Autos {
    * @param displayLabel what driverstation displays as the auto's name
    * @param pathNames what paths (in order) make up the auto
    */
-  public record AutoRoutine(String displayLabel, List<String> pathNames) {
+  public record AutoRoutine(boolean canMirror, String displayLabel, List<String> pathNames) {
     public AutoRoutine {
       pathNames = List.copyOf(pathNames);
     }
@@ -130,22 +130,20 @@ public class Autos {
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
           // Madtown Depot
-          new AutoRoutine("Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
+          new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
           new AutoRoutine(
-              "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
+              false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
 
           // Madtown No Depot
           new AutoRoutine(
-              "James", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
+              true, "James", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
           new AutoRoutine(
-              "Tamed James",
+              true, "Tamed James",
               List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal")),
 
-          // Kev (Long)
-
-          new AutoRoutine(
+          new AutoRoutine(true,
               "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
 
           // Middle Depot
-          new AutoRoutine("Bum", List.of()));
+          new AutoRoutine(true, "Bum", List.of()));
 }
