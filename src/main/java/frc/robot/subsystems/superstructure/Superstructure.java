@@ -223,12 +223,12 @@ public class Superstructure {
                       || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)
                   || shooterGoal == ShooterGoal.MANUAL);
 
-      if (indexing) {
-        setGoal(SetpointGoal.INDEX);
-      } else if (Controllers.OUTTAKE.getAsBoolean()) {
+      if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
       } else if (Controllers.UNJAM.getAsBoolean()) {
         setGoal(SetpointGoal.UNJAM);
+      } else if (indexing) {
+        setGoal(SetpointGoal.INDEX);
       }
 
     } else if (DriverStation.isAutonomous()) {
