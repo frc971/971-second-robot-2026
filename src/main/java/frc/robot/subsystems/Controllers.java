@@ -14,7 +14,7 @@ public class Controllers {
   public static final Trigger JUICE = ANDRE.a();
   public static final Edge INTAKE_PIVOT_EDGE = new Edge(TROY.leftBumper());
   public static final Trigger INTAKE_ROLLERS = TROY.leftTrigger();
-  public static final Trigger UNJAM = ANDRE.rightStick();
+  public static final Trigger UNJAM = ANDRE.leftStick();
 
   public static final Trigger SHOOT_REDUNDANCY = TROY.axisGreaterThan(3, 0.9);
   public static final Trigger INDEX = TROY.rightTrigger();
