@@ -141,6 +141,7 @@ public class Autos {
               true, "Tamed James",
               List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal")),
 
+          // Supersteal
           new AutoRoutine(false,
               "SuperSteal Depot", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
           new AutoRoutine(true,
