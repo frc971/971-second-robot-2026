@@ -129,10 +129,23 @@ public class Autos {
   // Most paths are S, H, F, H/D
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
+          // Madtown Depot
+          new AutoRoutine("Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
+          new AutoRoutine(
+              "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
+
+          // Madtown No Depot
+          new AutoRoutine(
+              "James", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
+          new AutoRoutine(
+              "Tamed James",
+              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal")),
+
+          // Kev (Long)
+
           new AutoRoutine(
               "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
-          new AutoRoutine("Depot", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
-          new AutoRoutine("Niko", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
-          new AutoRoutine(
-              "Tamed Depot", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")));
+
+          // Middle Depot
+          new AutoRoutine("Bum", List.of()));
 }
