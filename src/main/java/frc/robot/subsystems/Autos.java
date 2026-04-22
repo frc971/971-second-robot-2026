@@ -3,30 +3,39 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
-import java.io.File;
+import java.util.List;
 import lombok.Getter;
 
 public class Autos {
 
+  /**
+   * @param displayLabel what driverstation displays as the auto's name
+   * @param pathNames what paths (in order) make up the auto
+   */
+  public record AutoRoutine(String displayLabel, List<String> pathNames) {
+    public AutoRoutine {
+      pathNames = List.copyOf(pathNames);
+    }
+  }
+
   private static class AutoPathOption {
-    public final String name;
+    public final AutoRoutine routine;
     public final boolean mirrored;
 
-    public AutoPathOption(String name, boolean mirrored) {
-      this.name = name;
+    public AutoPathOption(AutoRoutine routine, boolean mirrored) {
+      this.routine = routine;
       this.mirrored = mirrored;
     }
 
     @Override
     public String toString() {
-      return name + (mirrored ? " (Mirrored)" : "");
+      return routine.displayLabel() + (mirrored ? " (Mirrored)" : "");
     }
   }
 
@@ -35,51 +44,43 @@ public class Autos {
 
   @Getter private final SendableChooser<AutoPathOption> chooser = new SendableChooser<>();
 
-  private final FollowPath.Builder pathBuilder;
+  private final FollowPath.Builder pathBuilderWithStartPoseReset;
+  private final FollowPath.Builder pathBuilderContinuation;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
 
-    chooser.setDefaultOption("bumblebee", new AutoPathOption("bumblebee", false));
+    chooser.setDefaultOption("None", null);
 
     // Build chooser FIRST so builder can reference it
     populateChooser();
 
-    pathBuilder =
-        new FollowPath.Builder(
-                drivetrain,
-                () -> drivetrain.getState().Pose,
-                () -> drivetrain.getState().Speeds,
-                speeds -> drivetrain.setControl(pathApplyRobotSpeeds.withSpeeds(speeds)),
-                new PIDController(5.0, 0.0, 0.0),
-                new PIDController(3.0, 0.0, 0.0),
-                new PIDController(2.0, 0.0, 0.0))
-            // Custom mirror (left/right)
-            .withShouldMirror(
-                () -> {
-                  AutoPathOption selected = chooser.getSelected();
-                  return selected != null && selected.mirrored;
-                })
-            // Optional: keep alliance flip (remove if undesired)
-            .withDefaultShouldFlip()
-            .withPoseReset(drivetrain::resetPose);
+    pathBuilderWithStartPoseReset = newPathBuilder(drivetrain).withPoseReset(drivetrain::resetPose);
+    pathBuilderContinuation = newPathBuilder(drivetrain);
 
     SmartDashboard.putData("Auto Mode", chooser);
   }
 
+  private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
+    return new FollowPath.Builder(
+            drivetrain,
+            () -> drivetrain.getState().Pose,
+            () -> drivetrain.getState().Speeds,
+            speeds -> drivetrain.setControl(pathApplyRobotSpeeds.withSpeeds(speeds)),
+            new PIDController(5.0, 0.0, 0.0),
+            new PIDController(3.0, 0.0, 0.0),
+            new PIDController(2.0, 0.0, 0.0))
+        .withShouldMirror(
+            () -> {
+              AutoPathOption selected = chooser.getSelected();
+              return selected != null && selected.mirrored;
+            })
+        .withDefaultShouldFlip();
+  }
+
   private void populateChooser() {
-    File pathsDir = new File(Filesystem.getDeployDirectory(), "autos/paths");
-    File[] files = pathsDir.listFiles((dir, name) -> name.endsWith(".json"));
-
-    if (files != null && files.length > 0) {
-      for (File file : files) {
-        String baseName = file.getName().replace(".json", "");
-
-        AutoPathOption normal = new AutoPathOption(baseName, false);
-        AutoPathOption mirrored = new AutoPathOption(baseName, true);
-
-        chooser.addOption(baseName, normal);
-        chooser.addOption(baseName + " (Mirrored)", mirrored);
-      }
+    for (AutoRoutine routine : AUTO_ROUTINES) {
+      chooser.addOption(routine.displayLabel(), new AutoPathOption(routine, false));
+      chooser.addOption(routine.displayLabel() + " (Mirrored)", new AutoPathOption(routine, true));
     }
   }
 
@@ -90,7 +91,13 @@ public class Autos {
       return Commands.none();
     }
 
-    return pathBuilder.build(new Path(selected.name));
+    Command auto = Commands.none();
+    List<String> segments = selected.routine.pathNames();
+    for (int i = 0; i < segments.size(); i++) {
+      FollowPath.Builder builder = i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
+      auto = auto.andThen(builder.build(new Path(segments.get(i))));
+    }
+    return auto;
   }
 
   public Pose2d getAutonomousStartPose() {
@@ -100,10 +107,30 @@ public class Autos {
       return null;
     }
 
-    Path path = new Path(selected.name);
+    List<String> segments = selected.routine.pathNames();
+    if (segments.isEmpty()) {
+      return null;
+    }
+
+    Path path = new Path(segments.get(0));
 
     if (selected.mirrored) path.mirror();
 
     return path.getStartPose();
   }
+
+  // IMPORTANT: all autos must be defined here
+  // list JSON names (without .json), in order
+  public static final List<AutoRoutine> AUTO_ROUTINES =
+      List.of(
+          new AutoRoutine("Depot", List.of("S_Depot", "H_Depot1", "F_Depot", "H_Depot2")),
+          new AutoRoutine(
+              "Niko by Alex", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Depot")),
+          new AutoRoutine(
+              "Niko No-depot", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Normal")));
+  // new AutoRoutine("L_swipe", List.of("C_shoot", "L_swipe", "C_shoot", "L_swipe")),
+  // new AutoRoutine("Kev", List.of("kev")),
+  // new AutoRoutine(
+  //     "Test Continuity",
+  //     List.of("test_A", "test_B", "test_C", "test_D", "test_A", "test_B", "test_A")));
 }
