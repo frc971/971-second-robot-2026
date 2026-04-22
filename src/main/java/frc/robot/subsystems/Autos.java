@@ -129,5 +129,5 @@ public class Autos {
   // Most paths are S, H, F, H/D
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
-          new AutoRoutine("Depot", List.of("S_Depot", "H_Depot1", "F_Depot", "H_Depot2")));
+          new AutoRoutine("DepotOLD", List.of("S_Depot_OLD", "H_Depot1_OLD", "F_Depot_OLD", "H_Depot2_OLD")));
 }
