@@ -123,7 +123,7 @@ public class Autos {
   // list JSON names (without .json), in order
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
-          new AutoRoutine("Depot", List.of("S_Depot", "H_Depot1", "F_Depot", "H_Depot2")),
+          new AutoRoutine("Depot", List.of("depot")),
           new AutoRoutine(
               "Niko by Alex", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Depot")),
           new AutoRoutine(
