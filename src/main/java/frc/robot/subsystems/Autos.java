@@ -132,6 +132,7 @@ public class Autos {
           new AutoRoutine(
               "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
           new AutoRoutine("Depot", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
+          new AutoRoutine("Niko", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
           new AutoRoutine(
               "Tamed Depot", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")));
 }
