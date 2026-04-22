@@ -80,8 +80,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 6.194448328390927,
-        "y_meters": 5.385848708414829,
+        "x_meters": 6.042398792787213,
+        "y_meters": 5.385848708414828,
         "intermediate_handoff_radius_meters": 0.5
       },
       "rotation_target": {
@@ -92,8 +92,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 4.7910572412314965,
-        "y_meters": 5.487641247614924,
+        "x_meters": 4.628147024513232,
+        "y_meters": 5.433337842042171,
         "intermediate_handoff_radius_meters": 0.6499999999999995
       },
       "rotation_target": {
@@ -173,15 +173,15 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.1600000000000001,
+      "t_ratio": 0.15999999999999984,
       "lib_key": "intakeDown"
     },
     {
       "type": "waypoint",
       "translation_target": {
         "x_meters": 5.792330043310663,
-        "y_meters": 5.405476195968573,
-        "intermediate_handoff_radius_meters": 0.95
+        "y_meters": 5.3403121092812675,
+        "intermediate_handoff_radius_meters": 0.5
       },
       "rotation_target": {
         "rotation_radians": 1.5707963267948966,
@@ -239,8 +239,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 6.685892452635978,
-        "y_meters": 5.476987957333093,
+        "x_meters": 6.5338429170322625,
+        "y_meters": 5.346659783958479,
         "intermediate_handoff_radius_meters": 0.5
       },
       "rotation_target": {
@@ -250,23 +250,23 @@
     },
     {
       "type": "translation",
-      "x_meters": 3.171190619379391,
-      "y_meters": 5.561991607233338,
+      "x_meters": 3.171190619379392,
+      "y_meters": 5.475106158316929,
       "intermediate_handoff_radius_meters": 0.25
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.08645508203131007,
+      "t_ratio": 0.08645508203131003,
       "lib_key": "shoot"
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.7500000000000006,
+      "t_ratio": 0.7500000000000004,
       "lib_key": "intakeDown"
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.7500000000000006,
+      "t_ratio": 0.7500000000000004,
       "lib_key": "shootNoJuice"
     },
     {
