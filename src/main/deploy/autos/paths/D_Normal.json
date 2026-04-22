@@ -4,7 +4,7 @@
       "type": "translation",
       "x_meters": 3.171190619379392,
       "y_meters": 5.475106158316929,
-      "intermediate_handoff_radius_meters": 0.25
+      "intermediate_handoff_radius_meters": 0.5
     },
     {
       "type": "event_trigger",
