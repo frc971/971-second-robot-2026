@@ -126,7 +126,6 @@ public class Autos {
   // F_ = FUEL, sweep and intaking
   // H_ = HUB, shooting fuel
   // D_ = Depot
-  // Most paths are S, H, F, H/D
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
           // Madtown Depot
