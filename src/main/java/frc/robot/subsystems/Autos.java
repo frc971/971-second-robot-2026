@@ -121,16 +121,13 @@ public class Autos {
 
   // IMPORTANT: all autos must be defined here
   // list JSON names (without .json), in order
+  // KEY:
+  // S_AR = STT
+  // F_ = FUEL, sweep and intaking
+  // H_ = HUB, shooting fuel
+  // D_ = Depot
+  // Most paths are S, H, F, H/D
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
-          new AutoRoutine("Depot", List.of("depot")),
-          new AutoRoutine(
-              "Niko by Alex", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Depot")),
-          new AutoRoutine(
-              "Niko No-depot", List.of("S_Niko", "H_Niko_Normal", "F_Niko2nd", "H_Niko_Normal")));
-  // new AutoRoutine("L_swipe", List.of("C_shoot", "L_swipe", "C_shoot", "L_swipe")),
-  // new AutoRoutine("Kev", List.of("kev")),
-  // new AutoRoutine(
-  //     "Test Continuity",
-  //     List.of("test_A", "test_B", "test_C", "test_D", "test_A", "test_B", "test_A")));
+          new AutoRoutine("Depot", List.of("S_Depot", "H_Depot1", "F_Depot", "H_Depot2")));
 }
