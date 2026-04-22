@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -65,8 +64,6 @@ public class Robot extends LoggedRobot {
     robotContainer = new RobotContainer();
     bos = new BOS(robotContainer.drivetrain);
     autos = new Autos(robotContainer.drivetrain);
-
-    robotContainer.drivetrain.setModuleNeutralMode(NeutralModeValue.Coast);
   }
 
   @Override
