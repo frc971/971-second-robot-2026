@@ -30,8 +30,8 @@ public class RobotContainer {
 
   private static final double SHOOTING_SPEED = 0.3 * MAX_SPEED;
   private static final double SHOOTING_ANGULAR_RATE = 0.3 * MAX_ANGULAR_RATE;
-  private static final double SHUTTLING_SPEED = 0.6 * MAX_SPEED;
-  private static final double SHUTTLING_ANGULAR_RATE = 0.6 * MAX_ANGULAR_RATE;
+  private static final double SHUTTLING_SPEED = 0.5 * MAX_SPEED;
+  private static final double SHUTTLING_ANGULAR_RATE = 0.5 * MAX_ANGULAR_RATE;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric shootingDrive =
