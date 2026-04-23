@@ -79,9 +79,11 @@ public class Autos {
 
   private void populateChooser() {
     for (AutoRoutine routine : AUTO_ROUTINES) {
-      chooser.addOption(routine.displayLabel(), new AutoPathOption(routine, false));
+      AutoPathOption normal = new AutoPathOption(routine, false);
+      chooser.addOption(normal.toString(), normal);
       if (routine.canMirror) {
-        chooser.addOption(routine.displayLabel() + " (Mirrored)", new AutoPathOption(routine, true));
+        AutoPathOption mirrored = new AutoPathOption(routine, true);
+        chooser.addOption(mirrored.toString(), mirrored);
       }
     }
   }
