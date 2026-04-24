@@ -48,6 +48,7 @@ public class Superstructure {
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private final Timer juiceTimer = new Timer();
+  private boolean juiceAuto = false;
 
   private enum ShooterGoal {
     NONE,
@@ -93,6 +94,7 @@ public class Superstructure {
   }
 
   public void periodic() {
+    // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
@@ -222,17 +224,27 @@ public class Superstructure {
                       || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)
                   || shooterGoal == ShooterGoal.MANUAL);
 
-      if (indexing) {
-        setGoal(SetpointGoal.INDEX);
-      } else if (Controllers.OUTTAKE.getAsBoolean()) {
+      if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
       } else if (Controllers.UNJAM.getAsBoolean()) {
         setGoal(SetpointGoal.UNJAM);
+      } else if (indexing) {
+        setGoal(SetpointGoal.INDEX);
       }
 
-    } else if (DriverStation.isAutonomous()) {
+    } else if (DriverStation.isAutonomous()) { // MARK: Autonomous Logic
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
+      }
+
+      if (juiceAuto) {
+        int t = (int) (juiceTimer.get() * 100);
+
+        if (t % 100 < 50) {
+          setGoal(SetpointGoal.INTAKE_PIVOT);
+        } else {
+          setGoal(SetpointGoal.INTAKE_PIVOT_JUICE);
+        }
       }
 
       if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
@@ -255,10 +267,12 @@ public class Superstructure {
 
       if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
           || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
-        setGoal(SetpointGoal.INDEX);
+        setGoal(SetpointGoal.AUTO_INDEX);
+      } else {
+        setGoal(SetpointGoal.AUTO_STOP_INDEXING);
       }
 
-      setGoal(SetpointGoal.INTAKE_ROLLERS);
+      setGoal(SetpointGoal.AUTO_INTAKE_ROLLERS);
     }
 
     shooterHandlerLeft.periodic();
@@ -342,32 +356,18 @@ public class Superstructure {
   public Command neutral() {
     return Commands.runOnce(
         () -> {
+          juiceAuto = false;
           shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
           setGoal(SetpointGoal.AUTO_NEUTRAL);
-        });
-  }
-
-  public Command intakeAuto() {
-    return Commands.runOnce(
-        () -> {
-          setGoal(SetpointGoal.AUTO_INTAKE_ROLLERS);
         });
   }
 
   public Command intakePivotDownAuto() {
     return Commands.runOnce(
         () -> {
+          juiceAuto = false;
           setGoal(SetpointGoal.INTAKE_PIVOT);
-        });
-  }
-
-  public Command deployedAuto() {
-    return Commands.runOnce(
-        () -> {
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-          setGoal(SetpointGoal.AUTO_NEUTRAL);
         });
   }
 
@@ -385,31 +385,41 @@ public class Superstructure {
   }
 
   public Command shootAuto() {
-    return Commands.parallel(
-        Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-            .andThen(
-                Commands.runOnce(
-                    () -> {
-                      ObjectState curTarget =
-                          DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                              ? ShooterHandler.Targets.BLUE
-                              : ShooterHandler.Targets.RED;
-                      shooterHandlerLeft.setTargetState(curTarget);
-                      shooterHandlerRight.setTargetState(curTarget);
+    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  ObjectState curTarget =
+                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                          ? ShooterHandler.Targets.BLUE
+                          : ShooterHandler.Targets.RED;
+                  shooterHandlerLeft.setTargetState(curTarget);
+                  shooterHandlerRight.setTargetState(curTarget);
 
-                      shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                      shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                    })),
-        Commands.run(
-            () -> {
-              int t = (int) (juiceTimer.get() * 100);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
 
-              if (t % 100 < 50) {
-                setGoal(SetpointGoal.INTAKE_PIVOT);
-              } else {
-                setGoal(SetpointGoal.INTAKE_PIVOT_JUICE);
-              }
-            }));
+                  juiceAuto = true;
+                }));
+  }
+
+  public Command shootAutoNoJuice() {
+    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  ObjectState curTarget =
+                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                          ? ShooterHandler.Targets.BLUE
+                          : ShooterHandler.Targets.RED;
+                  shooterHandlerLeft.setTargetState(curTarget);
+                  shooterHandlerRight.setTargetState(curTarget);
+
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+
+                  juiceAuto = false;
+                }));
   }
 
   public Command shootSequenceAuto() {

@@ -4,13 +4,13 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.lib.BLine.*;
+import frc.robot.subsystems.Autos;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.vision.BOS;
@@ -28,6 +28,8 @@ public class Robot extends LoggedRobot {
   private final RobotContainer robotContainer;
 
   private final BOS bos;
+
+  private final Autos autos;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -61,6 +63,7 @@ public class Robot extends LoggedRobot {
 
     robotContainer = new RobotContainer();
     bos = new BOS(robotContainer.drivetrain);
+    autos = new Autos(robotContainer.drivetrain);
   }
 
   @Override
@@ -100,21 +103,18 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    // Log the autonomous starting pose
-    Pose2d autoInitPose = null;
-    Command selectedAuto = robotContainer.getAutonomousCommand();
+    Pose2d startPose = autos.getAutonomousStartPose();
 
-    if (selectedAuto instanceof PathPlannerAuto auto) {
-      autoInitPose = auto.getStartingPose();
-
+    if (startPose != null) {
       if (DriverStation.getAlliance().isPresent()
           && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-        autoInitPose = FlippingUtil.flipFieldPose(autoInitPose);
+        startPose = FlippingUtil.flipFieldPose(startPose);
       }
-    }
 
-    // Update the field visualization with the auto start pose
-    robotContainer.getTelemetry().setAutoStartPose(autoInitPose);
+      // Update the field visualization with the auto start pose
+      robotContainer.getTelemetry().setAutoStartPose(startPose);
+    }
+    // TODO: Log the autonomous starting pose
   }
 
   @Override
@@ -122,12 +122,11 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    autonomousCommand = autos.getAutonomousCommand();
 
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
-      robotContainer.resetPositionForAuto();
     }
     HubShiftUtil.initialize();
   }

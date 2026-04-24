@@ -1,0 +1,158 @@
+package frc.robot.subsystems;
+
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.lib.BLine.FollowPath;
+import frc.robot.lib.BLine.Path;
+import java.util.List;
+import lombok.Getter;
+
+public class Autos {
+
+  /**
+   * @param displayLabel what driverstation displays as the auto's name
+   * @param pathNames what paths (in order) make up the auto
+   */
+  public record AutoRoutine(boolean canMirror, String displayLabel, List<String> pathNames) {
+    public AutoRoutine {
+      pathNames = List.copyOf(pathNames);
+    }
+  }
+
+  private static class AutoPathOption {
+    public final AutoRoutine routine;
+    public final boolean mirrored;
+
+    public AutoPathOption(AutoRoutine routine, boolean mirrored) {
+      this.routine = routine;
+      this.mirrored = mirrored;
+    }
+
+    @Override
+    public String toString() {
+      return routine.displayLabel() + (mirrored ? " (Mirrored)" : "");
+    }
+  }
+
+  private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
+      new SwerveRequest.ApplyRobotSpeeds();
+
+  @Getter private final SendableChooser<AutoPathOption> chooser = new SendableChooser<>();
+
+  private final FollowPath.Builder pathBuilderWithStartPoseReset;
+  private final FollowPath.Builder pathBuilderContinuation;
+
+  public Autos(CommandSwerveDrivetrain drivetrain) {
+
+    chooser.setDefaultOption("None", null);
+
+    // Build chooser FIRST so builder can reference it
+    populateChooser();
+
+    pathBuilderWithStartPoseReset = newPathBuilder(drivetrain).withPoseReset(drivetrain::resetPose);
+    pathBuilderContinuation = newPathBuilder(drivetrain);
+
+    SmartDashboard.putData("Auto Mode", chooser);
+  }
+
+  private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
+    return new FollowPath.Builder(
+            drivetrain,
+            () -> drivetrain.getState().Pose,
+            () -> drivetrain.getState().Speeds,
+            speeds -> drivetrain.setControl(pathApplyRobotSpeeds.withSpeeds(speeds)),
+            new PIDController(5.0, 0.0, 0.0),
+            new PIDController(3.0, 0.0, 0.0),
+            new PIDController(2.0, 0.0, 0.0))
+        .withShouldMirror(
+            () -> {
+              AutoPathOption selected = chooser.getSelected();
+              return selected != null && selected.mirrored;
+            })
+        .withDefaultShouldFlip();
+  }
+
+  private void populateChooser() {
+    for (AutoRoutine routine : AUTO_ROUTINES) {
+      AutoPathOption normal = new AutoPathOption(routine, false);
+      chooser.addOption(normal.toString(), normal);
+      if (routine.canMirror) {
+        AutoPathOption mirrored = new AutoPathOption(routine, true);
+        chooser.addOption(mirrored.toString(), mirrored);
+      }
+    }
+  }
+
+  public Command getAutonomousCommand() {
+    AutoPathOption selected = chooser.getSelected();
+
+    if (selected == null) {
+      return Commands.none();
+    }
+
+    Command auto = Commands.none();
+    List<String> segments = selected.routine.pathNames();
+    for (int i = 0; i < segments.size(); i++) {
+      FollowPath.Builder builder = i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
+      auto = auto.andThen(builder.build(new Path(segments.get(i))));
+    }
+    return auto;
+  }
+
+  public Pose2d getAutonomousStartPose() {
+    AutoPathOption selected = chooser.getSelected();
+
+    if (selected == null) {
+      return null;
+    }
+
+    List<String> segments = selected.routine.pathNames();
+    if (segments.isEmpty()) {
+      return null;
+    }
+
+    Path path = new Path(segments.get(0));
+
+    if (selected.mirrored) path.mirror();
+
+    return path.getStartPose();
+  }
+
+  // IMPORTANT: all autos must be defined here
+  // list JSON names (without .json), in order
+  // KEY:
+  // S_ = START
+  // F_ = FUEL, sweep and intaking
+  // H_ = HUB, shooting fuel
+  // D_ = Depot
+  public static final List<AutoRoutine> AUTO_ROUTINES =
+      List.of(
+          // Madtown Depot
+          new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
+          new AutoRoutine(
+              false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
+
+          // Madtown No Depot
+          new AutoRoutine(
+              true, "James", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
+          new AutoRoutine(
+              true,
+              "Tamed James",
+              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal")),
+
+          // Supersteal
+          new AutoRoutine(
+              false,
+              "SuperSteal Depot",
+              List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
+          new AutoRoutine(
+              true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
+
+          // Middle Depot
+          new AutoRoutine(false, "Bum", List.of("MiddleDepot2")));
+}
