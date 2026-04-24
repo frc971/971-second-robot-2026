@@ -94,6 +94,7 @@ public class Superstructure {
   }
 
   public void periodic() {
+    // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
@@ -231,7 +232,7 @@ public class Superstructure {
         setGoal(SetpointGoal.INDEX);
       }
 
-    } else if (DriverStation.isAutonomous()) {
+    } else if (DriverStation.isAutonomous()) { // MARK: Autonomous Logic
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
       }
