@@ -149,7 +149,7 @@ public class Autos {
           new AutoRoutine(
               true,
               "Tamed James",
-              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal")),
+              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal_Tamed")),
           new AutoRoutine(
               true, "Short James", List.of("S_Short", "H_Normal", "F_Short", "H_Normal")),
           new AutoRoutine(
