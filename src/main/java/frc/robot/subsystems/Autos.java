@@ -136,6 +136,12 @@ public class Autos {
           new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
           new AutoRoutine(
               false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
+          new AutoRoutine(
+              false, "Short Niko", List.of("S_Short", "H_Normal", "F_Short", "D_Normal")),
+          new AutoRoutine(
+              false,
+              "Short Tamed Niko",
+              List.of("S_Short", "H_Normal", "F_Short_Tamed", "D_Normal")),
 
           // Madtown No Depot
           new AutoRoutine(
@@ -143,7 +149,13 @@ public class Autos {
           new AutoRoutine(
               true,
               "Tamed James",
-              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal")),
+              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal_Tamed")),
+          new AutoRoutine(
+              true, "Short James", List.of("S_Short", "H_Normal", "F_Short", "H_Normal")),
+          new AutoRoutine(
+              true,
+              "Short Tamed James",
+              List.of("S_Short", "H_Normal", "F_Short_Tamed", "H_Normal")),
 
           // Supersteal
           new AutoRoutine(
@@ -154,5 +166,5 @@ public class Autos {
               true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
 
           // Middle Depot
-          new AutoRoutine(false, "Bum", List.of("MiddleDepot2")));
+          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")));
 }

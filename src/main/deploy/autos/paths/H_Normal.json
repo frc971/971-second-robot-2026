@@ -37,7 +37,7 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.9,
+      "t_ratio": 0.8,
       "lib_key": "neutral"
     },
     {
