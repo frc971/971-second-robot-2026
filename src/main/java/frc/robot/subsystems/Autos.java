@@ -151,9 +151,9 @@ public class Autos {
               "Tamed James",
               List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal")),
           new AutoRoutine(
-              false, "Short James", List.of("S_Short", "H_Normal", "F_Short", "H_Normal")),
+              true, "Short James", List.of("S_Short", "H_Normal", "F_Short", "H_Normal")),
           new AutoRoutine(
-              false,
+              true,
               "Short Tamed James",
               List.of("S_Short", "H_Normal", "F_Short_Tamed", "H_Normal")),
 
