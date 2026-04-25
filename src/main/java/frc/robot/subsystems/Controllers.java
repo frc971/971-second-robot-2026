@@ -20,7 +20,6 @@ public class Controllers {
   public static final Trigger INDEX = TROY.rightTrigger();
 
   public static final Trigger ODOMETRY_RESET = TROY.y();
-  public static final Trigger DRIVE_LOCK = TROY.a();
 
   // === Andre's Controls
   public static final Trigger LEFT_SHUTTLE = ANDRE.leftBumper();

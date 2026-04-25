@@ -118,7 +118,12 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () -> {
-              if (Controllers.DRIVE_LOCK.getAsBoolean()) {
+              boolean wantsDrive =
+                  Math.abs(Controllers.TROY.getLeftY()) > TRANSLATION_DEADBAND
+                      || Math.abs(Controllers.TROY.getLeftX()) > TRANSLATION_DEADBAND
+                      || Math.abs(Controllers.TROY.getRightX()) > ROTATION_DEADBAND;
+
+              if (Controllers.SHOOTING.getAsBoolean() && !wantsDrive) {
                 return brake;
               }
 
