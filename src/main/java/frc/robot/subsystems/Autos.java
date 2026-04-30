@@ -46,6 +46,10 @@ public class Autos {
 
   private final FollowPath.Builder pathBuilderWithStartPoseReset;
   private final FollowPath.Builder pathBuilderContinuation;
+  private AutoPathOption cachedSelectedAuto = null;
+  private Command cachedAutonomousCommand = Commands.none();
+  private Pose2d cachedAutonomousStartPose = null;
+  private boolean selectedAutoIsCached = false;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
 
@@ -89,38 +93,66 @@ public class Autos {
   }
 
   public Command getAutonomousCommand() {
+    updateSelectedAutoCache();
+    return cachedAutonomousCommand;
+  }
+
+  public Pose2d getAutonomousStartPose() {
+    updateSelectedAutoCache();
+    return cachedAutonomousStartPose;
+  }
+
+  public boolean preloadSelectedAuto() {
+    updateSelectedAutoCache();
+    return selectedAutoIsCached;
+  }
+
+  public boolean isSelectedAutoIsCached() {
+    return selectedAutoIsCached;
+  }
+
+  private void updateSelectedAutoCache() {
     AutoPathOption selected = chooser.getSelected();
 
-    if (selected == null) {
-      return Commands.none();
+    // if didn't change auto --> don't need to re-cache
+    if (selected == cachedSelectedAuto && selectedAutoIsCached) {
+      return;
     }
 
+    // set flag --> so can see when not-ready/not-cached
+    selectedAutoIsCached = false;
+    cachedSelectedAuto = selected;
+
+    if (selected == null) {
+      cachedAutonomousCommand = Commands.none();
+      cachedAutonomousStartPose = null;
+      selectedAutoIsCached = true;
+      return;
+    }
+
+    // build auto path
     Command auto = Commands.none();
     List<String> segments = selected.routine.pathNames();
     for (int i = 0; i < segments.size(); i++) {
       FollowPath.Builder builder = i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
       auto = auto.andThen(builder.build(new Path(segments.get(i))));
     }
-    return auto;
-  }
+    cachedAutonomousCommand = auto;
 
-  public Pose2d getAutonomousStartPose() {
-    AutoPathOption selected = chooser.getSelected();
-
-    if (selected == null) {
-      return null;
-    }
-
-    List<String> segments = selected.routine.pathNames();
+    // empty auto
     if (segments.isEmpty()) {
-      return null;
+      cachedAutonomousStartPose = null;
+      selectedAutoIsCached = true;
+      return;
     }
 
-    Path path = new Path(segments.get(0));
+    // extract start pose
+    Path startPath = new Path(segments.get(0));
+    if (selected.mirrored) startPath.mirror();
+    cachedAutonomousStartPose = startPath.getStartPose();
 
-    if (selected.mirrored) path.mirror();
-
-    return path.getStartPose();
+    // flip back boolean flag: caching process finished
+    selectedAutoIsCached = true;
   }
 
   // IMPORTANT: all autos must be defined here
