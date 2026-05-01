@@ -161,7 +161,7 @@ public class Autos {
                 i -> {
                   FollowPath.Builder builder =
                       i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                  return builder.build(cachedPathSegments.get(i).copy());
+                  return builder.build(cachedPathSegments.get(i));
                 })
             .toArray(Command[]::new));
   }
