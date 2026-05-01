@@ -124,9 +124,10 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = autos.getAutonomousCommand();
-
-    CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
-    CommandScheduler.getInstance().schedule(autonomousCommand);
+    if (autonomousCommand != null) {
+      CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
+      CommandScheduler.getInstance().schedule(autonomousCommand);
+    }
     HubShiftUtil.initialize();
   }
 
