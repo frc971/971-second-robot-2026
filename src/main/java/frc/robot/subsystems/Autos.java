@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.Getter;
 
 public class Autos {
@@ -131,13 +132,18 @@ public class Autos {
     }
 
     // build auto path
-    Command auto = Commands.none();
     List<String> segments = selected.routine.pathNames();
-    for (int i = 0; i < segments.size(); i++) {
-      FollowPath.Builder builder = i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-      auto = auto.andThen(builder.build(new Path(segments.get(i))));
-    }
-    cachedAutonomousCommand = auto;
+
+    cachedAutonomousCommand =
+        Commands.sequence(
+            IntStream.range(0, segments.size())
+                .mapToObj(
+                    i -> {
+                      FollowPath.Builder builder =
+                          i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
+                      return builder.build(new Path(segments.get(i)));
+                    })
+                .toArray(Command[]::new));
 
     // empty auto
     if (segments.isEmpty()) {
