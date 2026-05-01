@@ -49,7 +49,7 @@ public class Autos {
   private final FollowPath.Builder pathBuilderWithStartPoseReset;
   private final FollowPath.Builder pathBuilderContinuation;
   private AutoPathOption cachedSelectedAuto = null;
-  private List<String> cachedPathSegments = Collections.emptyList();
+  private List<Path> cachedPathSegments = Collections.<Path>emptyList();
   private Pose2d cachedAutonomousStartPose = null;
   private boolean selectedAutoIsCached = false;
 
@@ -126,13 +126,13 @@ public class Autos {
     cachedSelectedAuto = selected;
 
     if (selected == null) {
-      cachedPathSegments = Collections.emptyList();
+      cachedPathSegments = Collections.<Path>emptyList();
       cachedAutonomousStartPose = null;
       selectedAutoIsCached = true;
       return;
     }
 
-    cachedPathSegments = selected.routine.pathNames();
+    cachedPathSegments = selected.routine.pathNames().stream().map(Path::new).toList();
 
     // empty auto
     if (cachedPathSegments.isEmpty()) {
@@ -142,7 +142,7 @@ public class Autos {
     }
 
     // extract start pose
-    Path startPath = new Path(cachedPathSegments.get(0));
+    Path startPath = cachedPathSegments.get(0).copy();
     if (selected.mirrored) startPath.mirror();
     cachedAutonomousStartPose = startPath.getStartPose();
 
@@ -161,7 +161,7 @@ public class Autos {
                 i -> {
                   FollowPath.Builder builder =
                       i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                  return builder.build(new Path(cachedPathSegments.get(i)));
+                  return builder.build(cachedPathSegments.get(i).copy());
                 })
             .toArray(Command[]::new));
   }
