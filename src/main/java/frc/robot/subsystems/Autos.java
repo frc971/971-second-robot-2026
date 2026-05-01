@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 import lombok.Getter;
 
 public class Autos {
+  private boolean mirrored = false;
 
   /**
    * @param displayLabel what driverstation displays as the auto's name
@@ -154,7 +155,14 @@ public class Autos {
 
     // extract start pose
     Path startPath = new Path(segments.get(0));
-    if (selected.mirrored) startPath.mirror();
+    if (selected.mirrored) {
+      if (!mirrored) {
+          startPath.mirror();
+      }
+
+      mirrored = !mirrored;
+    }
+
     cachedAutonomousStartPose = startPath.getStartPose();
 
     // flip back boolean flag: caching process finished
