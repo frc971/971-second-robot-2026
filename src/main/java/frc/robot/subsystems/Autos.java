@@ -11,7 +11,6 @@ import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.Getter;
 
 public class Autos {
@@ -153,15 +152,19 @@ public class Autos {
       return Commands.none();
     }
 
-    return Commands.sequence(
-        IntStream.range(0, cachedPathSegments.size())
-            .mapToObj(
-                i -> {
-                  FollowPath.Builder builder =
-                      i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                  return builder.build(cachedPathSegments.get(i));
-                })
-            .toArray(Command[]::new));
+    if (cachedPathSegments.isEmpty()) {
+      return Commands.none();
+    }
+
+    Command[] cmds = new Command[cachedPathSegments.size()];
+
+    cmds[0] = pathBuilderWithStartPoseReset.build(cachedPathSegments.get(0));
+
+    for (int i = 1; i < cachedPathSegments.size(); i++) {
+      cmds[i] = pathBuilderContinuation.build(cachedPathSegments.get(i));
+    }
+
+    return Commands.sequence(cmds);
   }
 
   // IMPORTANT: all autos must be defined here
