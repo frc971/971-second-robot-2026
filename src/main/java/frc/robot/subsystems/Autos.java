@@ -109,7 +109,7 @@ public class Autos {
     return selectedAutoIsCached;
   }
 
-  public boolean isSelectedAutoIsCached() {
+  public boolean isSelectedAutoCached() {
     return selectedAutoIsCached;
   }
 
@@ -128,7 +128,6 @@ public class Autos {
     if (selected == null) {
       cachedPathSegments = Collections.<Path>emptyList();
       cachedAutonomousStartPose = null;
-      selectedAutoIsCached = true;
       return;
     }
 
@@ -137,7 +136,6 @@ public class Autos {
     // empty auto
     if (cachedPathSegments.isEmpty()) {
       cachedAutonomousStartPose = null;
-      selectedAutoIsCached = true;
       return;
     }
 
