@@ -48,6 +48,7 @@ public enum SetpointGoal {
           .withRightTurretDegrees(0.0)
           .withGroundRollersVolts(0.0)
           .withRollerFloorVolts(0.0)),
+  FLYWHEEL_OFF(Setpoint.builder().withLeftFlywheelRPS(0.0).withRightFlywheelRPS(0.0)),
   SUPERCHARGED(
       Setpoint.builder()
           .withLeftFlywheelRPS(0.0)

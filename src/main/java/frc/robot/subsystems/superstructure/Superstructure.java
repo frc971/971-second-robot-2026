@@ -232,6 +232,17 @@ public class Superstructure {
         setGoal(SetpointGoal.INDEX);
       }
 
+      // Killing turret logic
+      if (Controllers.KILL_LEFT.toggled()) {
+        setGoal(SetpointGoal.KILL_LEFT.getSetpoint());
+      }
+      if (Controllers.KILL_RIGHT.toggled()) {
+        setGoal(SetpointGoal.KILL_RIGHT.getSetpoint());
+      }
+
+      if (shooterGoal == ShooterGoal.MANUAL) {
+        setGoal(SetpointGoal.FLYWHEEL_OFF);
+      }
     } else if (DriverStation.isAutonomous()) { // MARK: Autonomous Logic
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
