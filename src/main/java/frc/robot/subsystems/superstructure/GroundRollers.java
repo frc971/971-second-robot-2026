@@ -3,12 +3,23 @@ package frc.robot.subsystems.superstructure;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.lib.superstructure.*;
 
 public class GroundRollers extends MotorSubsystem {
   public GroundRollers() {
-    super(getMotorConfig());
+    super(getIO());
+  }
+
+  private static MotorIO getIO() {
+    if (RobotBase.isReal()) {
+      return new MotorWithFollowerTalonFX(
+          getMotorConfig(), new MotorConfig[] {getFollowerConfig()});
+    } else {
+      return new MotorSim(getMotorConfig());
+    }
   }
 
   public static MotorConfig getMotorConfig() {
@@ -19,7 +30,7 @@ public class GroundRollers extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 35.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
     tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
     return MotorConfig.builder()
@@ -28,6 +39,14 @@ public class GroundRollers extends MotorSubsystem {
         .BUS(new CANBus("rio"))
         .TALONFX_CONFIG(tc)
         .FOC(false)
+        .build();
+  }
+
+  public static MotorConfig getFollowerConfig() {
+    return getMotorConfig().toBuilder()
+        .NAME("Ground Roller Follower")
+        .ID(17)
+        .FOLLOWER_ALIGNMENT(MotorAlignmentValue.Opposed)
         .build();
   }
 }
