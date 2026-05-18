@@ -47,6 +47,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
+    drivetrain.periodic();
     superstructure.periodic();
     drivetrainController.periodic();
   }

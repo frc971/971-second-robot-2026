@@ -188,6 +188,8 @@ public class Manual {
     Logger.recordOutput("Drive/Manual/Joystick/X", Controllers.TROY.getLeftY());
     Logger.recordOutput("Drive/Manual/Joystick/Y", Controllers.TROY.getLeftX());
     Logger.recordOutput("Drive/Manual/Joystick/Rot", Controllers.TROY.getRightX());
+
+    drivetrain.applyRequest(curRequest);
   }
 
   public JoystickValues getValues() {
