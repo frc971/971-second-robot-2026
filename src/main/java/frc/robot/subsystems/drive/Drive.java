@@ -53,6 +53,9 @@ public class Drive {
 
   public void setDriveMode(Mode targetMode) {
     mode = targetMode;
+    if (mode == Mode.NONE) {
+      drivetrain.applyRequest(freezeRequest);
+    }
   }
 
   public void periodic() {
@@ -63,27 +66,15 @@ public class Drive {
     autoAlign.setGoal(mode.autoAlignGoal);
 
     manual.periodic();
-
-    if (mode == Mode.NONE && !DriverStation.isAutonomousEnabled()) {
-      drivetrain.applyRequest(freezeRequest);
-      return;
-    }
-
     thetaLock.periodic();
     autoAlign.periodic();
   }
 
   private void updateMode() {
-    // if (superstructure.freezeDriving()) {
-    //     mode = Mode.FREEZE;
-    //     return;
-    // }
-
-    // if (Controllers.AUTO_ALIGN.getAsBoolean()) {
-    //     mode = Mode.AUTO_ALIGN;
-    // } else {
-    //     mode = Mode.MANUAL;
-    // }
-
+    if (DriverStation.isDisabled()) {
+      setDriveMode(Mode.NONE);
+    } else if (DriverStation.isTeleop() && mode == Mode.NONE) {
+      setDriveMode(Mode.MANUAL);
+    }
   }
 }
