@@ -65,7 +65,7 @@ public class Autos {
             drivetrain,
             () -> drivetrain.getState().Pose,
             () -> drivetrain.getState().Speeds,
-            speeds -> drivetrain.setControl(pathApplyRobotSpeeds.withSpeeds(speeds)),
+            speeds -> drivetrain.applyRequest(pathApplyRobotSpeeds.withSpeeds(speeds)),
             new PIDController(5.0, 0.0, 0.0),
             new PIDController(3.0, 0.0, 0.0),
             new PIDController(2.0, 0.0, 0.0))

@@ -24,7 +24,6 @@ import frc.robot.Constants.SimSwerveConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -34,7 +33,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
   private MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
-  private Supplier<SwerveRequest> request = null;
+  private SwerveRequest request = new SwerveRequest.Idle();
   private static final double SIM_LOOP_PERIOD = 0.002; // 2 ms
   private Notifier simNotifier = null;
 
@@ -74,7 +73,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               // Log state with SignalLogger class
               state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
           new SysIdRoutine.Mechanism(
-              output -> setControl(translationCharacterization.withVolts(output)), null, this));
+              output -> applyRequest(translationCharacterization.withVolts(output)), null, this));
 
   /*
    * SysId routine for characterizing steer. This is used to find PID gains for the steer motors.
@@ -88,7 +87,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               // Log state with SignalLogger class
               state -> SignalLogger.writeString("SysIdSteer_State", state.toString())),
           new SysIdRoutine.Mechanism(
-              volts -> setControl(steerCharacterization.withVolts(volts)), null, this));
+              volts -> applyRequest(steerCharacterization.withVolts(volts)), null, this));
 
   /*
    * SysId routine for characterizing rotation.
@@ -198,8 +197,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
    *
    * @param request Function returning the request to apply
    */
-  public void applyRequest(Supplier<SwerveRequest> requestSupplier) {
-    this.request = requestSupplier;
+  public void applyRequest(SwerveRequest request) {
+    this.request = request;
   }
 
   /**
@@ -250,7 +249,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       super.resetPose(simPose);
     }
 
-    setControl(request.get());
+    setControl(request);
 
     // IMU is rotated 90 deg relative to robot, and coordinates are relative to imu
     Logger.recordOutput("Drive/IMU/GyroYaw", getPigeon2().getYaw().getValueAsDouble());

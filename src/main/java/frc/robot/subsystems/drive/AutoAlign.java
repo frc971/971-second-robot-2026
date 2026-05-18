@@ -111,7 +111,7 @@ public class AutoAlign {
     SwerveRequest.FieldCentricFacingAngle alignRequest =
         computeAlignment(currentPose, targetPose.get());
 
-    drivetrain.setControl(alignRequest);
+    drivetrain.applyRequest(alignRequest);
   }
 
   /**
