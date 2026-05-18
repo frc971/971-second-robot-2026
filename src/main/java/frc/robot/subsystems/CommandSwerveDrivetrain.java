@@ -48,10 +48,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private static final String[] MODULES = {"Front Left", "Front Right", "Back Left", "Back Right"};
 
-  /** Swerve request to apply during robot-centric path following */
-  private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
-      new SwerveRequest.ApplyRobotSpeeds();
-
   /* Swerve requests to apply during SysId characterization */
   private final SwerveRequest.SysIdSwerveTranslation translationCharacterization =
       new SwerveRequest.SysIdSwerveTranslation();
@@ -115,7 +111,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               this));
 
   /* The SysId routine to test */
-  private SysIdRoutine sysIdRoutineToApply = sysIdRoutineTranslation;
+  private final SysIdRoutine sysIdRoutineToApply = sysIdRoutineTranslation;
 
   /**
    * Constructs a CTRE SwerveDrivetrain using the specified constants.
