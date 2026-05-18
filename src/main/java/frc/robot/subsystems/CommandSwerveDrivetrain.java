@@ -189,9 +189,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   /**
-   * Sets the supplier to return a request for drivetrain
+   * Sets the control request to apply on the next drivetrain periodic cycle.
    *
-   * @param request Function returning the request to apply
+   * @param request Request to apply
    */
   public void applyRequest(SwerveRequest request) {
     this.request = request;

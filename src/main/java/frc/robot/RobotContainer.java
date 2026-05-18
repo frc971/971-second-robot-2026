@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,8 +28,6 @@ public class RobotContainer {
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    drivetrain.registerTelemetry(logger::telemeterize);
-
     if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
 
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
@@ -47,9 +43,9 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    drivetrain.periodic();
     superstructure.periodic();
     drivetrainController.periodic();
+    drivetrain.periodic();
   }
 
   public void resetSuperstructure() {

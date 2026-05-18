@@ -13,6 +13,7 @@ import frc.robot.lib.BLine.*;
 import frc.robot.subsystems.Autos;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.BOS;
 import frc.robot.subsystems.vision.TagHelper;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -99,6 +100,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     HubShiftUtil.initialize();
+    robotContainer.drivetrainController.setDriveMode(Drive.Mode.NONE);
   }
 
   @Override
@@ -129,6 +131,7 @@ public class Robot extends LoggedRobot {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
     HubShiftUtil.initialize();
+    robotContainer.drivetrainController.setDriveMode(Drive.Mode.NONE);
   }
 
   @Override
@@ -143,6 +146,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
     HubShiftUtil.initialize();
+    robotContainer.drivetrainController.setDriveMode(Drive.Mode.MANUAL);
   }
 
   @Override

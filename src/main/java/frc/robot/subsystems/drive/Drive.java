@@ -1,8 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.superstructure.*;
 import lombok.Getter;
@@ -18,11 +17,12 @@ public class Drive {
   private final Manual manual;
   private final ThetaLock thetaLock;
   private final AutoAlign autoAlign;
+  private final SwerveRequest.SwerveDriveBrake freezeRequest = new SwerveRequest.SwerveDriveBrake();
 
   private static final double ROTATION_DEADBAND = 0.2;
 
   public enum Mode {
-    FREEZE(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
+    NONE(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
     MANUAL(Manual.Goal.ACTIVE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
     THETA_LOCK(Manual.Goal.NONE, ThetaLock.Goal.ACTIVE, AutoAlign.Goal.NONE),
     AUTO_ALIGN(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.CLIMB);
@@ -51,23 +51,24 @@ public class Drive {
     this.autoAlign = new AutoAlign(drivetrain);
   }
 
-  public Command setDriveMode(Mode targetMode) {
-    return Commands.runOnce(
-        () -> {
-          mode = targetMode;
-        });
+  public void setDriveMode(Mode targetMode) {
+    mode = targetMode;
   }
 
   public void periodic() {
-    if (DriverStation.isTeleopEnabled()) {
-      updateMode();
-    }
+    updateMode();
 
     manual.setGoal(mode.manualGoal);
     thetaLock.setGoal(mode.thetaLockGoal);
     autoAlign.setGoal(mode.autoAlignGoal);
 
     manual.periodic();
+
+    if (mode == Mode.NONE && !DriverStation.isAutonomousEnabled()) {
+      drivetrain.applyRequest(freezeRequest);
+      return;
+    }
+
     thetaLock.periodic();
     autoAlign.periodic();
   }
