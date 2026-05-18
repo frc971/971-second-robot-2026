@@ -34,7 +34,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
   private MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
-
+  private Supplier<SwerveRequest> request = null;
   private static final double SIM_LOOP_PERIOD = 0.002; // 2 ms
   private Notifier simNotifier = null;
 
@@ -194,13 +194,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   /**
-   * Returns a command that applies the specified control request to this swerve drivetrain.
+   * Sets the supplier to return a request for drivetrain
    *
    * @param request Function returning the request to apply
-   * @return Command to run
    */
-  public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-    return run(() -> this.setControl(requestSupplier.get()));
+  public void applyRequest(Supplier<SwerveRequest> requestSupplier) {
+    this.request = requestSupplier;
   }
 
   /**
@@ -250,6 +249,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       Pose2d simPose = mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
       super.resetPose(simPose);
     }
+
+    setControl(request.get());
 
     // IMU is rotated 90 deg relative to robot, and coordinates are relative to imu
     Logger.recordOutput("Drive/IMU/GyroYaw", getPigeon2().getYaw().getValueAsDouble());

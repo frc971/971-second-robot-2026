@@ -1,0 +1,196 @@
+package frc.robot.subsystems.drive;
+
+import static edu.wpi.first.units.Units.*;
+
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import frc.robot.lib.JoystickValues;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Controllers;
+import lombok.Getter;
+import lombok.Setter;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
+public class Manual {
+
+  public enum Goal {
+    NONE,
+    ACTIVE
+  };
+
+  @Getter @Setter @AutoLogOutput private Goal goal = Goal.ACTIVE;
+
+  private final CommandSwerveDrivetrain drivetrain;
+  private static final double MAX_SPEED = 3.5;
+  private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
+
+  private static final double TRANSLATION_DEADBAND = 0.05;
+  private static final double ROTATION_DEADBAND = 0.1;
+
+  private static final double SHOOTING_SPEED = 0.3 * MAX_SPEED;
+  private static final double SHOOTING_ANGULAR_RATE = 0.3 * MAX_ANGULAR_RATE;
+  private static final double SHUTTLING_SPEED = 0.5 * MAX_SPEED;
+  private static final double SHUTTLING_ANGULAR_RATE = 0.5 * MAX_ANGULAR_RATE;
+
+  private static final JoystickValues JOYSTICK_VALUES = new JoystickValues();
+
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric shootingDrive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(SHOOTING_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(SHOOTING_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private final SwerveRequest.FieldCentric shuttlingDrive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(SHUTTLING_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(SHUTTLING_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private final SwerveRequest.FieldCentric drive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
+  // Slew rate limit for translation (m/s^2)
+  private static final double SHOOTING_SLEW_TRANSLATE_LIMIT = 10.0;
+  // Slew rate limit for rotation (rad/s^2)
+  private static final double SHOOTING_SLEW_ROTATION_LIMIT = 100.0;
+  // Slew rate limit for translation (m/s^2)
+  private static final double SHUTTLING_SLEW_TRANSLATE_LIMIT = 20.0;
+  // Slew rate limit for rotation (rad/s^2)
+  private static final double SHUTTLING_SLEW_ROTATION_LIMIT = 100.0;
+
+  private static final double SLEW_TRANSLATE_LIMIT = 1000.0;
+  // Slew rate limit for rotation (rad/s^2)
+  private static final double SLEW_ROTATION_LIMIT = 1000.0;
+
+  // Exponential curve for translation joystick
+  private static final double TRANSLATION_EXP_CURVE = 2;
+  // Exponential curve for rotation joystick
+  private static final double ROTATION_EXP_CURVE = 2;
+
+  // Rate limiters for smooth control
+  private static final SlewRateLimiter X_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter Y_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter ROT_LIMITER = new SlewRateLimiter(SLEW_ROTATION_LIMIT);
+
+  private static final SlewRateLimiter SHOOTING_X_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHOOTING_Y_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHOOTING_ROT_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_ROTATION_LIMIT);
+  private static final SlewRateLimiter SHUTTLING_X_LIMITER =
+      new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHUTTLING_Y_LIMITER =
+      new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHUTTLING_ROT_LIMITER =
+      new SlewRateLimiter(SHUTTLING_SLEW_ROTATION_LIMIT);
+
+  public Manual(CommandSwerveDrivetrain drivetrain) {
+    this.drivetrain = drivetrain;
+  }
+
+  public void periodic() {
+
+    if (goal == Goal.NONE) {
+      return;
+    }
+
+    SwerveRequest curRequest = null;
+    boolean wantsDrive =
+        Math.abs(Controllers.TROY.getLeftY()) > TRANSLATION_DEADBAND
+            || Math.abs(Controllers.TROY.getLeftX()) > TRANSLATION_DEADBAND
+            || Math.abs(Controllers.TROY.getRightX()) > ROTATION_DEADBAND;
+
+    if (Controllers.SHOOTING.getAsBoolean() && !wantsDrive) {
+      curRequest = brake;
+    } else if (Controllers.SHUTTLE_EDGE.falling()) {
+      X_LIMITER.reset(SHUTTLING_X_LIMITER.lastValue());
+      Y_LIMITER.reset(SHUTTLING_Y_LIMITER.lastValue());
+      ROT_LIMITER.reset(SHUTTLING_ROT_LIMITER.lastValue());
+    } else if (Controllers.SHOOT_EDGE.falling()) {
+      X_LIMITER.reset(SHOOTING_X_LIMITER.lastValue());
+      Y_LIMITER.reset(SHOOTING_Y_LIMITER.lastValue());
+      ROT_LIMITER.reset(SHOOTING_ROT_LIMITER.lastValue());
+    } else if (Controllers.SHUTTLE_EDGE.rising()) {
+      SHUTTLING_X_LIMITER.reset(X_LIMITER.lastValue());
+      SHUTTLING_Y_LIMITER.reset(Y_LIMITER.lastValue());
+      SHUTTLING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
+    } else if (Controllers.SHOOT_EDGE.rising()) {
+      SHOOTING_X_LIMITER.reset(X_LIMITER.lastValue());
+      SHOOTING_Y_LIMITER.reset(Y_LIMITER.lastValue());
+      SHOOTING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
+    }
+
+    if (Controllers.SHUTTLING.getAsBoolean()) {
+      JOYSTICK_VALUES
+          .setValues(
+              Controllers.TROY.getLeftY(),
+              Controllers.TROY.getLeftX(),
+              Controllers.TROY.getRightX())
+          .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+          .scale(
+              -SHUTTLING_SPEED, // Negative max speed and angular rate since
+              -SHUTTLING_ANGULAR_RATE) // controller inputs are reversed
+          .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
+          .slewRateLimit(SHUTTLING_X_LIMITER, SHUTTLING_Y_LIMITER, SHUTTLING_ROT_LIMITER);
+
+      curRequest =
+          shuttlingDrive
+              .withVelocityX(JOYSTICK_VALUES.getX())
+              .withVelocityY(JOYSTICK_VALUES.getY())
+              .withRotationalRate(JOYSTICK_VALUES.getRot());
+
+    } else if (Controllers.SHOOTING.getAsBoolean()) {
+      JOYSTICK_VALUES
+          .setValues(
+              Controllers.TROY.getLeftY(),
+              Controllers.TROY.getLeftX(),
+              Controllers.TROY.getRightX())
+          .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+          .scale(
+              -SHOOTING_SPEED, // Negative max speed and angular rate since
+              -SHOOTING_ANGULAR_RATE) // controller inputs are reversed
+          .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
+          .slewRateLimit(SHOOTING_X_LIMITER, SHOOTING_Y_LIMITER, SHOOTING_ROT_LIMITER);
+      curRequest =
+          shootingDrive
+              .withVelocityX(JOYSTICK_VALUES.getX())
+              .withVelocityY(JOYSTICK_VALUES.getY())
+              .withRotationalRate(JOYSTICK_VALUES.getRot());
+
+    } else {
+      JOYSTICK_VALUES
+          .setValues(
+              Controllers.TROY.getLeftY(),
+              Controllers.TROY.getLeftX(),
+              Controllers.TROY.getRightX())
+          .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+          .scale(
+              -MAX_SPEED, // Negative max speed and angular rate since
+              -MAX_ANGULAR_RATE) // controller inputs are reversed
+          .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
+
+      curRequest =
+          drive
+              .withVelocityX(JOYSTICK_VALUES.getX())
+              .withVelocityY(JOYSTICK_VALUES.getY())
+              .withRotationalRate(JOYSTICK_VALUES.getRot());
+    }
+
+    Logger.recordOutput("Drive/Manual/Joystick/X", Controllers.TROY.getLeftY());
+    Logger.recordOutput("Drive/Manual/Joystick/Y", Controllers.TROY.getLeftX());
+    Logger.recordOutput("Drive/Manual/Joystick/Rot", Controllers.TROY.getRightX());
+  }
+
+  public JoystickValues getValues() {
+    return JOYSTICK_VALUES;
+  }
+}
