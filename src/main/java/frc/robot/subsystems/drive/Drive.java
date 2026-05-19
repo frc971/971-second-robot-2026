@@ -20,20 +20,10 @@ public class Drive {
   private static final double ROTATION_DEADBAND = 0.2;
 
   public enum Mode {
-    NONE(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
-    MANUAL(Manual.Goal.ACTIVE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
-    THETA_LOCK(Manual.Goal.NONE, ThetaLock.Goal.ACTIVE, AutoAlign.Goal.NONE),
-    AUTO_ALIGN(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.ALIGN);
-
-    public final Manual.Goal manualGoal;
-    public final ThetaLock.Goal thetaLockGoal;
-    public final AutoAlign.Goal autoAlignGoal;
-
-    Mode(Manual.Goal manualGoal, ThetaLock.Goal thetaLockGoal, AutoAlign.Goal autoAlignGoal) {
-      this.manualGoal = manualGoal;
-      this.thetaLockGoal = thetaLockGoal;
-      this.autoAlignGoal = autoAlignGoal;
-    }
+    NONE,
+    MANUAL,
+    THETA_LOCK,
+    AUTO_ALIGN;
   }
 
   @AutoLogOutput @Getter @Setter private Mode mode = Mode.MANUAL;
@@ -58,9 +48,16 @@ public class Drive {
   public void periodic() {
     updateMode();
 
-    manual.setGoal(mode.manualGoal);
-    thetaLock.setGoal(mode.thetaLockGoal);
-    autoAlign.setGoal(mode.autoAlignGoal);
+    manual.setGoal(Manual.Goal.NONE);
+    thetaLock.setGoal(ThetaLock.Goal.NONE);
+    autoAlign.setGoal(AutoAlign.Goal.NONE);
+
+    switch (mode) {
+      case MANUAL -> manual.setGoal(Manual.Goal.ACTIVE);
+      case AUTO_ALIGN -> autoAlign.setGoal(AutoAlign.Goal.ALIGN);
+      case THETA_LOCK -> thetaLock.setGoal(ThetaLock.Goal.ACTIVE);
+      default -> {}
+    }
 
     manual.periodic();
     thetaLock.periodic();
