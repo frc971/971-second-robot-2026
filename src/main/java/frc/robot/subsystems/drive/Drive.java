@@ -12,8 +12,6 @@ public class Drive {
 
   private final CommandSwerveDrivetrain drivetrain;
 
-  private final Superstructure superstructure;
-
   private final Manual manual;
   private final ThetaLock thetaLock;
   private final AutoAlign autoAlign;
@@ -25,7 +23,7 @@ public class Drive {
     NONE(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
     MANUAL(Manual.Goal.ACTIVE, ThetaLock.Goal.NONE, AutoAlign.Goal.NONE),
     THETA_LOCK(Manual.Goal.NONE, ThetaLock.Goal.ACTIVE, AutoAlign.Goal.NONE),
-    AUTO_ALIGN(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.CLIMB);
+    AUTO_ALIGN(Manual.Goal.NONE, ThetaLock.Goal.NONE, AutoAlign.Goal.ALIGN);
 
     public final Manual.Goal manualGoal;
     public final ThetaLock.Goal thetaLockGoal;
@@ -40,11 +38,10 @@ public class Drive {
 
   @AutoLogOutput @Getter @Setter private Mode mode = Mode.MANUAL;
 
-  public Drive(CommandSwerveDrivetrain drivetrain, Superstructure superstructure) {
+  public Drive(CommandSwerveDrivetrain drivetrain) {
 
     this.drivetrain = drivetrain;
 
-    this.superstructure = superstructure;
     this.manual = new Manual(drivetrain);
 
     this.thetaLock = new ThetaLock(drivetrain, manual);
@@ -54,7 +51,7 @@ public class Drive {
   public void setDriveMode(Mode targetMode) {
     mode = targetMode;
     if (mode == Mode.NONE) {
-      drivetrain.applyRequest(freezeRequest);
+      drivetrain.setRequest(freezeRequest);
     }
   }
 

@@ -60,7 +60,7 @@ public class ThetaLock {
     Logger.recordOutput("Drive/ThetaLock/CurrentAngle", currentRotation.getDegrees());
     Logger.recordOutput("Drive/ThetaLock/RotationError", rotationError);
 
-    drivetrain.applyRequest(
+    drivetrain.setRequest(
         driveAtAngle
             .withVelocityX(manual.getValues().getX())
             .withVelocityY(manual.getValues().getY())

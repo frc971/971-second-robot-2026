@@ -195,7 +195,7 @@ public class Manual {
               .withRotationalRate(JOYSTICK_VALUES.getRot());
     }
 
-    drivetrain.applyRequest(curRequest);
+    drivetrain.setRequest(curRequest);
   }
 
   public JoystickValues getValues() {

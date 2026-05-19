@@ -26,11 +26,10 @@ public class AutoAlign {
 
   public enum Goal {
     NONE,
-    CLIMB
+    ALIGN
   }
 
-  // Todo: Change coordinates to more precies cooridnates from robot testing
-  private final Pose2d CLIMBING_TARGET_POSE = new Pose2d(1, 4, new Rotation2d(Math.PI));
+  private final Pose2d EXAMPLE_TARGET_POSE = new Pose2d(1, 4, new Rotation2d(Math.PI));
 
   @Getter @Setter private Goal goal = Goal.NONE;
   private Goal previousGoal = Goal.NONE;
@@ -96,10 +95,10 @@ public class AutoAlign {
 
     Optional<Pose2d> targetPose =
         switch (goal) {
-          case CLIMB -> DriverStation.getAlliance().isPresent()
+          case ALIGN -> DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-              ? Optional.of(FlippingUtil.flipFieldPose(CLIMBING_TARGET_POSE))
-              : Optional.of(CLIMBING_TARGET_POSE);
+              ? Optional.of(FlippingUtil.flipFieldPose(EXAMPLE_TARGET_POSE))
+              : Optional.of(EXAMPLE_TARGET_POSE);
           default -> Optional.empty();
         };
 
@@ -111,7 +110,7 @@ public class AutoAlign {
     SwerveRequest.FieldCentricFacingAngle alignRequest =
         computeAlignment(currentPose, targetPose.get());
 
-    drivetrain.applyRequest(alignRequest);
+    drivetrain.setRequest(alignRequest);
   }
 
   /**

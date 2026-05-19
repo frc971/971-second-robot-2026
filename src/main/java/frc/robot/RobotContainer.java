@@ -22,7 +22,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     superstructure = new Superstructure(this);
-    drivetrainController = new Drive(drivetrain, superstructure);
+    drivetrainController = new Drive(drivetrain);
 
     configureDrivetrain();
 
