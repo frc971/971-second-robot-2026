@@ -153,21 +153,25 @@ public class Manual {
             || Math.abs(Controllers.TROY.getLeftX()) > TRANSLATION_DEADBAND
             || Math.abs(Controllers.TROY.getRightX()) > ROTATION_DEADBAND;
 
-    if (Controllers.SHOOTING.getAsBoolean() && !wantsDrive) {
-      curRequest = brake;
-    } else if (Controllers.SHUTTLE_EDGE.falling()) {
+    if (Controllers.SHUTTLE_EDGE.falling()) {
       X_LIMITER.reset(SHUTTLING_X_LIMITER.lastValue());
       Y_LIMITER.reset(SHUTTLING_Y_LIMITER.lastValue());
       ROT_LIMITER.reset(SHUTTLING_ROT_LIMITER.lastValue());
-    } else if (Controllers.SHOOT_EDGE.falling()) {
+    }
+
+    if (Controllers.SHOOT_EDGE.falling()) {
       X_LIMITER.reset(SHOOTING_X_LIMITER.lastValue());
       Y_LIMITER.reset(SHOOTING_Y_LIMITER.lastValue());
       ROT_LIMITER.reset(SHOOTING_ROT_LIMITER.lastValue());
-    } else if (Controllers.SHUTTLE_EDGE.rising()) {
+    }
+
+    if (Controllers.SHUTTLE_EDGE.rising()) {
       SHUTTLING_X_LIMITER.reset(X_LIMITER.lastValue());
       SHUTTLING_Y_LIMITER.reset(Y_LIMITER.lastValue());
       SHUTTLING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
-    } else if (Controllers.SHOOT_EDGE.rising()) {
+    }
+
+    if (Controllers.SHOOT_EDGE.rising()) {
       SHOOTING_X_LIMITER.reset(X_LIMITER.lastValue());
       SHOOTING_Y_LIMITER.reset(Y_LIMITER.lastValue());
       SHOOTING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
@@ -193,6 +197,10 @@ public class Manual {
               .withVelocityX(JOYSTICK_VALUES.getX())
               .withVelocityY(JOYSTICK_VALUES.getY())
               .withRotationalRate(JOYSTICK_VALUES.getRot());
+    }
+
+    if (Controllers.SHOOTING.getAsBoolean() && !wantsDrive) {
+      curRequest = brake;
     }
 
     drivetrain.setRequest(curRequest);
