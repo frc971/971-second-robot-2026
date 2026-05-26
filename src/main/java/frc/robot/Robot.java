@@ -165,6 +165,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void simulationPeriodic() {
-      FuelSim.getInstance().updateSim();
+    FuelSim.getInstance().updateSim();
   }
 }

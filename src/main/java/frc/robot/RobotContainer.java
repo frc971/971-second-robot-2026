@@ -6,8 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -26,10 +24,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.BLine.*;
 import frc.robot.lib.JoystickValues;
+import frc.robot.lib.simulation.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.Superstructure;
-import frc.robot.lib.simulation.*;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
   public final Superstructure superstructure;
@@ -116,7 +115,7 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    if (Robot.isSimulation()){
+    if (Robot.isSimulation()) {
       drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
       configureFuelSim();
     }
@@ -236,101 +235,101 @@ public class RobotContainer {
 
   // MARK: Fuel Simulation
   private void configureFuelSim() {
-        FuelSim instance = FuelSim.getInstance();
-        instance.clearFuel();
-        instance.registerRobot(
-            Dimensions.FULL_WIDTH,
-            Dimensions.FULL_LENGTH,
-            Dimensions.BUMPER_HEIGHT,
-            () -> drivetrain.getState().Pose,
-            this::getFieldRelativeChassisSpeedsForSim
-        );
-        instance.registerIntake(
-            -Dimensions.FULL_LENGTH / 2.0,
-            Dimensions.FULL_LENGTH / 2.0,
-            -Dimensions.FULL_WIDTH / 2.0,
-            Dimensions.FULL_WIDTH / 2.0,
-            //intake::isIntaking, maybe will add this back later
-            () -> Logger.recordOutput("FuelSim/LastEvent", "Intake")
-        );
+    FuelSim instance = FuelSim.getInstance();
+    instance.clearFuel();
+    instance.registerRobot(
+        Dimensions.FULL_WIDTH,
+        Dimensions.FULL_LENGTH,
+        Dimensions.BUMPER_HEIGHT,
+        () -> drivetrain.getState().Pose,
+        this::getFieldRelativeChassisSpeedsForSim);
+    instance.registerIntake(
+        -Dimensions.FULL_LENGTH / 2.0,
+        Dimensions.FULL_LENGTH / 2.0,
+        -Dimensions.FULL_WIDTH / 2.0,
+        Dimensions.FULL_WIDTH / 2.0,
+        // intake::isIntaking, maybe will add this back later
+        () -> Logger.recordOutput("FuelSim/LastEvent", "Intake"));
 
-        instance.spawnStartingFuel();
-        instance.start();
+    instance.spawnStartingFuel();
+    instance.start();
 
-        Command spawnFuelCommand = Commands.runOnce(this::spawnFuelInFrontOfRobot)
+    Command spawnFuelCommand =
+        Commands.runOnce(this::spawnFuelInFrontOfRobot)
             .ignoringDisable(true)
             .withName("FuelSim/Spawn Fuel");
-        Command resetFuelCommand = Commands.runOnce(() -> {
-                instance.clearFuel();
-                instance.spawnStartingFuel();
-                Logger.recordOutput("FuelSim/LastEvent", "Reset");
-            })
+    Command resetFuelCommand =
+        Commands.runOnce(
+                () -> {
+                  instance.clearFuel();
+                  instance.spawnStartingFuel();
+                  Logger.recordOutput("FuelSim/LastEvent", "Reset");
+                })
             .ignoringDisable(true)
             .withName("FuelSim/Reset Fuel");
-        Command launchFuelCommand = Commands.runOnce(() -> launchFuelInSim(MetersPerSecond.of(8), Degrees.of(45)))
+    Command launchFuelCommand =
+        Commands.runOnce(() -> launchFuelInSim(MetersPerSecond.of(8), Degrees.of(45)))
             .ignoringDisable(true)
             .withName("FuelSim/Launch Fuel");
 
-        SmartDashboard.putData(spawnFuelCommand);
-        SmartDashboard.putData(resetFuelCommand);
-        SmartDashboard.putData(launchFuelCommand);
-    }
+    SmartDashboard.putData(spawnFuelCommand);
+    SmartDashboard.putData(resetFuelCommand);
+    SmartDashboard.putData(launchFuelCommand);
+  }
 
-    public void resetFuelSim() {
-        if (!RobotBase.isSimulation()) {
-            return;
-        }
-        FuelSim instance = FuelSim.getInstance();
-        instance.clearFuel();
-        instance.spawnStartingFuel();
-        Logger.recordOutput("FuelSim/LastEvent", "Auto Reset");
+  public void resetFuelSim() {
+    if (!RobotBase.isSimulation()) {
+      return;
     }
+    FuelSim instance = FuelSim.getInstance();
+    instance.clearFuel();
+    instance.spawnStartingFuel();
+    Logger.recordOutput("FuelSim/LastEvent", "Auto Reset");
+  }
 
-    private void spawnFuelInFrontOfRobot() {
-        Pose2d pose = drivetrain.getState().Pose;
-        Translation2d offset = new Translation2d(Dimensions.FULL_LENGTH / 2.0 + 0.1, 0)
-            .rotateBy(pose.getRotation());
-        Translation3d location = new Translation3d(
+  private void spawnFuelInFrontOfRobot() {
+    Pose2d pose = drivetrain.getState().Pose;
+    Translation2d offset =
+        new Translation2d(Dimensions.FULL_LENGTH / 2.0 + 0.1, 0).rotateBy(pose.getRotation());
+    Translation3d location =
+        new Translation3d(
             pose.getX() + offset.getX(),
             pose.getY() + offset.getY(),
-            Dimensions.BUMPER_HEIGHT / 2.0
-        );
-        FuelSim.getInstance().spawnFuel(location, new Translation3d());
-        Logger.recordOutput("FuelSim/LastEvent", "Manual Spawn");
-    }
+            Dimensions.BUMPER_HEIGHT / 2.0);
+    FuelSim.getInstance().spawnFuel(location, new Translation3d());
+    Logger.recordOutput("FuelSim/LastEvent", "Manual Spawn");
+  }
 
-    private void launchFuelInSim(LinearVelocity velocity, Angle elevation) {
-        Pose2d pose = drivetrain.getState().Pose;
-        Translation2d muzzleOffset = new Translation2d(Dimensions.FULL_LENGTH / 2.0, 0)
-            .rotateBy(pose.getRotation());
-        Translation3d initialPosition = new Translation3d(
+  private void launchFuelInSim(LinearVelocity velocity, Angle elevation) {
+    Pose2d pose = drivetrain.getState().Pose;
+    Translation2d muzzleOffset =
+        new Translation2d(Dimensions.FULL_LENGTH / 2.0, 0).rotateBy(pose.getRotation());
+    Translation3d initialPosition =
+        new Translation3d(
             pose.getX() + muzzleOffset.getX(),
             pose.getY() + muzzleOffset.getY(),
-            Dimensions.BUMPER_HEIGHT + 0.25
-        );
-        Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, pose.getRotation());
-        FuelSim.getInstance().spawnFuel(initialPosition, launchVelocity);
-        Logger.recordOutput("FuelSim/LastEvent", "Launch");
-    }
+            Dimensions.BUMPER_HEIGHT + 0.25);
+    Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, pose.getRotation());
+    FuelSim.getInstance().spawnFuel(initialPosition, launchVelocity);
+    Logger.recordOutput("FuelSim/LastEvent", "Launch");
+  }
 
-    private Translation3d createLaunchVelocity(LinearVelocity velocity, Angle elevation, Rotation2d heading) {
-        double speed = velocity.in(MetersPerSecond);
-        double elevationRadians = elevation.in(Radians);
-        double planarSpeed = speed * Math.cos(elevationRadians);
-        double verticalSpeed = speed * Math.sin(elevationRadians);
-        Translation2d planar = new Translation2d(planarSpeed, 0).rotateBy(heading);
-        return new Translation3d(planar.getX(), planar.getY(), verticalSpeed);
-    }
+  private Translation3d createLaunchVelocity(
+      LinearVelocity velocity, Angle elevation, Rotation2d heading) {
+    double speed = velocity.in(MetersPerSecond);
+    double elevationRadians = elevation.in(Radians);
+    double planarSpeed = speed * Math.cos(elevationRadians);
+    double verticalSpeed = speed * Math.sin(elevationRadians);
+    Translation2d planar = new Translation2d(planarSpeed, 0).rotateBy(heading);
+    return new Translation3d(planar.getX(), planar.getY(), verticalSpeed);
+  }
 
-    private ChassisSpeeds getFieldRelativeChassisSpeedsForSim() {
-        ChassisSpeeds speeds = drivetrain.getState().Speeds;
-        if (speeds == null) {
-            return new ChassisSpeeds();
-        }
-        return new ChassisSpeeds(
-            speeds.vxMetersPerSecond,
-            speeds.vyMetersPerSecond,
-            speeds.omegaRadiansPerSecond
-        );
+  private ChassisSpeeds getFieldRelativeChassisSpeedsForSim() {
+    ChassisSpeeds speeds = drivetrain.getState().Speeds;
+    if (speeds == null) {
+      return new ChassisSpeeds();
     }
+    return new ChassisSpeeds(
+        speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+  }
 }
