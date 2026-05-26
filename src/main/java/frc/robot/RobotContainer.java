@@ -119,7 +119,7 @@ public class RobotContainer {
     if (Robot.isSimulation()){
       drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
       configureFuelSim();
-    };
+    }
 
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
     FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
@@ -234,6 +234,7 @@ public class RobotContainer {
     return logger;
   }
 
+  // MARK: Fuel Simulation
   private void configureFuelSim() {
         FuelSim instance = FuelSim.getInstance();
         instance.clearFuel();
@@ -249,7 +250,7 @@ public class RobotContainer {
             Dimensions.FULL_LENGTH / 2.0,
             -Dimensions.FULL_WIDTH / 2.0,
             Dimensions.FULL_WIDTH / 2.0,
-            //intake::isIntaking, wil probably need to add this back somehow
+            //intake::isIntaking, maybe will add this back later
             () -> Logger.recordOutput("FuelSim/LastEvent", "Intake")
         );
 
