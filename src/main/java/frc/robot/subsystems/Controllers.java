@@ -33,7 +33,7 @@ public class Controllers {
 
   public static final Trigger OUTTAKE = ANDRE.leftTrigger();
 
-  public static final Toggle MANUAL = new Toggle(ANDRE.y());
+  public static final Toggle MANUAL = new Toggle(TROY.povUp());
   public static final Trigger DISABLE_OTF = ANDRE.x();
 
   public static final Trigger SHUTTLE_LEFT = ANDRE.leftBumper();

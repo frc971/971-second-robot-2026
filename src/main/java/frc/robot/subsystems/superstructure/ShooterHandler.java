@@ -25,20 +25,22 @@ import org.littletonrobotics.junction.Logger;
 public class ShooterHandler {
   public static final class Targets {
     private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
-    private static final double HUB_HEIGHT = 1.430425;
+    private static final double HUB_HEIGHT = 1.22;
 
-    public static final ObjectState BLUE =
-        new ObjectState(
-            new Translation3d(
-                (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
-                (FlippingUtil.fieldSizeY / 2),
-                HUB_HEIGHT),
-            new Translation3d());
     public static final ObjectState RED =
         new ObjectState(
             new Translation3d(
-                FlippingUtil.flipFieldPosition(BLUE.xyPos()).getX(),
-                FlippingUtil.flipFieldPosition(BLUE.xyPos()).getY(),
+                11.947,
+                7.425 - 1.57, // 1.57 = distance
+                // (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
+                // (FlippingUtil.fieldSizeY / 2),
+                HUB_HEIGHT),
+            new Translation3d());
+    public static final ObjectState BLUE =
+        new ObjectState(
+            new Translation3d(
+                FlippingUtil.flipFieldPosition(RED.xyPos()).getX(),
+                FlippingUtil.flipFieldPosition(RED.xyPos()).getY(),
                 HUB_HEIGHT),
             new Translation3d());
 
