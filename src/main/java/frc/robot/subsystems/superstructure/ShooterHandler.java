@@ -186,7 +186,7 @@ public class ShooterHandler {
       ObjectState adjustedTargetState =
           targetState.plus(new Translation3d(perpOffset), new Translation3d());
 
-      launchSolution = physics.twiceSolve(projectileState, adjustedTargetState);
+      launchSolution = physics.thriceSolve(projectileState, adjustedTargetState);
     }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
