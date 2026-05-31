@@ -154,8 +154,8 @@ public class RobotContainer {
               if (Controllers.SHUTTLING.getAsBoolean()) {
                 JOYSTICK_VALUES
                     .setValues(
-                        Controllers.TROY.getLeftY(),
-                        Controllers.TROY.getLeftX(),
+                        -Controllers.TROY.getLeftY(),
+                        -Controllers.TROY.getLeftX(),
                         Controllers.TROY.getRightX())
                     .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
                     .scale(
@@ -172,8 +172,8 @@ public class RobotContainer {
               } else if (Controllers.SHOOTING.getAsBoolean()) {
                 JOYSTICK_VALUES
                     .setValues(
-                        Controllers.TROY.getLeftY(),
-                        Controllers.TROY.getLeftX(),
+                        -Controllers.TROY.getLeftY(),
+                        -Controllers.TROY.getLeftX(),
                         Controllers.TROY.getRightX())
                     .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
                     .scale(
@@ -189,8 +189,8 @@ public class RobotContainer {
               } else {
                 JOYSTICK_VALUES
                     .setValues(
-                        Controllers.TROY.getLeftY(),
-                        Controllers.TROY.getLeftX(),
+                        -Controllers.TROY.getLeftY(),
+                        -Controllers.TROY.getLeftX(),
                         Controllers.TROY.getRightX())
                     .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
                     .scale(

@@ -25,25 +25,27 @@ import org.littletonrobotics.junction.Logger;
 public class ShooterHandler {
   public static final class Targets {
     private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
-    private static final double HUB_HEIGHT = 1.430425;
+    private static final double HUB_HEIGHT = 1.22;
 
-    public static final ObjectState BLUE =
-        new ObjectState(
-            new Translation3d(
-                (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
-                (FlippingUtil.fieldSizeY / 2),
-                HUB_HEIGHT),
-            new Translation3d());
     public static final ObjectState RED =
         new ObjectState(
             new Translation3d(
-                FlippingUtil.flipFieldPosition(BLUE.xyPos()).getX(),
-                FlippingUtil.flipFieldPosition(BLUE.xyPos()).getY(),
+                11.947,
+                7.425 - 1.57, // 1.57 = distance
+                // (FlippingUtil.fieldSizeX / 2) - X_DISTANCE_FROM_CENTER,
+                // (FlippingUtil.fieldSizeY / 2),
+                HUB_HEIGHT),
+            new Translation3d());
+    public static final ObjectState BLUE =
+        new ObjectState(
+            new Translation3d(
+                FlippingUtil.flipFieldPosition(RED.xyPos()).getX(),
+                FlippingUtil.flipFieldPosition(RED.xyPos()).getY(),
                 HUB_HEIGHT),
             new Translation3d());
 
     // offset from the corner
-    private static final Translation3d SHUTTLE_OFFSET = new Translation3d(0.8, 1.7, 0.0);
+    private static final Translation3d SHUTTLE_OFFSET = new Translation3d(1.2, 1.7, 0.0);
 
     public static final ObjectState RIGHT_BLUE_SHUTTLE =
         new ObjectState(SHUTTLE_OFFSET, new Translation3d());
@@ -184,7 +186,7 @@ public class ShooterHandler {
       ObjectState adjustedTargetState =
           targetState.plus(new Translation3d(perpOffset), new Translation3d());
 
-      launchSolution = physics.twiceSolve(projectileState, adjustedTargetState);
+      launchSolution = physics.thriceSolve(projectileState, adjustedTargetState);
     }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled

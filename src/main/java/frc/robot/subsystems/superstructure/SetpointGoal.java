@@ -27,10 +27,10 @@ public enum SetpointGoal {
           .withGroundPivotDegrees(140.0)),
   NEUTRAL(
       Setpoint.builder()
-          .withLeftFlywheelRPS(10.0)
+          .withLeftFlywheelRPS(0.0)
           .withLeftHoodInches(0.0)
           .withLeftTurretDegrees(0.0)
-          .withRightFlywheelRPS(10.0)
+          .withRightFlywheelRPS(0.0)
           .withRightHoodInches(0.0)
           .withRightTurretDegrees(0.0)
           .withGroundRollersVolts(0.0)
