@@ -83,7 +83,7 @@ public class ShooterPhysics {
 
     double h0 = proj.position().getZ();
     double ht = target.position().getZ();
-    double H = MathUtil.clamp(h0 + (currentDistance * 0.3), h0 + 0.2, 2.64);
+    double H = MathUtil.clamp(h0 + (currentDistance * 0.3), h0 + 0.2, 2.8);
 
     // compute helper terms
     double deltaH = H - h0;

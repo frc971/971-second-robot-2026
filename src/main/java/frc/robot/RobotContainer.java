@@ -34,20 +34,23 @@ public class RobotContainer {
   private static final double SHUTTLING_ANGULAR_RATE = 0.5 * MAX_ANGULAR_RATE;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
-  private final SwerveRequest.FieldCentric shootingDrive = new SwerveRequest.FieldCentric()
-      .withDeadband(SHOOTING_SPEED * TRANSLATION_DEADBAND)
-      .withRotationalDeadband(SHOOTING_ANGULAR_RATE * ROTATION_DEADBAND)
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.FieldCentric shootingDrive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(SHOOTING_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(SHOOTING_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-  private final SwerveRequest.FieldCentric shuttlingDrive = new SwerveRequest.FieldCentric()
-      .withDeadband(SHUTTLING_SPEED * TRANSLATION_DEADBAND)
-      .withRotationalDeadband(SHUTTLING_ANGULAR_RATE * ROTATION_DEADBAND)
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.FieldCentric shuttlingDrive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(SHUTTLING_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(SHUTTLING_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
-      .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.FieldCentric drive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
+          .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
@@ -74,12 +77,18 @@ public class RobotContainer {
   private static final SlewRateLimiter Y_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
   private static final SlewRateLimiter ROT_LIMITER = new SlewRateLimiter(SLEW_ROTATION_LIMIT);
 
-  private static final SlewRateLimiter SHOOTING_X_LIMITER = new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SHOOTING_Y_LIMITER = new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SHOOTING_ROT_LIMITER = new SlewRateLimiter(SHOOTING_SLEW_ROTATION_LIMIT);
-  private static final SlewRateLimiter SHUTTLING_X_LIMITER = new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SHUTTLING_Y_LIMITER = new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SHUTTLING_ROT_LIMITER = new SlewRateLimiter(SHUTTLING_SLEW_ROTATION_LIMIT);
+  private static final SlewRateLimiter SHOOTING_X_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHOOTING_Y_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHOOTING_ROT_LIMITER =
+      new SlewRateLimiter(SHOOTING_SLEW_ROTATION_LIMIT);
+  private static final SlewRateLimiter SHUTTLING_X_LIMITER =
+      new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHUTTLING_Y_LIMITER =
+      new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
+  private static final SlewRateLimiter SHUTTLING_ROT_LIMITER =
+      new SlewRateLimiter(SHUTTLING_SLEW_ROTATION_LIMIT);
 
   private static final JoystickValues JOYSTICK_VALUES = new JoystickValues();
 
@@ -95,8 +104,7 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    if (Robot.isSimulation())
-      drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
+    if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
 
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
     FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
@@ -110,9 +118,10 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () -> {
-              boolean wantsDrive = Math.abs(Controllers.TROY.getLeftY()) > TRANSLATION_DEADBAND
-                  || Math.abs(Controllers.TROY.getLeftX()) > TRANSLATION_DEADBAND
-                  || Math.abs(Controllers.TROY.getRightX()) > ROTATION_DEADBAND;
+              boolean wantsDrive =
+                  Math.abs(Controllers.TROY.getLeftY()) > TRANSLATION_DEADBAND
+                      || Math.abs(Controllers.TROY.getLeftX()) > TRANSLATION_DEADBAND
+                      || Math.abs(Controllers.TROY.getRightX()) > ROTATION_DEADBAND;
 
               if (Controllers.SHOOTING.getAsBoolean() && !wantsDrive) {
                 return brake;
