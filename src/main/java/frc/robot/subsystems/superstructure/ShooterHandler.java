@@ -171,7 +171,7 @@ public class ShooterHandler {
 
     // calculate physics
     if (isShuttle(targetState)) {
-      launchSolution = physics.thriceSolve(projectileState, targetState);
+      launchSolution = physics.apexHeightSolve(projectileState, targetState);
     } else {
       // use offset
       Translation2d perpOffset =
@@ -184,7 +184,7 @@ public class ShooterHandler {
       ObjectState adjustedTargetState =
           targetState.plus(new Translation3d(perpOffset), new Translation3d());
 
-      launchSolution = physics.twiceSolve(projectileState, adjustedTargetState);
+      launchSolution = physics.targetAngleSolve(projectileState, adjustedTargetState);
     }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
