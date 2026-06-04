@@ -12,15 +12,23 @@ Code for Team 971's 2026 robot, Mixtape.
 
 - [frc.robot.lib.shooter](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/lib/shooter)
 
-  Contains physics solvers for shooting
+  Contains definitions of physics solvers for shooting.
 
-- [frc.robot.subsystems](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems)
+- [frc.robot.lib.superstrucutre](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems)
 
-  Contains all subsystems
+  Contains abstractions for CANCoder and motor configurations for all subsystems. Also contains superclasses such as AngularSubsystem and LinearSubsystem which the subsystems extend.
 
 - [frc.robot.subsystems.superstructure](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems/superstructure)
 
   Contains coordination logic for all subsystems, and controls shooter states.
+
+- [frc.robot.subsystems.superstructure.ShooterHandler.java](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems/superstructure/ShooterHandler.java)
+
+  Implements physics solvers to calculate desired hood angle, turret location, and flywheel speed periodically based on the robot and target positions and the robot velocity. Logs shooter states and updates them based on the solutions. Checks if solutions satisfy hardware + software constraints.
+
+- [frc.robot.subsystems.vision](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems/vision)
+
+  Contains classes used for AprilTag detection, pose estimation, and localization of the robot.
 
 - [frc.robot.subsystems.Autos.java](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems/Autos.java)
 
