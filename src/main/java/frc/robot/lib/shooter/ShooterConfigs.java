@@ -1,6 +1,9 @@
 package frc.robot.lib.shooter;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Translation3d;
 
@@ -113,11 +116,11 @@ public class ShooterConfigs {
     table.put(MetersPerSecond.of(0.00000), RotationsPerSecond.of(0.00000));
 
     table.put(MetersPerSecond.of(5.45568), RotationsPerSecond.of(36.71875));
-    table.put(MetersPerSecond.of(5.91819), RotationsPerSecond.of(40.62500 + 1.0));
-    table.put(MetersPerSecond.of(6.61531), RotationsPerSecond.of(45.70313 + 2.0));
-    table.put(MetersPerSecond.of(7.27521), RotationsPerSecond.of(50.00000 + 3.0));
-    table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813 + 3.0));
-    table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750 + 3.0));
+    table.put(MetersPerSecond.of(5.91819), RotationsPerSecond.of(40.62500));
+    table.put(MetersPerSecond.of(6.61531), RotationsPerSecond.of(45.70313));
+    table.put(MetersPerSecond.of(7.27521), RotationsPerSecond.of(50.00000 + 1.0));
+    table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813 + 2.0));
+    table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750));
     table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(89.3950053912));
 
     return table;
@@ -129,11 +132,11 @@ public class ShooterConfigs {
     table.put(MetersPerSecond.of(0.00000), RotationsPerSecond.of(0.00000));
 
     table.put(MetersPerSecond.of(5.45568), RotationsPerSecond.of(36.71875));
-    table.put(MetersPerSecond.of(5.91819), RotationsPerSecond.of(40.62500 + 1.0));
-    table.put(MetersPerSecond.of(6.61531), RotationsPerSecond.of(45.70313 + 2.0));
-    table.put(MetersPerSecond.of(7.27521), RotationsPerSecond.of(50.00000 + 3.0));
-    table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813 + 3.0));
-    table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750 + 3.0));
+    table.put(MetersPerSecond.of(5.91819), RotationsPerSecond.of(40.62500));
+    table.put(MetersPerSecond.of(6.61531), RotationsPerSecond.of(45.70313));
+    table.put(MetersPerSecond.of(7.27521), RotationsPerSecond.of(50.00000 + 1.0));
+    table.put(MetersPerSecond.of(7.94416), RotationsPerSecond.of(55.07813 + 2.0));
+    table.put(MetersPerSecond.of(8.60935), RotationsPerSecond.of(60.93750));
     table.put(MetersPerSecond.of(13.0), RotationsPerSecond.of(89.3950053912));
 
     return table;

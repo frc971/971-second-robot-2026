@@ -232,7 +232,7 @@ public class Superstructure {
         setGoal(SetpointGoal.INDEX);
       }
 
-    } else if (DriverStation.isAutonomous()) { // MARK: Autonomous Logic
+    } else if (DriverStation.isAutonomousEnabled()) { // MARK: Autonomous Logic
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
       }
