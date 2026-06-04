@@ -28,7 +28,7 @@ Code for Team 971's 2026 robot, Mixtape.
 
 - [frc.robot.subsystems.vision](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems/vision)
 
-  We use BOS, a custom vision system, for pose estimation and localization. This folder contains classes used to publish data from this system to NetworkTables.
+  We use [BOS](https://github.com/frc971/bos), a custom vision system, for pose estimation and localization. This folder contains classes used to publish data from this system to NetworkTables.
 
 - [frc.robot.subsystems.Autos.java](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems/Autos.java)
 
