@@ -247,9 +247,9 @@ public class RobotContainer {
 
     instance.registerIntake(
         -Dimensions.FULL_LENGTH,
-        Dimensions.FULL_LENGTH,
-        -Dimensions.FULL_WIDTH / 2.0,
-        Dimensions.FULL_WIDTH / 2.0,
+        Dimensions.FULL_LENGTH / 2.0,
+        -Dimensions.FULL_WIDTH / 6.0,
+        Dimensions.FULL_WIDTH / 6.0,
         () -> (true),
         () -> Logger.recordOutput("FuelSim/LastEvent", "Intake"));
 
