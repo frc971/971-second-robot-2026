@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.subsystems.Controllers;
 
 import java.util.ArrayList;
@@ -527,6 +528,11 @@ public class FuelSim {
       if (!ableToIntake.getAsBoolean() || fuel.pos.getZ() > bumperHeight) {
         return false;
       }
+
+      // only consider intaking if either the robot is in autonomous or inputs are given so that the pivot is down and the rollers are spinning
+      if (!RobotState.isAutonomous() && !(Controllers.INTAKE_PIVOT.toggled() && Controllers.INTAKE_ROLLERS.getAsBoolean())) {
+        return false;
+      } 
 
       Translation2d fuelRelativePos =
           new Pose2d(fuel.pos.toTranslation2d(), Rotation2d.kZero)
