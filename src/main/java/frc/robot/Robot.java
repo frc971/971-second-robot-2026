@@ -104,6 +104,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
+    Logger.recordOutput("Auto/SelectedOptionCached", autos.preloadSelectedAuto());
     Pose2d startPose = autos.getAutonomousStartPose();
 
     if (startPose != null) {
@@ -124,7 +125,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = autos.getAutonomousCommand();
-
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);

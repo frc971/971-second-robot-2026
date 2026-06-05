@@ -134,9 +134,9 @@ public class RobotContainer {
         drivetrain.applyRequest(
             () -> {
               boolean wantsDrive =
-                  Math.abs(Controllers.TROY.getLeftY()) > TRANSLATION_DEADBAND
-                      || Math.abs(Controllers.TROY.getLeftX()) > TRANSLATION_DEADBAND
-                      || Math.abs(Controllers.TROY.getRightX()) > ROTATION_DEADBAND;
+                  Math.abs(Controllers.DRIVER.getLeftY()) > TRANSLATION_DEADBAND
+                      || Math.abs(Controllers.DRIVER.getLeftX()) > TRANSLATION_DEADBAND
+                      || Math.abs(Controllers.DRIVER.getRightX()) > ROTATION_DEADBAND;
 
               if (Controllers.SHOOTING.getAsBoolean() && !wantsDrive) {
                 return brake;
@@ -169,9 +169,9 @@ public class RobotContainer {
               if (Controllers.SHUTTLING.getAsBoolean()) {
                 JOYSTICK_VALUES
                     .setValues(
-                        Controllers.TROY.getLeftY(),
-                        Controllers.TROY.getLeftX(),
-                        Controllers.TROY.getRightX())
+                        Controllers.DRIVER.getLeftY(),
+                        Controllers.DRIVER.getLeftX(),
+                        Controllers.DRIVER.getRightX())
                     .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
                     .scale(
                         -SHUTTLING_SPEED, // Negative max speed and angular rate since
@@ -187,9 +187,9 @@ public class RobotContainer {
               } else if (Controllers.SHOOTING.getAsBoolean()) {
                 JOYSTICK_VALUES
                     .setValues(
-                        Controllers.TROY.getLeftY(),
-                        Controllers.TROY.getLeftX(),
-                        Controllers.TROY.getRightX())
+                        Controllers.DRIVER.getLeftY(),
+                        Controllers.DRIVER.getLeftX(),
+                        Controllers.DRIVER.getRightX())
                     .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
                     .scale(
                         -SHOOTING_SPEED, // Negative max speed and angular rate since
@@ -204,9 +204,9 @@ public class RobotContainer {
               } else {
                 JOYSTICK_VALUES
                     .setValues(
-                        Controllers.TROY.getLeftY(),
-                        Controllers.TROY.getLeftX(),
-                        Controllers.TROY.getRightX())
+                        Controllers.DRIVER.getLeftY(),
+                        Controllers.DRIVER.getLeftX(),
+                        Controllers.DRIVER.getRightX())
                     .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
                     .scale(
                         -MAX_SPEED, // Negative max speed and angular rate since

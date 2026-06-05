@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.Getter;
 
 public class Autos {
@@ -46,6 +48,10 @@ public class Autos {
 
   private final FollowPath.Builder pathBuilderWithStartPoseReset;
   private final FollowPath.Builder pathBuilderContinuation;
+  private AutoPathOption cachedSelectedAuto = null;
+  private List<Path> cachedPathSegments = Collections.<Path>emptyList();
+  private Pose2d cachedAutonomousStartPose = null;
+  private boolean selectedAutoIsCached = false;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
 
@@ -89,38 +95,73 @@ public class Autos {
   }
 
   public Command getAutonomousCommand() {
-    AutoPathOption selected = chooser.getSelected();
-
-    if (selected == null) {
-      return Commands.none();
-    }
-
-    Command auto = Commands.none();
-    List<String> segments = selected.routine.pathNames();
-    for (int i = 0; i < segments.size(); i++) {
-      FollowPath.Builder builder = i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-      auto = auto.andThen(builder.build(new Path(segments.get(i))));
-    }
-    return auto;
+    updateSelectedAutoCache();
+    return buildCommandFromCachedSegments();
   }
 
   public Pose2d getAutonomousStartPose() {
+    updateSelectedAutoCache();
+    return cachedAutonomousStartPose;
+  }
+
+  public boolean preloadSelectedAuto() {
+    updateSelectedAutoCache();
+    return selectedAutoIsCached;
+  }
+
+  public boolean isSelectedAutoCached() {
+    return selectedAutoIsCached;
+  }
+
+  private void updateSelectedAutoCache() {
     AutoPathOption selected = chooser.getSelected();
 
+    // if didn't change auto --> don't need to re-cache
+    if (selected == cachedSelectedAuto && selectedAutoIsCached) {
+      return;
+    }
+
+    // set flag --> so can see when not-ready/not-cached
+    selectedAutoIsCached = false;
+    cachedSelectedAuto = selected;
+
     if (selected == null) {
-      return null;
+      cachedPathSegments = Collections.<Path>emptyList();
+      cachedAutonomousStartPose = null;
+      return;
     }
 
-    List<String> segments = selected.routine.pathNames();
-    if (segments.isEmpty()) {
-      return null;
+    cachedPathSegments = selected.routine.pathNames().stream().map(Path::new).toList();
+
+    // empty auto
+    if (cachedPathSegments.isEmpty()) {
+      cachedAutonomousStartPose = null;
+      return;
     }
 
-    Path path = new Path(segments.get(0));
+    // extract start pose
+    Path startPath = cachedPathSegments.get(0).copy();
+    if (selected.mirrored) startPath.mirror();
+    cachedAutonomousStartPose = startPath.getStartPose();
 
-    if (selected.mirrored) path.mirror();
+    // flip back boolean flag: caching process finished
+    selectedAutoIsCached = true;
+  }
 
-    return path.getStartPose();
+  private Command buildCommandFromCachedSegments() {
+    if (cachedPathSegments.isEmpty()) {
+      return Commands.none();
+    }
+
+    return Commands.sequence(
+        IntStream.range(0, cachedPathSegments.size())
+            .mapToObj(
+                i -> {
+                  FollowPath.Builder builder =
+                      i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
+                  return builder.build(cachedPathSegments.get(i));
+                })
+            .toArray(Command[]::new));
   }
 
   // IMPORTANT: all autos must be defined here
