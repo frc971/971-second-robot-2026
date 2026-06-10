@@ -152,59 +152,71 @@ public class RobotContainer {
               }
 
               if (Controllers.SHUTTLING.getAsBoolean()) {
-                JOYSTICK_VALUES
-                    .setValues(
-                        Controllers.DRIVER.getLeftY(),
-                        Controllers.DRIVER.getLeftX(),
-                        Controllers.DRIVER.getRightX())
-                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                    .scale(
-                        -SHUTTLING_SPEED, // Negative max speed and angular rate since
-                        -SHUTTLING_ANGULAR_RATE) // controller inputs are reversed
-                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
-                    .slewRateLimit(SHUTTLING_X_LIMITER, SHUTTLING_Y_LIMITER, SHUTTLING_ROT_LIMITER);
-
-                return shuttlingDrive
-                    .withVelocityX(JOYSTICK_VALUES.getX())
-                    .withVelocityY(JOYSTICK_VALUES.getY())
-                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+                return buildFieldCentricRequest(
+                    shuttlingDrive,
+                    SHUTTLING_SPEED,
+                    SHUTTLING_ANGULAR_RATE,
+                    Controllers.DRIVER.getLeftY(),
+                    Controllers.DRIVER.getLeftX(),
+                    Controllers.DRIVER.getRightX(),
+                    SHUTTLING_X_LIMITER,
+                    SHUTTLING_Y_LIMITER,
+                    SHUTTLING_ROT_LIMITER);
 
               } else if (Controllers.SHOOTING.getAsBoolean()) {
-                JOYSTICK_VALUES
-                    .setValues(
-                        Controllers.DRIVER.getLeftY(),
-                        Controllers.DRIVER.getLeftX(),
-                        Controllers.DRIVER.getRightX())
-                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                    .scale(
-                        -SHOOTING_SPEED, // Negative max speed and angular rate since
-                        -SHOOTING_ANGULAR_RATE) // controller inputs are reversed
-                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
-                    .slewRateLimit(SHOOTING_X_LIMITER, SHOOTING_Y_LIMITER, SHOOTING_ROT_LIMITER);
-                return shootingDrive
-                    .withVelocityX(JOYSTICK_VALUES.getX())
-                    .withVelocityY(JOYSTICK_VALUES.getY())
-                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+                return buildFieldCentricRequest(
+                    shootingDrive,
+                    SHOOTING_SPEED,
+                    SHOOTING_ANGULAR_RATE,
+                    Controllers.DRIVER.getLeftX(),
+                    Controllers.DRIVER.getLeftX(),
+                    Controllers.DRIVER.getRightX(),
+                    SHOOTING_X_LIMITER,
+                    SHOOTING_Y_LIMITER,
+                    SHOOTING_ROT_LIMITER);
 
               } else {
-                JOYSTICK_VALUES
-                    .setValues(
-                        Controllers.DRIVER.getLeftY(),
-                        Controllers.DRIVER.getLeftX(),
-                        Controllers.DRIVER.getRightX())
-                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                    .scale(
-                        -MAX_SPEED, // Negative max speed and angular rate since
-                        -MAX_ANGULAR_RATE) // controller inputs are reversed
-                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
-
-                return drive
-                    .withVelocityX(JOYSTICK_VALUES.getX())
-                    .withVelocityY(JOYSTICK_VALUES.getY())
-                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+                return buildFieldCentricRequest(
+                    drive,
+                    MAX_SPEED,
+                    MAX_ANGULAR_RATE,
+                    Controllers.DRIVER.getLeftY(),
+                    Controllers.DRIVER.getLeftX(),
+                    Controllers.DRIVER.getRightX(),
+                    null,
+                    null,
+                    null);
               }
             }));
     drivetrain.registerTelemetry(logger::telemeterize);
+  }
+
+  private SwerveRequest.FieldCentric buildFieldCentricRequest(
+      SwerveRequest.FieldCentric request,
+      double maxSpeed,
+      double maxAngularRate,
+      double controllerForward,
+      double controllerStrafe,
+      double controllerRotation,
+      SlewRateLimiter secondaryXLimiter,
+      SlewRateLimiter secondaryYLimiter,
+      SlewRateLimiter secondaryRotLimiter) {
+    JOYSTICK_VALUES
+        .setValues(controllerForward, controllerStrafe, controllerRotation)
+        .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+        .scale(
+            -maxSpeed, // Negative max speed and angular rate since controller inputs are reversed
+            -maxAngularRate)
+        .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
+
+    if (secondaryXLimiter != null && secondaryYLimiter != null && secondaryRotLimiter != null) {
+      JOYSTICK_VALUES.slewRateLimit(secondaryXLimiter, secondaryYLimiter, secondaryRotLimiter);
+    }
+
+    return request
+        .withVelocityX(JOYSTICK_VALUES.getX())
+        .withVelocityY(JOYSTICK_VALUES.getY())
+        .withRotationalRate(JOYSTICK_VALUES.getRot());
   }
 
   public void periodic() {
