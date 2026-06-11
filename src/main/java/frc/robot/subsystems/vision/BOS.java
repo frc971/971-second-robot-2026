@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,10 +16,18 @@ public class BOS {
   public static final String[] CAMERA_NAMES = {
     "PoseEstimate/Right/", "PoseEstimate/Left/", "PoseEstimate/Front/"
   };
+  private static final double FIELD_LENGTH_X = FlippingUtil.fieldSizeX,
+      FIELD_LENGTH_Y = FlippingUtil.fieldSizeY,
+      BAD_ODOMETRY_TOLERANCE = 0.02;
+
+  private static final boolean OVERRIDE_BAD_ODOM = true;
+
   IntegerPublisher num_tags_per_control_loop_publisher;
 
   DoubleArraySubscriber[] tag_estimation_subscribers =
       new DoubleArraySubscriber[CAMERA_NAMES.length];
+
+  Pose2d lastVisionPose = new Pose2d(0, 0, new Rotation2d());
 
   public BOS(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -59,15 +68,38 @@ public class BOS {
         if (tagEstimations[i][0] == -1) {
           continue;
         }
-        drivetrain.addVisionMeasurement(
+
+        Pose2d estimate =
             new Pose2d(
-                tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2])),
-            tagEstimations[i][4],
-            VecBuilder.fill(
-                tagEstimations[i][3] / 3.0,
-                tagEstimations[i][3] / 3.0,
-                tagEstimations[i][3] * 2.0 / 3.0));
+                tagEstimations[i][0], tagEstimations[i][1], new Rotation2d(tagEstimations[i][2]));
+
+        if (OVERRIDE_BAD_ODOM
+            && poseOffField(drivetrain.getState().Pose)
+            && !poseOffField(estimate)) {
+          drivetrain.resetPose(estimate);
+        } else {
+          drivetrain.addVisionMeasurement(
+              estimate,
+              tagEstimations[i][4],
+              VecBuilder.fill(
+                  tagEstimations[i][3] / 4.0,
+                  tagEstimations[i][3] / 4.0,
+                  tagEstimations[i][3] * 2.0 / 3.0));
+        }
+
+        lastVisionPose = estimate;
       }
     }
+  }
+
+  public Pose2d getLastVisionPose() {
+    return lastVisionPose;
+  }
+
+  public static boolean poseOffField(Pose2d pose) {
+    return pose.getX() < -BAD_ODOMETRY_TOLERANCE
+        || pose.getY() < -BAD_ODOMETRY_TOLERANCE
+        || pose.getX() > FIELD_LENGTH_X + BAD_ODOMETRY_TOLERANCE
+        || pose.getY() > FIELD_LENGTH_Y + BAD_ODOMETRY_TOLERANCE;
   }
 }

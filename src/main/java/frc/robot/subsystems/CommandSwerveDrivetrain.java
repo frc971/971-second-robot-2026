@@ -7,10 +7,6 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,7 +17,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -30,6 +25,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -48,6 +44,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private static final Rotation2d RED_ALLIANCE_PERSPECTIVE_ROTATION = Rotation2d.k180deg;
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean hasAppliedOperatorPerspective = false;
+
+  private final double BUMP_TILT_THRESHOLD_DEGREES = 5.0; // probably need to tune
+
+  private static final String[] MODULES = {"Front Left", "Front Right", "Back Left", "Back Right"};
 
   /** Swerve request to apply during robot-centric path following */
   private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
@@ -135,7 +135,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) {
       startSimThread();
     }
-    configureAutoBuilder();
   }
 
   /**
@@ -160,7 +159,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) {
       startSimThread();
     }
-    configureAutoBuilder();
   }
 
   /**
@@ -192,37 +190,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules));
     if (Utils.isSimulation()) {
       startSimThread();
-    }
-    configureAutoBuilder();
-  }
-
-  private void configureAutoBuilder() {
-    try {
-      var config = RobotConfig.fromGUISettings();
-      AutoBuilder.configure(
-          () -> getState().Pose, // Supplier of current robot pose
-          this::resetPose, // Consumer for seeding pose against auto
-          () -> getState().Speeds, // Supplier of current robot speeds
-          // Consumer of ChassisSpeeds and feedforwards to drive the robot
-          (speeds, feedforwards) ->
-              setControl(
-                  pathApplyRobotSpeeds
-                      .withSpeeds(speeds)
-                      .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                      .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-          new PPHolonomicDriveController(
-              // PID constants for translation
-              new PIDConstants(10, 0, 0),
-              // PID constants for rotation
-              new PIDConstants(7, 0, 0)),
-          config,
-          // Assume the path needs to be flipped for Red vs Blue, this is normally the case
-          () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-          this // Subsystem for requirements
-          );
-    } catch (Exception ex) {
-      DriverStation.reportError(
-          "Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
     }
   }
 
@@ -284,12 +251,44 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       super.resetPose(simPose);
     }
 
+    // IMU is rotated 90 deg relative to robot, and coordinates are relative to imu
+    Logger.recordOutput("Drive/IMU/GyroYaw", getPigeon2().getYaw().getValueAsDouble());
+    Logger.recordOutput("Drive/IMU/GyroPitch", getPigeon2().getPitch().getValueAsDouble());
+    Logger.recordOutput("Drive/IMU/GyroRoll", getPigeon2().getRoll().getValueAsDouble());
+    Logger.recordOutput(
+        "Drive/IMU/AccelerometerX", getPigeon2().getAccelerationX().getValueAsDouble());
+    Logger.recordOutput(
+        "Drive/IMU/AccelerometerY", getPigeon2().getAccelerationY().getValueAsDouble());
+    Logger.recordOutput(
+        "Drive/IMU/AccelerometerZ", getPigeon2().getAccelerationZ().getValueAsDouble());
+
     Logger.recordOutput("Drive/Pose", getState().Pose);
 
     Logger.recordOutput("BatteryVoltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("Drive/TargetStates", getState().ModuleTargets);
     Logger.recordOutput("Drive/MeasuredStates", getState().ModuleStates);
     Logger.recordOutput("Drive/MeasuredSpeeds", getState().Speeds);
+
+    // Sum currents across all drive motors
+    double totalDriveStatorCurrent = 0;
+    double totalDriveSupplyCurrent = 0;
+
+    int i = 0;
+    for (var module : getModules()) {
+      double stator = module.getDriveMotor().getStatorCurrent().getValueAsDouble();
+      double supply = module.getDriveMotor().getSupplyCurrent().getValueAsDouble();
+      totalDriveStatorCurrent += stator;
+      totalDriveSupplyCurrent += supply;
+      Logger.recordOutput("Drive/Currents/" + MODULES[i] + " Drive Motor/StatorCurrent", stator);
+      Logger.recordOutput("Drive/Currents/" + MODULES[i] + " Drive Motor/SupplyCurrent", supply);
+      i++;
+    }
+    double batteryVoltage = RobotController.getBatteryVoltage();
+    double totalDrivePower = totalDriveSupplyCurrent * batteryVoltage;
+
+    Logger.recordOutput("Drive/TotalDriveStatorCurrent", totalDriveStatorCurrent);
+    Logger.recordOutput("Drive/TotalDriveSupplyCurrent", totalDriveSupplyCurrent);
+    Logger.recordOutput("Drive/TotalDrivePower", totalDrivePower);
   }
 
   private void startSimThread() {
@@ -318,8 +317,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void resetPose(Pose2d pose) {
     if (this.mapleSimSwerveDrivetrain != null)
       mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
-    Timer.delay(0.1); // wait for simulation to update
     super.resetPose(pose);
+  }
+
+  @AutoLogOutput(key = "Drive/OnBump")
+  public boolean isRobotOnBump() {
+    // use the hypotenuse of pitch and roll to account for cases if the robot is tilted diagonally
+    return Math.hypot(
+            getPigeon2().getPitch().getValue().in(Degrees),
+            getPigeon2().getRoll().getValue().in(Degrees))
+        >= BUMP_TILT_THRESHOLD_DEGREES;
   }
 
   /**

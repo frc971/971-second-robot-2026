@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Long Kev 1 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kev 6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Tamed Kev 4 "
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Tamed Kev 5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kev 6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kev 7"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

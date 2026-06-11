@@ -5,52 +5,45 @@
     "data": {
       "commands": [
         {
-          "type": "race",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "ShootSequence"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.5
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Neutral"
+            "pathName": "Quato 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Center"
+            "pathName": "Quato 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Depot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "pathName": "Quato 3 6"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Climb"
+            "pathName": "Quato 4 7"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Quato 5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Quato 3 6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Quato 4 7"
           }
         }
       ]

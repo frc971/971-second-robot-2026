@@ -1,0 +1,143 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.916,
+        "y": 7.422
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.145173032404456,
+        "y": 7.478634403934317
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.721692780668343,
+        "y": 6.805470341434316
+      },
+      "prevControl": {
+        "x": 6.781310470583418,
+        "y": 7.506962790691187
+      },
+      "nextControl": {
+        "x": 8.028613085720245,
+        "y": 6.576518484079534
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.721692780668343,
+        "y": 5.4870260358731935
+      },
+      "prevControl": {
+        "x": 7.837040887848264,
+        "y": 5.708825075929749
+      },
+      "nextControl": {
+        "x": 7.534179484644984,
+        "y": 5.1264629536290345
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.475775992422135,
+        "y": 5.307197710998333
+      },
+      "prevControl": {
+        "x": 7.747350950725213,
+        "y": 4.772805763074586
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.8912212171052627,
+      "rotationDegrees": 81.41912343335412
+    },
+    {
+      "waypointRelativePos": 1.81174958881579,
+      "rotationDegrees": 76.9823306168459
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.5,
+      "maxWaypointRelativePos": 2.5,
+      "constraints": {
+        "maxVelocity": 3.5,
+        "maxAcceleration": 6.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 540.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "IntakePivotDown"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.1,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "ReverseShooters"
+        }
+      }
+    },
+    {
+      "name": "cosmetic field",
+      "waypointRelativePos": 0.2,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 6.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 540.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 2.0,
+    "rotation": -45.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

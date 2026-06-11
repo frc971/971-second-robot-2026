@@ -4,16 +4,16 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.lib.BLine.*;
+import frc.robot.subsystems.Autos;
+import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.vision.BOS;
-import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.TagHelper;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -28,7 +28,8 @@ public class Robot extends LoggedRobot {
   private final RobotContainer robotContainer;
 
   private final BOS bos;
-  private final Limelight limelight;
+
+  private final Autos autos;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -62,7 +63,7 @@ public class Robot extends LoggedRobot {
 
     robotContainer = new RobotContainer();
     bos = new BOS(robotContainer.drivetrain);
-    limelight = new Limelight(robotContainer.drivetrain);
+    autos = new Autos(robotContainer.drivetrain);
   }
 
   @Override
@@ -76,14 +77,21 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     robotContainer.periodic();
 
-    HubShiftUtil.ShiftInfo info = HubShiftUtil.getOfficialShiftInfo();
-
-    Logger.recordOutput("HubShift/Active", info.active());
+    HubShiftUtil.ShiftInfo info = HubShiftUtil.getShiftInfo();
+    Logger.recordOutput("HubShift/Active", info.hubActive());
     Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
+    Logger.recordOutput("HubShift/UntilHubFlip", Math.round(info.timeUntilHubStateChange()));
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
 
     bos.updatePose();
-    limelight.updatePose();
+
+    if (Controllers.ODOMETRY_RESET.getAsBoolean()) {
+      robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
+    }
+
+    if (Controllers.DISABLE_OTF.getAsBoolean()) {
+      robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
+    }
 
     CommandScheduler.getInstance().run();
   }
@@ -95,21 +103,19 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    // Log the autonomous starting pose
-    Pose2d autoInitPose = null;
-    Command selectedAuto = robotContainer.getAutonomousCommand();
+    Logger.recordOutput("Auto/SelectedOptionCached", autos.preloadSelectedAuto());
+    Pose2d startPose = autos.getAutonomousStartPose();
 
-    if (selectedAuto instanceof PathPlannerAuto auto) {
-      autoInitPose = auto.getStartingPose();
-
+    if (startPose != null) {
       if (DriverStation.getAlliance().isPresent()
           && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-        autoInitPose = FlippingUtil.flipFieldPose(autoInitPose);
+        startPose = FlippingUtil.flipFieldPose(startPose);
       }
-    }
 
-    // Update the field visualization with the auto start pose
-    robotContainer.getTelemetry().setAutoStartPose(autoInitPose);
+      // Update the field visualization with the auto start pose
+      robotContainer.getTelemetry().setAutoStartPose(startPose);
+    }
+    // TODO: Log the autonomous starting pose
   }
 
   @Override
@@ -117,12 +123,10 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
-
+    autonomousCommand = autos.getAutonomousCommand();
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
-      robotContainer.resetPositionForAuto(limelight);
     }
     HubShiftUtil.initialize();
   }

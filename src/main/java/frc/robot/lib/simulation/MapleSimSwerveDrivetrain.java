@@ -33,6 +33,7 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.ironmaple.simulation.motorsims.SimulatedBattery;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 
 /**
  *
@@ -113,6 +114,9 @@ public class MapleSimSwerveDrivetrain {
       simModules[i] = new SimSwerveModule(moduleConstants[0], moduleSimulations[i], modules[i]);
 
     SimulatedArena.overrideSimulationTimings(simPeriod, 1);
+
+    // makes ramp not have collisions/physics
+    SimulatedArena.overrideInstance(new Arena2026Rebuilt(false));
     SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive);
   }
 

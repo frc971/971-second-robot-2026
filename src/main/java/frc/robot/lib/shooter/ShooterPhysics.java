@@ -41,7 +41,7 @@ public class ShooterPhysics {
    * @param target target ObjectState
    * @return LaunchSolution, or null if the shot is impossible
    */
-  public LaunchSolution twiceSolve(ObjectState proj, ObjectState target) {
+  public LaunchSolution targetAngleSolve(ObjectState proj, ObjectState target) {
 
     Translation2d distance2d = target.minus(proj).xyPos();
     double currentDistance = distance2d.getNorm();
@@ -77,13 +77,13 @@ public class ShooterPhysics {
     return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
   }
 
-  public LaunchSolution thriceSolve(ObjectState proj, ObjectState target) {
+  public LaunchSolution apexHeightSolve(ObjectState proj, ObjectState target) {
     Translation2d distance2d = target.minus(proj).xyPos();
     double currentDistance = distance2d.getNorm();
 
     double h0 = proj.position().getZ();
     double ht = target.position().getZ();
-    double H = MathUtil.clamp(h0 + (currentDistance * 0.3), h0 + 0.2, 3.5);
+    double H = MathUtil.clamp(h0 + (currentDistance * 0.3), h0 + 0.2, 100);
 
     // compute helper terms
     double deltaH = H - h0;

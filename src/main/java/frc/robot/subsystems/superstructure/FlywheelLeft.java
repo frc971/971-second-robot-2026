@@ -39,7 +39,7 @@ public class FlywheelLeft extends AngularSubsystem {
     tc.Slot0.kG = 0.0;
 
     // tc.Slot0.kP = 0.55;
-    tc.Slot0.kP = 0.4;
+    tc.Slot0.kP = 0.5;
     tc.Slot0.kI = 0.0;
     tc.Slot0.kD = 0.0;
 
@@ -54,7 +54,7 @@ public class FlywheelLeft extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
+    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
     tc.Feedback.SensorToMechanismRatio = 1.0 / 1.0; // Motor to output gear ratio

@@ -7,25 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center"
+            "pathName": "Short Kev 1 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Depot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "pathName": "Kev 6"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Climb"
+            "pathName": "Tamed Kev 4 "
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Tamed Kev 5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kev 6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kev 7"
           }
         }
       ]

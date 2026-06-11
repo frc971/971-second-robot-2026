@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger;
 public class ShooterHandler {
   public static final class Targets {
     private static final double X_DISTANCE_FROM_CENTER = 3.6448975;
-    private static final double HUB_HEIGHT = 1.63254385;
+    private static final double HUB_HEIGHT = 1.430425;
 
     public static final ObjectState BLUE =
         new ObjectState(
@@ -43,7 +43,7 @@ public class ShooterHandler {
             new Translation3d());
 
     // offset from the corner
-    private static final Translation3d SHUTTLE_OFFSET = new Translation3d(0.8, 1.3, 0.0);
+    private static final Translation3d SHUTTLE_OFFSET = new Translation3d(1.2, 1.7, 0.0);
 
     public static final ObjectState RIGHT_BLUE_SHUTTLE =
         new ObjectState(SHUTTLE_OFFSET, new Translation3d());
@@ -98,15 +98,13 @@ public class ShooterHandler {
   @Getter
   private Angle turretOffset = Degrees.of(0.0);
 
-  private AngularVelocity desiredFlywheel = RotationsPerSecond.of(0.0);
-
   @AutoLogOutput(key = "{name}/desiredTurret")
   private Angle desiredTurretRel = Degrees.of(0.0);
 
   private static final AngularVelocity FLYWHEEL_STEP = RotationsPerSecond.of(2.0);
   private static final Angle TURRET_STEP = Degrees.of(2.0);
 
-  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.1);
+  private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.05);
 
   // state machine
   public enum State {
@@ -173,7 +171,7 @@ public class ShooterHandler {
 
     // calculate physics
     if (isShuttle(targetState)) {
-      launchSolution = physics.thriceSolve(projectileState, targetState);
+      launchSolution = physics.apexHeightSolve(projectileState, targetState);
     } else {
       // use offset
       Translation2d perpOffset =
@@ -186,7 +184,7 @@ public class ShooterHandler {
       ObjectState adjustedTargetState =
           targetState.plus(new Translation3d(perpOffset), new Translation3d());
 
-      launchSolution = physics.twiceSolve(projectileState, adjustedTargetState);
+      launchSolution = physics.targetAngleSolve(projectileState, adjustedTargetState);
     }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
@@ -211,20 +209,15 @@ public class ShooterHandler {
           shooterState = State.FIRING;
         }
       }
-      case FIRING -> {
-        if (canTransitionToNotReady()) {
-          shooterState = State.AIMING;
-        }
-      }
+      case FIRING -> {}
     }
 
     // --- compute tuned + clamped desired goals (used for outputs AND error) ---
     if (launchSolution == null || shooterState == State.NOT_READY) {
-      desiredFlywheel = RotationsPerSecond.of(0.0);
       desiredTurretRel = Degrees.of(0.0);
     } else {
       // Base goals from physics
-      AngularVelocity flywheelGoal = getFlywheelSpeed(); // includes fudge factor
+      AngularVelocity flywheelGoal = launchSolution.flywheelSpeed();
       Angle turretGoalRel = getRelativeTurretAngle();
 
       // Apply live-tuning offsets TO THE GOALS
@@ -239,7 +232,6 @@ public class ShooterHandler {
                   config.CONSTRAINTS().MIN_FLYWHEEL_SPEED().in(RadiansPerSecond),
                   config.CONSTRAINTS().MAX_FLYWHEEL_SPEED().in(RadiansPerSecond)));
 
-      desiredFlywheel = flywheelGoal;
       desiredTurretRel = turretGoalRel;
     }
 
@@ -247,8 +239,6 @@ public class ShooterHandler {
 
     // set output
     if (shooterState != State.NOT_READY) {
-      flywheel.setVelocity(desiredFlywheel);
-
       // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
       turret.setPosition(desiredTurretRel);
     }
@@ -266,16 +256,12 @@ public class ShooterHandler {
     if (Controllers.TURRET_RIGHT.rising()) turretOffset = turretOffset.minus(TURRET_STEP);
   }
 
-  public Optional<Angle> getDesiredHoodAngle() {
-    if (launchSolution == null || shooterState == State.NOT_READY) {
-      return Optional.empty();
-    }
-
-    return Optional.of(launchSolution.hoodAngle());
+  public Optional<Angle> getHoodAngle() {
+    return Optional.ofNullable(launchSolution).map(LaunchSolution::hoodAngle);
   }
 
-  public AngularVelocity getFlywheelSpeed() {
-    return launchSolution.flywheelSpeed();
+  public Optional<AngularVelocity> getFlywheelSpeed() {
+    return Optional.ofNullable(launchSolution).map(LaunchSolution::flywheelSpeed);
   }
 
   public Angle getRelativeTurretAngle() {
@@ -319,33 +305,21 @@ public class ShooterHandler {
     if (launchSolution == null) {
       return false;
     }
-
-    return flywheelSpeedAbsDiff().lt(config.THRESHOLD().AIMING_FLYWHEEL_THRESHOLD())
-        && turretRotationAbsDiff().lt(config.THRESHOLD().AIMING_ROTATION_THRESHOLD())
-        && hoodAngleAbsDiff().lt(config.THRESHOLD().AIMING_HOOD_ANGLE_THRESHOLD());
-  }
-
-  @AutoLogOutput(key = "{name}/canTransitionToNotReady")
-  private boolean canTransitionToNotReady() {
-    if (launchSolution == null) {
-      return true;
-    }
-
     if (targetState == Targets.BLUE || targetState == Targets.RED) {
-      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().FIRING_FLYWHEEL_ABORT())
-          || turretRotationAbsDiff().gt(config.THRESHOLD().FIRING_ROTATION_THRESHOLD())
-          || hoodAngleAbsDiff().gt(config.THRESHOLD().FIRING_HOOD_ANGLE_THRESHOLD());
+      return flywheelSpeedAbsDiff().lt(config.THRESHOLD().HUB_FLYWHEEL_THRESHOLD())
+          && turretRotationAbsDiff().lt(config.THRESHOLD().HUB_TURRET_THRESHOLD())
+          && hoodAngleAbsDiff().lt(config.THRESHOLD().HUB_HOOD_THRESHOLD());
     } else {
-      return flywheelSpeedAbsDiff().gt(config.THRESHOLD().SHUTTLING_FLYWHEEL_THRESHOLD())
-          || turretRotationAbsDiff().gt(config.THRESHOLD().SHUTTLING_ROTATION_THRESHOLD())
-          || hoodAngleAbsDiff().gt(config.THRESHOLD().SHUTTLING_HOOD_ANGLE_THRESHOLD());
+      return flywheelSpeedAbsDiff().lt(config.THRESHOLD().SHUTTLE_FLYWHEEL_THRESHOLD())
+          && turretRotationAbsDiff().lt(config.THRESHOLD().SHUTTLE_TURRET_THRESHOLD())
+          && hoodAngleAbsDiff().lt(config.THRESHOLD().SHUTTLE_HOOD_THRESHOLD());
     }
   }
 
   // --- Threshold helper functions ---
   private AngularVelocity flywheelSpeedAbsDiff() {
     return RadiansPerSecond.of(
-        getFlywheelSpeed().minus(flywheel.getVelocity()).abs(RadiansPerSecond));
+        launchSolution.flywheelSpeed().minus(flywheel.getVelocity()).abs(RadiansPerSecond));
   }
 
   private Angle turretRotationAbsDiff() {
@@ -455,5 +429,9 @@ public class ShooterHandler {
 
   public ShooterConfig getConfig() {
     return config;
+  }
+
+  public void setStateAiming() {
+    shooterState = shooterState.AIMING;
   }
 }

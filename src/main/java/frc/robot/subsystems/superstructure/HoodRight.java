@@ -49,6 +49,7 @@ public class HoodRight extends Hood {
         .BUS(new CANBus("Superstructure Bus"))
         .TALONFX_CONFIG(tc)
         .LOG_UNIT(Inches)
+        .FOC(false)
         .build();
   }
 
