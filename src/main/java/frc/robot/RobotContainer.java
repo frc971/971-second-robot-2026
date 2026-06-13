@@ -349,9 +349,11 @@ public class RobotContainer {
   private void handleSimShooting() {
     if (Controllers.SHOOTING.getAsBoolean()) {
 
-      Optional<Angle> hoodAngle = /*superstructure.shooterHandlerLeft.getHoodAngle()*/ Optional.of(Degrees.of(45));
-      Optional<AngularVelocity> flywheelSpeed = /*superstructure.shooterHandlerLeft.getFlywheelSpeed()*/ Optional.of(RPM.of(1500));
+      //Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
+      //Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
 
+      Optional<Angle> hoodAngle = superstructure.shooterHandlerLeft.getHoodAngle();
+      Optional<AngularVelocity> flywheelSpeed = superstructure.shooterHandlerLeft.getFlywheelSpeed();
       if (hoodAngle.isPresent() && flywheelSpeed.isPresent()) {
         double flywheelSpeedAsDouble = flywheelSpeed.get().magnitude();
         double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
