@@ -5,10 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.RobotState;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Controllers;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
@@ -28,8 +25,7 @@ public class FuelSim {
   private static final double FIELD_WIDTH = 8.04;
   private static final double FRICTION = 0.1; // horizontal velocity lost per second on ground
 
-  //TODO: update numbers to match actual robot if this is necessary
-  
+  // TODO: update numbers to match actual robot if this is necessary
 
   private static FuelSim instance = null;
 
@@ -156,8 +152,6 @@ public class FuelSim {
         vel = new Translation3d(-vel.getX() * NET_COR, vel.getY() * NET_COR, vel.getZ());
       }
     }
-
-    
 
     private void addImpulse(Translation3d impulse) {
       vel = vel.plus(impulse);

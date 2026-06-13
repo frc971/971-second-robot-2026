@@ -434,6 +434,7 @@ public class ShooterHandler {
   public Side getSide() {
     return side;
   }
+
   public ShooterPhysics getPhysics() {
     return physics;
   }
