@@ -115,7 +115,6 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MAX_SPEED);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  //TODO: update numbers to match actual robot if this is necessary
   private static ProjectileSimulator projectileSimulator = new ProjectileSimulator(
     new ProjectileSimulator.SimParameters(
       0.215,
@@ -226,8 +225,6 @@ public class RobotContainer {
                         -SHOOTING_ANGULAR_RATE) // controller inputs are reversed
                     .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
                     .slewRateLimit(SHOOTING_X_LIMITER, SHOOTING_Y_LIMITER, SHOOTING_ROT_LIMITER);
-                  // if in sim simulate fuel
-                  if (RobotBase.isSimulation()) launchFuelIfShooting();
                 return shootingDrive
                     .withVelocityX(JOYSTICK_VALUES.getX())
                     .withVelocityY(JOYSTICK_VALUES.getY())
@@ -255,6 +252,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
+    handleSimShooting();
     superstructure.periodic();
   }
 
@@ -348,16 +346,19 @@ public class RobotContainer {
     Logger.recordOutput("FuelSim/LastEvent", "Launch");
   }
 
-  private void launchFuelIfShooting() {
-    Pose2d pose = drivetrain.getState().Pose;
-    
-    Optional<Angle> hoodAngle = superstructure.shooterHandlerLeft.getHoodAngle();
-    Optional<AngularVelocity> flywheelSpeed = superstructure.shooterHandlerLeft.getFlywheelSpeed();
+  private void handleSimShooting() {
+    if (Controllers.SHOOTING.getAsBoolean()) {
 
-    if (hoodAngle.isPresent() && flywheelSpeed.isPresent()) {
-      double flywheelSpeedAsDouble = flywheelSpeed.get().magnitude();
-      double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
-      launchFuelInSim(MetersPerSecond.of(exitVelocity),hoodAngle.get());
+      Optional<Angle> hoodAngle = /*superstructure.shooterHandlerLeft.getHoodAngle()*/ Optional.of(Degrees.of(45));
+      Optional<AngularVelocity> flywheelSpeed = /*superstructure.shooterHandlerLeft.getFlywheelSpeed()*/ Optional.of(RPM.of(1500));
+
+      if (hoodAngle.isPresent() && flywheelSpeed.isPresent()) {
+        double flywheelSpeedAsDouble = flywheelSpeed.get().magnitude();
+        double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
+        System.out.println("Hood angle: " + hoodAngle);
+        System.out.println("Flywheel RPM: " + flywheelSpeedAsDouble + "\n Ball Exit Velocity: " + exitVelocity);
+        launchFuelInSim(MetersPerSecond.of(exitVelocity),hoodAngle.get());
+      }
     }
     
   }
