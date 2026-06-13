@@ -137,15 +137,10 @@ public class Manual {
   }
 
   public void periodic() {
-    updateJoystickValues();
 
     Logger.recordOutput("Drive/Manual/Joystick/X", Controllers.TROY.getLeftY());
     Logger.recordOutput("Drive/Manual/Joystick/Y", Controllers.TROY.getLeftX());
     Logger.recordOutput("Drive/Manual/Joystick/Rot", Controllers.TROY.getRightX());
-
-    if (goal == Goal.NONE) {
-      return;
-    }
 
     SwerveRequest curRequest = null;
     boolean wantsDrive =
@@ -177,6 +172,12 @@ public class Manual {
       SHOOTING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
     }
 
+    updateJoystickValues();
+
+    if (goal == Goal.NONE) {
+      return;
+    }
+
     if (Controllers.SHUTTLING.getAsBoolean()) {
       curRequest =
           shuttlingDrive
@@ -199,7 +200,8 @@ public class Manual {
               .withRotationalRate(JOYSTICK_VALUES.getRot());
     }
 
-    if (Controllers.SHOOTING.getAsBoolean() && !wantsDrive) {
+    if ((Controllers.SHOOTING.getAsBoolean() || Controllers.SHUTTLING.getAsBoolean())
+        && !wantsDrive) {
       curRequest = brake;
     }
 
