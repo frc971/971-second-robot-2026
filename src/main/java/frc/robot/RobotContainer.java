@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -15,6 +17,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -23,6 +27,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.BLine.*;
+import frc.robot.lib.shooter.LaunchSolution;
+import frc.robot.lib.shooter.ObjectState;
+import frc.robot.lib.shooter.ShooterPhysics;
+import frc.robot.subsystems.superstructure.ShooterHandler;
+import frc.robot.subsystems.superstructure.ShooterHandler.Side;
 import frc.robot.lib.JoystickValues;
 import frc.robot.lib.simulation.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -106,6 +115,27 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MAX_SPEED);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+  //TODO: update numbers to match actual robot if this is necessary
+  private static ProjectileSimulator projectileSimulator = new ProjectileSimulator(
+    new ProjectileSimulator.SimParameters(
+      0.215,
+      0.1501,
+      0.47,
+      0.2,
+      1.225,
+      0.43,
+      0.1016,
+      1.83,
+      0.6,
+      45.0,
+      0.004,
+      1500,
+      6000,
+      25,
+      5.0f
+    )
+  );
+
   public RobotContainer() {
     superstructure = new Superstructure(this);
 
@@ -124,6 +154,7 @@ public class RobotContainer {
     FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
     FollowPath.registerEventTrigger("neutral", superstructure.neutral());
     FollowPath.registerEventTrigger("intakeDown", superstructure.intakePivotDownAuto());
+
   }
 
   private void configureDrivetrain() {
@@ -195,6 +226,8 @@ public class RobotContainer {
                         -SHOOTING_ANGULAR_RATE) // controller inputs are reversed
                     .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
                     .slewRateLimit(SHOOTING_X_LIMITER, SHOOTING_Y_LIMITER, SHOOTING_ROT_LIMITER);
+                  // if in sim simulate fuel
+                  if (RobotBase.isSimulation()) launchFuelIfShooting();
                 return shootingDrive
                     .withVelocityX(JOYSTICK_VALUES.getX())
                     .withVelocityY(JOYSTICK_VALUES.getY())
@@ -313,6 +346,20 @@ public class RobotContainer {
     Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, pose.getRotation());
     FuelSim.getInstance().spawnFuel(initialPosition, launchVelocity);
     Logger.recordOutput("FuelSim/LastEvent", "Launch");
+  }
+
+  private void launchFuelIfShooting() {
+    Pose2d pose = drivetrain.getState().Pose;
+    
+    Optional<Angle> hoodAngle = superstructure.shooterHandlerLeft.getHoodAngle();
+    Optional<AngularVelocity> flywheelSpeed = superstructure.shooterHandlerLeft.getFlywheelSpeed();
+
+    if (hoodAngle.isPresent() && flywheelSpeed.isPresent()) {
+      double flywheelSpeedAsDouble = flywheelSpeed.get().magnitude();
+      double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
+      launchFuelInSim(MetersPerSecond.of(exitVelocity),hoodAngle.get());
+    }
+    
   }
 
   private Translation3d createLaunchVelocity(
