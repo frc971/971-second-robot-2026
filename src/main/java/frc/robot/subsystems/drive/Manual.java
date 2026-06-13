@@ -101,9 +101,9 @@ public class Manual {
     if (Controllers.SHUTTLING.getAsBoolean()) {
       JOYSTICK_VALUES
           .setValues(
-              Controllers.TROY.getLeftY(),
-              Controllers.TROY.getLeftX(),
-              Controllers.TROY.getRightX())
+              Controllers.DRIVER.getLeftY(),
+              Controllers.DRIVER.getLeftX(),
+              Controllers.DRIVER.getRightX())
           .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
           .scale(
               -SHUTTLING_SPEED, // Negative max speed and angular rate since
@@ -113,9 +113,9 @@ public class Manual {
     } else if (Controllers.SHOOTING.getAsBoolean()) {
       JOYSTICK_VALUES
           .setValues(
-              Controllers.TROY.getLeftY(),
-              Controllers.TROY.getLeftX(),
-              Controllers.TROY.getRightX())
+              Controllers.DRIVER.getLeftY(),
+              Controllers.DRIVER.getLeftX(),
+              Controllers.DRIVER.getRightX())
           .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
           .scale(
               -SHOOTING_SPEED, // Negative max speed and angular rate since
@@ -125,9 +125,9 @@ public class Manual {
     } else {
       JOYSTICK_VALUES
           .setValues(
-              Controllers.TROY.getLeftY(),
-              Controllers.TROY.getLeftX(),
-              Controllers.TROY.getRightX())
+              Controllers.DRIVER.getLeftY(),
+              Controllers.DRIVER.getLeftX(),
+              Controllers.DRIVER.getRightX())
           .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
           .scale(
               -MAX_SPEED, // Negative max speed and angular rate since
@@ -138,15 +138,15 @@ public class Manual {
 
   public void periodic() {
 
-    Logger.recordOutput("Drive/Manual/Joystick/X", Controllers.TROY.getLeftY());
-    Logger.recordOutput("Drive/Manual/Joystick/Y", Controllers.TROY.getLeftX());
-    Logger.recordOutput("Drive/Manual/Joystick/Rot", Controllers.TROY.getRightX());
+    Logger.recordOutput("Drive/Manual/Joystick/X", Controllers.DRIVER.getLeftY());
+    Logger.recordOutput("Drive/Manual/Joystick/Y", Controllers.DRIVER.getLeftX());
+    Logger.recordOutput("Drive/Manual/Joystick/Rot", Controllers.DRIVER.getRightX());
 
     SwerveRequest curRequest = null;
     boolean wantsDrive =
-        Math.abs(Controllers.TROY.getLeftY()) > TRANSLATION_DEADBAND
-            || Math.abs(Controllers.TROY.getLeftX()) > TRANSLATION_DEADBAND
-            || Math.abs(Controllers.TROY.getRightX()) > ROTATION_DEADBAND;
+        Math.abs(Controllers.DRIVER.getLeftY()) > TRANSLATION_DEADBAND
+            || Math.abs(Controllers.DRIVER.getLeftX()) > TRANSLATION_DEADBAND
+            || Math.abs(Controllers.DRIVER.getRightX()) > ROTATION_DEADBAND;
 
     if (Controllers.SHUTTLE_EDGE.falling()) {
       X_LIMITER.reset(SHUTTLING_X_LIMITER.lastValue());
