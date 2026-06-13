@@ -17,10 +17,9 @@ public class Drive {
   private final AutoAlign autoAlign;
   private final SwerveRequest.SwerveDriveBrake freezeRequest = new SwerveRequest.SwerveDriveBrake();
 
-  private static final double ROTATION_DEADBAND = 0.2;
-
   public enum Mode {
     NONE,
+    BRAKE,
     MANUAL,
     THETA_LOCK,
     AUTO_ALIGN;
@@ -40,9 +39,6 @@ public class Drive {
 
   public void setDriveMode(Mode targetMode) {
     mode = targetMode;
-    if (mode == Mode.NONE) {
-      drivetrain.setRequest(freezeRequest);
-    }
   }
 
   public void periodic() {
@@ -53,10 +49,11 @@ public class Drive {
     autoAlign.setGoal(AutoAlign.Goal.NONE);
 
     switch (mode) {
+      case BRAKE -> drivetrain.setRequest(freezeRequest);
       case MANUAL -> manual.setGoal(Manual.Goal.ACTIVE);
       case AUTO_ALIGN -> autoAlign.setGoal(AutoAlign.Goal.ALIGN);
       case THETA_LOCK -> thetaLock.setGoal(ThetaLock.Goal.ACTIVE);
-      default -> {}
+      case NONE -> {}
     }
 
     manual.periodic();
@@ -66,8 +63,10 @@ public class Drive {
 
   private void updateMode() {
     if (DriverStation.isDisabled()) {
+      setDriveMode(Mode.BRAKE);
+    } else if (DriverStation.isAutonomous()) {
       setDriveMode(Mode.NONE);
-    } else if (DriverStation.isTeleop() && mode == Mode.NONE) {
+    } else if (DriverStation.isTeleop() && (mode == Mode.NONE || mode == Mode.BRAKE)) {
       setDriveMode(Mode.MANUAL);
     }
   }
