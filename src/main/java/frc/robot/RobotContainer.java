@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.BLine.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.Superstructure;
 
@@ -30,10 +31,10 @@ public class RobotContainer {
 
     if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
 
-    FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
-    FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
-    FollowPath.registerEventTrigger("neutral", superstructure.neutral());
-    FollowPath.registerEventTrigger("intakeDown", superstructure.intakePivotDownAuto());
+    FollowPath.registerEventTrigger("shoot", () -> superstructure.requestAutoShoot(true));
+    FollowPath.registerEventTrigger("shootNoJuice", () -> superstructure.requestAutoShoot(false));
+    FollowPath.registerEventTrigger("neutral", superstructure::autoNeutral);
+    FollowPath.registerEventTrigger("intakeDown", superstructure::autoIntakePivotDown);
   }
 
   private void configureDrivetrain() {
@@ -43,6 +44,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
+    Controllers.periodic();
     superstructure.periodic();
     drivetrainController.periodic();
     drivetrain.periodic();

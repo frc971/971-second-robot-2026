@@ -7,8 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.BLine.*;
 import frc.robot.subsystems.Autos;
 import frc.robot.subsystems.Controllers;
@@ -23,8 +21,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
-  private Command autonomousCommand;
-
   private final RobotContainer robotContainer;
 
   private final BOS bos;
@@ -92,8 +88,6 @@ public class Robot extends LoggedRobot {
     if (Controllers.DISABLE_OTF.getAsBoolean()) {
       robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
     }
-
-    CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -123,25 +117,24 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    autonomousCommand = autos.getAutonomousCommand();
-    if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
-      CommandScheduler.getInstance().schedule(autonomousCommand);
-    }
+    robotContainer.superstructure.autoNeutral();
+    autos.startAutonomous();
     HubShiftUtil.initialize();
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    autos.periodic();
+  }
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+    autos.endAutonomous();
+  }
 
   @Override
   public void teleopInit() {
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
-    }
+    autos.endAutonomous();
     HubShiftUtil.initialize();
   }
 
@@ -153,7 +146,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
+    autos.endAutonomous();
   }
 
   @Override

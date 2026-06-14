@@ -5,8 +5,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import java.util.Collections;
@@ -54,6 +52,8 @@ public class Autos {
   private List<Path> cachedPathSegments = Collections.<Path>emptyList();
   private Pose2d cachedAutonomousStartPose = null;
   private boolean selectedAutoIsCached = false;
+  private List<FollowPath> runningPathSegments = Collections.<FollowPath>emptyList();
+  private int runningPathIndex = -1;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -97,9 +97,49 @@ public class Autos {
     }
   }
 
-  public Command getAutonomousCommand() {
+  public void startAutonomous() {
     updateSelectedAutoCache();
-    return buildCommandFromCachedSegments();
+    runningPathSegments = buildPathFollowersFromCachedSegments();
+    runningPathIndex = runningPathSegments.isEmpty() ? -1 : 0;
+
+    if (runningPathIndex >= 0) {
+      runningPathSegments.get(runningPathIndex).initialize();
+    } else {
+      idleDrivetrain();
+    }
+  }
+
+  public void periodic() {
+    if (runningPathIndex < 0 || runningPathIndex >= runningPathSegments.size()) {
+      return;
+    }
+
+    FollowPath currentPath = runningPathSegments.get(runningPathIndex);
+    currentPath.execute();
+
+    if (!currentPath.isFinished()) {
+      return;
+    }
+
+    currentPath.end(false);
+    runningPathIndex++;
+
+    if (runningPathIndex < runningPathSegments.size()) {
+      runningPathSegments.get(runningPathIndex).initialize();
+    } else {
+      runningPathIndex = -1;
+      idleDrivetrain();
+    }
+  }
+
+  public void endAutonomous() {
+    if (runningPathIndex >= 0 && runningPathIndex < runningPathSegments.size()) {
+      runningPathSegments.get(runningPathIndex).end(true);
+    }
+
+    runningPathIndex = -1;
+    runningPathSegments = Collections.<FollowPath>emptyList();
+    idleDrivetrain();
   }
 
   public Pose2d getAutonomousStartPose() {
@@ -151,21 +191,19 @@ public class Autos {
     selectedAutoIsCached = true;
   }
 
-  private Command buildCommandFromCachedSegments() {
-    if (cachedPathSegments.isEmpty()) {
-      return Commands.none();
-    }
+  private List<FollowPath> buildPathFollowersFromCachedSegments() {
+    return IntStream.range(0, cachedPathSegments.size())
+        .mapToObj(
+            i -> {
+              FollowPath.Builder builder =
+                  i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
+              return builder.build(cachedPathSegments.get(i));
+            })
+        .toList();
+  }
 
-    return Commands.sequence(
-            IntStream.range(0, cachedPathSegments.size())
-                .mapToObj(
-                    i -> {
-                      FollowPath.Builder builder =
-                          i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                      return builder.build(cachedPathSegments.get(i));
-                    })
-                .toArray(Command[]::new))
-        .finallyDo(() -> drivetrain.setRequest(autoIdleRequest));
+  private void idleDrivetrain() {
+    drivetrain.setRequest(autoIdleRequest);
   }
 
   // IMPORTANT: all autos must be defined here

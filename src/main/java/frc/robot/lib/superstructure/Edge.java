@@ -1,14 +1,12 @@
 package frc.robot.lib.superstructure;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.BooleanSupplier;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
-public class Edge extends SubsystemBase implements BooleanSupplier {
-  private Trigger button;
+public class Edge implements BooleanSupplier {
+  private BooleanSupplier button;
   private boolean prevButton = false;
 
   @Accessors(fluent = true)
@@ -19,11 +17,10 @@ public class Edge extends SubsystemBase implements BooleanSupplier {
   @Getter
   private boolean falling = false;
 
-  public Edge(Trigger button) {
+  public Edge(BooleanSupplier button) {
     this.button = button;
   }
 
-  @Override
   public void periodic() {
     boolean cur = button.getAsBoolean();
     if (DriverStation.isTeleop()) {
