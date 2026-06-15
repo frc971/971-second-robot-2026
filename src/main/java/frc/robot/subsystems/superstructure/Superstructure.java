@@ -173,17 +173,7 @@ public class Superstructure {
         }
       }
 
-      if (Controllers.INTAKE_PIVOT.toggled()) {
-        setGoal(SetpointGoal.INTAKE_PIVOT);
-
-        if (Controllers.JUICE.getAsBoolean()) {
-          int t = (int) (juiceTimer.get() * 100);
-
-          if (t % 100 < 50) {
-            setGoal(SetpointGoal.INTAKE_PIVOT_JUICE);
-          }
-        }
-      }
+      updateIntakePivotGoal();
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE_ROLLERS);
@@ -295,6 +285,22 @@ public class Superstructure {
   }
 
   // MARK: Helper functions
+
+  private void updateIntakePivotGoal() {
+    if (Controllers.INTAKE_PIVOT.toggled()) {
+      SetpointGoal intakePivotGoal = SetpointGoal.INTAKE_PIVOT_JUICE;
+
+      if (Controllers.JUICE.getAsBoolean()) {
+        int t = (int) (juiceTimer.get() * 100);
+
+        if (t % 100 >= 50) {
+          intakePivotGoal = SetpointGoal.INTAKE_PIVOT;
+        }
+      }
+
+      setGoal(intakePivotGoal);
+    }
+  }
 
   public void setGoal(Setpoint setpoint) {
     if (setpoint.getRollerFloor().isPresent()) {
