@@ -5,8 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
@@ -49,11 +47,18 @@ public class Superstructure {
 
   private final Timer juiceTimer = new Timer();
   private boolean juiceAuto = false;
+  private AutoShootRequest pendingAutoShoot = AutoShootRequest.NONE;
 
   private enum ShooterGoal {
     NONE,
     MANUAL,
     TARGETING
+  }
+
+  private enum AutoShootRequest {
+    NONE,
+    WITH_JUICE,
+    WITHOUT_JUICE
   }
 
   public Superstructure(RobotContainer robotContainer) {
@@ -237,6 +242,11 @@ public class Superstructure {
         juiceTimer.restart();
       }
 
+      if (pendingAutoShoot != AutoShootRequest.NONE && !drivetrain.isRobotOnBump()) {
+        activateAutoShoot(pendingAutoShoot == AutoShootRequest.WITH_JUICE);
+        pendingAutoShoot = AutoShootRequest.NONE;
+      }
+
       if (juiceAuto) {
         int t = (int) (juiceTimer.get() * 100);
 
@@ -351,106 +361,42 @@ public class Superstructure {
     groundPivot.resetPosition(SetpointGoal.RESET.getSetpoint().getGroundPivot().get());
   }
 
-  // MARK: AUTO Commands
+  // MARK: AUTO Actions
 
-  public Command neutral() {
-    return Commands.runOnce(
-        () -> {
-          juiceAuto = false;
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-          setGoal(SetpointGoal.AUTO_NEUTRAL);
-        });
+  public void autoNeutral() {
+    pendingAutoShoot = AutoShootRequest.NONE;
+    juiceAuto = false;
+    shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+    shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+    setGoal(SetpointGoal.AUTO_NEUTRAL);
   }
 
-  public Command intakePivotDownAuto() {
-    return Commands.runOnce(
-        () -> {
-          juiceAuto = false;
-          setGoal(SetpointGoal.INTAKE_PIVOT);
-        });
+  public void autoIntakePivotDown() {
+    pendingAutoShoot = AutoShootRequest.NONE;
+    juiceAuto = false;
+    setGoal(SetpointGoal.INTAKE_PIVOT);
   }
 
-  public Command reverseShooters() {
-    return Commands.run(
-            () -> {
-              setGoal(SetpointGoal.REVERSE_SHOOTERS);
-            })
-        .withTimeout(1)
-        .andThen(
-            () -> {
-              setGoal(SetpointGoal.AUTO_NEUTRAL);
-            })
-        .withTimeout(1);
+  public void requestAutoShoot(boolean useJuice) {
+    if (drivetrain.isRobotOnBump()) {
+      pendingAutoShoot = useJuice ? AutoShootRequest.WITH_JUICE : AutoShootRequest.WITHOUT_JUICE;
+      return;
+    }
+
+    activateAutoShoot(useJuice);
   }
 
-  public Command shootAuto() {
-    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  ObjectState curTarget =
-                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                          ? ShooterHandler.Targets.BLUE
-                          : ShooterHandler.Targets.RED;
-                  shooterHandlerLeft.setTargetState(curTarget);
-                  shooterHandlerRight.setTargetState(curTarget);
+  private void activateAutoShoot(boolean useJuice) {
+    ObjectState curTarget =
+        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+            ? ShooterHandler.Targets.BLUE
+            : ShooterHandler.Targets.RED;
+    shooterHandlerLeft.setTargetState(curTarget);
+    shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+    shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+    shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
 
-                  juiceAuto = true;
-                }));
-  }
-
-  public Command shootAutoNoJuice() {
-    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  ObjectState curTarget =
-                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                          ? ShooterHandler.Targets.BLUE
-                          : ShooterHandler.Targets.RED;
-                  shooterHandlerLeft.setTargetState(curTarget);
-                  shooterHandlerRight.setTargetState(curTarget);
-
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-
-                  juiceAuto = false;
-                }));
-  }
-
-  public Command shootSequenceAuto() {
-    return Commands.run(
-        () -> {
-          groundPivot.setVoltage(Volts.of(2.0));
-          ObjectState curTarget =
-              DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                  ? ShooterHandler.Targets.BLUE
-                  : ShooterHandler.Targets.RED;
-          shooterHandlerLeft.setTargetState(curTarget);
-          shooterHandlerRight.setTargetState(curTarget);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-        });
-  }
-
-  public Command shootOnceAuto() {
-    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  ObjectState curTarget =
-                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                          ? ShooterHandler.Targets.BLUE
-                          : ShooterHandler.Targets.RED;
-                  shooterHandlerLeft.setTargetState(curTarget);
-                  shooterHandlerRight.setTargetState(curTarget);
-
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                }));
+    juiceAuto = useJuice;
   }
 }

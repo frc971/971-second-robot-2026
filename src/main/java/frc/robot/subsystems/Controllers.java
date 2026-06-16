@@ -59,4 +59,16 @@ public class Controllers {
   public static final Trigger MANUAL_SHUTTLE_DOWN = MANIPULATOR.axisGreaterThan(5, 0.85);
   public static final Trigger MANUAL_SHUTTLE_LEFT = MANIPULATOR.axisLessThan(4, -0.85);
   public static final Trigger MANUAL_SHUTTLE_RIGHT = MANIPULATOR.axisGreaterThan(4, 0.85);
+
+  public static void periodic() {
+    INTAKE_PIVOT.periodic();
+    INTAKE_PIVOT_EDGE.periodic();
+    SHOOT_EDGE.periodic();
+    SHUTTLE_EDGE.periodic();
+    MANUAL.periodic();
+    FLYWHEEL_UP.periodic();
+    FLYWHEEL_DOWN.periodic();
+    TURRET_LEFT.periodic();
+    TURRET_RIGHT.periodic();
+  }
 }
