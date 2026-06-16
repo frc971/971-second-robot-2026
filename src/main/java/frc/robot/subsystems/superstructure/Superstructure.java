@@ -288,13 +288,13 @@ public class Superstructure {
 
   private void updateIntakePivotGoal() {
     if (Controllers.INTAKE_PIVOT.toggled()) {
-      SetpointGoal intakePivotGoal = SetpointGoal.INTAKE_PIVOT;
+      SetpointGoal intakePivotGoal = SetpointGoal.INTAKE_PIVOT_JUICE;
 
       if (Controllers.JUICE.getAsBoolean()) {
         int t = (int) (juiceTimer.get() * 100);
 
         if (t % 100 >= 50) {
-          intakePivotGoal = SetpointGoal.INTAKE_PIVOT_JUICE;
+          intakePivotGoal = SetpointGoal.INTAKE_PIVOT;
         }
       }
 
