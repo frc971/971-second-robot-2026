@@ -8,12 +8,19 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.Constants;
 import frc.robot.lib.superstructure.*;
 
 // TODO: change the constants!!
 public class FlywheelLeft extends AngularSubsystem {
+  private static final AngularVelocity STARTUP_DEADBAND = RotationsPerSecond.of(0.5);
+  private static final double MAX_PROFILED_ACCELERATION_RPS_PER_SEC = 240.0;
+  private static final double MAX_PROFILED_VELOCITY_RPS = 120.0;
+
+  private AngularVelocity profiledVelocity = RotationsPerSecond.zero();
 
   public FlywheelLeft() {
     super(getIO());
@@ -45,8 +52,19 @@ public class FlywheelLeft extends AngularSubsystem {
 
     tc.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
-    tc.MotionMagic.MotionMagicCruiseVelocity = 0.0; // TODO: make this reasonable
-    tc.MotionMagic.MotionMagicAcceleration = 0.0;
+    tc.Slot1.kS = 0.21;
+    tc.Slot1.kV = 0.125;
+    tc.Slot1.kA = 0.0;
+    tc.Slot1.kG = 0.0;
+
+    tc.Slot1.kP = 0.55;
+    tc.Slot1.kI = 0.0;
+    tc.Slot1.kD = 0.0;
+
+    tc.Slot1.GravityType = GravityTypeValue.Elevator_Static;
+
+    tc.MotionMagic.MotionMagicCruiseVelocity = MAX_PROFILED_VELOCITY_RPS;
+    tc.MotionMagic.MotionMagicAcceleration = MAX_PROFILED_ACCELERATION_RPS_PER_SEC;
     tc.MotionMagic.MotionMagicJerk = 0.0;
 
     tc.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -77,11 +95,34 @@ public class FlywheelLeft extends AngularSubsystem {
 
   @Override
   public void setVelocity(AngularVelocity goalVelocity) {
-    if (goalVelocity.equals(RotationsPerSecond.zero())) {
+    if (goalVelocity.in(RotationsPerSecond) == 0.0) {
+      profiledVelocity = RotationsPerSecond.zero();
       setCoast();
       this.goalVelocity = RotationsPerSecond.zero();
-    } else {
-      super.setVelocity(goalVelocity);
+      return;
     }
+
+    double startingVelocity = profiledVelocity.in(RotationsPerSecond);
+    if (startingVelocity == 0.0
+        && !getVelocity().isNear(RotationsPerSecond.zero(), STARTUP_DEADBAND)) {
+      startingVelocity = getVelocity().in(RotationsPerSecond);
+    }
+
+    double maxDelta = MAX_PROFILED_ACCELERATION_RPS_PER_SEC * Constants.UPDATE_PERIOD.in(Seconds);
+    double nextProfiledVelocity =
+        MathUtil.clamp(
+            goalVelocity.in(RotationsPerSecond),
+            startingVelocity - maxDelta,
+            startingVelocity + maxDelta);
+    profiledVelocity = RotationsPerSecond.of(nextProfiledVelocity);
+
+    if (getVelocity().isNear(RotationsPerSecond.zero(), STARTUP_DEADBAND)
+        || profiledVelocity.isNear(RotationsPerSecond.zero(), STARTUP_DEADBAND)) {
+      setSlot(1);
+    } else {
+      setSlot(0);
+    }
+
+    super.setVelocity(profiledVelocity);
   }
 }
