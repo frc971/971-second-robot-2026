@@ -11,7 +11,17 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.BLine.*;
 import frc.robot.lib.JoystickValues;
@@ -20,202 +30,148 @@ import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.Superstructure;
 
 public class RobotContainer {
-  public final Superstructure superstructure;
+    public final Superstructure superstructure;
 
-  private static final double MAX_SPEED = 3.5;
-  private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
+    private static final double MAX_SPEED = 3.5;
+    private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
 
-  private static final double TRANSLATION_DEADBAND = 0.05;
-  private static final double ROTATION_DEADBAND = 0.1;
+    private static final double TRANSLATION_DEADBAND = 0.05;
+    private static final double ROTATION_DEADBAND = 0.1;
 
-  private static final double SHOOTING_SPEED = 0.3 * MAX_SPEED;
-  private static final double SHOOTING_ANGULAR_RATE = 0.3 * MAX_ANGULAR_RATE;
-  private static final double SHUTTLING_SPEED = 0.5 * MAX_SPEED;
-  private static final double SHUTTLING_ANGULAR_RATE = 0.5 * MAX_ANGULAR_RATE;
+    private static final double SHOOTING_SPEED = 0.3 * MAX_SPEED;
+    private static final double SHOOTING_ANGULAR_RATE = 0.3 * MAX_ANGULAR_RATE;
+    private static final double SHUTTLING_SPEED = 0.5 * MAX_SPEED;
+    private static final double SHUTTLING_ANGULAR_RATE = 0.5 * MAX_ANGULAR_RATE;
 
-  /* Setting up bindings for necessary control of the swerve drive platform */
-  private final SwerveRequest.FieldCentric shootingDrive =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(SHOOTING_SPEED * TRANSLATION_DEADBAND)
-          .withRotationalDeadband(SHOOTING_ANGULAR_RATE * ROTATION_DEADBAND)
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    /* Setting up bindings for necessary control of the swerve drive platform */
+    private final SwerveRequest.FieldCentric shootingDrive = new SwerveRequest.FieldCentric()
+            .withDeadband(SHOOTING_SPEED * TRANSLATION_DEADBAND)
+            .withRotationalDeadband(SHOOTING_ANGULAR_RATE * ROTATION_DEADBAND)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-  private final SwerveRequest.FieldCentric shuttlingDrive =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(SHUTTLING_SPEED * TRANSLATION_DEADBAND)
-          .withRotationalDeadband(SHUTTLING_ANGULAR_RATE * ROTATION_DEADBAND)
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    private final SwerveRequest.FieldCentric shuttlingDrive = new SwerveRequest.FieldCentric()
+            .withDeadband(SHUTTLING_SPEED * TRANSLATION_DEADBAND)
+            .withRotationalDeadband(SHUTTLING_ANGULAR_RATE * ROTATION_DEADBAND)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-  private final SwerveRequest.FieldCentric drive =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
-          .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
+            .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
-  // Slew rate limit for translation (m/s^2)
-  private static final double SHOOTING_SLEW_TRANSLATE_LIMIT = 10.0;
-  // Slew rate limit for rotation (rad/s^2)
-  private static final double SHOOTING_SLEW_ROTATION_LIMIT = 100.0;
-  // Slew rate limit for translation (m/s^2)
-  private static final double SHUTTLING_SLEW_TRANSLATE_LIMIT = 20.0;
-  // Slew rate limit for rotation (rad/s^2)
-  private static final double SHUTTLING_SLEW_ROTATION_LIMIT = 100.0;
+    // Slew rate limit for translation (m/s^2)
+    private static final double SHOOTING_SLEW_TRANSLATE_LIMIT = 10.0;
+    // Slew rate limit for rotation (rad/s^2)
+    private static final double SHOOTING_SLEW_ROTATION_LIMIT = 100.0;
+    // Slew rate limit for translation (m/s^2)
+    private static final double SHUTTLING_SLEW_TRANSLATE_LIMIT = 20.0;
+    // Slew rate limit for rotation (rad/s^2)
+    private static final double SHUTTLING_SLEW_ROTATION_LIMIT = 100.0;
 
-  private static final double SLEW_TRANSLATE_LIMIT = 1000.0;
-  // Slew rate limit for rotation (rad/s^2)
-  private static final double SLEW_ROTATION_LIMIT = 1000.0;
+    private static final double SLEW_TRANSLATE_LIMIT = 1000.0;
+    // Slew rate limit for rotation (rad/s^2)
+    private static final double SLEW_ROTATION_LIMIT = 1000.0;
 
-  // Exponential curve for translation joystick
-  private static final double TRANSLATION_EXP_CURVE = 2;
-  // Exponential curve for rotation joystick
-  private static final double ROTATION_EXP_CURVE = 2;
+    // Exponential curve for translation joystick
+    private static final double TRANSLATION_EXP_CURVE = 2;
+    // Exponential curve for rotation joystick
+    private static final double ROTATION_EXP_CURVE = 2;
 
-  // Rate limiters for smooth control
-  private static final SlewRateLimiter X_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter Y_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter ROT_LIMITER = new SlewRateLimiter(SLEW_ROTATION_LIMIT);
+    // Rate limiters for smooth control
+    private static final SlewRateLimiter X_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
+    private static final SlewRateLimiter Y_LIMITER = new SlewRateLimiter(SLEW_TRANSLATE_LIMIT);
+    private static final SlewRateLimiter ROT_LIMITER = new SlewRateLimiter(SLEW_ROTATION_LIMIT);
 
-  private static final SlewRateLimiter SHOOTING_X_LIMITER =
-      new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SHOOTING_Y_LIMITER =
-      new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SHOOTING_ROT_LIMITER =
-      new SlewRateLimiter(SHOOTING_SLEW_ROTATION_LIMIT);
-  private static final SlewRateLimiter SHUTTLING_X_LIMITER =
-      new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SHUTTLING_Y_LIMITER =
-      new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
-  private static final SlewRateLimiter SHUTTLING_ROT_LIMITER =
-      new SlewRateLimiter(SHUTTLING_SLEW_ROTATION_LIMIT);
+    private static final SlewRateLimiter SHOOTING_X_LIMITER = new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
+    private static final SlewRateLimiter SHOOTING_Y_LIMITER = new SlewRateLimiter(SHOOTING_SLEW_TRANSLATE_LIMIT);
+    private static final SlewRateLimiter SHOOTING_ROT_LIMITER = new SlewRateLimiter(SHOOTING_SLEW_ROTATION_LIMIT);
+    private static final SlewRateLimiter SHUTTLING_X_LIMITER = new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
+    private static final SlewRateLimiter SHUTTLING_Y_LIMITER = new SlewRateLimiter(SHUTTLING_SLEW_TRANSLATE_LIMIT);
+    private static final SlewRateLimiter SHUTTLING_ROT_LIMITER = new SlewRateLimiter(SHUTTLING_SLEW_ROTATION_LIMIT);
 
-  private static final JoystickValues JOYSTICK_VALUES = new JoystickValues();
+    private static final JoystickValues JOYSTICK_VALUES = new JoystickValues();
 
-  private final Telemetry logger = new Telemetry(MAX_SPEED);
-  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final Telemetry logger = new Telemetry(MAX_SPEED);
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  public RobotContainer() {
-    superstructure = new Superstructure(this);
+    private final SendableChooser<Command> autoChooser;
 
-    configureDrivetrain();
+    // test stuff for pathing
+    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    private final DoubleSubscriber vxSub = inst.getDoubleTopic("/pathing/vx").subscribe(0.0);
+    private final DoubleSubscriber vySub = inst.getDoubleTopic("/pathing/vy").subscribe(0.0);
+    private final BooleanSubscriber pathingEnabled = inst.getBooleanTopic("/pathing/enabled").subscribe(false);
+    private final BooleanPublisher pathingEnabledPub = inst.getBooleanTopic("/pathing/enabled").publish();
+    private final StructPublisher<Pose2d> targetPub = inst.getStructTopic("/pathing/target", Pose2d.struct).publish();
 
-    DriverStation.silenceJoystickConnectionWarning(true);
+    public RobotContainer() {
+        superstructure = new Superstructure(this);
 
-    drivetrain.registerTelemetry(logger::telemeterize);
+        configureDrivetrain();
 
-    if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
+        targetPub.set(new Pose2d(8.0, 4.0, Rotation2d.kZero));
 
-    FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
-    FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
-    FollowPath.registerEventTrigger("neutral", superstructure.neutral());
-    FollowPath.registerEventTrigger("intakeDown", superstructure.intakePivotDownAuto());
-  }
+        DriverStation.silenceJoystickConnectionWarning(true);
 
-  private void configureDrivetrain() {
-    // Note that X is defined as forward according to WPILib convention,
-    // and Y is defined as to the left according to WPILib convention.
-    drivetrain.setDefaultCommand(
-        drivetrain.applyRequest(
-            () -> {
-              boolean wantsDrive =
-                  Math.abs(Controllers.DRIVER.getLeftY()) > TRANSLATION_DEADBAND
-                      || Math.abs(Controllers.DRIVER.getLeftX()) > TRANSLATION_DEADBAND
-                      || Math.abs(Controllers.DRIVER.getRightX()) > ROTATION_DEADBAND;
+        drivetrain.registerTelemetry(logger::telemeterize);
 
-              if (Controllers.SHOOTING.getAsBoolean() && !wantsDrive) {
-                return brake;
-              }
+        if (Robot.isSimulation())
+            drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
 
-              if (Controllers.SHUTTLE_EDGE.falling()) {
-                X_LIMITER.reset(SHUTTLING_X_LIMITER.lastValue());
-                Y_LIMITER.reset(SHUTTLING_Y_LIMITER.lastValue());
-                ROT_LIMITER.reset(SHUTTLING_ROT_LIMITER.lastValue());
-              }
+        FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
+        FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
+        FollowPath.registerEventTrigger("neutral", superstructure.neutral());
+        FollowPath.registerEventTrigger("intakeDown", superstructure.intakePivotDownAuto());
+    }
 
-              if (Controllers.SHOOT_EDGE.falling()) {
-                X_LIMITER.reset(SHOOTING_X_LIMITER.lastValue());
-                Y_LIMITER.reset(SHOOTING_Y_LIMITER.lastValue());
-                ROT_LIMITER.reset(SHOOTING_ROT_LIMITER.lastValue());
-              }
+    private void configureDrivetrain() {
+        // Note that X is defined as forward according to WPILib convention,
+        // and Y is defined as to the left according to WPILib convention.
+        drivetrain.setDefaultCommand(
+                drivetrain.applyRequest(
+                        () -> {
+                            JOYSTICK_VALUES
+                                    .setValues(
+                                            Controllers.TROY.getLeftY(),
+                                            Controllers.TROY.getLeftX(),
+                                            Controllers.TROY.getRightX())
+                                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
+                                    .scale(
+                                            -MAX_SPEED, // Negative max speed and angular rate since
+                                            -MAX_ANGULAR_RATE) // controller inputs are reversed
+                                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
+                            if (pathingEnabled.get()) {
+                                return drive
+                                        .withVelocityX(vxSub.get())
+                                        .withVelocityY(vySub.get())
+                                        .withRotationalRate(0);
+                            } else {
+                                return drive
+                                        .withVelocityX(JOYSTICK_VALUES.getX())
+                                        .withVelocityY(JOYSTICK_VALUES.getY())
+                                        .withRotationalRate(JOYSTICK_VALUES.getRot());
+                            }
+                        }));
 
-              if (Controllers.SHUTTLE_EDGE.rising()) {
-                SHUTTLING_X_LIMITER.reset(X_LIMITER.lastValue());
-                SHUTTLING_Y_LIMITER.reset(Y_LIMITER.lastValue());
-                SHUTTLING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
-              }
+        Controllers.TROY
+                .a()
+                .onTrue(Commands.runOnce(() -> pathingEnabledPub.set(true)))
+                .onFalse(Commands.runOnce(() -> pathingEnabledPub.set(false)));
 
-              if (Controllers.SHOOT_EDGE.rising()) {
-                SHOOTING_X_LIMITER.reset(X_LIMITER.lastValue());
-                SHOOTING_Y_LIMITER.reset(Y_LIMITER.lastValue());
-                SHOOTING_ROT_LIMITER.reset(ROT_LIMITER.lastValue());
-              }
+        drivetrain.registerTelemetry(logger::telemeterize);
+    }
 
-              if (Controllers.SHUTTLING.getAsBoolean()) {
-                JOYSTICK_VALUES
-                    .setValues(
-                        Controllers.DRIVER.getLeftY(),
-                        Controllers.DRIVER.getLeftX(),
-                        Controllers.DRIVER.getRightX())
-                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                    .scale(
-                        -SHUTTLING_SPEED, // Negative max speed and angular rate since
-                        -SHUTTLING_ANGULAR_RATE) // controller inputs are reversed
-                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
-                    .slewRateLimit(SHUTTLING_X_LIMITER, SHUTTLING_Y_LIMITER, SHUTTLING_ROT_LIMITER);
+    public void periodic() {
+        superstructure.periodic();
+    }
 
-                return shuttlingDrive
-                    .withVelocityX(JOYSTICK_VALUES.getX())
-                    .withVelocityY(JOYSTICK_VALUES.getY())
-                    .withRotationalRate(JOYSTICK_VALUES.getRot());
+    public void resetSuperstructure() {
+        superstructure.resetPositions();
+    }
 
-              } else if (Controllers.SHOOTING.getAsBoolean()) {
-                JOYSTICK_VALUES
-                    .setValues(
-                        Controllers.DRIVER.getLeftY(),
-                        Controllers.DRIVER.getLeftX(),
-                        Controllers.DRIVER.getRightX())
-                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                    .scale(
-                        -SHOOTING_SPEED, // Negative max speed and angular rate since
-                        -SHOOTING_ANGULAR_RATE) // controller inputs are reversed
-                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER)
-                    .slewRateLimit(SHOOTING_X_LIMITER, SHOOTING_Y_LIMITER, SHOOTING_ROT_LIMITER);
-                return shootingDrive
-                    .withVelocityX(JOYSTICK_VALUES.getX())
-                    .withVelocityY(JOYSTICK_VALUES.getY())
-                    .withRotationalRate(JOYSTICK_VALUES.getRot());
-
-              } else {
-                JOYSTICK_VALUES
-                    .setValues(
-                        Controllers.DRIVER.getLeftY(),
-                        Controllers.DRIVER.getLeftX(),
-                        Controllers.DRIVER.getRightX())
-                    .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
-                    .scale(
-                        -MAX_SPEED, // Negative max speed and angular rate since
-                        -MAX_ANGULAR_RATE) // controller inputs are reversed
-                    .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
-
-                return drive
-                    .withVelocityX(JOYSTICK_VALUES.getX())
-                    .withVelocityY(JOYSTICK_VALUES.getY())
-                    .withRotationalRate(JOYSTICK_VALUES.getRot());
-              }
-            }));
-    drivetrain.registerTelemetry(logger::telemeterize);
-  }
-
-  public void periodic() {
-    superstructure.periodic();
-  }
-
-  public void resetSuperstructure() {
-    superstructure.resetPositions();
-  }
-
-  public Telemetry getTelemetry() {
-    return logger;
-  }
+    public Telemetry getTelemetry() {
+        return logger;
+    }
 }
