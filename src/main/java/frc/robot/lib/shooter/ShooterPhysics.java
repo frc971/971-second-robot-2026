@@ -73,9 +73,6 @@ public class ShooterPhysics {
     Angle hoodAngle = Radians.of(Math.atan2(vBall.getZ(), Math.hypot(vBall.getX(), vBall.getY())));
     AngularVelocity flywheelSpeed =
         physicsConfig.EXIT_SPEED_TABLE().calcAngularVel(MetersPerSecond.of(vBall.getNorm()));
-    
-    System.out.println("hood angle from targetAngleSolve: " + hoodAngle);
-    System.out.println("flywheel speed from targetAngleSolve: " + flywheelSpeed);
 
     return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
   }

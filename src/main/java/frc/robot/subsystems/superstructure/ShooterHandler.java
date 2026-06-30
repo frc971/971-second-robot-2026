@@ -162,6 +162,7 @@ public class ShooterHandler {
   }
 
   public void periodic() {
+    System.out.println("Shooter state: " + shooterState);
     projectileState = getProjectileState();
 
     // clear robot velocity if not using OTF

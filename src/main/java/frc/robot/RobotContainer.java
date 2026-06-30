@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.BLine.*;
+import frc.robot.lib.shooter.LaunchSolution;
 import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.JoystickValues;
 import frc.robot.lib.simulation.*;
@@ -346,17 +347,20 @@ public class RobotContainer {
       //Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
       //Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
 
-      Optional<Angle> hoodAngle = superstructure.shooterHandlerLeft.getHoodAngle();
-      Optional<AngularVelocity> flywheelSpeed =
-         superstructure.shooterHandlerLeft.getFlywheelSpeed();
-      if (hoodAngle.isPresent() && flywheelSpeed.isPresent()) {
-        double flywheelSpeedAsDouble = flywheelSpeed.get().magnitude();
-        double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
-        System.out.println("Hood angle: " + hoodAngle.get());
-        System.out.println(
-            "Flywheel RPM: " + flywheelSpeedAsDouble + "\n Ball Exit Velocity: " + exitVelocity);
-        launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle.get());
-      }
+      System.out.println("SHOOTING");
+
+      LaunchSolution launchSolution = superstructure.shooterHandlerLeft.getLaunchSolution();
+
+      Angle hoodAngle = launchSolution.hoodAngle();
+      AngularVelocity flywheelSpeed = launchSolution.flywheelSpeed();
+
+      double flywheelSpeedAsDouble = flywheelSpeed.in(RPM);
+      double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
+      System.out.println("Hood angle: " + hoodAngle);
+      System.out.println(
+          "Flywheel RPM: " + flywheelSpeedAsDouble + "\n Ball Exit Velocity: " + exitVelocity);
+      launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle);
+      
     }
   }
 
