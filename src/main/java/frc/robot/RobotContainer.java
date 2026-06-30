@@ -112,7 +112,7 @@ public class RobotContainer {
   private static ProjectileSimulator projectileSimulator =
       new ProjectileSimulator(
           new ProjectileSimulator.SimParameters(
-              0.215, 0.1501, 0.47, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.6, 45.0, 0.004, 1500, 6000, 25,
+              0.215, 0.1501, 0.47, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.3, 45.0, 0.004, 1500, 6000, 25,
               5.0f));
 
   public RobotContainer() {
@@ -315,7 +315,7 @@ public class RobotContainer {
 
   private void launchFuelInSim(LinearVelocity velocity, Angle elevation) {
     Pose2d pose = drivetrain.getState().Pose;
-    
+
     Translation3d leftMuzzlePose =
         superstructure.shooterHandlerLeft
         .getProjectileState()
@@ -330,14 +330,14 @@ public class RobotContainer {
             velocity, elevation, launchYaw);
     FuelSim.getInstance().spawnFuel(leftMuzzlePose, launchVelocity);
 
-    Translation3d rightMuzzlePose =
-        superstructure.shooterHandlerRight
-        .getProjectileState()
-        .position();
-    launchVelocity =
-        createLaunchVelocity(
-            velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
-    FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
+    // Translation3d rightMuzzlePose =
+    //     superstructure.shooterHandlerRight
+    //     .getProjectileState()
+    //     .position();
+    // launchVelocity =
+    //     createLaunchVelocity(
+    //         velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
+    // FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
 
     Logger.recordOutput("FuelSim/LastEvent", "Launch");
   }
