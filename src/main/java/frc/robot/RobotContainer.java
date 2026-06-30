@@ -312,31 +312,42 @@ public class RobotContainer {
 
   private void launchFuelInSim(LinearVelocity velocity, Angle elevation) {
     Pose2d pose = drivetrain.getState().Pose;
-    Translation2d muzzleOffset =
-        new Translation2d(Dimensions.FULL_LENGTH / 2.0, 0).rotateBy(pose.getRotation());
-    Translation3d initialPosition =
+    Translation2d leftTurretOffset =
+        new Translation2d(superstructure.visualization.robotToLeftTurret.getX(), superstructure.visualization.robotToLeftTurret.getY()).rotateBy(pose.getRotation());
+    Translation3d leftTurretPose =
         new Translation3d(
-            pose.getX() + muzzleOffset.getX(),
-            pose.getY() + muzzleOffset.getY(),
-            Dimensions.BUMPER_HEIGHT + 0.25);
+            pose.getX() + leftTurretOffset.getX(),
+            pose.getY() + leftTurretOffset.getY(),
+            superstructure.visualization.robotToLeftTurret.getZ());
     Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, pose.getRotation());
-    FuelSim.getInstance().spawnFuel(initialPosition, launchVelocity);
+    FuelSim.getInstance().spawnFuel(leftTurretPose, launchVelocity);
+
+    Translation2d rightTurretOffset =
+        new Translation2d(superstructure.visualization.robotToRightTurret.getX(), superstructure.visualization.robotToRightTurret.getY()).rotateBy(pose.getRotation());
+    Translation3d rightTurretPose =
+        new Translation3d(
+            pose.getX() + rightTurretOffset.getX(),
+            pose.getY() + rightTurretOffset.getY(),
+            superstructure.visualization.robotToRightTurret.getZ());
+    launchVelocity = createLaunchVelocity(velocity, elevation, pose.getRotation());
+    FuelSim.getInstance().spawnFuel(rightTurretPose, launchVelocity);
+
     Logger.recordOutput("FuelSim/LastEvent", "Launch");
   }
 
   private void handleSimShooting() {
     if (Controllers.SHOOTING.getAsBoolean()) {
 
-      // Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
-      // Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
+      Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
+      Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
 
-      Optional<Angle> hoodAngle = superstructure.shooterHandlerLeft.getHoodAngle();
-      Optional<AngularVelocity> flywheelSpeed =
-          superstructure.shooterHandlerLeft.getFlywheelSpeed();
+      //Optional<Angle> hoodAngle = superstructure.shooterHandlerLeft.getHoodAngle();
+      //Optional<AngularVelocity> flywheelSpeed =
+         superstructure.shooterHandlerLeft.getFlywheelSpeed();
       if (hoodAngle.isPresent() && flywheelSpeed.isPresent()) {
         double flywheelSpeedAsDouble = flywheelSpeed.get().magnitude();
         double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
-        System.out.println("Hood angle: " + hoodAngle);
+        System.out.println("Hood angle: " + hoodAngle.get());
         System.out.println(
             "Flywheel RPM: " + flywheelSpeedAsDouble + "\n Ball Exit Velocity: " + exitVelocity);
         launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle.get());
