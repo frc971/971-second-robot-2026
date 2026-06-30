@@ -29,6 +29,7 @@ import frc.robot.lib.shooter.LaunchSolution;
 import frc.robot.lib.simulation.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
 import org.littletonrobotics.junction.Logger;
 
@@ -111,7 +112,7 @@ public class RobotContainer {
   private static ProjectileSimulator projectileSimulator =
       new ProjectileSimulator(
           new ProjectileSimulator.SimParameters(
-              0.215, 0.1501, 0.47, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.6, 45.0, 0.004, 1500, 6000, 25,
+              0.215, 0.1501, 0.47, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.3, 45.0, 0.004, 1500, 6000, 25,
               5.0f));
 
   public RobotContainer() {
@@ -230,10 +231,10 @@ public class RobotContainer {
   }
 
   public void periodic() {
+    superstructure.periodic();
     if (RobotBase.isSimulation()) {
       handleSimShooting();
     }
-    superstructure.periodic();
   }
 
   public void resetSuperstructure() {
@@ -324,9 +325,14 @@ public class RobotContainer {
             pose.getX() + leftTurretOffset.getX(),
             pose.getY() + leftTurretOffset.getY(),
             superstructure.visualization.robotToLeftTurret.getZ());
+    
+    Rotation2d launchYaw =
+    drivetrain.getState().Pose.getRotation()
+        .plus(new Rotation2d(superstructure.turretLeft.getPosition()));
+
     Translation3d launchVelocity =
         createLaunchVelocity(
-            velocity, elevation, new Rotation2d(superstructure.turretLeft.getPosition()));
+            velocity, elevation, launchYaw);
     FuelSim.getInstance().spawnFuel(leftTurretPose, launchVelocity);
 
     Translation2d rightTurretOffset =
@@ -348,10 +354,13 @@ public class RobotContainer {
   }
 
   private void handleSimShooting() {
-    if (Controllers.SHOOTING.getAsBoolean() || superstructure.shootingDuringAuto) {
+    if ((Controllers.SHOOTING.getAsBoolean() || superstructure.shootingDuringAuto)) {
 
       // Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
       // Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
+
+      superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+      superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
 
       System.out.println("SHOOTING");
 
@@ -360,12 +369,22 @@ public class RobotContainer {
       Angle hoodAngle = launchSolution.hoodAngle();
       AngularVelocity flywheelSpeed = launchSolution.flywheelSpeed();
 
+      // Angle hoodAngle = superstructure.hoodLeft.getPosition();
+      // AngularVelocity flywheelSpeed = superstructure.turretLeft.getVelocity();
+
       double flywheelSpeedAsDouble = flywheelSpeed.in(RPM);
       double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
       System.out.println("Hood angle: " + hoodAngle);
       System.out.println(
           "Flywheel RPM: " + flywheelSpeedAsDouble + "\n Ball Exit Velocity: " + exitVelocity);
+      System.out.println("Left turret angle: " + superstructure.turretLeft.getPosition());
+      System.out.println("Right turret angle: " + superstructure.turretRight.getPosition());
+
       launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle);
+    }
+    else {
+      superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+      superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
     }
   }
 

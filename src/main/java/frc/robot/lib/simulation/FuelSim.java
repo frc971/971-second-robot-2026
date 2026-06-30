@@ -25,8 +25,6 @@ public class FuelSim {
   private static final double FIELD_WIDTH = 8.04;
   private static final double FRICTION = 0.1; // horizontal velocity lost per second on ground
 
-  // TODO: update numbers to match actual robot if this is necessary
-
   private static FuelSim instance = null;
 
   private static final Translation3d[] FIELD_XZ_LINE_STARTS = {
