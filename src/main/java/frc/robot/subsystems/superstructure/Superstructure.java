@@ -3,8 +3,8 @@ package frc.robot.subsystems.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -391,63 +391,59 @@ public class Superstructure {
   public Command shootAuto() {
     if (RobotBase.isReal()) {
       return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  ObjectState curTarget =
-                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                          ? ShooterHandler.Targets.BLUE
-                          : ShooterHandler.Targets.RED;
-                  shooterHandlerLeft.setTargetState(curTarget);
-                  shooterHandlerRight.setTargetState(curTarget);
+          .andThen(
+              Commands.runOnce(
+                  () -> {
+                    ObjectState curTarget =
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                            ? ShooterHandler.Targets.BLUE
+                            : ShooterHandler.Targets.RED;
+                    shooterHandlerLeft.setTargetState(curTarget);
+                    shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                    shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                    shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
 
-                  juiceAuto = true;
-                }));
-    }
-    else {
+                    juiceAuto = true;
+                  }));
+    } else {
       return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  shootingDuringAuto = true;
-                  juiceAuto = true;
-                }));
+          .andThen(
+              Commands.runOnce(
+                  () -> {
+                    shootingDuringAuto = true;
+                    juiceAuto = true;
+                  }));
     }
-    
   }
 
   public Command shootAutoNoJuice() {
     if (RobotBase.isReal()) {
       return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  ObjectState curTarget =
-                      DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                          ? ShooterHandler.Targets.BLUE
-                          : ShooterHandler.Targets.RED;
-                  shooterHandlerLeft.setTargetState(curTarget);
-                  shooterHandlerRight.setTargetState(curTarget);
+          .andThen(
+              Commands.runOnce(
+                  () -> {
+                    ObjectState curTarget =
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                            ? ShooterHandler.Targets.BLUE
+                            : ShooterHandler.Targets.RED;
+                    shooterHandlerLeft.setTargetState(curTarget);
+                    shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                    shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                    shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
 
-                  juiceAuto = false;
-                }));
-    }
-    else {
+                    juiceAuto = false;
+                  }));
+    } else {
       return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  shootingDuringAuto = true;
-                  juiceAuto = true;
-                }));
+          .andThen(
+              Commands.runOnce(
+                  () -> {
+                    shootingDuringAuto = true;
+                    juiceAuto = true;
+                  }));
     }
-    
   }
 
   public Command shootSequenceAuto() {

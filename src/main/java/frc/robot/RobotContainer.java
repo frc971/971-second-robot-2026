@@ -18,22 +18,18 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.BLine.*;
-import frc.robot.lib.shooter.LaunchSolution;
-import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.JoystickValues;
+import frc.robot.lib.shooter.LaunchSolution;
 import frc.robot.lib.simulation.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
-import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -319,23 +315,33 @@ public class RobotContainer {
   private void launchFuelInSim(LinearVelocity velocity, Angle elevation) {
     Pose2d pose = drivetrain.getState().Pose;
     Translation2d leftTurretOffset =
-        new Translation2d(superstructure.visualization.robotToLeftTurret.getX(), superstructure.visualization.robotToLeftTurret.getY()).rotateBy(pose.getRotation());
+        new Translation2d(
+                superstructure.visualization.robotToLeftTurret.getX(),
+                superstructure.visualization.robotToLeftTurret.getY())
+            .rotateBy(pose.getRotation());
     Translation3d leftTurretPose =
         new Translation3d(
             pose.getX() + leftTurretOffset.getX(),
             pose.getY() + leftTurretOffset.getY(),
             superstructure.visualization.robotToLeftTurret.getZ());
-    Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, new Rotation2d(superstructure.turretLeft.getPosition()));
+    Translation3d launchVelocity =
+        createLaunchVelocity(
+            velocity, elevation, new Rotation2d(superstructure.turretLeft.getPosition()));
     FuelSim.getInstance().spawnFuel(leftTurretPose, launchVelocity);
 
     Translation2d rightTurretOffset =
-        new Translation2d(superstructure.visualization.robotToRightTurret.getX(), superstructure.visualization.robotToRightTurret.getY()).rotateBy(pose.getRotation());
+        new Translation2d(
+                superstructure.visualization.robotToRightTurret.getX(),
+                superstructure.visualization.robotToRightTurret.getY())
+            .rotateBy(pose.getRotation());
     Translation3d rightTurretPose =
         new Translation3d(
             pose.getX() + rightTurretOffset.getX(),
             pose.getY() + rightTurretOffset.getY(),
             superstructure.visualization.robotToRightTurret.getZ());
-    launchVelocity = createLaunchVelocity(velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
+    launchVelocity =
+        createLaunchVelocity(
+            velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
     FuelSim.getInstance().spawnFuel(rightTurretPose, launchVelocity);
 
     Logger.recordOutput("FuelSim/LastEvent", "Launch");
@@ -344,8 +350,8 @@ public class RobotContainer {
   private void handleSimShooting() {
     if (Controllers.SHOOTING.getAsBoolean() || superstructure.shootingDuringAuto) {
 
-      //Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
-      //Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
+      // Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
+      // Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
 
       System.out.println("SHOOTING");
 
@@ -360,7 +366,6 @@ public class RobotContainer {
       System.out.println(
           "Flywheel RPM: " + flywheelSpeedAsDouble + "\n Ball Exit Velocity: " + exitVelocity);
       launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle);
-      
     }
   }
 
