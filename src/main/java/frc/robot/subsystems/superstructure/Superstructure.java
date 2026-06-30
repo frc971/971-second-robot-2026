@@ -3,6 +3,7 @@ package frc.robot.subsystems.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,6 +56,8 @@ public class Superstructure {
     MANUAL,
     TARGETING
   }
+
+  public boolean shootingDuringAuto; // for sim shooting
 
   public Superstructure(RobotContainer robotContainer) {
     drivetrain = robotContainer.drivetrain;
@@ -357,6 +360,7 @@ public class Superstructure {
     return Commands.runOnce(
         () -> {
           juiceAuto = false;
+          if (RobotBase.isSimulation()) shootingDuringAuto = false;
           shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
           setGoal(SetpointGoal.AUTO_NEUTRAL);
@@ -385,7 +389,8 @@ public class Superstructure {
   }
 
   public Command shootAuto() {
-    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+    if (RobotBase.isReal()) {
+      return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
         .andThen(
             Commands.runOnce(
                 () -> {
@@ -401,10 +406,22 @@ public class Superstructure {
 
                   juiceAuto = true;
                 }));
+    }
+    else {
+      return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  shootingDuringAuto = true;
+                  juiceAuto = true;
+                }));
+    }
+    
   }
 
   public Command shootAutoNoJuice() {
-    return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+    if (RobotBase.isReal()) {
+      return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
         .andThen(
             Commands.runOnce(
                 () -> {
@@ -420,6 +437,17 @@ public class Superstructure {
 
                   juiceAuto = false;
                 }));
+    }
+    else {
+      return Commands.waitUntil(() -> !drivetrain.isRobotOnBump())
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  shootingDuringAuto = true;
+                  juiceAuto = true;
+                }));
+    }
+    
   }
 
   public Command shootSequenceAuto() {
