@@ -319,7 +319,7 @@ public class RobotContainer {
             pose.getX() + leftTurretOffset.getX(),
             pose.getY() + leftTurretOffset.getY(),
             superstructure.visualization.robotToLeftTurret.getZ());
-    Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, pose.getRotation());
+    Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, new Rotation2d(superstructure.turretLeft.getPosition()));
     FuelSim.getInstance().spawnFuel(leftTurretPose, launchVelocity);
 
     Translation2d rightTurretOffset =
@@ -329,7 +329,7 @@ public class RobotContainer {
             pose.getX() + rightTurretOffset.getX(),
             pose.getY() + rightTurretOffset.getY(),
             superstructure.visualization.robotToRightTurret.getZ());
-    launchVelocity = createLaunchVelocity(velocity, elevation, pose.getRotation());
+    launchVelocity = createLaunchVelocity(velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
     FuelSim.getInstance().spawnFuel(rightTurretPose, launchVelocity);
 
     Logger.recordOutput("FuelSim/LastEvent", "Launch");
