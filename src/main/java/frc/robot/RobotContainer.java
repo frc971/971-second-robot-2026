@@ -317,23 +317,20 @@ public class RobotContainer {
     Pose2d pose = drivetrain.getState().Pose;
 
     Translation3d leftMuzzlePose =
-        superstructure.shooterHandlerLeft
-        .getProjectileState()
-        .position();
-    
-    Rotation2d launchYaw =
-    drivetrain.getState().Pose.getRotation()
-        .plus(new Rotation2d(superstructure.turretLeft.getPosition()));
+        superstructure.shooterHandlerLeft.getProjectileState().position();
 
-    Translation3d launchVelocity =
-        createLaunchVelocity(
-            velocity, elevation, launchYaw);
+    Rotation2d launchYaw =
+        drivetrain
+            .getState()
+            .Pose
+            .getRotation()
+            .plus(new Rotation2d(superstructure.turretLeft.getPosition()));
+
+    Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
     FuelSim.getInstance().spawnFuel(leftMuzzlePose, launchVelocity);
 
     Translation3d rightMuzzlePose =
-        superstructure.shooterHandlerRight
-        .getProjectileState()
-        .position();
+        superstructure.shooterHandlerRight.getProjectileState().position();
     launchVelocity =
         createLaunchVelocity(
             velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
@@ -371,8 +368,7 @@ public class RobotContainer {
       System.out.println("Right turret angle: " + superstructure.turretRight.getPosition());
 
       launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle);
-    }
-    else {
+    } else {
       superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
       superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
     }
