@@ -330,14 +330,14 @@ public class RobotContainer {
             velocity, elevation, launchYaw);
     FuelSim.getInstance().spawnFuel(leftMuzzlePose, launchVelocity);
 
-    // Translation3d rightMuzzlePose =
-    //     superstructure.shooterHandlerRight
-    //     .getProjectileState()
-    //     .position();
-    // launchVelocity =
-    //     createLaunchVelocity(
-    //         velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
-    // FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
+    Translation3d rightMuzzlePose =
+        superstructure.shooterHandlerRight
+        .getProjectileState()
+        .position();
+    launchVelocity =
+        createLaunchVelocity(
+            velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
+    FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
 
     Logger.recordOutput("FuelSim/LastEvent", "Launch");
   }
