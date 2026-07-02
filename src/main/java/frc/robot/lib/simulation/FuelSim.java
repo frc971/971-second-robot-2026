@@ -291,6 +291,8 @@ public class FuelSim {
       if (robotSupplier != null) {
         handleRobotCollisions(fuels);
         handleIntakes(fuels);
+        handleClearingFuel(fuels);
+        
       }
     }
 
@@ -366,6 +368,12 @@ public class FuelSim {
           i--;
         }
       }
+    }
+  }
+
+  private void handleClearingFuel(ArrayList<Fuel> fuels) {
+    if (Controllers.CLEAR_SIM_FUEL.getAsBoolean()) {
+      fuels.clear();
     }
   }
 
