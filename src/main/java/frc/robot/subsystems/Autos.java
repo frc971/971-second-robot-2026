@@ -174,6 +174,7 @@ public class Autos {
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
           // Madtown Depot
+          new AutoRoutine(false, "BUI Test", List.of("bui_test")),
           new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
           new AutoRoutine(
               false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
