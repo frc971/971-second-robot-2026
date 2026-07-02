@@ -42,7 +42,7 @@ public class ShooterPhysics {
    * @return LaunchSolution, or null if the shot is impossible
    */
   public LaunchSolution targetAngleSolve(ObjectState proj, ObjectState target) {
-
+    System.out.println("targetAngleSolve");
     Translation2d distance2d = target.minus(proj).xyPos();
     double currentDistance = distance2d.getNorm();
 
@@ -78,6 +78,7 @@ public class ShooterPhysics {
   }
 
   public LaunchSolution apexHeightSolve(ObjectState proj, ObjectState target) {
+    System.out.println("apexHeightSolve");
     Translation2d distance2d = target.minus(proj).xyPos();
     double currentDistance = distance2d.getNorm();
 

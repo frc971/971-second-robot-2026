@@ -11,13 +11,27 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.BLine.*;
 import frc.robot.lib.JoystickValues;
+import frc.robot.lib.shooter.LaunchSolution;
+import frc.robot.lib.simulation.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
   public final Superstructure superstructure;
@@ -95,6 +109,12 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MAX_SPEED);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+  private static ProjectileSimulator projectileSimulator =
+      new ProjectileSimulator(
+          new ProjectileSimulator.SimParameters(
+              0.215, 0.1501, 0.47, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.3, 45.0, 0.004, 1500, 6000, 25,
+              5.0f));
+
   public RobotContainer() {
     superstructure = new Superstructure(this);
 
@@ -104,7 +124,10 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
+    if (Robot.isSimulation()) {
+      drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
+      configureFuelSim();
+    }
 
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
     FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
@@ -209,6 +232,9 @@ public class RobotContainer {
 
   public void periodic() {
     superstructure.periodic();
+    if (RobotBase.isSimulation()) {
+      handleSimShooting();
+    }
   }
 
   public void resetSuperstructure() {
@@ -217,5 +243,161 @@ public class RobotContainer {
 
   public Telemetry getTelemetry() {
     return logger;
+  }
+
+  // MARK: Fuel Simulation
+  private void configureFuelSim() {
+    FuelSim instance = FuelSim.getInstance();
+    instance.clearFuel();
+    instance.registerRobot(
+        Dimensions.FULL_WIDTH,
+        Dimensions.FULL_LENGTH,
+        Dimensions.BUMPER_HEIGHT,
+        () -> drivetrain.getState().Pose,
+        this::getFieldRelativeChassisSpeedsForSim);
+
+    instance.registerIntake(
+        -Dimensions.FULL_LENGTH,
+        Dimensions.FULL_LENGTH / 2.0,
+        -Dimensions.FULL_WIDTH / 6.0,
+        Dimensions.FULL_WIDTH / 6.0,
+        () -> (true),
+        () -> Logger.recordOutput("FuelSim/LastEvent", "Intake"));
+
+    instance.spawnStartingFuel();
+    instance.start();
+
+    Command spawnFuelCommand =
+        Commands.runOnce(this::spawnFuelInFrontOfRobot)
+            .ignoringDisable(true)
+            .withName("FuelSim/Spawn Fuel");
+    Command resetFuelCommand =
+        Commands.runOnce(
+                () -> {
+                  instance.clearFuel();
+                  instance.spawnStartingFuel();
+                  Logger.recordOutput("FuelSim/LastEvent", "Reset");
+                })
+            .ignoringDisable(true)
+            .withName("FuelSim/Reset Fuel");
+    Command launchFuelCommand =
+        Commands.runOnce(() -> launchFuelInSim(MetersPerSecond.of(8), Degrees.of(45)))
+            .ignoringDisable(true)
+            .withName("FuelSim/Launch Fuel");
+
+    SmartDashboard.putData(spawnFuelCommand);
+    SmartDashboard.putData(resetFuelCommand);
+    SmartDashboard.putData(launchFuelCommand);
+  }
+
+  public void resetFuelSim() {
+    if (!RobotBase.isSimulation()) {
+      return;
+    }
+    FuelSim instance = FuelSim.getInstance();
+    instance.clearFuel();
+    instance.spawnStartingFuel();
+    Logger.recordOutput("FuelSim/LastEvent", "Auto Reset");
+  }
+
+  private void spawnFuelInFrontOfRobot() {
+    Pose2d pose = drivetrain.getState().Pose;
+    Translation2d offset =
+        new Translation2d(Dimensions.FULL_LENGTH / 2.0 + 0.1, 0).rotateBy(pose.getRotation());
+    Translation3d location =
+        new Translation3d(
+            pose.getX() + offset.getX(),
+            pose.getY() + offset.getY(),
+            Dimensions.BUMPER_HEIGHT / 2.0);
+    FuelSim.getInstance().spawnFuel(location, new Translation3d());
+    Logger.recordOutput("FuelSim/LastEvent", "Manual Spawn");
+  }
+
+  private void launchFuelInSim(LinearVelocity velocity, Angle elevation) {
+    Pose2d pose = drivetrain.getState().Pose;
+
+    Translation3d leftMuzzlePose =
+        superstructure.shooterHandlerLeft.getProjectileState().position();
+
+    Rotation2d launchYaw =
+        drivetrain
+            .getState()
+            .Pose
+            .getRotation()
+            .plus(new Rotation2d(superstructure.turretLeft.getPosition()));
+
+    Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
+    FuelSim.getInstance().spawnFuel(leftMuzzlePose, launchVelocity);
+
+    Translation3d rightMuzzlePose =
+        superstructure.shooterHandlerRight.getProjectileState().position();
+    
+    launchYaw =
+        drivetrain
+            .getState()
+            .Pose
+            .getRotation()
+            .plus(new Rotation2d(superstructure.turretRight.getPosition()));
+
+    launchVelocity =
+        createLaunchVelocity(
+            velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
+    FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
+
+    Logger.recordOutput("FuelSim/LastEvent", "Launch");
+  }
+
+  private void handleSimShooting() {
+    if ((Controllers.SHOOTING.getAsBoolean() || superstructure.shootingDuringAuto)) {
+
+      // Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
+      // Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
+
+      superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+      superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+
+      System.out.println("SHOOTING");
+
+      LaunchSolution launchSolution = superstructure.shooterHandlerLeft.getLaunchSolution();
+
+      Angle hoodAngle = launchSolution.hoodAngle();
+      AngularVelocity flywheelSpeed = launchSolution.flywheelSpeed();
+
+      // Angle hoodAngle = superstructure.hoodLeft.getPosition();
+      // AngularVelocity flywheelSpeed = superstructure.turretLeft.getVelocity();
+
+      double flywheelSpeedAsDouble = flywheelSpeed.in(RPM);
+      double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
+      System.out.println("Solved hood angle: " + hoodAngle);
+      System.out.println("Actual hood angle: " + superstructure.hoodLeft.getHoodAngle());
+      System.out.println(
+          "Flywheel RPM: " + flywheelSpeedAsDouble + "\n Ball Exit Velocity: " + exitVelocity);
+      System.out.println("Left turret angle: " + superstructure.turretLeft.getPosition());
+      System.out.println("Right turret angle: " + superstructure.turretRight.getPosition());
+
+      launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle);
+    } else {
+      superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+      superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
+    }
+  }
+
+  private Translation3d createLaunchVelocity(
+      LinearVelocity velocity, Angle elevation, Rotation2d heading) {
+    double speed = velocity.in(MetersPerSecond);
+    double elevationRadians = elevation.in(Radians);
+    double planarSpeed = speed * Math.cos(elevationRadians);
+    double verticalSpeed = speed * Math.sin(elevationRadians);
+    Translation2d planar = new Translation2d(planarSpeed, 0).rotateBy(heading);
+    return new Translation3d(planar.getX(), planar.getY(), verticalSpeed);
+  }
+
+  private ChassisSpeeds getFieldRelativeChassisSpeedsForSim() {
+    ChassisSpeeds speeds = drivetrain.getState().Speeds;
+    if (speeds == null) {
+      return new ChassisSpeeds();
+    }
+    return new ChassisSpeeds(
+        speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
   }
 }

@@ -39,6 +39,9 @@ public class Controllers {
   public static final Trigger SHUTTLE_LEFT = MANIPULATOR.leftBumper();
   public static final Trigger SHUTTLE_RIGHT = MANIPULATOR.rightBumper();
 
+  // For sim - clear all fuel in ArrayList
+  public static final Trigger CLEAR_SIM_FUEL = MANIPULATOR.axisGreaterThan(4, 0.9);
+
   // OTF Tuning
   public static final Trigger TUNE_LEFT = MANIPULATOR.back();
   public static final Trigger TUNE_RIGHT = MANIPULATOR.start();

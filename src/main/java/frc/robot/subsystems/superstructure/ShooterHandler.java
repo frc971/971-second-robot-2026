@@ -162,6 +162,9 @@ public class ShooterHandler {
   }
 
   public void periodic() {
+    System.out.println("Shooter state: " + shooterState);
+    System.out.println("Shooter goal: " + shooterGoal);
+    System.out.println();
     projectileState = getProjectileState();
 
     // clear robot velocity if not using OTF
@@ -416,7 +419,7 @@ public class ShooterHandler {
     return robotState.plus(projPoseOffset, projVelOffset);
   }
 
-  private boolean isShuttle(ObjectState target) {
+  public boolean isShuttle(ObjectState target) {
     return target == Targets.LEFT_BLUE_SHUTTLE
         || target == Targets.RIGHT_BLUE_SHUTTLE
         || target == Targets.LEFT_RED_SHUTTLE
@@ -429,6 +432,14 @@ public class ShooterHandler {
 
   public ShooterConfig getConfig() {
     return config;
+  }
+
+  public Side getSide() {
+    return side;
+  }
+
+  public ShooterPhysics getPhysics() {
+    return physics;
   }
 
   public void setStateAiming() {

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.BLine.*;
+import frc.robot.lib.simulation.FuelSim;
 import frc.robot.subsystems.Autos;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
@@ -161,4 +162,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testExit() {}
+
+  @Override
+  public void simulationPeriodic() {
+    FuelSim.getInstance().updateSim();
+  }
 }
