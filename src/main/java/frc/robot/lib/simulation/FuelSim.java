@@ -292,7 +292,6 @@ public class FuelSim {
         handleRobotCollisions(fuels);
         handleIntakes(fuels);
         handleClearingFuel(fuels);
-        
       }
     }
 

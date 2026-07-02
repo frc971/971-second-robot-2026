@@ -112,7 +112,7 @@ public class RobotContainer {
   private static ProjectileSimulator projectileSimulator =
       new ProjectileSimulator(
           new ProjectileSimulator.SimParameters(
-              0.215, 0.1501, 0.47, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.3, 45.0, 0.004, 1500, 6000, 25,
+              0.215, 0.1501, 0.47, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.6, 45.0, 0.004, 1500, 6000, 25,
               5.0f));
 
   public RobotContainer() {
@@ -281,7 +281,7 @@ public class RobotContainer {
             .ignoringDisable(true)
             .withName("FuelSim/Reset Fuel");
     Command launchFuelCommand =
-        Commands.runOnce(() -> launchFuelInSim(MetersPerSecond.of(8), Degrees.of(45)))
+        Commands.runOnce(() -> launchFuelInSim(MetersPerSecond.of(8), Degrees.of(45), 0))
             .ignoringDisable(true)
             .withName("FuelSim/Launch Fuel");
 
@@ -313,36 +313,40 @@ public class RobotContainer {
     Logger.recordOutput("FuelSim/LastEvent", "Manual Spawn");
   }
 
-  private void launchFuelInSim(LinearVelocity velocity, Angle elevation) {
+  // int turret: 0 = left turret, 1 = right turret
+  private void launchFuelInSim(LinearVelocity velocity, Angle elevation, int turret) {
     Pose2d pose = drivetrain.getState().Pose;
 
-    Translation3d leftMuzzlePose =
+    if (turret == 0) {
+      Translation3d leftMuzzlePose =
         superstructure.shooterHandlerLeft.getProjectileState().position();
 
-    Rotation2d launchYaw =
-        drivetrain
-            .getState()
-            .Pose
-            .getRotation()
-            .plus(new Rotation2d(superstructure.turretLeft.getPosition()));
+      Rotation2d launchYaw =
+          drivetrain
+              .getState()
+              .Pose
+              .getRotation()
+              .plus(new Rotation2d(superstructure.turretLeft.getPosition()));
 
-    Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
-    FuelSim.getInstance().spawnFuel(leftMuzzlePose, launchVelocity);
-
-    Translation3d rightMuzzlePose =
+      Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
+      FuelSim.getInstance().spawnFuel(leftMuzzlePose, launchVelocity);
+    }
+    else {
+      Translation3d rightMuzzlePose =
         superstructure.shooterHandlerRight.getProjectileState().position();
-    
-    launchYaw =
-        drivetrain
-            .getState()
-            .Pose
-            .getRotation()
-            .plus(new Rotation2d(superstructure.turretRight.getPosition()));
 
-    launchVelocity =
-        createLaunchVelocity(
-            velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
-    FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
+      Rotation2d launchYaw =
+          drivetrain
+              .getState()
+              .Pose
+              .getRotation()
+              .plus(new Rotation2d(superstructure.turretRight.getPosition()));
+
+      Translation3d launchVelocity =
+          createLaunchVelocity(
+              velocity, elevation, launchYaw);
+      FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
+    }
 
     Logger.recordOutput("FuelSim/LastEvent", "Launch");
   }
@@ -358,25 +362,44 @@ public class RobotContainer {
 
       System.out.println("SHOOTING");
 
-      LaunchSolution launchSolution = superstructure.shooterHandlerLeft.getLaunchSolution();
+      LaunchSolution leftLaunchSolution = superstructure.shooterHandlerLeft.getLaunchSolution();
 
-      Angle hoodAngle = launchSolution.hoodAngle();
-      AngularVelocity flywheelSpeed = launchSolution.flywheelSpeed();
+      Angle leftHoodAngle = leftLaunchSolution.hoodAngle();
+      AngularVelocity leftFlywheelSpeed = leftLaunchSolution.flywheelSpeed();
 
       // Angle hoodAngle = superstructure.hoodLeft.getPosition();
       // AngularVelocity flywheelSpeed = superstructure.turretLeft.getVelocity();
 
-      double flywheelSpeedAsDouble = flywheelSpeed.in(RPM);
-      double exitVelocity = projectileSimulator.exitVelocity(flywheelSpeedAsDouble);
-      System.out.println("Solved hood angle: " + hoodAngle);
-      System.out.println("Actual hood angle: " + superstructure.hoodLeft.getHoodAngle());
+      double leftFlywheelSpeedAsDouble = leftFlywheelSpeed.in(RPM);
+      double leftExitVelocity = projectileSimulator.exitVelocity(leftFlywheelSpeedAsDouble);
+      System.out.println("Solved left hood angle: " + leftHoodAngle);
+      System.out.println("Actual left hood angle: " + superstructure.hoodLeft.getHoodAngle());
       System.out.println(
-          "Flywheel RPM: " + flywheelSpeedAsDouble + "\n Ball Exit Velocity: " + exitVelocity);
+          "Left Flywheel RPM: " + leftFlywheelSpeedAsDouble + "\n Left Ball Exit Velocity: " + leftExitVelocity);
       System.out.println("Left turret angle: " + superstructure.turretLeft.getPosition());
       System.out.println("Right turret angle: " + superstructure.turretRight.getPosition());
 
-      launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle);
-    } else {
+      launchFuelInSim(MetersPerSecond.of(leftExitVelocity), leftHoodAngle, 0);
+
+      LaunchSolution rightLaunchSolution = superstructure.shooterHandlerRight.getLaunchSolution();
+
+      Angle rightHoodAngle = rightLaunchSolution.hoodAngle();
+      AngularVelocity rightFlywheelSpeed = rightLaunchSolution.flywheelSpeed();
+
+      // Angle rightHoodAngle = superstructure.hoodRight.getPosition()
+      // AngularVelocity rightFlywheelSpeed = superStructure.turretRight.getVelocity()
+
+      double rightFlywheelSpeedAsDouble = rightFlywheelSpeed.in(RPM);
+      double rightExitVelocity = projectileSimulator.exitVelocity(rightFlywheelSpeedAsDouble);
+
+      System.out.println("Solved right hood angle: " + rightHoodAngle);
+      System.out.println("Actual right hood angle: " + superstructure.hoodRight.getHoodAngle());
+      System.out.println(
+          "right Flywheel RPM: " + rightFlywheelSpeedAsDouble + "\n right Ball Exit Velocity: " + rightExitVelocity);
+      launchFuelInSim(MetersPerSecond.of(rightExitVelocity), rightHoodAngle, 1);
+
+    } 
+    else {
       superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
       superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
     }
