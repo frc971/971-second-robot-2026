@@ -331,6 +331,14 @@ public class RobotContainer {
 
     Translation3d rightMuzzlePose =
         superstructure.shooterHandlerRight.getProjectileState().position();
+    
+    launchYaw =
+        drivetrain
+            .getState()
+            .Pose
+            .getRotation()
+            .plus(new Rotation2d(superstructure.turretRight.getPosition()));
+
     launchVelocity =
         createLaunchVelocity(
             velocity, elevation, new Rotation2d(superstructure.turretRight.getPosition()));
