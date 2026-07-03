@@ -12,6 +12,7 @@ import frc.robot.lib.shooter.ShotTable.ShooterData;
 
 public class ShooterPhysics {
   private final ShooterConfig.Physics physicsConfig;
+  public double exitSpeed = 0;
 
   public ShooterPhysics(ShooterConfig.Physics physicsConfig) {
     this.physicsConfig = physicsConfig;
@@ -52,11 +53,14 @@ public class ShooterPhysics {
                 - Math.tan(targetAngle));
 
     double tanDiff = Math.tan(targetAngle) - Math.tan(shotAngle);
-    double exitSpeed =
+    exitSpeed =
         (1.0 / Math.cos(shotAngle))
             * Math.sqrt((physicsConfig.GRAVITY() * currentDistance) / Math.abs(tanDiff));
     // checks if exit speed is finite and positive
     if (!Double.isFinite(exitSpeed) || exitSpeed <= 0) return null;
+
+    System.out.println("Solved exit speed: " + exitSpeed);
+
 
     // resolves velocity vector into components
     double vHoriz = exitSpeed * Math.cos(shotAngle);
@@ -101,7 +105,7 @@ public class ShooterPhysics {
     // compute angle
     double shotAngle = Math.atan(tanTheta);
 
-    // compute exit speed from apex constraint
+    // compute exit speed from apex constraints
     double sinTheta = Math.sin(shotAngle);
     if (Math.abs(sinTheta) < 1e-6) return null;
 

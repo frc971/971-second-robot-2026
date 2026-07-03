@@ -368,7 +368,7 @@ public class RobotContainer {
       // AngularVelocity flywheelSpeed = superstructure.turretLeft.getVelocity();
 
       double leftFlywheelSpeedAsDouble = leftFlywheelSpeed.in(RPM);
-      double leftExitVelocity = projectileSimulator.exitVelocity(leftFlywheelSpeedAsDouble);
+      double leftExitVelocity = superstructure.shooterHandlerLeft.getPhysics().exitSpeed;
       System.out.println("Solved left hood angle: " + leftHoodAngle);
       System.out.println("Actual left hood angle: " + superstructure.hoodLeft.getHoodAngle());
       System.out.println(
@@ -389,7 +389,7 @@ public class RobotContainer {
       // AngularVelocity rightFlywheelSpeed = superStructure.turretRight.getVelocity()
 
       double rightFlywheelSpeedAsDouble = rightFlywheelSpeed.in(RPM);
-      double rightExitVelocity = projectileSimulator.exitVelocity(rightFlywheelSpeedAsDouble);
+      double rightExitVelocity = superstructure.shooterHandlerRight.getPhysics().exitSpeed;
 
       System.out.println("Solved right hood angle: " + rightHoodAngle);
       System.out.println("Actual right hood angle: " + superstructure.hoodRight.getHoodAngle());
