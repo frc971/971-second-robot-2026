@@ -329,6 +329,8 @@ public class RobotContainer {
               .plus(new Rotation2d(superstructure.turretLeft.getPosition()));
 
       Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
+      launchVelocity =
+          launchVelocity.plus(superstructure.shooterHandlerLeft.getProjectileState().velocity());
       FuelSim.getInstance().spawnFuel(leftMuzzlePose, launchVelocity);
     } else {
       Translation3d rightMuzzlePose =
@@ -342,6 +344,8 @@ public class RobotContainer {
               .plus(new Rotation2d(superstructure.turretRight.getPosition()));
 
       Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
+      launchVelocity =
+          launchVelocity.plus(superstructure.shooterHandlerRight.getProjectileState().velocity());
       FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
     }
 
@@ -369,6 +373,7 @@ public class RobotContainer {
 
       double leftFlywheelSpeedAsDouble = leftFlywheelSpeed.in(RPM);
       double leftExitVelocity = superstructure.shooterHandlerLeft.getPhysics().exitSpeed;
+
       System.out.println("Solved left hood angle: " + leftHoodAngle);
       System.out.println("Actual left hood angle: " + superstructure.hoodLeft.getHoodAngle());
       System.out.println(
