@@ -112,7 +112,7 @@ public class RobotContainer {
   private static ProjectileSimulator projectileSimulator =
       new ProjectileSimulator(
           new ProjectileSimulator.SimParameters(
-              0.215, 0.1501, 0.47, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.6, 45.0, 0.004, 1500, 6000, 25,
+              0.215, 0.1501, 25, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.5, 45.0, 0.004, 1500, 6000, 25,
               5.0f));
 
   public RobotContainer() {
@@ -319,7 +319,7 @@ public class RobotContainer {
 
     if (turret == 0) {
       Translation3d leftMuzzlePose =
-        superstructure.shooterHandlerLeft.getProjectileState().position();
+          superstructure.shooterHandlerLeft.getProjectileState().position();
 
       Rotation2d launchYaw =
           drivetrain
@@ -330,10 +330,9 @@ public class RobotContainer {
 
       Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
       FuelSim.getInstance().spawnFuel(leftMuzzlePose, launchVelocity);
-    }
-    else {
+    } else {
       Translation3d rightMuzzlePose =
-        superstructure.shooterHandlerRight.getProjectileState().position();
+          superstructure.shooterHandlerRight.getProjectileState().position();
 
       Rotation2d launchYaw =
           drivetrain
@@ -342,9 +341,7 @@ public class RobotContainer {
               .getRotation()
               .plus(new Rotation2d(superstructure.turretRight.getPosition()));
 
-      Translation3d launchVelocity =
-          createLaunchVelocity(
-              velocity, elevation, launchYaw);
+      Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
       FuelSim.getInstance().spawnFuel(rightMuzzlePose, launchVelocity);
     }
 
@@ -375,9 +372,11 @@ public class RobotContainer {
       System.out.println("Solved left hood angle: " + leftHoodAngle);
       System.out.println("Actual left hood angle: " + superstructure.hoodLeft.getHoodAngle());
       System.out.println(
-          "Left Flywheel RPM: " + leftFlywheelSpeedAsDouble + "\n Left Ball Exit Velocity: " + leftExitVelocity);
+          "Left Flywheel RPM: "
+              + leftFlywheelSpeedAsDouble
+              + "\n Left Ball Exit Velocity: "
+              + leftExitVelocity);
       System.out.println("Left turret angle: " + superstructure.turretLeft.getPosition());
-      System.out.println("Right turret angle: " + superstructure.turretRight.getPosition());
 
       launchFuelInSim(MetersPerSecond.of(leftExitVelocity), leftHoodAngle, 0);
 
@@ -395,11 +394,17 @@ public class RobotContainer {
       System.out.println("Solved right hood angle: " + rightHoodAngle);
       System.out.println("Actual right hood angle: " + superstructure.hoodRight.getHoodAngle());
       System.out.println(
-          "right Flywheel RPM: " + rightFlywheelSpeedAsDouble + "\n right Ball Exit Velocity: " + rightExitVelocity);
+          "right Flywheel RPM: "
+              + rightFlywheelSpeedAsDouble
+              + "\n right Ball Exit Velocity: "
+              + rightExitVelocity);
+      System.out.println("Right turret angle: " + superstructure.turretRight.getPosition());
+
+      System.out.println();
+
       launchFuelInSim(MetersPerSecond.of(rightExitVelocity), rightHoodAngle, 1);
 
-    } 
-    else {
+    } else {
       superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
       superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
     }
