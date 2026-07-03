@@ -59,9 +59,6 @@ public class ShooterPhysics {
     // checks if exit speed is finite and positive
     if (!Double.isFinite(exitSpeed) || exitSpeed <= 0) return null;
 
-    System.out.println("Solved exit speed: " + exitSpeed);
-
-
     // resolves velocity vector into components
     double vHoriz = exitSpeed * Math.cos(shotAngle);
     double vVertical = exitSpeed * Math.sin(shotAngle);
