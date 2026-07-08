@@ -75,14 +75,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
-    robotContainer.periodic();
-
-    HubShiftUtil.ShiftInfo info = HubShiftUtil.getShiftInfo();
-    Logger.recordOutput("HubShift/Active", info.hubActive());
-    Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
-    Logger.recordOutput("HubShift/UntilHubFlip", Math.round(info.timeUntilHubStateChange()));
-    Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
-
     bos.updatePose();
 
     if (Controllers.ODOMETRY_RESET.getAsBoolean()) {
@@ -94,6 +86,13 @@ public class Robot extends LoggedRobot {
     }
 
     CommandScheduler.getInstance().run();
+    robotContainer.periodic();
+
+    HubShiftUtil.ShiftInfo info = HubShiftUtil.getShiftInfo();
+    Logger.recordOutput("HubShift/Active", info.hubActive());
+    Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
+    Logger.recordOutput("HubShift/UntilHubFlip", Math.round(info.timeUntilHubStateChange()));
+    Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
   }
 
   @Override
