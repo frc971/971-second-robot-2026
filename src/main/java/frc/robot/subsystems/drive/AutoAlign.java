@@ -139,8 +139,7 @@ public class AutoAlign {
                 -MAX_TRANSLATION_VELOCITY.in(MetersPerSecond),
                 MAX_TRANSLATION_VELOCITY.in(MetersPerSecond)));
 
-    Rotation2d angleToTarget =
-        targetPose.getTranslation().minus(currentPose.getTranslation()).getAngle();
+    Rotation2d angleToTarget = translationError.getAngle();
     this.angleToTarget = angleToTarget;
 
     // Convert distanceOutput into a 2D velocity vector pointing toward the target
@@ -151,7 +150,8 @@ public class AutoAlign {
     this.currentPose = currentPose;
     this.targetPose = targetPose;
 
-    this.rotationError = translationError.getAngle();
+    this.rotationError =
+        Degrees.of(targetPose.getRotation().minus(currentPose.getRotation()).getDegrees());
     this.translationOutput = translationOutput;
 
     return driveAtAngle
