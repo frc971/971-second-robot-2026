@@ -12,7 +12,7 @@ import frc.robot.lib.shooter.ShotTable.ShooterData;
 
 public class ShooterPhysics {
   private final ShooterConfig.Physics physicsConfig;
-  public double exitSpeed = 0;
+  private double exitSpeed = 0;
 
   public ShooterPhysics(ShooterConfig.Physics physicsConfig) {
     this.physicsConfig = physicsConfig;
@@ -106,7 +106,7 @@ public class ShooterPhysics {
     double sinTheta = Math.sin(shotAngle);
     if (Math.abs(sinTheta) < 1e-6) return null;
 
-    double exitSpeed = Math.sqrt(2 * physicsConfig.GRAVITY() * deltaH) / sinTheta;
+    exitSpeed = Math.sqrt(2 * physicsConfig.GRAVITY() * deltaH) / sinTheta;
 
     // checks if exit speed is finite and positive
     if (!Double.isFinite(exitSpeed) || exitSpeed <= 0) return null;
@@ -135,5 +135,9 @@ public class ShooterPhysics {
         physicsConfig.EXIT_SPEED_TABLE().calcAngularVel(MetersPerSecond.of(vBall.getNorm()));
 
     return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
+  }
+
+  public double getExitSpeed() {
+    return exitSpeed;
   }
 }

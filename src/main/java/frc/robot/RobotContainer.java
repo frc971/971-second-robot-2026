@@ -109,12 +109,6 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MAX_SPEED);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  private static ProjectileSimulator projectileSimulator =
-      new ProjectileSimulator(
-          new ProjectileSimulator.SimParameters(
-              0.215, 0.1501, 25, 0.2, 1.225, 0.43, 0.1016, 1.83, 0.5, 45.0, 0.004, 1500, 6000, 25,
-              5.0f));
-
   public RobotContainer() {
     superstructure = new Superstructure(this);
 
@@ -315,8 +309,6 @@ public class RobotContainer {
 
   // int turret: 0 = left turret, 1 = right turret
   private void launchFuelInSim(LinearVelocity velocity, Angle elevation, int turret) {
-    Pose2d pose = drivetrain.getState().Pose;
-
     if (turret == 0) {
       Translation3d leftMuzzlePose =
           superstructure.shooterHandlerLeft.getProjectileState().position();
@@ -353,7 +345,7 @@ public class RobotContainer {
   }
 
   private void handleSimShooting() {
-    if ((Controllers.SHOOTING.getAsBoolean() || superstructure.shootingDuringAuto)) {
+    if ((Controllers.SHOOTING.getAsBoolean() || Controllers.SHUTTLING.getAsBoolean() || superstructure.shootingDuringAuto)) {
 
       // Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
       // Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
@@ -372,7 +364,7 @@ public class RobotContainer {
       // AngularVelocity flywheelSpeed = superstructure.turretLeft.getVelocity();
 
       double leftFlywheelSpeedAsDouble = leftFlywheelSpeed.in(RPM);
-      double leftExitVelocity = superstructure.shooterHandlerLeft.getPhysics().exitSpeed;
+      double leftExitVelocity = superstructure.shooterHandlerLeft.getPhysics().getExitSpeed();
 
       System.out.println("Solved left hood angle: " + leftHoodAngle);
       System.out.println("Actual left hood angle: " + superstructure.hoodLeft.getHoodAngle());
@@ -394,7 +386,7 @@ public class RobotContainer {
       // AngularVelocity rightFlywheelSpeed = superStructure.turretRight.getVelocity()
 
       double rightFlywheelSpeedAsDouble = rightFlywheelSpeed.in(RPM);
-      double rightExitVelocity = superstructure.shooterHandlerRight.getPhysics().exitSpeed;
+      double rightExitVelocity = superstructure.shooterHandlerRight.getPhysics().getExitSpeed();
 
       System.out.println("Solved right hood angle: " + rightHoodAngle);
       System.out.println("Actual right hood angle: " + superstructure.hoodRight.getHoodAngle());
