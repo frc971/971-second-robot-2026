@@ -151,8 +151,7 @@ public class AutoAlign {
     this.currentPose = currentPose;
     this.targetPose = targetPose;
 
-    this.rotationError =
-        Degrees.of(targetPose.getRotation().minus(currentPose.getRotation()).getDegrees());
+    this.rotationError = translationError.getAngle();
     this.translationOutput = translationOutput;
 
     return driveAtAngle
