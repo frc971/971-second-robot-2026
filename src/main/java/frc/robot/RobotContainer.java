@@ -345,7 +345,9 @@ public class RobotContainer {
   }
 
   private void handleSimShooting() {
-    if ((Controllers.SHOOTING.getAsBoolean() || Controllers.SHUTTLING.getAsBoolean() || superstructure.shootingDuringAuto)) {
+    if ((Controllers.SHOOTING.getAsBoolean()
+        || Controllers.SHUTTLING.getAsBoolean()
+        || superstructure.shootingDuringAuto)) {
 
       // Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
       // Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
