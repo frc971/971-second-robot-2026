@@ -27,9 +27,10 @@ public class FuelSimHelper {
   public FuelSimHelper(RobotContainer robotContainer) {
     this.drivetrain = robotContainer.drivetrain;
     this.superstructure = robotContainer.superstructure;
-    shooterHandlers = new ShooterHandler[] {
-            superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight
-          };
+    shooterHandlers =
+        new ShooterHandler[] {
+          superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight
+        };
   }
 
   public void configureFuelSim() {
