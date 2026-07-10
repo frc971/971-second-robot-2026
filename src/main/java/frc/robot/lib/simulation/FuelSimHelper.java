@@ -20,12 +20,16 @@ public class FuelSimHelper {
 
   private final CommandSwerveDrivetrain drivetrain;
   private final Superstructure superstructure;
+  private final ShooterHandler[] shooterHandlers;
   private double simFuelExitVelocity;
 
   // Pass in robotContainer in order to access superstructure and drivetrain
   public FuelSimHelper(RobotContainer robotContainer) {
     this.drivetrain = robotContainer.drivetrain;
     this.superstructure = robotContainer.superstructure;
+    shooterHandlers = new ShooterHandler[] {
+            superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight
+          };
   }
 
   public void configureFuelSim() {
@@ -81,11 +85,6 @@ public class FuelSimHelper {
   private void handleSimShooting() {
     if ((superstructure.shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING)
         && (superstructure.shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)) {
-
-      ShooterHandler[] shooterHandlers =
-          new ShooterHandler[] {
-            superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight
-          };
 
       for (ShooterHandler shooterHandler : shooterHandlers) {
         LaunchSolution launchSolution = shooterHandler.getLaunchSolution();

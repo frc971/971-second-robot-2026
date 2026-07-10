@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.superstructure.Edge;
@@ -20,6 +21,9 @@ public class Controllers {
   public static final Trigger INDEX = DRIVER.rightTrigger();
 
   public static final Trigger ODOMETRY_RESET = DRIVER.y();
+
+  // Only make the button if the robot is in sim to prevent future overlap
+  public static final Trigger CLEAR_SIM_FUEL = (RobotBase.isSimulation()) ? DRIVER.axisGreaterThan(5, 0.9) : null;
 
   // === Manipulator's Controls
   public static final Trigger LEFT_SHUTTLE = MANIPULATOR.leftBumper();
