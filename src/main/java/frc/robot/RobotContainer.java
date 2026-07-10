@@ -349,21 +349,13 @@ public class RobotContainer {
         || Controllers.SHUTTLING.getAsBoolean()
         || superstructure.shootingDuringAuto)) {
 
-      // Optional<Angle> hoodAngle = Optional.of(Degrees.of(45));
-      // Optional<AngularVelocity> flywheelSpeed = Optional.of(RPM.of(1500));
-
       superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
       superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-
-      System.out.println("SHOOTING");
 
       LaunchSolution leftLaunchSolution = superstructure.shooterHandlerLeft.getLaunchSolution();
 
       Angle leftHoodAngle = leftLaunchSolution.hoodAngle();
       AngularVelocity leftFlywheelSpeed = leftLaunchSolution.flywheelSpeed();
-
-      // Angle hoodAngle = superstructure.hoodLeft.getPosition();
-      // AngularVelocity flywheelSpeed = superstructure.turretLeft.getVelocity();
 
       double leftFlywheelSpeedAsDouble = leftFlywheelSpeed.in(RPM);
       double leftExitVelocity = superstructure.shooterHandlerLeft.getPhysics().getExitSpeed();
@@ -383,9 +375,6 @@ public class RobotContainer {
 
       Angle rightHoodAngle = rightLaunchSolution.hoodAngle();
       AngularVelocity rightFlywheelSpeed = rightLaunchSolution.flywheelSpeed();
-
-      // Angle rightHoodAngle = superstructure.hoodRight.getPosition()
-      // AngularVelocity rightFlywheelSpeed = superStructure.turretRight.getVelocity()
 
       double rightFlywheelSpeedAsDouble = rightFlywheelSpeed.in(RPM);
       double rightExitVelocity = superstructure.shooterHandlerRight.getPhysics().getExitSpeed();
@@ -421,10 +410,6 @@ public class RobotContainer {
 
   private ChassisSpeeds getFieldRelativeChassisSpeedsForSim() {
     ChassisSpeeds speeds = drivetrain.getState().Speeds;
-    if (speeds == null) {
-      return new ChassisSpeeds();
-    }
-    return new ChassisSpeeds(
-        speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+    return (speeds == null) ? new ChassisSpeeds() : speeds;
   }
 }

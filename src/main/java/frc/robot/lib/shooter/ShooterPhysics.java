@@ -9,10 +9,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.lib.shooter.ShotTable.ShooterData;
+import lombok.Getter;
 
 public class ShooterPhysics {
   private final ShooterConfig.Physics physicsConfig;
-  private double exitSpeed = 0;
+  @Getter private double exitSpeed = 0;
 
   public ShooterPhysics(ShooterConfig.Physics physicsConfig) {
     this.physicsConfig = physicsConfig;
@@ -135,9 +136,5 @@ public class ShooterPhysics {
         physicsConfig.EXIT_SPEED_TABLE().calcAngularVel(MetersPerSecond.of(vBall.getNorm()));
 
     return new LaunchSolution(new ShooterData(hoodAngle, flywheelSpeed), turretRotation);
-  }
-
-  public double getExitSpeed() {
-    return exitSpeed;
   }
 }

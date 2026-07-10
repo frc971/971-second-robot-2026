@@ -162,9 +162,6 @@ public class ShooterHandler {
   }
 
   public void periodic() {
-    // System.out.println("Shooter state: " + shooterState);
-    // System.out.println("Shooter goal: " + shooterGoal);
-    // System.out.println();
     projectileState = getProjectileState();
 
     // clear robot velocity if not using OTF
@@ -432,10 +429,6 @@ public class ShooterHandler {
 
   public ShooterConfig getConfig() {
     return config;
-  }
-
-  public Side getSide() {
-    return side;
   }
 
   public ShooterPhysics getPhysics() {
