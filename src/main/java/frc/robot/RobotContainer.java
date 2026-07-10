@@ -112,6 +112,8 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MAX_SPEED);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+  private double simFuelExitVelocity;
+
   public RobotContainer() {
     superstructure = new Superstructure(this);
 
@@ -230,6 +232,7 @@ public class RobotContainer {
   public void periodic() {
     superstructure.periodic();
     if (RobotBase.isSimulation()) {
+      Logger.recordOutput("Fuel Simulation/Shooting/ExitVelocity", simFuelExitVelocity);
       handleSimShooting();
     }
   }
@@ -263,28 +266,6 @@ public class RobotContainer {
 
     instance.spawnStartingFuel();
     instance.start();
-
-    Command spawnFuelCommand =
-        Commands.runOnce(this::spawnFuelInFrontOfRobot)
-            .ignoringDisable(true)
-            .withName("FuelSim/Spawn Fuel");
-    Command resetFuelCommand =
-        Commands.runOnce(
-                () -> {
-                  instance.clearFuel();
-                  instance.spawnStartingFuel();
-                  Logger.recordOutput("FuelSim/LastEvent", "Reset");
-                })
-            .ignoringDisable(true)
-            .withName("FuelSim/Reset Fuel");
-    Command launchFuelCommand =
-        Commands.runOnce(() -> launchFuelInSim(MetersPerSecond.of(8), Degrees.of(45), superstructure.shooterHandlerLeft))
-            .ignoringDisable(true)
-            .withName("FuelSim/Launch Fuel");
-
-    SmartDashboard.putData(spawnFuelCommand);
-    SmartDashboard.putData(resetFuelCommand);
-    SmartDashboard.putData(launchFuelCommand);
   }
 
   public void resetFuelSim() {
@@ -295,19 +276,6 @@ public class RobotContainer {
     instance.clearFuel();
     instance.spawnStartingFuel();
     Logger.recordOutput("FuelSim/LastEvent", "Auto Reset");
-  }
-
-  private void spawnFuelInFrontOfRobot() {
-    Pose2d pose = drivetrain.getState().Pose;
-    Translation2d offset =
-        new Translation2d(Dimensions.FULL_LENGTH / 2.0 + 0.1, 0).rotateBy(pose.getRotation());
-    Translation3d location =
-        new Translation3d(
-            pose.getX() + offset.getX(),
-            pose.getY() + offset.getY(),
-            Dimensions.BUMPER_HEIGHT / 2.0);
-    FuelSim.getInstance().spawnFuel(location, new Translation3d());
-    Logger.recordOutput("FuelSim/LastEvent", "Manual Spawn");
   }
 
   private void launchFuelInSim(LinearVelocity velocity, Angle elevation, ShooterHandler shooterHandler) {
@@ -324,9 +292,8 @@ public class RobotContainer {
   }
 
   private void handleSimShooting() {
-    if ((Controllers.SHOOTING.getAsBoolean()
-        || Controllers.SHUTTLING.getAsBoolean()
-        || superstructure.shootingDuringAuto)) {
+    if ((superstructure.shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING)
+        && (superstructure.shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)) {
 
         ShooterHandler[] shooterHandlers = new ShooterHandler[]{superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight};
         
@@ -335,14 +302,10 @@ public class RobotContainer {
 
           Angle hoodAngle = launchSolution.hoodAngle();
 
-          double exitVelocity = shooterHandler.getPhysics().getExitSpeed();
-          Logger.recordOutput("Fuel Simulation/Shooting/ExitVelocity", exitVelocity);
+          simFuelExitVelocity = shooterHandler.getPhysics().getExitSpeed();
 
-          launchFuelInSim(MetersPerSecond.of(exitVelocity), hoodAngle, shooterHandler);
+          launchFuelInSim(MetersPerSecond.of(simFuelExitVelocity), hoodAngle, shooterHandler);
         }
-    } else {
-      superstructure.shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
-      superstructure.shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
     }
   }
 
