@@ -131,7 +131,7 @@ public class ShooterHandler {
 
   // needs access DriveTrain (for robotState)
   private final CommandSwerveDrivetrain drivetrain;
-  private final AngularSubsystem turret;
+  @Getter private final AngularSubsystem turret;
   private final Hood hood;
   private final AngularSubsystem flywheel;
 
