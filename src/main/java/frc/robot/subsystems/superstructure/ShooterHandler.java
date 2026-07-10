@@ -78,8 +78,8 @@ public class ShooterHandler {
   }
 
   // config + physics model
-  private ShooterConfig config;
-  private ShooterPhysics physics;
+  private @Getter ShooterConfig config;
+  private @Getter ShooterPhysics physics;
   private ObjectState projectileState;
   private @Setter @Getter ObjectState targetState;
   private final String name;
@@ -425,14 +425,6 @@ public class ShooterHandler {
 
   public Distance currentDistance() {
     return Meters.of(targetState.minus(projectileState).xyPos().getNorm());
-  }
-
-  public ShooterConfig getConfig() {
-    return config;
-  }
-
-  public ShooterPhysics getPhysics() {
-    return physics;
   }
 
   public void setStateAiming() {
