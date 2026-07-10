@@ -25,6 +25,9 @@ public class FuelSim {
   private static final double FIELD_WIDTH = 8.04;
   private static final double FRICTION = 0.1; // horizontal velocity lost per second on ground
 
+  // Maximum amount of fuel rendered at once
+  private final double FUEL_CLEAR_THRESHOLD = 500;
+
   private static FuelSim instance = null;
 
   private static final Translation3d[] FIELD_XZ_LINE_STARTS = {
@@ -371,7 +374,7 @@ public class FuelSim {
   }
 
   private void handleClearingFuel(ArrayList<Fuel> fuels) {
-    if (Controllers.CLEAR_SIM_FUEL.getAsBoolean()) {
+    if (fuels.size() >= FUEL_CLEAR_THRESHOLD) {
       fuels.clear();
     }
   }
