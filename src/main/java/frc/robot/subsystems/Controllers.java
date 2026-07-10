@@ -23,8 +23,7 @@ public class Controllers {
   public static final Trigger ODOMETRY_RESET = DRIVER.y();
 
   // Only make the button if the robot is in sim to prevent future overlap
-  public static final Trigger CLEAR_SIM_FUEL =
-      (RobotBase.isSimulation()) ? DRIVER.axisGreaterThan(5, 0.9) : null;
+  public static final Trigger CLEAR_SIM_FUEL = DRIVER.axisGreaterThan(7, 0.9);
 
   // === Manipulator's Controls
   public static final Trigger LEFT_SHUTTLE = MANIPULATOR.leftBumper();
