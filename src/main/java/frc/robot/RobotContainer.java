@@ -11,30 +11,15 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.BLine.*;
 import frc.robot.lib.JoystickValues;
-import frc.robot.lib.shooter.LaunchSolution;
 import frc.robot.lib.simulation.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
-
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
   public final Superstructure superstructure;
@@ -127,8 +112,7 @@ public class RobotContainer {
       this.fuelSimHelper = new FuelSimHelper(this);
       drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
       fuelSimHelper.configureFuelSim();
-    }
-    else {
+    } else {
       fuelSimHelper = null;
     }
 
@@ -247,5 +231,4 @@ public class RobotContainer {
   public Telemetry getTelemetry() {
     return logger;
   }
-  
 }

@@ -2,8 +2,6 @@ package frc.robot.lib.simulation;
 
 import static edu.wpi.first.units.Units.*;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -16,39 +14,40 @@ import frc.robot.lib.shooter.LaunchSolution;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
+import org.littletonrobotics.junction.Logger;
 
 public class FuelSimHelper {
 
-    private final CommandSwerveDrivetrain drivetrain;
-    private final Superstructure superstructure;
-    private double simFuelExitVelocity;
+  private final CommandSwerveDrivetrain drivetrain;
+  private final Superstructure superstructure;
+  private double simFuelExitVelocity;
 
-    // Pass in robotContainer in order to access superstructure and drivetrain
-    public FuelSimHelper(RobotContainer robotContainer) {
-        this.drivetrain = robotContainer.drivetrain;
-        this.superstructure = robotContainer.superstructure;
-    }
+  // Pass in robotContainer in order to access superstructure and drivetrain
+  public FuelSimHelper(RobotContainer robotContainer) {
+    this.drivetrain = robotContainer.drivetrain;
+    this.superstructure = robotContainer.superstructure;
+  }
 
-    public void configureFuelSim() {
-        FuelSim instance = FuelSim.getInstance();
-        instance.clearFuel();
-        instance.registerRobot(
-            Dimensions.FULL_WIDTH,
-            Dimensions.FULL_LENGTH,
-            Dimensions.BUMPER_HEIGHT,
-            () -> drivetrain.getState().Pose,
-            this::getFieldRelativeChassisSpeedsForSim);
+  public void configureFuelSim() {
+    FuelSim instance = FuelSim.getInstance();
+    instance.clearFuel();
+    instance.registerRobot(
+        Dimensions.FULL_WIDTH,
+        Dimensions.FULL_LENGTH,
+        Dimensions.BUMPER_HEIGHT,
+        () -> drivetrain.getState().Pose,
+        this::getFieldRelativeChassisSpeedsForSim);
 
-        instance.registerIntake(
-            -Dimensions.FULL_LENGTH,
-            Dimensions.FULL_LENGTH / 2.0,
-            -Dimensions.FULL_WIDTH / 6.0,
-            Dimensions.FULL_WIDTH / 6.0,
-            () -> (true),
-            () -> Logger.recordOutput("FuelSim/LastEvent", "Intake"));
+    instance.registerIntake(
+        -Dimensions.FULL_LENGTH,
+        Dimensions.FULL_LENGTH / 2.0,
+        -Dimensions.FULL_WIDTH / 6.0,
+        Dimensions.FULL_WIDTH / 6.0,
+        () -> (true),
+        () -> Logger.recordOutput("FuelSim/LastEvent", "Intake"));
 
-        instance.spawnStartingFuel();
-        instance.start();
+    instance.spawnStartingFuel();
+    instance.start();
   }
 
   public void resetFuelSim() {
@@ -61,10 +60,15 @@ public class FuelSimHelper {
     Logger.recordOutput("FuelSim/LastEvent", "Auto Reset");
   }
 
-  private void launchFuelInSim(LinearVelocity velocity, Angle elevation, ShooterHandler shooterHandler) {
+  private void launchFuelInSim(
+      LinearVelocity velocity, Angle elevation, ShooterHandler shooterHandler) {
     Translation3d muzzlePose = shooterHandler.getProjectileState().position();
-    Rotation2d launchYaw = drivetrain.getState().Pose.getRotation()
-      .plus(new Rotation2d(shooterHandler.getTurret().getPosition()));
+    Rotation2d launchYaw =
+        drivetrain
+            .getState()
+            .Pose
+            .getRotation()
+            .plus(new Rotation2d(shooterHandler.getTurret().getPosition()));
 
     Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
     launchVelocity = launchVelocity.plus(shooterHandler.getProjectileState().velocity());
@@ -78,17 +82,20 @@ public class FuelSimHelper {
     if ((superstructure.shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING)
         && (superstructure.shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)) {
 
-        ShooterHandler[] shooterHandlers = new ShooterHandler[]{superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight};
-        
-        for (ShooterHandler shooterHandler : shooterHandlers) {
-          LaunchSolution launchSolution = shooterHandler.getLaunchSolution();
+      ShooterHandler[] shooterHandlers =
+          new ShooterHandler[] {
+            superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight
+          };
 
-          Angle hoodAngle = launchSolution.hoodAngle();
+      for (ShooterHandler shooterHandler : shooterHandlers) {
+        LaunchSolution launchSolution = shooterHandler.getLaunchSolution();
 
-          simFuelExitVelocity = shooterHandler.getPhysics().getExitSpeed();
+        Angle hoodAngle = launchSolution.hoodAngle();
 
-          launchFuelInSim(MetersPerSecond.of(simFuelExitVelocity), hoodAngle, shooterHandler);
-        }
+        simFuelExitVelocity = shooterHandler.getPhysics().getExitSpeed();
+
+        launchFuelInSim(MetersPerSecond.of(simFuelExitVelocity), hoodAngle, shooterHandler);
+      }
     }
   }
 
