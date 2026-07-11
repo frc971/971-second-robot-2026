@@ -95,7 +95,6 @@ public class FuelSimHelper {
         launchFuelInSim(MetersPerSecond.of(simFuelExitVelocity), hoodAngle, shooterHandler);
       }
     }
-    
   }
 
   private Translation3d createLaunchVelocity(
