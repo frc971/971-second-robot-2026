@@ -84,10 +84,8 @@ public class FuelSimHelper {
   }
 
   private void handleSimShooting() {
-    if ((superstructure.shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING)
-        && (superstructure.shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)) {
-
-      for (ShooterHandler shooterHandler : shooterHandlers) {
+    for (ShooterHandler shooterHandler : shooterHandlers) {
+      if (shooterHandler.getShooterState() == ShooterHandler.State.FIRING) {
         LaunchSolution launchSolution = shooterHandler.getLaunchSolution();
 
         Angle hoodAngle = launchSolution.hoodAngle();
@@ -97,6 +95,7 @@ public class FuelSimHelper {
         launchFuelInSim(MetersPerSecond.of(simFuelExitVelocity), hoodAngle, shooterHandler);
       }
     }
+    
   }
 
   private Translation3d createLaunchVelocity(

@@ -21,7 +21,7 @@ public class Controllers {
 
   public static final Trigger ODOMETRY_RESET = DRIVER.y();
 
-  // Only make the button if the robot is in sim to prevent future overlap
+  // Make the button on an axis that doesn't exist on a real controller to prevent future overlap
   public static final Trigger CLEAR_SIM_FUEL = DRIVER.axisGreaterThan(7, 0.9);
 
   // === Manipulator's Controls
