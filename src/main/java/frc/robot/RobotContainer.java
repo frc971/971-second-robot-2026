@@ -231,4 +231,8 @@ public class RobotContainer {
   public Telemetry getTelemetry() {
     return logger;
   }
+
+  public void simAutoInit() {
+    fuelSimHelper.resetFuelSim();
+  }
 }
