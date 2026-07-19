@@ -59,6 +59,7 @@ public class Drive {
     manual.periodic();
     thetaLock.periodic();
     autoAlign.periodic();
+    drivetrain.periodic();
   }
 
   private void updateMode() {

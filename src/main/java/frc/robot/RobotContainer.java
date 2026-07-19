@@ -15,14 +15,14 @@ import frc.robot.subsystems.superstructure.Superstructure;
 
 public class RobotContainer {
   public final Superstructure superstructure;
-  public final Drive drivetrainController;
+  public final Drive drive;
 
   private final Telemetry logger = new Telemetry(3.5);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   public RobotContainer() {
     superstructure = new Superstructure(this);
-    drivetrainController = new Drive(drivetrain);
+    drive = new Drive(drivetrain);
 
     configureDrivetrain();
 
@@ -44,8 +44,7 @@ public class RobotContainer {
 
   public void periodic() {
     superstructure.periodic();
-    drivetrainController.periodic();
-    drivetrain.periodic();
+    drive.periodic();
   }
 
   public void resetSuperstructure() {
