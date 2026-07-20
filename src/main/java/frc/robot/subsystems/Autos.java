@@ -43,7 +43,6 @@ public class Autos {
 
   private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
       new SwerveRequest.ApplyRobotSpeeds();
-  private final SwerveRequest.Idle autoIdleRequest = new SwerveRequest.Idle();
 
   @Getter private final SendableChooser<AutoPathOption> chooser = new SendableChooser<>();
 
@@ -157,15 +156,14 @@ public class Autos {
     }
 
     return Commands.sequence(
-            IntStream.range(0, cachedPathSegments.size())
-                .mapToObj(
-                    i -> {
-                      FollowPath.Builder builder =
-                          i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                      return builder.build(cachedPathSegments.get(i));
-                    })
-                .toArray(Command[]::new))
-        .finallyDo(() -> drivetrain.setRequest(autoIdleRequest));
+        IntStream.range(0, cachedPathSegments.size())
+            .mapToObj(
+                i -> {
+                  FollowPath.Builder builder =
+                      i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
+                  return builder.build(cachedPathSegments.get(i));
+                })
+            .toArray(Command[]::new));
   }
 
   // IMPORTANT: all autos must be defined here

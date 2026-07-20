@@ -56,6 +56,11 @@ public class ThetaLock {
     Rotation2d currentRotation = drivetrain.getState().Pose.getRotation();
     double rotationError = Math.abs(desiredRotation.get().minus(currentRotation).getDegrees());
 
+    // OperatorPerspective keeps translation alliance driver relative, so we offset the target to
+    // keep rotation absolute
+    Rotation2d targetRotation =
+        desiredRotation.get().minus(drivetrain.getOperatorForwardDirection());
+
     Logger.recordOutput("Drive/ThetaLock/TargetAngle", desiredRotation.get().getDegrees());
     Logger.recordOutput("Drive/ThetaLock/CurrentAngle", currentRotation.getDegrees());
     Logger.recordOutput("Drive/ThetaLock/RotationError", rotationError);
@@ -64,7 +69,7 @@ public class ThetaLock {
         driveAtAngle
             .withVelocityX(manual.getValues().getX())
             .withVelocityY(manual.getValues().getY())
-            .withTargetDirection(desiredRotation.get())
-            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
+            .withTargetDirection(targetRotation)
+            .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
   }
 }
