@@ -182,7 +182,7 @@ public class AutoAlign {
 
   /** Updates dashboard with current alignment status. */
   public void updateDashboard() {
-    Logger.recordOutput("AutoAlign/Aligned", isAligned());
+    Logger.recordOutput("Drive/AutoAlign/Aligned", isAligned());
     Logger.recordOutput("Drive/AutoAlign/Goal", goal);
     Logger.recordOutput("Drive/AutoAlign/IsAligning", isAligning);
 

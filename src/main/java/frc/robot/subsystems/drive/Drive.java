@@ -42,8 +42,6 @@ public class Drive {
   }
 
   public void periodic() {
-    updateMode();
-
     manual.setGoal(Manual.Goal.NONE);
     thetaLock.setGoal(ThetaLock.Goal.NONE);
     autoAlign.setGoal(AutoAlign.Goal.NONE);
@@ -61,6 +59,8 @@ public class Drive {
     autoAlign.periodic();
 
     drivetrain.periodic();
+
+    updateMode();
   }
 
   private void updateMode() {
