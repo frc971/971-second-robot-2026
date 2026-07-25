@@ -81,16 +81,14 @@ public class Drive {
         && autoAlign.getGoal() == AutoAlign.Goal.ALIGN
         && autoAlign.isAligned()) {
       setDriveMode(Mode.NONE);
-    } else if (DriverStation.isTeleop() && (mode == Mode.NONE || mode == Mode.BRAKE)) {
+    } else if (DriverStation.isTeleop()) {
       setDriveMode(Mode.MANUAL);
-    }
+    } 
 
-    if (Controllers.SHUTTLING.getAsBoolean()) {
-      setDriveMode(Mode.AUTO_ALIGN);
-    } else if (Controllers.DISABLE_OTF.getAsBoolean()) {
-      setDriveMode(Mode.THETA_LOCK);
-    } else {
-      setDriveMode(Mode.NONE);
+    if (DriverStation.isTeleopEnabled()) {
+      if (Controllers.DISABLE_OTF.getAsBoolean()) {
+        setDriveMode(Mode.AUTO_ALIGN);
+      }
     }
   }
 }
