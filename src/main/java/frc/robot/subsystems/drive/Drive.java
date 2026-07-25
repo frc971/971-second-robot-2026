@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -8,7 +9,10 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.superstructure.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import org.littletonrobotics.junction.AutoLogOutput;
+
+import frc.robot.subsystems.Controllers;
 
 public class Drive {
 
@@ -79,6 +83,14 @@ public class Drive {
       setDriveMode(Mode.NONE);
     } else if (DriverStation.isTeleop() && (mode == Mode.NONE || mode == Mode.BRAKE)) {
       setDriveMode(Mode.MANUAL);
+    }
+
+    if (Controllers.SHUTTLING.getAsBoolean()) {
+      setDriveMode(Mode.AUTO_ALIGN);
+    } else if (Controllers.DISABLE_OTF.getAsBoolean()) {
+      setDriveMode(Mode.THETA_LOCK);
+    } else {
+      setDriveMode(Mode.NONE);
     }
   }
 }
