@@ -34,6 +34,10 @@ public class RobotContainer {
     FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
     FollowPath.registerEventTrigger("neutral", superstructure.neutral());
     FollowPath.registerEventTrigger("intakeDown", superstructure.intakePivotDownAuto());
+    FollowPath.registerEventTrigger("autoAlign", drive.setDriveModeCommand(Drive.Mode.AUTO_ALIGN));
+    FollowPath.registerEventTrigger("thetaLock", drive.setDriveModeCommand(Drive.Mode.THETA_LOCK));
+    FollowPath.registerEventTrigger("pathControl", drive.setDriveModeCommand(Drive.Mode.NONE));
+    FollowPath.registerEventTrigger("driveBrake", drive.setDriveModeCommand(Drive.Mode.BRAKE));
   }
 
   private void configureDrivetrain() {

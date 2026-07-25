@@ -2,6 +2,8 @@ package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.superstructure.*;
 import lombok.Getter;
@@ -41,7 +43,13 @@ public class Drive {
     mode = targetMode;
   }
 
+  public Command setDriveModeCommand(Mode targetMode) {
+    return Commands.runOnce(() -> setDriveMode(targetMode));
+  }
+
   public void periodic() {
+    updateMode();
+
     manual.setGoal(Manual.Goal.NONE);
     thetaLock.setGoal(ThetaLock.Goal.NONE);
     autoAlign.setGoal(AutoAlign.Goal.NONE);
@@ -59,14 +67,15 @@ public class Drive {
     autoAlign.periodic();
 
     drivetrain.periodic();
-
-    updateMode();
   }
 
   private void updateMode() {
     if (DriverStation.isDisabled()) {
       setDriveMode(Mode.BRAKE);
-    } else if (DriverStation.isAutonomous()) {
+    } else if (DriverStation.isAutonomous()
+        && mode == Mode.AUTO_ALIGN
+        && autoAlign.getGoal() == AutoAlign.Goal.ALIGN
+        && autoAlign.isAligned()) {
       setDriveMode(Mode.NONE);
     } else if (DriverStation.isTeleop() && (mode == Mode.NONE || mode == Mode.BRAKE)) {
       setDriveMode(Mode.MANUAL);
