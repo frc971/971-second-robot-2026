@@ -56,7 +56,7 @@ public class FuelSimHelper {
         -Dimensions.FULL_WIDTH / 6.0,
         Dimensions.FULL_WIDTH / 6.0,
         () -> (true),
-        () -> Logger.recordOutput("FuelSim/LastEvent", "Intake"));
+        () -> Logger.recordOutput("Fuel Simulation/LastEvent", "Intake"));
 
     instance.spawnStartingFuel();
     instance.start();
