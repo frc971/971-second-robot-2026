@@ -373,6 +373,7 @@ public class FuelSim {
   private void handleClearingFuel(ArrayList<Fuel> fuels) {
     if (Controllers.CLEAR_SIM_FUEL != null && Controllers.CLEAR_SIM_FUEL.getAsBoolean()) {
       fuels.clear();
+      Logger.recordOutput("Fuel Simulation/LastEvent", "Clear Fuel");
     }
   }
 

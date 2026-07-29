@@ -6,14 +6,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.RobotContainer;
-import frc.robot.lib.shooter.LaunchSolution;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
+import java.util.Optional;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class FuelSimHelper {
@@ -21,6 +22,10 @@ public class FuelSimHelper {
   private final CommandSwerveDrivetrain drivetrain;
   private final Superstructure superstructure;
   private final ShooterHandler[] shooterHandlers;
+  private final Voltage autoShootingGoal = Volts.of(11.0);
+  private final double wheelDiameterM = Inches.of(4.0).in(Meters); // from shooter CAD
+  private final double slipFactor =
+      0.45; // how much surface speed transfers to the ball, 0.45 prevents overshooting
   private double simFuelExitVelocity;
 
   // Pass in robotContainer in order to access superstructure and drivetrain
@@ -62,7 +67,7 @@ public class FuelSimHelper {
     FuelSim instance = FuelSim.getInstance();
     instance.clearFuel();
     instance.spawnStartingFuel();
-    Logger.recordOutput("FuelSim/LastEvent", "Auto Reset");
+    Logger.recordOutput("Fuel Simulation/LastEvent", "Auto Reset");
   }
 
   private void launchFuelInSim(
@@ -80,19 +85,47 @@ public class FuelSimHelper {
 
     FuelSim.getInstance().spawnFuel(muzzlePose, launchVelocity);
 
-    Logger.recordOutput("FuelSim/LastEvent", "Launch");
+    Logger.recordOutput("Fuel Simulation/LastEvent", "Launch");
+  }
+
+  @AutoLogOutput(key = "Fuel Simulation/Shooting/isShooting")
+  private boolean isShooting() {
+    boolean shooting = false;
+
+    Voltage rollerFloorVolts = superstructure.rollerFloor.getAppliedVoltage();
+    Voltage b2Volts = superstructure.b2.getAppliedVoltage();
+    Voltage kickerVolts = superstructure.kicker.getAppliedVoltage();
+
+    if (DriverStation.isAutonomous()) {
+      shooting =
+          rollerFloorVolts.isEquivalent(autoShootingGoal)
+              && b2Volts.isEquivalent(autoShootingGoal)
+              && kickerVolts.isEquivalent(autoShootingGoal);
+    } else if (DriverStation.isTeleop()) {
+      shooting =
+          rollerFloorVolts.isEquivalent(Volts.of(8.0))
+              && b2Volts.isEquivalent(Volts.of(7.0))
+              && kickerVolts.isEquivalent(Volts.of(8.0));
+    }
+
+    return shooting;
+  }
+
+  // credit to team 9562 for exitVelocity function
+  private double exitVelocity(double rpm) {
+    return slipFactor * rpm * Math.PI * wheelDiameterM / 60.0;
   }
 
   private void handleSimShooting() {
-    for (ShooterHandler shooterHandler : shooterHandlers) {
-      if (shooterHandler.getShooterState() == ShooterHandler.State.FIRING) {
-        LaunchSolution launchSolution = shooterHandler.getLaunchSolution();
+    if (isShooting()) {
+      for (ShooterHandler shooterHandler : shooterHandlers) {
+        Optional<AngularVelocity> flywheelSpeed = shooterHandler.getFlywheelSpeed();
+        Optional<Angle> hoodAngle = shooterHandler.getHoodAngle();
 
-        Angle hoodAngle = launchSolution.hoodAngle();
-
-        simFuelExitVelocity = shooterHandler.getPhysics().getExitSpeed();
-
-        launchFuelInSim(MetersPerSecond.of(simFuelExitVelocity), hoodAngle, shooterHandler);
+        if (flywheelSpeed.isPresent() && hoodAngle.isPresent()) {
+          simFuelExitVelocity = exitVelocity(flywheelSpeed.get().in(RPM));
+          launchFuelInSim(MetersPerSecond.of(simFuelExitVelocity), hoodAngle.get(), shooterHandler);
+        }
       }
     }
   }
