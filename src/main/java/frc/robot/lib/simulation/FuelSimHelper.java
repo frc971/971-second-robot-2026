@@ -24,8 +24,10 @@ public class FuelSimHelper {
   private final ShooterHandler[] shooterHandlers;
   private final Voltage autoShootingGoal = Volts.of(11.0);
   private final double wheelDiameterM = Inches.of(4.0).in(Meters); // from shooter CAD
-  private final double slipFactor =
-      0.45; // how much surface speed transfers to the ball, 0.45 prevents overshooting
+
+  // how much surface speed transfers to the ball, 0.45 prevents overshooting
+  private final double slipFactor = 0.45;
+
   private double simFuelExitVelocity;
 
   // Pass in robotContainer in order to access superstructure and drivetrain
