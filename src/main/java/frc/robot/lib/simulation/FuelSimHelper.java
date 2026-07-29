@@ -87,7 +87,7 @@ public class FuelSimHelper {
 
     FuelSim.getInstance().spawnFuel(muzzlePose, launchVelocity);
 
-    Logger.recordOutput("Fuel Simulation/LastEvent", "Launch");
+    Logger.recordOutput("Fuel Simulation/LastEvent", "Shoot");
   }
 
   @AutoLogOutput(key = "Fuel Simulation/Shooting/isShooting")
