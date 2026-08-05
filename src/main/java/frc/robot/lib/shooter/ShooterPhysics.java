@@ -13,7 +13,7 @@ import lombok.Getter;
 
 public class ShooterPhysics {
   private final ShooterConfig.Physics physicsConfig;
-  @Getter private double exitSpeed = 0;
+  private double exitSpeed = 0;
 
   public ShooterPhysics(ShooterConfig.Physics physicsConfig) {
     this.physicsConfig = physicsConfig;

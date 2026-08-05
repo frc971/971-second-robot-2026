@@ -78,8 +78,8 @@ public class ShooterHandler {
   }
 
   // config + physics model
-  private @Getter ShooterConfig config;
-  private @Getter ShooterPhysics physics;
+  private ShooterConfig config;
+  private ShooterPhysics physics;
   private ObjectState projectileState;
   private @Setter @Getter ObjectState targetState;
   private final String name;
@@ -416,7 +416,7 @@ public class ShooterHandler {
     return robotState.plus(projPoseOffset, projVelOffset);
   }
 
-  public boolean isShuttle(ObjectState target) {
+  private boolean isShuttle(ObjectState target) {
     return target == Targets.LEFT_BLUE_SHUTTLE
         || target == Targets.RIGHT_BLUE_SHUTTLE
         || target == Targets.LEFT_RED_SHUTTLE
