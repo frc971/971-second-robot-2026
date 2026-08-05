@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.lib.shooter.ShotTable.ShooterData;
-import lombok.Getter;
 
 public class ShooterPhysics {
   private final ShooterConfig.Physics physicsConfig;

@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -98,7 +97,9 @@ public class FuelSimHelper {
     Voltage b2Volts = superstructure.b2.getAppliedVoltage();
     Voltage kickerVolts = superstructure.kicker.getAppliedVoltage();
 
-    if (rollerFloorVolts.magnitude() > 0 && b2Volts.magnitude() > 0 && kickerVolts.magnitude() > 0) {
+    if (rollerFloorVolts.magnitude() > 0
+        && b2Volts.magnitude() > 0
+        && kickerVolts.magnitude() > 0) {
       shooting = true;
     }
 
