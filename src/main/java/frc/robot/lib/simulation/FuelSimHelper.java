@@ -98,16 +98,8 @@ public class FuelSimHelper {
     Voltage b2Volts = superstructure.b2.getAppliedVoltage();
     Voltage kickerVolts = superstructure.kicker.getAppliedVoltage();
 
-    if (DriverStation.isAutonomous()) {
-      shooting =
-          rollerFloorVolts.isEquivalent(autoShootingGoal)
-              && b2Volts.isEquivalent(autoShootingGoal)
-              && kickerVolts.isEquivalent(autoShootingGoal);
-    } else if (DriverStation.isTeleop()) {
-      shooting =
-          rollerFloorVolts.isEquivalent(Volts.of(8.0))
-              && b2Volts.isEquivalent(Volts.of(7.0))
-              && kickerVolts.isEquivalent(Volts.of(8.0));
+    if (rollerFloorVolts.magnitude() > 0 && b2Volts.magnitude() > 0 && kickerVolts.magnitude() > 0) {
+      shooting = true;
     }
 
     return shooting;

@@ -13,7 +13,6 @@ import lombok.Getter;
 
 public class ShooterPhysics {
   private final ShooterConfig.Physics physicsConfig;
-  private double exitSpeed = 0;
 
   public ShooterPhysics(ShooterConfig.Physics physicsConfig) {
     this.physicsConfig = physicsConfig;
@@ -54,7 +53,7 @@ public class ShooterPhysics {
                 - Math.tan(targetAngle));
 
     double tanDiff = Math.tan(targetAngle) - Math.tan(shotAngle);
-    exitSpeed =
+    double exitSpeed =
         (1.0 / Math.cos(shotAngle))
             * Math.sqrt((physicsConfig.GRAVITY() * currentDistance) / Math.abs(tanDiff));
     // checks if exit speed is finite and positive
@@ -107,7 +106,7 @@ public class ShooterPhysics {
     double sinTheta = Math.sin(shotAngle);
     if (Math.abs(sinTheta) < 1e-6) return null;
 
-    exitSpeed = Math.sqrt(2 * physicsConfig.GRAVITY() * deltaH) / sinTheta;
+    double exitSpeed = Math.sqrt(2 * physicsConfig.GRAVITY() * deltaH) / sinTheta;
 
     // checks if exit speed is finite and positive
     if (!Double.isFinite(exitSpeed) || exitSpeed <= 0) return null;
