@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
 import java.util.Optional;
@@ -21,7 +22,6 @@ public class FuelSimHelper {
   private final CommandSwerveDrivetrain drivetrain;
   private final Superstructure superstructure;
   private final ShooterHandler[] shooterHandlers;
-  private final Voltage autoShootingGoal = Volts.of(11.0);
   private final double wheelDiameterM = Inches.of(4.0).in(Meters); // from shooter CAD
 
   // how much surface speed transfers to the ball, 0.45 prevents overshooting
@@ -54,7 +54,9 @@ public class FuelSimHelper {
         Dimensions.FULL_LENGTH / 2.0,
         -Dimensions.FULL_WIDTH / 6.0,
         Dimensions.FULL_WIDTH / 6.0,
-        () -> (true),
+        () -> (superstructure.groundRollers.getAppliedVoltage() != null && 
+      superstructure.groundRollers.getAppliedVoltage().magnitude() > 0 && 
+      superstructure.groundPivot.getPosition().isNear(Degrees.of(0.0), Degrees.of(0.02))),
         () -> Logger.recordOutput("Fuel Simulation/LastEvent", "Intake"));
 
     instance.spawnStartingFuel();
@@ -125,6 +127,13 @@ public class FuelSimHelper {
     }
   }
 
+  private void handleClearingFuel() {
+    if (Controllers.CLEAR_SIM_FUEL != null && Controllers.CLEAR_SIM_FUEL.getAsBoolean()) {
+      FuelSim.getInstance().clearFuel();
+      Logger.recordOutput("Fuel Simulation/LastEvent", "Clear Fuel");
+    }
+  }
+
   private Translation3d createLaunchVelocity(
       LinearVelocity velocity, Angle elevation, Rotation2d heading) {
     double speed = velocity.in(MetersPerSecond);
@@ -141,7 +150,8 @@ public class FuelSimHelper {
   }
 
   public void periodic() {
-    Logger.recordOutput("Fuel Simulation/Shooting/ExitVelocity", simFuelExitVelocity);
     handleSimShooting();
+    Logger.recordOutput("Fuel Simulation/Shooting/ExitVelocity", simFuelExitVelocity);
+    handleClearingFuel();
   }
 }

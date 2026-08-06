@@ -199,10 +199,6 @@ public class FuelSim {
     return instance;
   }
 
-  public void clearFuel() {
-    fuels.clear();
-  }
-
   public void spawnStartingFuel() {
     Translation3d center = new Translation3d(FIELD_LENGTH / 2, FIELD_WIDTH / 2, FUEL_RADIUS);
     for (int i = 0; i < 15; i++) {
@@ -291,7 +287,6 @@ public class FuelSim {
       if (robotSupplier != null) {
         handleRobotCollisions(fuels);
         handleIntakes(fuels);
-        handleClearingFuel(fuels);
       }
     }
 
@@ -370,11 +365,8 @@ public class FuelSim {
     }
   }
 
-  private void handleClearingFuel(ArrayList<Fuel> fuels) {
-    if (Controllers.CLEAR_SIM_FUEL != null && Controllers.CLEAR_SIM_FUEL.getAsBoolean()) {
-      fuels.clear();
-      Logger.recordOutput("Fuel Simulation/LastEvent", "Clear Fuel");
-    }
+  public void clearFuel() {
+    fuels.clear();
   }
 
   public void registerIntake(
@@ -532,14 +524,8 @@ public class FuelSim {
     }
 
     private boolean shouldIntake(Fuel fuel, Pose2d robotPose) {
+      Logger.recordOutput("Fuel Simulation/Intaking/AbleToIntake", ableToIntake);
       if (!ableToIntake.getAsBoolean() || fuel.pos.getZ() > bumperHeight) {
-        return false;
-      }
-
-      // only consider intaking if either the robot is in autonomous or inputs are given so that the
-      // pivot is down and the rollers are spinning
-      if (!RobotState.isAutonomous()
-          && !(Controllers.INTAKE_PIVOT.toggled() && Controllers.INTAKE_ROLLERS.getAsBoolean())) {
         return false;
       }
 
