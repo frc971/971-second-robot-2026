@@ -29,7 +29,7 @@ public class AutoAlign {
     ALIGN
   }
 
-  private final Pose2d EXAMPLE_TARGET_POSE = new Pose2d(4, 6, new Rotation2d(Math.PI/2));
+  private final Pose2d EXAMPLE_TARGET_POSE = new Pose2d(4, 6, new Rotation2d(Math.PI / 2));
 
   @Getter @Setter private Goal goal = Goal.NONE;
   private Goal previousGoal = Goal.NONE;

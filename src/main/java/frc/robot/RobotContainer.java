@@ -17,14 +17,11 @@ public class RobotContainer {
   public final Superstructure superstructure;
   public final Drive drive;
 
-  private final Telemetry logger = new Telemetry(3.5);
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   public RobotContainer() {
     superstructure = new Superstructure(this);
     drive = new Drive(drivetrain);
-
-    configureDrivetrain();
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -40,12 +37,6 @@ public class RobotContainer {
     FollowPath.registerEventTrigger("driveBrake", drive.setDriveModeCommand(Drive.Mode.BRAKE));
   }
 
-  private void configureDrivetrain() {
-    // Note that X is defined as forward according to WPILib convention,
-    // and Y is defined as to the left according to WPILib convention.
-    drivetrain.registerTelemetry(logger::telemeterize);
-  }
-
   public void periodic() {
     superstructure.periodic();
     drive.periodic();
@@ -53,9 +44,5 @@ public class RobotContainer {
 
   public void resetSuperstructure() {
     superstructure.resetPositions();
-  }
-
-  public Telemetry getTelemetry() {
-    return logger;
   }
 }

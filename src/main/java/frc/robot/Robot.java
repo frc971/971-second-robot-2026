@@ -113,7 +113,7 @@ public class Robot extends LoggedRobot {
       }
 
       // Update the field visualization with the auto start pose
-      robotContainer.getTelemetry().setAutoStartPose(startPose);
+      robotContainer.drive.setAutoStartPose(startPose);
     }
     // TODO: Log the autonomous starting pose
   }

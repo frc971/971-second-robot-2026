@@ -1,22 +1,22 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 
-import frc.robot.subsystems.Controllers;
-
 public class Drive {
+  public static final double MAX_SPEED_METERS_PER_SECOND = 3.5;
 
   private final CommandSwerveDrivetrain drivetrain;
+  private final Telemetry telemetry = new Telemetry(MAX_SPEED_METERS_PER_SECOND);
 
   private final Manual manual;
   private final ThetaLock thetaLock;
@@ -36,6 +36,7 @@ public class Drive {
   public Drive(CommandSwerveDrivetrain drivetrain) {
 
     this.drivetrain = drivetrain;
+    drivetrain.registerTelemetry(telemetry::telemeterize);
 
     this.manual = new Manual(drivetrain);
 
@@ -49,6 +50,10 @@ public class Drive {
 
   public Command setDriveModeCommand(Mode targetMode) {
     return Commands.runOnce(() -> setDriveMode(targetMode));
+  }
+
+  public void setAutoStartPose(Pose2d pose) {
+    telemetry.setAutoStartPose(pose);
   }
 
   public void periodic() {
@@ -83,7 +88,7 @@ public class Drive {
       setDriveMode(Mode.NONE);
     } else if (DriverStation.isTeleop()) {
       setDriveMode(Mode.MANUAL);
-    } 
+    }
 
     if (DriverStation.isTeleopEnabled()) {
       if (Controllers.DISABLE_OTF.getAsBoolean()) {

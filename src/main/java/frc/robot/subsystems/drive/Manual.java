@@ -23,7 +23,7 @@ public class Manual {
   @Getter @Setter @AutoLogOutput private Goal goal = Goal.ACTIVE;
 
   private final CommandSwerveDrivetrain drivetrain;
-  private static final double MAX_SPEED = 3.5;
+  private static final double MAX_SPEED = Drive.MAX_SPEED_METERS_PER_SECOND;
   private static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.8).in(RadiansPerSecond);
 
   private static final double TRANSLATION_DEADBAND = 0.05;
