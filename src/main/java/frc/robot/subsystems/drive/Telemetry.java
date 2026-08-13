@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 public class Telemetry {
-  private final double MaxSpeed;
+  private final double maxSpeed;
 
   /* Field2d for robot visualization */
   private final Field2d field = new Field2d();
@@ -36,7 +36,7 @@ public class Telemetry {
    * @param maxSpeed Maximum speed in meters per second
    */
   public Telemetry(double maxSpeed) {
-    MaxSpeed = maxSpeed;
+    this.maxSpeed = maxSpeed;
     SignalLogger.start();
 
     // Create the autonomous starting pose field object
@@ -158,7 +158,7 @@ public class Telemetry {
     for (int i = 0; i < 4; ++i) {
       moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
       moduleDirections[i].setAngle(state.ModuleStates[i].angle);
-      moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
+      moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * maxSpeed));
 
       SmartDashboard.putData("Module " + i, moduleMechanisms[i]);
     }
