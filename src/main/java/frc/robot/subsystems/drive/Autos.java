@@ -46,7 +46,6 @@ public class Autos {
 
   @Getter private final SendableChooser<AutoPathOption> chooser = new SendableChooser<>();
 
-  private final CommandSwerveDrivetrain drivetrain;
   private final FollowPath.Builder pathBuilderWithStartPoseReset;
   private final FollowPath.Builder pathBuilderContinuation;
   private AutoPathOption cachedSelectedAuto = null;
@@ -55,7 +54,6 @@ public class Autos {
   private boolean selectedAutoIsCached = false;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
-    this.drivetrain = drivetrain;
 
     chooser.setDefaultOption("None", null);
 

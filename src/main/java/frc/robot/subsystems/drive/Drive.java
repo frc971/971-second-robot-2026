@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -91,9 +90,7 @@ public class Drive {
     }
 
     if (DriverStation.isTeleopEnabled()) {
-      if (Controllers.DISABLE_OTF.getAsBoolean()) {
-        setDriveMode(Mode.AUTO_ALIGN);
-      }
+      // TODO: add teleop specific triggered logic
     }
   }
 }
