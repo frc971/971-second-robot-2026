@@ -26,7 +26,7 @@ public class FuelSimHelper {
   private LinearVelocity simFuelExitVelocity;
 
   // 10 bps, since robot has 2 shooters there is a 1/5 s interval between shots instead of 1/10 s
-  private static final double LAUNCH_INTERVAL_SECONDS = 0.2; 
+  private static final double LAUNCH_INTERVAL_SECONDS = 0.2;
   private double lastLaunchTimeSeconds = 0.0;
 
   // Pass in robotContainer in order to access superstructure and drivetrain
