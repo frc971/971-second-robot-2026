@@ -13,7 +13,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
-import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -27,7 +26,7 @@ public class FuelSimHelper {
   // how much surface speed transfers to the ball, 0.45 prevents overshooting
   private final double slipFactor = 0.45;
 
-  private double simFuelExitVelocity;
+  private LinearVelocity simFuelExitVelocity;
 
   // Pass in robotContainer in order to access superstructure and drivetrain
   public FuelSimHelper(RobotContainer robotContainer) {
@@ -54,9 +53,13 @@ public class FuelSimHelper {
         Dimensions.FULL_LENGTH / 2.0,
         -Dimensions.FULL_WIDTH / 6.0,
         Dimensions.FULL_WIDTH / 6.0,
-        () -> (superstructure.groundRollers.getAppliedVoltage() != null && 
-      superstructure.groundRollers.getAppliedVoltage().magnitude() > 0 && 
-      superstructure.groundPivot.getPosition().isNear(Degrees.of(0.0), Degrees.of(0.02))),
+        () ->
+            (superstructure.groundRollers.getAppliedVoltage() != null
+                && superstructure.groundRollers.getAppliedVoltage().magnitude() > 0
+                && superstructure
+                    .groundPivot
+                    .getPosition()
+                    .isNear(Degrees.of(0.0), Degrees.of(0.02))),
         () -> Logger.recordOutput("Fuel Simulation/LastEvent", "Intake"));
 
     instance.spawnStartingFuel();
@@ -108,21 +111,27 @@ public class FuelSimHelper {
     return shooting;
   }
 
-  // credit to team 9562 for exitVelocity function
-  private double exitVelocity(double rpm) {
-    return slipFactor * rpm * Math.PI * wheelDiameterM / 60.0;
-  }
-
   private void handleSimShooting() {
     if (isShooting()) {
       for (ShooterHandler shooterHandler : shooterHandlers) {
-        Optional<AngularVelocity> flywheelSpeed = shooterHandler.getFlywheelSpeed();
-        Optional<Angle> hoodAngle = shooterHandler.getHoodAngle();
+        boolean leftHandler = shooterHandler == superstructure.shooterHandlerLeft;
+        AngularVelocity flywheelSpeed =
+            leftHandler
+                ? superstructure.flywheelLeft.getVelocity()
+                : superstructure.flywheelRight.getVelocity();
+        Angle hoodAngle =
+            leftHandler
+                ? superstructure.hoodLeft.getHoodAngle()
+                : superstructure.hoodRight.getHoodAngle();
 
-        if (flywheelSpeed.isPresent() && hoodAngle.isPresent()) {
-          simFuelExitVelocity = exitVelocity(flywheelSpeed.get().in(RPM));
-          launchFuelInSim(MetersPerSecond.of(simFuelExitVelocity), hoodAngle.get(), shooterHandler);
-        }
+        FlywheelSpeedTable shotTable =
+            leftHandler
+                ? SimShotTables.leftFlywheelSpeedTable()
+                : SimShotTables.rightFlywheelSpeedTable();
+        System.out.println(RotationsPerSecond.of(flywheelSpeed.in(RotationsPerSecond)));
+        simFuelExitVelocity =
+            shotTable.calcLinearVel(RotationsPerSecond.of(flywheelSpeed.in(RotationsPerSecond)));
+        launchFuelInSim(simFuelExitVelocity, hoodAngle, shooterHandler);
       }
     }
   }
