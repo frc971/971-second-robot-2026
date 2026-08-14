@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer; // Added Timer import
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
@@ -25,7 +25,8 @@ public class FuelSimHelper {
 
   private LinearVelocity simFuelExitVelocity;
 
-  private static final double LAUNCH_INTERVAL_SECONDS = 0.1; // 10 fuel per second (1.0s / 10)
+  // 10 bps, since robot has 2 shooters there is a 1/5 s interval between shots instead of 1/10 s
+  private static final double LAUNCH_INTERVAL_SECONDS = 0.2; 
   private double lastLaunchTimeSeconds = 0.0;
 
   // Pass in robotContainer in order to access superstructure and drivetrain

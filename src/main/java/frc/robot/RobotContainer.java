@@ -30,8 +30,6 @@ public class RobotContainer {
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    drivetrain.registerTelemetry(logger::telemeterize);
-
     if (Robot.isSimulation()) {
       this.fuelSimHelper = new FuelSimHelper(this);
       drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
@@ -60,10 +58,6 @@ public class RobotContainer {
 
   public void resetSuperstructure() {
     superstructure.resetPositions();
-  }
-
-  public Telemetry getTelemetry() {
-    return logger;
   }
 
   public void simAutoInit() {
