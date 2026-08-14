@@ -15,6 +15,7 @@ import frc.robot.lib.simulation.FuelSim;
 import frc.robot.subsystems.Autos;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.BOS;
 import frc.robot.subsystems.vision.TagHelper;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -77,14 +78,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
-    robotContainer.periodic();
-
-    HubShiftUtil.ShiftInfo info = HubShiftUtil.getShiftInfo();
-    Logger.recordOutput("HubShift/Active", info.hubActive());
-    Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
-    Logger.recordOutput("HubShift/UntilHubFlip", Math.round(info.timeUntilHubStateChange()));
-    Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
-
     bos.updatePose();
 
     if (Controllers.ODOMETRY_RESET.getAsBoolean()) {
@@ -96,6 +89,13 @@ public class Robot extends LoggedRobot {
     }
 
     CommandScheduler.getInstance().run();
+    robotContainer.periodic();
+
+    HubShiftUtil.ShiftInfo info = HubShiftUtil.getShiftInfo();
+    Logger.recordOutput("HubShift/Active", info.hubActive());
+    Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
+    Logger.recordOutput("HubShift/UntilHubFlip", Math.round(info.timeUntilHubStateChange()));
+    Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
   }
 
   @Override
@@ -115,7 +115,7 @@ public class Robot extends LoggedRobot {
       }
 
       // Update the field visualization with the auto start pose
-      robotContainer.getTelemetry().setAutoStartPose(startPose);
+      robotContainer.drive.setAutoStartPose(startPose);
     }
     // TODO: Log the autonomous starting pose
   }
@@ -125,6 +125,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    robotContainer.drive.setDriveMode(Drive.Mode.NONE);
     autonomousCommand = autos.getAutonomousCommand();
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
