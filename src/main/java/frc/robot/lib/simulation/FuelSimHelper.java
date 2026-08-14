@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer; // Added Timer import
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
@@ -21,12 +22,11 @@ public class FuelSimHelper {
   private final CommandSwerveDrivetrain drivetrain;
   private final Superstructure superstructure;
   private final ShooterHandler[] shooterHandlers;
-  private final double wheelDiameterM = Inches.of(4.0).in(Meters); // from shooter CAD
-
-  // how much surface speed transfers to the ball, 0.45 prevents overshooting
-  private final double slipFactor = 0.45;
 
   private LinearVelocity simFuelExitVelocity;
+
+  private static final double LAUNCH_INTERVAL_SECONDS = 0.1; // 10 fuel per second (1.0s / 10)
+  private double lastLaunchTimeSeconds = 0.0;
 
   // Pass in robotContainer in order to access superstructure and drivetrain
   public FuelSimHelper(RobotContainer robotContainer) {
@@ -113,25 +113,33 @@ public class FuelSimHelper {
 
   private void handleSimShooting() {
     if (isShooting()) {
-      for (ShooterHandler shooterHandler : shooterHandlers) {
-        boolean leftHandler = shooterHandler == superstructure.shooterHandlerLeft;
-        AngularVelocity flywheelSpeed =
-            leftHandler
-                ? superstructure.flywheelLeft.getVelocity()
-                : superstructure.flywheelRight.getVelocity();
-        Angle hoodAngle =
-            leftHandler
-                ? superstructure.hoodLeft.getHoodAngle()
-                : superstructure.hoodRight.getHoodAngle();
+      double currentTime = Timer.getFPGATimestamp();
 
-        FlywheelSpeedTable shotTable =
-            leftHandler
-                ? SimShotTables.leftFlywheelSpeedTable()
-                : SimShotTables.rightFlywheelSpeedTable();
-        System.out.println(RotationsPerSecond.of(flywheelSpeed.in(RotationsPerSecond)));
-        simFuelExitVelocity =
-            shotTable.calcLinearVel(RotationsPerSecond.of(flywheelSpeed.in(RotationsPerSecond)));
-        launchFuelInSim(simFuelExitVelocity, hoodAngle, shooterHandler);
+      // Only shoot if 0.1s has passed since the last launch
+      if (currentTime - lastLaunchTimeSeconds >= LAUNCH_INTERVAL_SECONDS) {
+        for (ShooterHandler shooterHandler : shooterHandlers) {
+          boolean leftHandler = shooterHandler == superstructure.shooterHandlerLeft;
+          AngularVelocity flywheelSpeed =
+              leftHandler
+                  ? superstructure.flywheelLeft.getVelocity()
+                  : superstructure.flywheelRight.getVelocity();
+          Angle hoodAngle =
+              leftHandler
+                  ? superstructure.hoodLeft.getHoodAngle()
+                  : superstructure.hoodRight.getHoodAngle();
+
+          FlywheelSpeedTable shotTable =
+              leftHandler
+                  ? SimShotTables.leftFlywheelSpeedTable()
+                  : SimShotTables.rightFlywheelSpeedTable();
+
+          simFuelExitVelocity =
+              shotTable.calcLinearVel(RotationsPerSecond.of(flywheelSpeed.in(RotationsPerSecond)));
+          launchFuelInSim(simFuelExitVelocity, hoodAngle, shooterHandler);
+        }
+
+        // Update the last launch time after shooting
+        lastLaunchTimeSeconds = currentTime;
       }
     }
   }
