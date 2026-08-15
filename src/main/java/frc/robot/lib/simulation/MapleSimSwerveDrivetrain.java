@@ -158,15 +158,11 @@ public class MapleSimSwerveDrivetrain {
    * @return The robot's simulated 3D pose (X/Y/Z + roll/pitch/yaw), suitable for AdvantageScope.
    */
   public Pose3d updateBumpSim() {
-    // SimulatedArena.simulationPeriodic() (called from update() above, on the 2 ms Notifier
-    // thread) steps the dyn4j physics body backing mapleSimDrive under `synchronized (this)`.
-    // setSimulationWorldPose() mutates that same body's transform/velocity directly and is NOT
-    // synchronized, so calling it here (on the 20 ms main robot thread) without matching the
-    // same lock races the physics step: a torn transform/velocity write mid-step corrupts
-    // dyn4j's contact resolution and injects spurious impulses, which reads as a violent spin.
-    // Since this runs every tick while on the ramp, the bump crossing is exactly when the race
-    // window is hit most often. Synchronizing on the same monitor as simulationPeriodic()
-    // closes it.
+    // update() (2 ms Notifier thread) steps mapleSimDrive's physics body under
+    // simulationPeriodic()'s `synchronized (this)`. setSimulationWorldPose() below mutates that
+    // same body directly and isn't synchronized, so without matching the lock here, this call
+    // (20 ms main thread) can race a mid-step physics update and corrupt it — the violent spin
+    // seen crossing the bump. Same monitor as simulationPeriodic() closes the race.
     synchronized (SimulatedArena.getInstance()) {
       Pose2d simPose = mapleSimDrive.getSimulatedDriveTrainPose();
       ChassisSpeeds fieldRelativeSpeeds =
@@ -182,21 +178,6 @@ public class MapleSimSwerveDrivetrain {
       pigeonSim.setRoll(Radians.of(simPose3d.getRotation().getX()));
 
       return simPose3d;
-    }
-  }
-
-  /**
-   *
-   *
-   * <h2>Reads Maple-Sim's ground-truth 2D pose under the same lock as {@link #updateBumpSim()}.</h2>
-   *
-   * <p>Must be used (instead of reading {@link #mapleSimDrive} directly) whenever the caller wants
-   * the pose immediately after {@link #updateBumpSim()} has applied its ramp correction, so the
-   * read can't race the physics Notifier thread's {@code simulationPeriodic()} step.
-   */
-  public Pose2d getSyncedGroundTruthPose() {
-    synchronized (SimulatedArena.getInstance()) {
-      return mapleSimDrive.getSimulatedDriveTrainPose();
     }
   }
 

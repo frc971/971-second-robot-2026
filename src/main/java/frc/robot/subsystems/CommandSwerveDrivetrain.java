@@ -156,9 +156,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       Logger.recordOutput("Drive/Pose3d", simPose3d);
       // Reset from Maple-Sim's own 2D pose (already ramp-corrected by updateBumpSim above)
       // rather than simPose3d.toPose2d(), so odometry rotation never depends on decomposing
-      // the tilted 3D pose back down to yaw. Read via getSyncedGroundTruthPose() (not
-      // mapleSimDrive directly) so this doesn't race the physics Notifier thread either.
-      super.resetPose(mapleSimSwerveDrivetrain.getSyncedGroundTruthPose());
+      // the tilted 3D pose back down to yaw.
+      super.resetPose(mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose());
     }
 
     setControl(request);
