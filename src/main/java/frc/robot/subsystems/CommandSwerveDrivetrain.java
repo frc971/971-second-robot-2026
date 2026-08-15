@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -151,8 +152,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     if (RobotBase.isSimulation() && mapleSimSwerveDrivetrain != null) {
-      Pose2d simPose = mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
-      super.resetPose(simPose);
+      Pose3d simPose3d = mapleSimSwerveDrivetrain.updateBumpSim();
+      Logger.recordOutput("Drive/Pose3d", simPose3d);
+      // Reset from Maple-Sim's own 2D pose (already ramp-corrected by updateBumpSim above)
+      // rather than simPose3d.toPose2d(), so odometry rotation never depends on decomposing
+      // the tilted 3D pose back down to yaw. Read via getSyncedGroundTruthPose() (not
+      // mapleSimDrive directly) so this doesn't race the physics Notifier thread either.
+      super.resetPose(mapleSimSwerveDrivetrain.getSyncedGroundTruthPose());
     }
 
     setControl(request);
