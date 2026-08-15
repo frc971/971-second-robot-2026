@@ -1,9 +1,6 @@
 package frc.robot.subsystems.drive;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -11,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import lombok.Getter;
 import lombok.Setter;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Drive {
   public static final double MAX_SPEED_METERS_PER_SECOND = 3.5;

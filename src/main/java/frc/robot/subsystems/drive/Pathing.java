@@ -1,65 +1,54 @@
 package frc.robot.subsystems.drive;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Pathing {
 
   public enum Goal {
     NONE,
-    ACTIVE
+    ACTIVE,
   }
 
   private final CommandSwerveDrivetrain drivetrain;
-
-  private final NetworkTableInstance inst;
-
-  private final DoubleArraySubscriber velocitySub;
-
+  private final DoubleSubscriber vxSub;
+  private final DoubleSubscriber vySub;
+  private final BooleanSubscriber isDoneSub;
+  private final StructPublisher<Pose2d> targetPub;
   private final NetworkTableEntry enabledEntry;
 
-  @AutoLogOutput(key = "Pathing/Goal")
+  @AutoLogOutput(key = "/pathing/enabled")
   private Goal goal = Goal.NONE;
 
   private double vx = 0;
   private double vy = 0;
   private double velocityTimestamp = 0;
 
-  @AutoLogOutput(key = "Pathing/TargetPose")
+  @AutoLogOutput(key = "/pathing/target")
   private Pose2d targetPose = new Pose2d();
-
-  private static final double MAX_AGE_SECONDS = 0.2;
-  private static final double PATH_COMPLETE_X_TOLERANCE_METERS = 0.05;
-  private static final double PATH_COMPLETE_Y_TOLERANCE_METERS = 0.05;
 
   private final SwerveRequest.ApplyRobotSpeeds request = new SwerveRequest.ApplyRobotSpeeds();
 
   public Pathing(CommandSwerveDrivetrain drivetrain) {
-
     this.drivetrain = drivetrain;
-
-    inst = NetworkTableInstance.getDefault();
-
-    NetworkTable pathing = inst.getTable("Pathing");
-
-    NetworkTable orin = inst.getTable("Orin").getSubTable("OTFVelocity");
-
-    enabledEntry = pathing.getEntry("Enabled");
-
-    velocitySub =
-        orin.getDoubleArrayTopic("Velocity")
-            .subscribe(new double[] {0, 0, 0}, PubSubOption.keepDuplicates(true));
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable pathing = inst.getTable("pathing");
+    enabledEntry = pathing.getEntry("enabled");
+    targetPub = pathing.getStructTopic("target", Pose2d.struct).publish();
+    vxSub = pathing.getDoubleTopic("vx").subscribe(0.0);
+    vySub = pathing.getDoubleTopic("vy").subscribe(0.0);
+    isDoneSub = pathing.getBooleanTopic("isDone").subscribe(false);
+    enabledEntry.setBoolean(false);
   }
 
   public void setGoal(Goal goal) {
@@ -67,27 +56,25 @@ public class Pathing {
       disable();
       return;
     }
-
     this.goal = goal;
+    enabledEntry.setBoolean(true);
   }
 
   public void setTargetPose(Pose2d pose) {
     targetPose = pose;
-    goal = Goal.ACTIVE;
+    targetPub.set(pose);
+    setGoal(Goal.ACTIVE);
   }
 
   public void disable() {
     goal = Goal.NONE;
+    enabledEntry.setBoolean(false);
     vx = 0;
     vy = 0;
-
     drivetrain.setRequest(request.withSpeeds(new ChassisSpeeds(0, 0, 0)));
   }
 
   public void periodic() {
-
-    Pose2d pose = drivetrain.getState().Pose;
-
     boolean ntEnabled = enabledEntry.getBoolean(false);
     if (!ntEnabled || goal != Goal.ACTIVE) {
       if (goal == Goal.ACTIVE) {
@@ -95,13 +82,10 @@ public class Pathing {
       }
       return;
     }
-
     updateVelocityFromNetworkTables();
-
+    Pose2d pose = drivetrain.getState().Pose;
     ChassisSpeeds field = new ChassisSpeeds(vx, vy, 0);
-
     ChassisSpeeds robot = ChassisSpeeds.fromFieldRelativeSpeeds(field, pose.getRotation());
-
     drivetrain.setRequest(request.withSpeeds(robot));
   }
 
@@ -110,9 +94,7 @@ public class Pathing {
   }
 
   public boolean isPathComplete() {
-    Pose2d currentPose = drivetrain.getState().Pose;
-    return Math.abs(targetPose.getX() - currentPose.getX()) < PATH_COMPLETE_X_TOLERANCE_METERS
-        && Math.abs(targetPose.getY() - currentPose.getY()) < PATH_COMPLETE_Y_TOLERANCE_METERS;
+    return isDoneSub.get();
   }
 
   @AutoLogOutput(key = "Pathing/CurrentPose")
@@ -126,37 +108,13 @@ public class Pathing {
   }
 
   private void updateVelocityFromNetworkTables() {
-    double timestamp = getNetworkTablesTimestampSeconds();
-    velocityTimestamp = timestamp;
-
-    double[] velocity = velocitySub.get();
-    if (velocity == null || velocity.length < 3) {
-      stop();
-      return;
-    }
-
-    double age = timestamp - velocity[2];
-    if (age < 0 || age >= MAX_AGE_SECONDS) {
-      stop();
-      return;
-    }
-
-    vx = clamp(velocity[0]);
-    vy = clamp(velocity[1]);
+    velocityTimestamp = Timer.getFPGATimestamp();
+    vx = clamp(vxSub.get());
+    vy = clamp(vySub.get());
   }
 
-  private void stop() {
-    vx = 0;
-    vy = 0;
-  }
-
-  private double clamp(double v) {
+  private double clamp(double value) {
     return Math.max(
-        -Drive.MAX_SPEED_METERS_PER_SECOND, Math.min(Drive.MAX_SPEED_METERS_PER_SECOND, v));
-  }
-
-  private double getNetworkTablesTimestampSeconds() {
-    long offsetUs = inst.getServerTimeOffset().orElse(0L);
-    return Timer.getFPGATimestamp() + (offsetUs / 1_000_000.0);
+        -Drive.MAX_SPEED_METERS_PER_SECOND, Math.min(Drive.MAX_SPEED_METERS_PER_SECOND, value));
   }
 }
