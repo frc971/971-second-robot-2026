@@ -148,12 +148,12 @@ public class MapleSimSwerveDrivetrain {
    *
    * <h2>Advance the standalone bump-crossing physics sim.</h2>
    *
-   * <p>Must be called once per robot loop (20 ms), separately from {@link #update()} which runs
-   * on the faster {@code SIM_LOOP_PERIOD} notifier. Reads the latest Maple-Sim pose/speeds,
-   * advances {@link RobotBumpSim}, and — while a module is in contact with a bump — overrides
-   * Maple-Sim's world pose so the robot actually slides/stalls on the ramp instead of just
-   * visually clipping through it. Also feeds the resulting pitch/roll into the simulated Pigeon2
-   * so gyro-tilt-based bump detection works identically in simulation and on the real robot.
+   * <p>Must be called once per robot loop (20 ms), separately from {@link #update()} which runs on
+   * the faster {@code SIM_LOOP_PERIOD} notifier. Reads the latest Maple-Sim pose/speeds, advances
+   * {@link RobotBumpSim}, and — while a module is in contact with a bump — overrides Maple-Sim's
+   * world pose so the robot actually slides/stalls on the ramp instead of just visually clipping
+   * through it. Also feeds the resulting pitch/roll into the simulated Pigeon2 so gyro-tilt-based
+   * bump detection works identically in simulation and on the real robot.
    *
    * @return The robot's simulated 3D pose (X/Y/Z + roll/pitch/yaw), suitable for AdvantageScope.
    */
