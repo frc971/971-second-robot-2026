@@ -14,7 +14,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.75,
-      "lib_key": "Intake Down"
+      "lib_key": "intakeDown"
     },
     {
       "type": "waypoint",
