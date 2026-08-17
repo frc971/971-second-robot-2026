@@ -20,9 +20,7 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -48,11 +46,8 @@ import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
  * <p>It replaces the {@link com.ctre.phoenix6.swerve.SimSwerveDrivetrain} class.
  */
 public class MapleSimSwerveDrivetrain {
-  private static final int BUMP_SIM_SUBTICKS = 5;
-
   private final Pigeon2SimState pigeonSim;
   private final SimSwerveModule[] simModules;
-  private final RobotBumpSim robotBumpSim;
   public final SwerveDriveSimulation mapleSimDrive;
 
   /**
@@ -113,7 +108,6 @@ public class MapleSimSwerveDrivetrain {
                     KilogramSquareMeters.of(moduleConstants[0].SteerInertia),
                     wheelCOF));
     mapleSimDrive = new SwerveDriveSimulation(simulationConfig, new Pose2d());
-    robotBumpSim = new RobotBumpSim(moduleLocations);
 
     SwerveModuleSimulation[] moduleSimulations = mapleSimDrive.getModules();
     for (int i = 0; i < this.simModules.length; i++)
@@ -141,44 +135,6 @@ public class MapleSimSwerveDrivetrain {
         RadiansPerSecond.of(
             mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative()
                 .omegaRadiansPerSecond));
-  }
-
-  /**
-   *
-   *
-   * <h2>Advance the standalone bump-crossing physics sim.</h2>
-   *
-   * <p>Must be called once per robot loop (20 ms), separately from {@link #update()} which runs on
-   * the faster {@code SIM_LOOP_PERIOD} notifier. Reads the latest Maple-Sim pose/speeds, advances
-   * {@link RobotBumpSim}, and — while a module is in contact with a bump — overrides Maple-Sim's
-   * world pose so the robot actually slides/stalls on the ramp instead of just visually clipping
-   * through it. Also feeds the resulting pitch/roll into the simulated Pigeon2 so gyro-tilt-based
-   * bump detection works identically in simulation and on the real robot.
-   *
-   * @return The robot's simulated 3D pose (X/Y/Z + roll/pitch/yaw), suitable for AdvantageScope.
-   */
-  public Pose3d updateBumpSim() {
-    // update() (2 ms Notifier thread) steps mapleSimDrive's physics body under
-    // simulationPeriodic()'s `synchronized (this)`. setSimulationWorldPose() below mutates that
-    // same body directly and isn't synchronized, so without matching the lock here, this call
-    // (20 ms main thread) can race a mid-step physics update and corrupt it — the violent spin
-    // seen crossing the bump. Same monitor as simulationPeriodic() closes the race.
-    synchronized (SimulatedArena.getInstance()) {
-      Pose2d simPose = mapleSimDrive.getSimulatedDriveTrainPose();
-      ChassisSpeeds fieldRelativeSpeeds =
-          mapleSimDrive.getDriveTrainSimulatedChassisSpeedsFieldRelative();
-
-      Pose3d simPose3d = robotBumpSim.update(simPose, fieldRelativeSpeeds, BUMP_SIM_SUBTICKS);
-
-      if (robotBumpSim.isOnRamp()) {
-        mapleSimDrive.setSimulationWorldPose(robotBumpSim.getSimWorldPose(simPose));
-      }
-
-      pigeonSim.setPitch(Radians.of(simPose3d.getRotation().getY()));
-      pigeonSim.setRoll(Radians.of(simPose3d.getRotation().getX()));
-
-      return simPose3d;
-    }
   }
 
   /**

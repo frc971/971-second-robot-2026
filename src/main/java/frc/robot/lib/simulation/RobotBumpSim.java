@@ -63,7 +63,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * }
  *
  * // 4. Log or visualise the 3D pose (e.g. with AdvantageScope).
- * Logger.recordOutput("Drive/Pose3d", simPose3d);
+ * Logger.recordOutput("Drive/SimPose3d", simPose3d);
  * }</pre>
  *
  * <h2>Tunable constants</h2>

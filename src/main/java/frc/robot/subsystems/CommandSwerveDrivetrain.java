@@ -10,6 +10,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -22,6 +23,8 @@ import frc.robot.Constants.SimSwerveConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
+import frc.robot.lib.simulation.RobotBumpSim;
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -31,8 +34,10 @@ import org.littletonrobotics.junction.Logger;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
   private MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
+  private RobotBumpSim robotBumpSim = null;
   private SwerveRequest request = new SwerveRequest.Idle();
   private static final double SIM_LOOP_PERIOD = 0.002; // 2 ms
+  private static final int BUMP_SIM_SUBTICKS = 5;
   private Notifier simNotifier = null;
 
   /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
@@ -152,8 +157,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     if (RobotBase.isSimulation() && mapleSimSwerveDrivetrain != null) {
-      Pose3d simPose3d = mapleSimSwerveDrivetrain.updateBumpSim();
-      Logger.recordOutput("Drive/Pose3d", simPose3d);
+      Pose3d simPose3d = updateBumpSim();
+      Logger.recordOutput("Drive/SimPose3d", simPose3d);
       // Reset from Maple-Sim's own 2D pose (already ramp-corrected by updateBumpSim above)
       // rather than simPose3d.toPose2d(), so odometry rotation never depends on decomposing
       // the tilted 3D pose back down to yaw.
@@ -219,9 +224,51 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             TunerConstants.FrontRight,
             TunerConstants.BackLeft,
             TunerConstants.BackRight);
+    robotBumpSim = new RobotBumpSim(getModuleLocations());
     /* Run simulation at a faster rate so PID gains behave more reasonably */
     simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
     simNotifier.startPeriodic(SIM_LOOP_PERIOD);
+  }
+
+  /**
+   *
+   *
+   * <h2>Advance the standalone bump-crossing physics sim.</h2>
+   *
+   * <p>Must be called once per robot loop (20 ms), separately from {@link
+   * MapleSimSwerveDrivetrain#update()} which runs on the faster {@code SIM_LOOP_PERIOD} notifier.
+   * Reads the latest Maple-Sim pose/speeds, advances {@link RobotBumpSim}, and — while a module is
+   * in contact with a bump — overrides Maple-Sim's world pose so the robot actually slides/stalls
+   * on the ramp instead of just visually clipping through it. Also feeds the resulting pitch/roll
+   * into the simulated Pigeon2 so gyro-tilt-based bump detection works identically in simulation
+   * and on the real robot.
+   *
+   * @return The robot's simulated 3D pose (X/Y/Z + roll/pitch/yaw), suitable for AdvantageScope.
+   */
+  private Pose3d updateBumpSim() {
+    // MapleSimSwerveDrivetrain.update() (2 ms Notifier thread) steps mapleSimDrive's physics body
+    // under simulationPeriodic()'s `synchronized (this)`. setSimulationWorldPose() below mutates
+    // that same body directly and isn't synchronized, so without matching the lock here, this call
+    // (20 ms main thread) can race a mid-step physics update and corrupt it — the violent spin
+    // seen crossing the bump. Same monitor as simulationPeriodic() closes the race.
+    synchronized (SimulatedArena.getInstance()) {
+      var mapleSimDrive = mapleSimSwerveDrivetrain.mapleSimDrive;
+      Pose2d simPose = mapleSimDrive.getSimulatedDriveTrainPose();
+      ChassisSpeeds fieldRelativeSpeeds =
+          mapleSimDrive.getDriveTrainSimulatedChassisSpeedsFieldRelative();
+
+      Pose3d simPose3d = robotBumpSim.update(simPose, fieldRelativeSpeeds, BUMP_SIM_SUBTICKS);
+
+      if (robotBumpSim.isOnRamp()) {
+        mapleSimDrive.setSimulationWorldPose(robotBumpSim.getSimWorldPose(simPose));
+      }
+
+      var pigeonSim = getPigeon2().getSimState();
+      pigeonSim.setPitch(Radians.of(simPose3d.getRotation().getY()));
+      pigeonSim.setRoll(Radians.of(simPose3d.getRotation().getX()));
+
+      return simPose3d;
+    }
   }
 
   @Override

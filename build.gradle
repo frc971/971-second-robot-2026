@@ -129,6 +129,9 @@ wpi.java.configureTestTasks(test)
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+    // Without this, javac falls back to the platform default charset. GitHub Actions runners
+    // default to US-ASCII, which fails to compile javadoc containing non-ASCII characters
+    // (e.g. em dashes, degree signs) even though the same code compiles fine locally.
     options.encoding = 'UTF-8'
 }
 
