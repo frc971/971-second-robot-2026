@@ -17,72 +17,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 /**
- * RobotBumpSim — standalone robot-bump physics simulation for MapleSim.
- *
- * <h2>What this class does</h2>
- *
- * <p>Simulates the robot's 3D pose (Z height, pitch, and roll) as it drives over the raised bumps
- * on the 2026 FRC REBUILT field. It also implements a frictionless-slide model that prevents the
- * robot from "ghosting" through a bump when it lacks the speed to crest it.
- *
- * <h2>How it works</h2>
- *
- * <ul>
- *   <li>Four swerve module contact points are tracked independently in the XZ plane.
- *   <li>When any module first touches a bump's ascending face the sim enters <em>ramp mode</em>: it
- *       captures the robot's current field-X velocity ({@code simXVel}) and absolute field-X
- *       position ({@code simXPos}), then owns them for the duration of the crossing attempt.
- *   <li>While on the ramp, only gravity acts along X (frictionless surface). If {@code simXVel}
- *       decays to zero before the peak the robot slides back to flat ground.
- *   <li>The robot exits ramp mode when it either backs off (all module Z ≈ 0) or successfully
- *       crosses over the peak (modules come back to flat ground on the far side).
- *   <li>A diagonal approach reduces effective deceleration via {@code contactFactor = |cos(2 *
- *       robotYaw)|}, making 45° crossings easier.
- * </ul>
- *
- * <p>Minimum crossing speed: {@code sqrt(2·g·h) ≈ sqrt(2·9.81·0.165) ≈ 1.80 m/s}.
- *
- * <h2>Quick-start integration with MapleSim</h2>
- *
- * <pre>{@code
- * // 1. Construct once, typically in startSimThread() alongside your MapleSim drivetrain.
- * RobotBumpSim robotBumpSim = new RobotBumpSim(drivetrain.getModuleLocations());
- *
- * // 2. Call every simulationPeriodic() AFTER MapleSim has stepped.
- * Pose2d simPose = mapleSimDrive.getSimulatedDriveTrainPose();
- * ChassisSpeeds fieldRelativeSpeeds = mapleSimSwerveDrivetrain.mapleSimDrive.getDriveTrainSimulatedChassisSpeedsFieldRelative();
- *
- * // subticks should match the number of physics sub-steps you pass to your ball/object sim.
- * // A value of 5 works well for a 20 ms loop (4 ms sub-steps).
- * Pose3d simPose3d = robotBumpSim.update(simPose, fieldSpeeds, subticks);
- *
- * // 3. When on the ramp, override MapleSim's pose so the robot physically slides back
- * //    instead of the correction being purely visual.
- * if (robotBumpSim.isOnRamp()) {
- *     mapleSimDrive.setSimulationWorldPose(robotBumpSim.getSimWorldPose(simPose));
- * }
- *
- * // 4. Log or visualise the 3D pose (e.g. with AdvantageScope).
- * Logger.recordOutput("Drive/SimPose3d", simPose3d);
- * }</pre>
- *
- * <h2>Tunable constants</h2>
- *
- * <ul>
- *   <li>{@link #WHEEL_RADIUS} — effective contact radius of a wheel against the ramp surface
- *       (metres). Increase this to make the robot appear to "float" higher above the bump.
- *   <li>{@link #CHASSIS_HEIGHT} — offset from the average module-contact Z to the robot body
- *       origin. Set to your chassis clearance height if you want a visually accurate robot body Z.
- *   <li>{@link #BUMP_COR} — coefficient of restitution for vertical collisions with the bump. 0 =
- *       perfectly inelastic (no bounce), 1 = perfectly elastic.
- * </ul>
- *
- * <h2>Field geometry</h2>
- *
- * <p>The bump geometry is encoded as XZ line segments with Y-range guards. Each bump has two
- * segments per side (ascending face + descending face) at X positions symmetric about field centre.
- * See {@link #BUMP_LINE_STARTS} / {@link #BUMP_LINE_ENDS} for the raw coordinates. All positions
- * are in metres, origin at the Blue Alliance driver-station corner.
+ * Standalone bump-crossing physics for the 2026 REBUILT field. Tracks each swerve module's Z height
+ * in the XZ plane; when a module touches a bump's ascending face, the sim takes over the robot's
+ * field-X frictionless-slide-style so it either crests (given enough speed) or stalls and slides
+ * back down, instead of driving straight through. Min crossing speed ≈ 1.80 m/s (sqrt(2gh) for a
+ * 0.165 m bump). A diagonal approach reduces effective deceleration.
  */
 public class RobotBumpSim {
 
