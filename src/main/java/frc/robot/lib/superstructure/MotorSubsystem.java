@@ -109,6 +109,10 @@ public class MotorSubsystem {
     io.setFeedforward(feedforward);
   }
 
+  public void setSlot(int slot) {
+    io.setSlot(slot);
+  }
+
   public void setCoast() {
     this.controlMode = Mode.COAST;
   }

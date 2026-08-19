@@ -38,6 +38,7 @@ public class MotorTalonFX extends MotorIO {
   protected StatusSignal<Current> statorCurrentSignal;
   protected StatusSignal<Temperature> temperatureSignal;
   protected Optional<StatusSignal<Angle>> absolutePositionSignal;
+  protected int currentSlot = 0;
 
   public MotorTalonFX(MotorConfig motorConfig, Optional<CANcoderConfig> optionalCancoderConfig) {
     super(motorConfig);
@@ -101,7 +102,8 @@ public class MotorTalonFX extends MotorIO {
 
   @Override
   public void setVelocity(AngularVelocity goalVelocity) {
-    motor.setControl(velocityRequest.withVelocity(goalVelocity.in(RotationsPerSecond)));
+    motor.setControl(
+        velocityRequest.withVelocity(goalVelocity.in(RotationsPerSecond)).withSlot(currentSlot));
   }
 
   @Override
@@ -130,7 +132,7 @@ public class MotorTalonFX extends MotorIO {
             .withPosition(goalPosition)
             .withFeedForward(feedforward)
             .withEnableFOC(motorConfig.FOC())
-            .withSlot(0));
+            .withSlot(currentSlot));
   }
 
   private void setPositionVoltage(double goalPosition) {
@@ -139,7 +141,7 @@ public class MotorTalonFX extends MotorIO {
             .withPosition(goalPosition)
             .withFeedForward(feedforward)
             .withEnableFOC(motorConfig.FOC())
-            .withSlot(0));
+            .withSlot(currentSlot));
   }
 
   @Override
@@ -181,5 +183,10 @@ public class MotorTalonFX extends MotorIO {
   @Override
   public void resetPosition(Distance newPosition) {
     motor.setPosition(newPosition.in(Meters));
+  }
+
+  @Override
+  public void setSlot(int slot) {
+    currentSlot = slot;
   }
 }

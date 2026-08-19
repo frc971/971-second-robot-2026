@@ -84,6 +84,11 @@ public class MotorSim extends MotorIO {
   }
 
   @Override
+  public void setSlot(int slot) {
+    // no-op
+  }
+
+  @Override
   public void setCoast() {
     setVelocity(RotationsPerSecond.zero());
   }
