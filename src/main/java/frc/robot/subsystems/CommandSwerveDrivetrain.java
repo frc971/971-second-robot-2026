@@ -8,7 +8,9 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -21,6 +23,7 @@ import frc.robot.Constants.SimSwerveConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
+import frc.robot.lib.simulation.RobotBumpSim;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,8 +33,10 @@ import org.littletonrobotics.junction.Logger;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
   private MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
+  private RobotBumpSim robotBumpSim = null;
   private SwerveRequest request = new SwerveRequest.Idle();
   private static final double SIM_LOOP_PERIOD = 0.002; // 2 ms
+  private static final double BUM_SIM_SUBTICKS = 5;
   private Notifier simNotifier = null;
 
   /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
@@ -152,7 +157,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     if (RobotBase.isSimulation() && mapleSimSwerveDrivetrain != null) {
       Pose2d simPose = mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
-      super.resetPose(simPose);
+      ChassisSpeeds fieldRelativeSpeeds =
+          mapleSimSwerveDrivetrain.mapleSimDrive.getDriveTrainSimulatedChassisSpeedsFieldRelative();
+      Pose3d simPose3d = robotBumpSim.update(simPose, fieldRelativeSpeeds, 5);
+
+      if (robotBumpSim.isOnRamp()) {
+        mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(
+            robotBumpSim.getSimWorldPose(simPose));
+      }
+
+      Logger.recordOutput("Drive/SimPose3d", simPose3d);
     }
 
     setControl(request);
@@ -216,6 +230,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             TunerConstants.BackRight);
     /* Run simulation at a faster rate so PID gains behave more reasonably */
     simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
+    robotBumpSim = new RobotBumpSim(getModuleLocations());
     simNotifier.startPeriodic(SIM_LOOP_PERIOD);
   }
 
