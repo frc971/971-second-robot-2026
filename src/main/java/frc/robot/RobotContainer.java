@@ -51,8 +51,7 @@ public class RobotContainer {
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    if (Robot.isSimulation())
-      drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
+    if (Robot.isSimulation()) drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
 
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
     FollowPath.registerEventTrigger("shootNoJuice", superstructure.shootAutoNoJuice());
