@@ -53,6 +53,10 @@ public class Drive {
     return Commands.runOnce(() -> setDriveMode(targetMode));
   }
 
+  public void setPathingTargetPose(Pose2d targetPose) {
+    pathing.setTargetPose(targetPose);
+  }
+
   public void setAutoStartPose(Pose2d pose) {
     telemetry.setAutoStartPose(pose);
   }
@@ -63,6 +67,7 @@ public class Drive {
     manual.setGoal(Manual.Goal.NONE);
     thetaLock.setGoal(ThetaLock.Goal.NONE);
     autoAlign.setGoal(AutoAlign.Goal.NONE);
+    if (mode != Mode.PATHING) pathing.setGoal(Pathing.Goal.NONE);
 
     switch (mode) {
       case BRAKE -> drivetrain.setRequest(freezeRequest);
@@ -89,7 +94,7 @@ public class Drive {
         && autoAlign.getGoal() == AutoAlign.Goal.ALIGN
         && autoAlign.isAligned()) {
       setDriveMode(Mode.NONE);
-    } else if (DriverStation.isTeleop()) {
+    } else if (DriverStation.isTeleop() && mode != Mode.PATHING) {
       setDriveMode(Mode.MANUAL);
     }
 
