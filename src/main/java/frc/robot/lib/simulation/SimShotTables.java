@@ -2,8 +2,6 @@ package frc.robot.lib.simulation;
 
 import static edu.wpi.first.units.Units.*;
 
-import frc.robot.lib.shooter.ExitSpeedTable;
-
 public class SimShotTables {
 
   public static FlywheelSpeedTable rightFlywheelSpeedTable() {

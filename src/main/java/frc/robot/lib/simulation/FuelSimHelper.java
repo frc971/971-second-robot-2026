@@ -110,8 +110,7 @@ public class FuelSimHelper {
           && kickerVolts.gt(Volts.of(0))) {
         shooting = true;
       }
-    } 
-    
+    }
 
     return shooting;
   }
