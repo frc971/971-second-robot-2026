@@ -9,7 +9,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Visualization {
   public static final Transform3d robotToLeftTurret =
-      new Transform3d(0.1624076 - 0.0144525, 0.224003 - 0.0144525, 0.2761615, Rotation3d.kZero);
+      new Transform3d(0.209550, -0.147955, 0.274574, Rotation3d.kZero);
 
   public static final Transform3d turretToLeftHood =
       new Transform3d(
