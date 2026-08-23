@@ -8,8 +8,9 @@ import edu.wpi.first.math.geometry.Translation3d;
 import org.littletonrobotics.junction.Logger;
 
 public class Visualization {
+  // potentially use a wpilib rotation matrix function instead?
   public static final Transform3d robotToLeftTurret =
-      new Transform3d(0.209550, -0.147955, 0.274574, Rotation3d.kZero);
+      new Transform3d(0.147955, 0.209550, 0.274574, new Rotation3d(0, 0, Math.PI / 2));
 
   public static final Transform3d turretToLeftHood =
       new Transform3d(
