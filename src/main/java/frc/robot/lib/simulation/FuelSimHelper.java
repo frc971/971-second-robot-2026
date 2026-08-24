@@ -23,6 +23,7 @@ public class FuelSimHelper {
   private final CommandSwerveDrivetrain drivetrain;
   private final Superstructure superstructure;
   private final ShooterHandler[] shooterHandlers;
+  private final FlywheelSpeedTable leftFlywheelSpeedTable, rightFlywheelSpeedTable;
 
   private LinearVelocity simFuelExitVelocity;
 
@@ -38,6 +39,12 @@ public class FuelSimHelper {
         new ShooterHandler[] {
           superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight
         };
+    leftFlywheelSpeedTable =
+        FlywheelSpeedTable.buildTable(
+            superstructure.shooterHandlerLeft.getConfig().PHYSICS().EXIT_SPEED_TABLE());
+    rightFlywheelSpeedTable =
+        FlywheelSpeedTable.buildTable(
+            superstructure.shooterHandlerRight.getConfig().PHYSICS().EXIT_SPEED_TABLE());
   }
 
   public void configureFuelSim() {
@@ -133,9 +140,7 @@ public class FuelSimHelper {
                   : superstructure.hoodRight.getHoodAngle();
 
           FlywheelSpeedTable shotTable =
-              leftHandler
-                  ? SimShotTables.leftFlywheelSpeedTable()
-                  : SimShotTables.rightFlywheelSpeedTable();
+              leftHandler ? leftFlywheelSpeedTable : rightFlywheelSpeedTable;
 
           simFuelExitVelocity =
               shotTable.calcLinearVel(RotationsPerSecond.of(flywheelSpeed.in(RotationsPerSecond)));

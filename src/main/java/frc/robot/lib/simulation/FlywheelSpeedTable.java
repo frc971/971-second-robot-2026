@@ -5,10 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import frc.robot.lib.shooter.ExitSpeedTable;
 import java.util.Set;
 import java.util.TreeSet;
 
-// Maps exit flywheel angular velocity (rot/s to )linear speed (m/s)
+// Maps exit flywheel angular velocity (rot/s) to linear speed (m/s)
 public class FlywheelSpeedTable {
   /*
    * Separate interpolation tables for hood angle and flywheel speed
@@ -23,13 +24,19 @@ public class FlywheelSpeedTable {
 
   public void put(AngularVelocity flywheelSpeed, LinearVelocity linearSpeed) {
     angularSpeeds.add(flywheelSpeed);
-    // flywheelSpeedTable.put(linearSpeed.in(MetersPerSecond),
-    // flywheelSpeed.in(RotationsPerSecond));
     flywheelSpeedTable.put(flywheelSpeed.in(RotationsPerSecond), linearSpeed.in(MetersPerSecond));
   }
 
   public LinearVelocity calcLinearVel(AngularVelocity speed) {
     return MetersPerSecond.of(flywheelSpeedTable.get(speed.in(RotationsPerSecond)));
+  }
+
+  public static FlywheelSpeedTable buildTable(ExitSpeedTable exitSpeedTable) {
+    FlywheelSpeedTable table = new FlywheelSpeedTable();
+    for (LinearVelocity speed : exitSpeedTable.getSpeeds()) {
+      table.put(exitSpeedTable.calcAngularVel(speed), speed);
+    }
+    return table;
   }
 
   public String printSingleLine() {

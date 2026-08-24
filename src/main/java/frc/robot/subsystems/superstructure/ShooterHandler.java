@@ -430,4 +430,8 @@ public class ShooterHandler {
   public void setStateAiming() {
     shooterState = shooterState.AIMING;
   }
+
+  public ShooterConfig getConfig() {
+    return config;
+  }
 }

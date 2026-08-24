@@ -43,4 +43,8 @@ public class ExitSpeedTable {
     }
     return sb.toString();
   }
+
+  public Set<LinearVelocity> getSpeeds() {
+    return speeds;
+  }
 }
