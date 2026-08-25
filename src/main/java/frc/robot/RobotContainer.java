@@ -60,6 +60,6 @@ public class RobotContainer {
   }
 
   public void simAutoInit() {
-    fuelSimHelper.resetFuelSim();
+    if (fuelSimHelper != null) fuelSimHelper.resetFuelSim();
   }
 }
