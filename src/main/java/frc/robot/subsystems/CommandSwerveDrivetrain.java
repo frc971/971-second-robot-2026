@@ -168,8 +168,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       super.resetPose(
           simPose3d.toPose2d()); // periodically tell sim drivetrain that it's at the bump sim pose
 
-      super.resetPose(simPose3d.toPose2d());
-
       Logger.recordOutput("Drive/SimPose3d", simPose3d);
     }
 
