@@ -7,9 +7,11 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.BLine.*;
+import frc.robot.lib.simulation.FuelSim;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.drive.Autos;
@@ -130,6 +132,8 @@ public class Robot extends LoggedRobot {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
     HubShiftUtil.initialize();
+
+    if (RobotBase.isSimulation()) robotContainer.simAutoInit();
   }
 
   @Override
@@ -162,4 +166,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testExit() {}
+
+  @Override
+  public void simulationPeriodic() {
+    FuelSim.getInstance().updateSim();
+  }
 }

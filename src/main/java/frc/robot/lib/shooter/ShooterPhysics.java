@@ -42,7 +42,6 @@ public class ShooterPhysics {
    * @return LaunchSolution, or null if the shot is impossible
    */
   public LaunchSolution targetAngleSolve(ObjectState proj, ObjectState target) {
-
     Translation2d distance2d = target.minus(proj).xyPos();
     double currentDistance = distance2d.getNorm();
 
@@ -102,7 +101,7 @@ public class ShooterPhysics {
     // compute angle
     double shotAngle = Math.atan(tanTheta);
 
-    // compute exit speed from apex constraint
+    // compute exit speed from apex constraints
     double sinTheta = Math.sin(shotAngle);
     if (Math.abs(sinTheta) < 1e-6) return null;
 

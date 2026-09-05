@@ -1,0 +1,183 @@
+package frc.robot.lib.simulation;
+
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.*;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.superstructure.ShooterHandler;
+import frc.robot.subsystems.superstructure.Superstructure;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
+public class FuelSimHelper {
+
+  private final CommandSwerveDrivetrain drivetrain;
+  private final Superstructure superstructure;
+  private final ShooterHandler[] shooterHandlers;
+  private final FlywheelSpeedTable leftFlywheelSpeedTable, rightFlywheelSpeedTable;
+
+  private LinearVelocity simFuelExitVelocity;
+
+  // 10 bps, since robot has 2 shooters there is a 1/5 s interval between shots instead of 1/10 s
+  private static final double LAUNCH_INTERVAL_SECONDS = 0.2;
+  private double lastLaunchTimeSeconds = 0.0;
+
+  // Pass in robotContainer in order to access superstructure and drivetrain
+  public FuelSimHelper(RobotContainer robotContainer) {
+    this.drivetrain = robotContainer.drivetrain;
+    this.superstructure = robotContainer.superstructure;
+    shooterHandlers =
+        new ShooterHandler[] {
+          superstructure.shooterHandlerLeft, superstructure.shooterHandlerRight
+        };
+    leftFlywheelSpeedTable =
+        FlywheelSpeedTable.buildTable(
+            superstructure.shooterHandlerLeft.getConfig().PHYSICS().EXIT_SPEED_TABLE());
+    rightFlywheelSpeedTable =
+        FlywheelSpeedTable.buildTable(
+            superstructure.shooterHandlerRight.getConfig().PHYSICS().EXIT_SPEED_TABLE());
+  }
+
+  public void configureFuelSim() {
+    FuelSim instance = FuelSim.getInstance();
+    instance.clearFuel();
+    instance.registerRobot(
+        Dimensions.FULL_WIDTH,
+        Dimensions.FULL_LENGTH,
+        Dimensions.BUMPER_HEIGHT,
+        () -> drivetrain.getState().Pose,
+        this::getFieldRelativeChassisSpeedsForSim);
+
+    instance.registerIntake(
+        -Dimensions.FULL_LENGTH,
+        Dimensions.FULL_LENGTH / 2.0,
+        -Dimensions.FULL_WIDTH / 6.0,
+        Dimensions.FULL_WIDTH / 6.0,
+        () ->
+            (superstructure.groundRollers.getAppliedVoltage() != null
+                && superstructure.groundRollers.getAppliedVoltage().magnitude() > 0
+                && superstructure
+                    .groundPivot
+                    .getPosition()
+                    .isNear(Degrees.of(0.0), Degrees.of(0.02))),
+        () -> Logger.recordOutput("Fuel Simulation/LastEvent", "Intake"));
+
+    instance.spawnStartingFuel();
+    instance.start();
+  }
+
+  public void resetFuelSim() {
+    if (!RobotBase.isSimulation()) {
+      return;
+    }
+    FuelSim instance = FuelSim.getInstance();
+    instance.clearFuel();
+    instance.spawnStartingFuel();
+    Logger.recordOutput("Fuel Simulation/LastEvent", "Auto Reset");
+  }
+
+  private void launchFuelInSim(
+      LinearVelocity velocity, Angle elevation, ShooterHandler shooterHandler) {
+    Translation3d muzzlePose = shooterHandler.getProjectileState().position();
+    Rotation2d launchYaw =
+        drivetrain
+            .getState()
+            .Pose
+            .getRotation()
+            .plus(new Rotation2d(shooterHandler.getTurret().getPosition()));
+
+    Translation3d launchVelocity = createLaunchVelocity(velocity, elevation, launchYaw);
+    launchVelocity = launchVelocity.plus(shooterHandler.getProjectileState().velocity());
+
+    FuelSim.getInstance().spawnFuel(muzzlePose, launchVelocity);
+
+    Logger.recordOutput("Fuel Simulation/LastEvent", "Shoot");
+  }
+
+  @AutoLogOutput(key = "Fuel Simulation/Shooting/isShooting")
+  private boolean isShooting() {
+    boolean shooting = false;
+
+    if (DriverStation.isEnabled()) {
+      Voltage rollerFloorVolts = superstructure.rollerFloor.getAppliedVoltage();
+      Voltage b2Volts = superstructure.b2.getAppliedVoltage();
+      Voltage kickerVolts = superstructure.kicker.getAppliedVoltage();
+
+      if (rollerFloorVolts.gt(Volts.of(0))
+          && b2Volts.gt(Volts.of(0))
+          && kickerVolts.gt(Volts.of(0))) {
+        shooting = true;
+      }
+    }
+
+    return shooting;
+  }
+
+  private void handleSimShooting() {
+    if (isShooting()) {
+      double currentTime = Timer.getFPGATimestamp();
+
+      // Only shoot if 0.1s has passed since the last launch
+      if (currentTime - lastLaunchTimeSeconds >= LAUNCH_INTERVAL_SECONDS) {
+        for (ShooterHandler shooterHandler : shooterHandlers) {
+          boolean leftHandler = shooterHandler == superstructure.shooterHandlerLeft;
+          AngularVelocity flywheelSpeed =
+              leftHandler
+                  ? superstructure.flywheelLeft.getVelocity()
+                  : superstructure.flywheelRight.getVelocity();
+          Angle hoodAngle =
+              leftHandler
+                  ? superstructure.hoodLeft.getHoodAngle()
+                  : superstructure.hoodRight.getHoodAngle();
+
+          FlywheelSpeedTable shotTable =
+              leftHandler ? leftFlywheelSpeedTable : rightFlywheelSpeedTable;
+
+          simFuelExitVelocity =
+              shotTable.calcLinearVel(RotationsPerSecond.of(flywheelSpeed.in(RotationsPerSecond)));
+          launchFuelInSim(simFuelExitVelocity, hoodAngle, shooterHandler);
+        }
+
+        // Update the last launch time after shooting
+        lastLaunchTimeSeconds = currentTime;
+      }
+    }
+  }
+
+  private void handleClearingFuel() {
+    if (Controllers.CLEAR_SIM_FUEL != null && Controllers.CLEAR_SIM_FUEL.getAsBoolean()) {
+      FuelSim.getInstance().clearFuel();
+      Logger.recordOutput("Fuel Simulation/LastEvent", "Clear Fuel");
+    }
+  }
+
+  private Translation3d createLaunchVelocity(
+      LinearVelocity velocity, Angle elevation, Rotation2d heading) {
+    double speed = velocity.in(MetersPerSecond);
+    double elevationRadians = elevation.in(Radians);
+    double planarSpeed = speed * Math.cos(elevationRadians);
+    double verticalSpeed = speed * Math.sin(elevationRadians);
+    Translation2d planar = new Translation2d(planarSpeed, 0).rotateBy(heading);
+    return new Translation3d(planar.getX(), planar.getY(), verticalSpeed);
+  }
+
+  private ChassisSpeeds getFieldRelativeChassisSpeedsForSim() {
+    ChassisSpeeds speeds = drivetrain.getState().Speeds;
+    return (speeds == null) ? new ChassisSpeeds() : speeds;
+  }
+
+  public void periodic() {
+    handleSimShooting();
+    Logger.recordOutput("Fuel Simulation/Shooting/ExitVelocity", simFuelExitVelocity);
+    handleClearingFuel();
+  }
+}
