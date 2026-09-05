@@ -21,6 +21,9 @@ public class Controllers {
 
   public static final Trigger ODOMETRY_RESET = DRIVER.y();
 
+  // Make the button on an axis that doesn't exist on a real controller to prevent future overlap
+  public static final Trigger CLEAR_SIM_FUEL = DRIVER.axisGreaterThan(7, 0.9);
+
   // === Manipulator's Controls
   public static final Trigger LEFT_SHUTTLE = MANIPULATOR.leftBumper();
   public static final Trigger RIGHT_SHUTTLE = MANIPULATOR.rightBumper();

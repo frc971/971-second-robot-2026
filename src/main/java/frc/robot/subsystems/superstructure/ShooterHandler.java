@@ -78,7 +78,7 @@ public class ShooterHandler {
   }
 
   // config + physics model
-  private ShooterConfig config;
+  private @Getter ShooterConfig config;
   private ShooterPhysics physics;
   private ObjectState projectileState;
   private @Setter @Getter ObjectState targetState;
@@ -131,7 +131,7 @@ public class ShooterHandler {
 
   // needs access DriveTrain (for robotState)
   private final CommandSwerveDrivetrain drivetrain;
-  private final AngularSubsystem turret;
+  @Getter private final AngularSubsystem turret;
   private final Hood hood;
   private final AngularSubsystem flywheel;
 
@@ -425,10 +425,6 @@ public class ShooterHandler {
 
   public Distance currentDistance() {
     return Meters.of(targetState.minus(projectileState).xyPos().getNorm());
-  }
-
-  public ShooterConfig getConfig() {
-    return config;
   }
 
   public void setStateAiming() {
