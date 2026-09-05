@@ -78,7 +78,7 @@ public class ShooterHandler {
   }
 
   // config + physics model
-  private ShooterConfig config;
+  private @Getter ShooterConfig config;
   private ShooterPhysics physics;
   private ObjectState projectileState;
   private @Setter @Getter ObjectState targetState;
@@ -429,9 +429,5 @@ public class ShooterHandler {
 
   public void setStateAiming() {
     shooterState = shooterState.AIMING;
-  }
-
-  public ShooterConfig getConfig() {
-    return config;
   }
 }
