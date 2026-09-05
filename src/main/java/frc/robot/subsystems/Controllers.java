@@ -62,4 +62,16 @@ public class Controllers {
   public static final Trigger MANUAL_SHUTTLE_DOWN = MANIPULATOR.axisGreaterThan(5, 0.85);
   public static final Trigger MANUAL_SHUTTLE_LEFT = MANIPULATOR.axisLessThan(4, -0.85);
   public static final Trigger MANUAL_SHUTTLE_RIGHT = MANIPULATOR.axisGreaterThan(4, 0.85);
+
+  // === Software's Controls
+  public static final Toggle TUNE_LEFT_TURRET = new Toggle(DRIVER.back());
+  public static final Toggle TUNE_RIGHT_TURRET = new Toggle(DRIVER.start());
+
+  // score/save must be the same button, no space
+  public static final Edge SCORE = new Edge(DRIVER.a());
+
+  public static final Edge UNDERSHOOT = new Edge(DRIVER.povUp());
+  public static final Edge OVERSHOOT = new Edge(DRIVER.povDown());
+  public static final Edge REVERT = new Edge(DRIVER.povLeft());
+  public static final Edge HIT = new Edge(DRIVER.povRight());
 }
