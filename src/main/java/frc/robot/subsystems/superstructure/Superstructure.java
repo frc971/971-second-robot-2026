@@ -13,6 +13,7 @@ import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler.State;
+import frc.robot.subsystems.superstructure.power_manager.PowerManager;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
@@ -45,6 +46,7 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Visualization visualization;
+  public final PowerManager powerManager;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private final Timer juiceTimer = new Timer();
@@ -89,6 +91,17 @@ public class Superstructure {
             ShooterHandler.Side.LEFT);
 
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
+    powerManager =
+        new PowerManager(
+            flywheelLeft,
+            flywheelRight,
+            groundRollers,
+            groundPivot,
+            hoodLeft,
+            hoodRight,
+            kicker,
+            rollerFloor,
+            b2);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -340,6 +353,24 @@ public class Superstructure {
   }
 
   public void setGoal(SetpointGoal setpoint) {
+    switch (setpoint) {
+      case INTAKE_PIVOT, INTAKE_PIVOT_JUICE, INTAKE_ROLLERS, AUTO_INTAKE_ROLLERS -> powerManager
+          .intakeRequest();
+      case INDEX, AUTO_INDEX -> powerManager.feedingRequest();
+      case OUTTAKE, UNJAM, REVERSE_SHOOTERS -> powerManager.outtakeRequest();
+      case AUTO_FLYWHEEL,
+          SUPERCHARGED,
+          MANUAL_UP,
+          MANUAL_DOWN,
+          MANUAL_LEFT,
+          MANUAL_RIGHT -> powerManager.scoringRequest();
+      case AUTO_NEUTRAL, AUTO_STOP_INDEXING, NEUTRAL, RESET, MANUAL_RESET -> powerManager
+          .neutralRequest();
+      case MANUAL_SHUTTLE_UP,
+          MANUAL_SHUTTLE_DOWN,
+          MANUAL_SHUTTLE_LEFT,
+          MANUAL_SHUTTLE_RIGHT -> powerManager.scoringRequest();
+    }
     setGoal(setpoint.getSetpoint());
   }
 
