@@ -14,6 +14,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler.State;
 import frc.robot.subsystems.superstructure.power_manager.PowerManager;
+import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
@@ -93,6 +94,7 @@ public class Superstructure {
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
     powerManager =
         new PowerManager(
+            drivetrain,
             flywheelLeft,
             flywheelRight,
             groundRollers,
@@ -355,21 +357,21 @@ public class Superstructure {
   public void setGoal(SetpointGoal setpoint) {
     switch (setpoint) {
       case INTAKE_PIVOT, INTAKE_PIVOT_JUICE, INTAKE_ROLLERS, AUTO_INTAKE_ROLLERS -> powerManager
-          .intakeRequest();
-      case INDEX, AUTO_INDEX -> powerManager.feedingRequest();
-      case OUTTAKE, UNJAM, REVERSE_SHOOTERS -> powerManager.outtakeRequest();
-      case AUTO_FLYWHEEL,
-          SUPERCHARGED,
-          MANUAL_UP,
-          MANUAL_DOWN,
-          MANUAL_LEFT,
-          MANUAL_RIGHT -> powerManager.scoringRequest();
-      case AUTO_NEUTRAL, AUTO_STOP_INDEXING, NEUTRAL, RESET, MANUAL_RESET -> powerManager
-          .neutralRequest();
+          .setState(PowerManagerState.INTAKE);
+      case INDEX, AUTO_INDEX -> powerManager.setState(PowerManagerState.FEEDING);
+      case OUTTAKE, UNJAM, REVERSE_SHOOTERS -> powerManager.setState(PowerManagerState.OUTTAKE);
+      case AUTO_FLYWHEEL, MANUAL_UP, MANUAL_DOWN, MANUAL_LEFT, MANUAL_RIGHT -> powerManager
+          .setState(PowerManagerState.SCORING);
+      case AUTO_NEUTRAL, AUTO_STOP_INDEXING, NEUTRAL, RESET, MANUAL_RESET -> powerManager.setState(
+          shooterHandlerLeft.getShooterState() != State.NOT_READY
+                  || shooterHandlerRight.getShooterState() != State.NOT_READY
+              ? PowerManagerState.SCORING
+              : PowerManagerState.IDLE);
       case MANUAL_SHUTTLE_UP,
           MANUAL_SHUTTLE_DOWN,
           MANUAL_SHUTTLE_LEFT,
-          MANUAL_SHUTTLE_RIGHT -> powerManager.scoringRequest();
+          MANUAL_SHUTTLE_RIGHT -> powerManager.setState(PowerManagerState.SHUTTLING);
+      case SUPERCHARGED -> {}
     }
     setGoal(setpoint.getSetpoint());
   }

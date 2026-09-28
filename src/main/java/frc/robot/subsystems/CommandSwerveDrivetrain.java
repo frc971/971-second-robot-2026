@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -132,6 +133,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
    */
   public void setRequest(SwerveRequest request) {
     this.request = request;
+  }
+
+  public void setSupplyCurrentLimits(double driveAmps, double steerAmps) {
+    CurrentLimitsConfigs driveLimits =
+        new CurrentLimitsConfigs()
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(driveAmps);
+    CurrentLimitsConfigs steerLimits =
+        new CurrentLimitsConfigs()
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(steerAmps);
+
+    for (var module : getModules()) {
+      module.getDriveMotor().getConfigurator().apply(driveLimits);
+      module.getSteerMotor().getConfigurator().apply(steerLimits);
+    }
   }
 
   @Override

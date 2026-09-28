@@ -149,6 +149,7 @@ public class MotorTalonFX extends MotorIO {
 
   @Override
   public void setSupplyCurrentLimit(double amps) {
+    super.setSupplyCurrentLimit(amps);
     motorConfig.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimitEnable = true;
     motorConfig.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit = amps;
     motor.getConfigurator().apply(motorConfig.TALONFX_CONFIG());
