@@ -35,9 +35,9 @@ public class Robot extends LoggedRobot {
   private final Autos autos;
 
   public Robot() {
-    Logger.recordMetadata("ProjectName", "971 First Bot 2026");
+    Logger.recordMetadata("ProjectName", "971 Second Bot 2026");
     Logger.recordMetadata("TeamNumber", "971");
-    Logger.recordMetadata("RobotName", "971 Robot");
+    Logger.recordMetadata("RobotName", "TWICE");
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
