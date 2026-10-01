@@ -1,23 +1,21 @@
 package frc.robot.subsystems.superstructure.power_manager;
 
 public enum PowerManagerState {
-  INTAKE(50, 80, 15, 40, 10, 10, 25, 27, 10),
-  IDLE(50, 25, 25, 40, 10, 10, 25, 27, 10),
-  SCORING(50, 20, 15, 40, 20, 20, 25, 20, 10),
-  SHUTTLING(60, 20, 15, 40, 15, 15, 25, 27, 10),
-  FEEDING(35, 20, 15, 40, 30, 30, 25, 27, 10),
-  OUTTAKE(35, 20, 15, 40, 30, 30, 25, 27, 10),
-  AUTONOMOUS(50, 25, 25, 40, 10, 10, 25, 27, 10);
+  DEFAULT(40, 40, 25, 25, 30, 30, 25, 30, 27, 10),
+  SHOOTING(50, 20, 15, 40, 20, 20, 25, 30, 20, 10),
+  SHUTTLING(60, 20, 15, 40, 15, 15, 25, 30, 27, 10),
+  SUPERCHARGED(50, 25, 25, 40, 10, 10, 25, 30, 27, 10);
 
-  final double flywheelSupplyCurrent;
-  final double groundRollersSupplyCurrent;
-  final double groundPivotSupplyCurrent;
-  final double hoodSupplyCurrent;
-  final double kickerSupplyCurrent;
-  final double rollerFloorSupplyCurrent;
-  final double b2SupplyCurrent;
-  final double drivetrainSupplyCurrent;
-  final double drivetrainSteerSupplyCurrent;
+  public final double flywheelSupplyCurrent;
+  public final double groundRollersSupplyCurrent;
+  public final double groundPivotSupplyCurrent;
+  public final double hoodSupplyCurrent;
+  public final double kickerSupplyCurrent;
+  public final double rollerFloorSupplyCurrent;
+  public final double b2SupplyCurrent;
+  public final double turretSupplyCurrent;
+  public final double drivetrainSupplyCurrent;
+  public final double drivetrainSteerSupplyCurrent;
 
   PowerManagerState(
       double flywheelSupplyCurrent,
@@ -27,6 +25,7 @@ public enum PowerManagerState {
       double kickerSupplyCurrent,
       double rollerFloorSupplyCurrent,
       double b2SupplyCurrent,
+      double turretSupplyCurrent,
       double drivetrainSupplyCurrent,
       double drivetrainSteerSupplyCurrent) {
     this.flywheelSupplyCurrent = flywheelSupplyCurrent;
@@ -36,6 +35,7 @@ public enum PowerManagerState {
     this.kickerSupplyCurrent = kickerSupplyCurrent;
     this.rollerFloorSupplyCurrent = rollerFloorSupplyCurrent;
     this.b2SupplyCurrent = b2SupplyCurrent;
+    this.turretSupplyCurrent = turretSupplyCurrent;
     this.drivetrainSupplyCurrent = drivetrainSupplyCurrent;
     this.drivetrainSteerSupplyCurrent = drivetrainSteerSupplyCurrent;
   }

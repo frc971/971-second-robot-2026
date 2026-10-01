@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.lib.superstructure.*;
+import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 
 // TODO: change the constants!!
 public class FlywheelLeft extends AngularSubsystem {
@@ -54,7 +55,7 @@ public class FlywheelLeft extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 40.0;
+    tc.CurrentLimits.SupplyCurrentLimit = PowerManagerState.DEFAULT.flywheelSupplyCurrent;
     tc.CurrentLimits.StatorCurrentLimit = 100.0;
 
     tc.Feedback.SensorToMechanismRatio = 1.0 / 1.0; // Motor to output gear ratio

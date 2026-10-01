@@ -103,12 +103,18 @@ public class Superstructure {
             hoodRight,
             kicker,
             rollerFloor,
-            b2);
+            b2,
+            turretLeft,
+            turretRight,
+            shooterHandlerLeft,
+            shooterHandlerRight);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
 
   public void periodic() {
+    powerManager.periodic();
+
     // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
       if (!juiceTimer.isRunning()) {
@@ -356,22 +362,14 @@ public class Superstructure {
 
   public void setGoal(SetpointGoal setpoint) {
     switch (setpoint) {
-      case INTAKE_PIVOT, INTAKE_PIVOT_JUICE, INTAKE_ROLLERS, AUTO_INTAKE_ROLLERS -> powerManager
-          .setState(PowerManagerState.INTAKE);
-      case INDEX, AUTO_INDEX -> powerManager.setState(PowerManagerState.FEEDING);
-      case OUTTAKE, UNJAM, REVERSE_SHOOTERS -> powerManager.setState(PowerManagerState.OUTTAKE);
-      case AUTO_FLYWHEEL, MANUAL_UP, MANUAL_DOWN, MANUAL_LEFT, MANUAL_RIGHT -> powerManager
-          .setState(PowerManagerState.SCORING);
-      case AUTO_NEUTRAL, AUTO_STOP_INDEXING, NEUTRAL, RESET, MANUAL_RESET -> powerManager.setState(
-          shooterHandlerLeft.getShooterState() != State.NOT_READY
-                  || shooterHandlerRight.getShooterState() != State.NOT_READY
-              ? PowerManagerState.SCORING
-              : PowerManagerState.IDLE);
+      case MANUAL_UP, MANUAL_DOWN, MANUAL_LEFT, MANUAL_RIGHT -> powerManager.setState(
+          PowerManagerState.SHOOTING);
       case MANUAL_SHUTTLE_UP,
           MANUAL_SHUTTLE_DOWN,
           MANUAL_SHUTTLE_LEFT,
           MANUAL_SHUTTLE_RIGHT -> powerManager.setState(PowerManagerState.SHUTTLING);
       case SUPERCHARGED -> {}
+      default -> {}
     }
     setGoal(setpoint.getSetpoint());
   }

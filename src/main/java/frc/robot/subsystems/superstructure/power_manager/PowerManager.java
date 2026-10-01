@@ -11,6 +11,9 @@ import frc.robot.subsystems.superstructure.HoodLeft;
 import frc.robot.subsystems.superstructure.HoodRight;
 import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.RollerFloor;
+import frc.robot.subsystems.superstructure.ShooterHandler;
+import frc.robot.subsystems.superstructure.TurretLeft;
+import frc.robot.subsystems.superstructure.TurretRight;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.littletonrobotics.junction.Logger;
@@ -26,9 +29,13 @@ public class PowerManager {
   private final MotorSubsystem kicker;
   private final MotorSubsystem rollerFloor;
   private final MotorSubsystem b2;
+  private final MotorSubsystem turretLeft;
+  private final MotorSubsystem turretRight;
+  private final ShooterHandler shooterHandlerLeft;
+  private final ShooterHandler shooterHandlerRight;
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-  private PowerManagerState state = PowerManagerState.IDLE;
+  private PowerManagerState state = PowerManagerState.DEFAULT;
 
   public PowerManager(
       CommandSwerveDrivetrain drivetrain,
@@ -40,7 +47,11 @@ public class PowerManager {
       HoodRight hoodRight,
       Kicker kicker,
       RollerFloor rollerFloor,
-      B2 b2) {
+      B2 b2,
+      TurretLeft turretLeft,
+      TurretRight turretRight,
+      ShooterHandler shooterHandlerLeft,
+      ShooterHandler shooterHandlerRight) {
     this.drivetrain = drivetrain;
     this.flywheelLeft = flywheelLeft;
     this.flywheelRight = flywheelRight;
@@ -51,7 +62,23 @@ public class PowerManager {
     this.kicker = kicker;
     this.rollerFloor = rollerFloor;
     this.b2 = b2;
+    this.turretLeft = turretLeft;
+    this.turretRight = turretRight;
+    this.shooterHandlerLeft = shooterHandlerLeft;
+    this.shooterHandlerRight = shooterHandlerRight;
     applyState();
+  }
+
+  public void periodic() {
+    if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
+        || shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+      setState(
+          shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()
+              ? PowerManagerState.SHUTTLING
+              : PowerManagerState.SUPERCHARGED);
+    } else {
+      setState(PowerManagerState.DEFAULT);
+    }
   }
 
   public PowerManagerState getState() {
@@ -65,8 +92,7 @@ public class PowerManager {
   }
 
   private void applyState() {
-    PowerManagerState requestedState = state;
-    executor.submit(() -> applyState(requestedState));
+    executor.submit(() -> applyState(state));
   }
 
   private void applyState(PowerManagerState requestedState) {
@@ -81,6 +107,7 @@ public class PowerManager {
     Logger.recordOutput(
         "PowerManager/RollerFloorSupplyCurrent", requestedState.rollerFloorSupplyCurrent);
     Logger.recordOutput("PowerManager/B2SupplyCurrent", requestedState.b2SupplyCurrent);
+    Logger.recordOutput("PowerManager/TurretSupplyCurrent", requestedState.turretSupplyCurrent);
     Logger.recordOutput(
         "PowerManager/DrivetrainSupplyCurrent", requestedState.drivetrainSupplyCurrent);
     Logger.recordOutput(
@@ -97,5 +124,7 @@ public class PowerManager {
     kicker.setSupplyCurrentLimit(requestedState.kickerSupplyCurrent);
     rollerFloor.setSupplyCurrentLimit(requestedState.rollerFloorSupplyCurrent);
     b2.setSupplyCurrentLimit(requestedState.b2SupplyCurrent);
+    turretLeft.setSupplyCurrentLimit(requestedState.turretSupplyCurrent);
+    turretRight.setSupplyCurrentLimit(requestedState.turretSupplyCurrent);
   }
 }
