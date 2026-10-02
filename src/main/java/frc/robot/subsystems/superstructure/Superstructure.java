@@ -13,6 +13,8 @@ import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler.State;
+import frc.robot.subsystems.superstructure.power_manager.PowerManager;
+import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
@@ -45,6 +47,7 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Visualization visualization;
+  public final PowerManager powerManager;
   @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
 
   private final Timer juiceTimer = new Timer();
@@ -89,13 +92,33 @@ public class Superstructure {
             ShooterHandler.Side.LEFT);
 
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
+    powerManager =
+        new PowerManager(
+            drivetrain,
+            flywheelLeft,
+            flywheelRight,
+            groundRollers,
+            groundPivot,
+            hoodLeft,
+            hoodRight,
+            kicker,
+            rollerFloor,
+            b2,
+            turretLeft,
+            turretRight,
+            shooterHandlerLeft,
+            shooterHandlerRight,
+            () -> shooterGoal == ShooterGoal.MANUAL);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
 
   public void periodic() {
+
     // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
+      powerManager.setState(PowerManagerState.DEFAULT);
+
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
       }
@@ -292,6 +315,8 @@ public class Superstructure {
     groundRollers.periodic();
 
     visualization.periodic();
+
+    powerManager.periodic();
   }
 
   // MARK: Helper functions
@@ -340,6 +365,16 @@ public class Superstructure {
   }
 
   public void setGoal(SetpointGoal setpoint) {
+    switch (setpoint) {
+      case MANUAL_UP, MANUAL_DOWN, MANUAL_LEFT, MANUAL_RIGHT -> powerManager.setState(
+          PowerManagerState.SHOOTING);
+      case MANUAL_SHUTTLE_UP,
+          MANUAL_SHUTTLE_DOWN,
+          MANUAL_SHUTTLE_LEFT,
+          MANUAL_SHUTTLE_RIGHT -> powerManager.setState(PowerManagerState.SHUTTLING);
+      case SUPERCHARGED -> {}
+      default -> {}
+    }
     setGoal(setpoint.getSetpoint());
   }
 

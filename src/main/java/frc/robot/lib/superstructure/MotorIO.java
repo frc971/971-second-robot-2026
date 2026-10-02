@@ -40,6 +40,13 @@ public abstract class MotorIO {
   @AutoLogOutput(key = "{name}/Connected")
   protected boolean connected = false;
 
+  protected double supplyCurrentLimit = 0.0;
+
+  @AutoLogOutput(key = "{name}/Supply Current Limit")
+  public double getSupplyCurrentLimit() {
+    return supplyCurrentLimit;
+  }
+
   @Getter protected Angle absolutePosition = Rotations.of(0.0);
   @Getter protected Angle position = Rotations.of(0.0);
   @Getter protected AngularVelocity velocity = RotationsPerSecond.of(0.0);
@@ -89,4 +96,8 @@ public abstract class MotorIO {
   public abstract void resetPosition(Distance newPosition);
 
   public abstract void setCoast();
+
+  public void setSupplyCurrentLimit(double amps) {
+    supplyCurrentLimit = amps;
+  }
 }
