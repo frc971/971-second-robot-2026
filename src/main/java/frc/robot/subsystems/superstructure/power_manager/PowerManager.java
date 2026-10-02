@@ -70,18 +70,21 @@ public class PowerManager {
     this.shooterHandlerLeft = shooterHandlerLeft;
     this.shooterHandlerRight = shooterHandlerRight;
     this.isManualGoal = isManualGoal;
-    applyState();
   }
 
   public void periodic() {
-    if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
-        || shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
-      setState(
-          shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()
-              ? PowerManagerState.SHUTTLING
-              : PowerManagerState.SUPERCHARGED);
-    } else {
-      setState(PowerManagerState.DEFAULT);
+    if (!isManualGoal.getAsBoolean()) {
+      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
+          || shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+        setState(
+            shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()
+                ? PowerManagerState.SHUTTLING
+                : PowerManagerState.SUPERCHARGED);
+      } else {
+        setState(PowerManagerState.DEFAULT);
+      }
+
+      applyState();
     }
   }
 
@@ -92,16 +95,10 @@ public class PowerManager {
   public void setState(PowerManagerState newState) {
     if (state == newState) return;
     state = newState;
-    applyState();
   }
 
   private void applyState() {
-    executor.submit(
-        () -> {
-          if (!isManualGoal.getAsBoolean()) {
-            applyState(state);
-          }
-        });
+    executor.submit(() -> applyState(state));
   }
 
   private void applyState(PowerManagerState requestedState) {

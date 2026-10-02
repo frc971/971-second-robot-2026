@@ -36,9 +36,12 @@ public abstract class MotorIO {
   @AutoLogOutput(key = "{name}/Temperature")
   protected Temperature temperature;
 
-  @Getter
-  @AutoLogOutput(key = "{name}/Connected")
   protected boolean connected = false;
+
+  @AutoLogOutput(key = "{name}/Connected")
+  public boolean isConnected() {
+    return connected;
+  }
 
   @Getter
   @AutoLogOutput(key = "{name}/Supply Current Limit")
