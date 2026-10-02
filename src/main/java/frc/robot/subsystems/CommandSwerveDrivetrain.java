@@ -139,11 +139,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     CurrentLimitsConfigs driveLimits =
         new CurrentLimitsConfigs()
             .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(driveAmps);
+            .withSupplyCurrentLimit(driveAmps)
+            .withStatorCurrentLimitEnable(true)
+            .withStatorCurrentLimit(120.0);
     CurrentLimitsConfigs steerLimits =
         new CurrentLimitsConfigs()
             .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(steerAmps);
+            .withSupplyCurrentLimit(steerAmps)
+            .withStatorCurrentLimitEnable(true)
+            .withStatorCurrentLimit(60.0);
 
     for (var module : getModules()) {
       module.getDriveMotor().getConfigurator().apply(driveLimits);
