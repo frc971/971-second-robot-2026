@@ -17,8 +17,6 @@ import frc.robot.subsystems.superstructure.power_manager.PowerManager;
 import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 import org.littletonrobotics.junction.AutoLogOutput;
 
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
-
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
  * {@code RobotContainer} from being cluttered with individual mechanism construction logic and
