@@ -16,6 +16,7 @@ import frc.robot.subsystems.superstructure.TurretLeft;
 import frc.robot.subsystems.superstructure.TurretRight;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class PowerManager {
@@ -34,6 +35,7 @@ public class PowerManager {
   private final ShooterHandler shooterHandlerLeft;
   private final ShooterHandler shooterHandlerRight;
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
+  private final BooleanSupplier isManualGoal;
 
   private PowerManagerState state = PowerManagerState.DEFAULT;
 
@@ -51,7 +53,8 @@ public class PowerManager {
       TurretLeft turretLeft,
       TurretRight turretRight,
       ShooterHandler shooterHandlerLeft,
-      ShooterHandler shooterHandlerRight) {
+      ShooterHandler shooterHandlerRight,
+      BooleanSupplier isManualGoal) {
     this.drivetrain = drivetrain;
     this.flywheelLeft = flywheelLeft;
     this.flywheelRight = flywheelRight;
@@ -66,6 +69,7 @@ public class PowerManager {
     this.turretRight = turretRight;
     this.shooterHandlerLeft = shooterHandlerLeft;
     this.shooterHandlerRight = shooterHandlerRight;
+    this.isManualGoal = isManualGoal;
     applyState();
   }
 
@@ -92,7 +96,12 @@ public class PowerManager {
   }
 
   private void applyState() {
-    executor.submit(() -> applyState(state));
+    executor.submit(
+        () -> {
+          if (!isManualGoal.getAsBoolean()) {
+            applyState(state);
+          }
+        });
   }
 
   private void applyState(PowerManagerState requestedState) {

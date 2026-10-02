@@ -107,13 +107,13 @@ public class Superstructure {
             turretLeft,
             turretRight,
             shooterHandlerLeft,
-            shooterHandlerRight);
+            shooterHandlerRight,
+            () -> shooterGoal == ShooterGoal.MANUAL);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
 
   public void periodic() {
-    powerManager.periodic();
 
     // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
@@ -313,6 +313,8 @@ public class Superstructure {
     groundRollers.periodic();
 
     visualization.periodic();
+
+    powerManager.periodic();
   }
 
   // MARK: Helper functions
