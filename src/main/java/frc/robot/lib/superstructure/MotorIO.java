@@ -36,16 +36,19 @@ public abstract class MotorIO {
   @AutoLogOutput(key = "{name}/Temperature")
   protected Temperature temperature;
 
+  @AutoLogOutput(key = "{name}/Connected")
   protected boolean connected = false;
 
-  @AutoLogOutput(key = "{name}/Connected")
   public boolean isConnected() {
     return connected;
   }
 
-  @Getter
-  @AutoLogOutput(key = "{name}/Supply Current Limit")
   protected double supplyCurrentLimit = 0.0;
+
+  @AutoLogOutput(key = "{name}/Supply Current Limit")
+  public double getSupplyCurrentLimit() {
+    return supplyCurrentLimit;
+  }
 
   @Getter protected Angle absolutePosition = Rotations.of(0.0);
   @Getter protected Angle position = Rotations.of(0.0);

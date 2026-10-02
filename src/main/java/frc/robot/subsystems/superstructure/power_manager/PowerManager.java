@@ -83,9 +83,8 @@ public class PowerManager {
       } else {
         setState(PowerManagerState.DEFAULT);
       }
-
-      applyState();
     }
+    applyState();
   }
 
   public PowerManagerState getState() {
