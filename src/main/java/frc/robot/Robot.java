@@ -16,7 +16,7 @@ import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.drive.Autos;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.vision.BOS;
+import frc.robot.subsystems.vision.COS;
 import frc.robot.subsystems.vision.TagHelper;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -30,7 +30,7 @@ public class Robot extends LoggedRobot {
 
   private final RobotContainer robotContainer;
 
-  private final BOS bos;
+  private final COS cos;
 
   private final Autos autos;
 
@@ -65,7 +65,7 @@ public class Robot extends LoggedRobot {
     TagHelper.init();
 
     robotContainer = new RobotContainer();
-    bos = new BOS(robotContainer.drivetrain);
+    cos = new COS(robotContainer.drivetrain);
     autos = new Autos(robotContainer.drivetrain);
   }
 
@@ -78,14 +78,14 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
-    bos.updatePose();
+    cos.updatePose();
 
     if (Controllers.ODOMETRY_RESET.getAsBoolean()) {
-      robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
+      robotContainer.drivetrain.resetPose(cos.getLastVisionPose());
     }
 
     if (Controllers.DISABLE_OTF.getAsBoolean()) {
-      robotContainer.drivetrain.resetPose(bos.getLastVisionPose());
+      robotContainer.drivetrain.resetPose(cos.getLastVisionPose());
     }
 
     CommandScheduler.getInstance().run();
