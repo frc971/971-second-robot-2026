@@ -114,7 +114,7 @@ public class ShooterHandler {
   }
 
   public enum Goal {
-    NONE,
+    INACTIVE,
     ACTIVE
   }
 
@@ -154,7 +154,7 @@ public class ShooterHandler {
     this.side = side;
 
     this.shooterState = State.NOT_READY;
-    this.shooterGoal = Goal.NONE;
+    this.shooterGoal = Goal.INACTIVE;
     this.targetState = Targets.BLUE;
     this.projectileState = Targets.BLUE;
 
@@ -188,7 +188,7 @@ public class ShooterHandler {
     }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
-    if (shooterGoal == Goal.NONE) {
+    if (shooterGoal == Goal.INACTIVE) {
       shooterState = State.NOT_READY;
       return;
     }
@@ -205,7 +205,7 @@ public class ShooterHandler {
         }
       }
       case AIMING -> {
-        if (launchSolution != null && canTransitionToReady()) {
+        if (launchSolution != null && canTransitionToFiring()) {
           shooterState = State.FIRING;
         }
       }
@@ -300,8 +300,8 @@ public class ShooterHandler {
     }
   }
 
-  @AutoLogOutput(key = "{name}/canTransitionToReady")
-  private boolean canTransitionToReady() {
+  @AutoLogOutput(key = "{name}/canTransitionToFiring")
+  private boolean canTransitionToFiring() {
     if (launchSolution == null) {
       return false;
     }
