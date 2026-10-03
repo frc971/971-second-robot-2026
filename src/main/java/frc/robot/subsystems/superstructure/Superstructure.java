@@ -14,6 +14,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler.ShooterState;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -45,13 +46,13 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Visualization visualization;
-  @AutoLogOutput private ShooterMode shooterMode = ShooterMode.NONE;
+  @AutoLogOutput private Mode mode = Mode.NONE;
 
   private final Timer juiceTimer = new Timer();
   private boolean juiceAuto = false;
 
   // Targeting hub/shuttle targets or using manual setpoints
-  private enum ShooterMode {
+  private enum Mode {
     NONE,
     MANUAL,
     TARGETING
@@ -108,11 +109,13 @@ public class Superstructure {
               || Controllers.SHOOT.getAsBoolean()
               || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
 
+      Logger.recordOutput("Superstructure/wantsShot", wantsShot);
+
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
-        shooterMode = ShooterMode.MANUAL;
+        mode = Mode.MANUAL;
       } else {
-        shooterMode = ShooterMode.TARGETING;
+        mode = Mode.TARGETING;
       }
 
       shooterHandlerLeft.setUseOTF(!Controllers.DISABLE_OTF.getAsBoolean());
@@ -121,14 +124,14 @@ public class Superstructure {
       shooterHandlerLeft.setTuningEnabled(Controllers.TUNE_LEFT.getAsBoolean());
       shooterHandlerRight.setTuningEnabled(Controllers.TUNE_RIGHT.getAsBoolean());
 
-      shooterHandlerRight.setShooterAimState(ShooterHandler.AimState.INACTIVE);
-      shooterHandlerLeft.setShooterAimState(ShooterHandler.AimState.INACTIVE);
+      shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.INACTIVE);
+      shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.INACTIVE);
 
-      switch (shooterMode) {
+      switch (mode) {
         case NONE -> {}
         case TARGETING -> {
-          shooterHandlerLeft.setShooterAimState(ShooterHandler.AimState.ACTIVE);
-          shooterHandlerRight.setShooterAimState(ShooterHandler.AimState.ACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
 
           ObjectState curTarget =
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
@@ -224,7 +227,7 @@ public class Superstructure {
               && ((shooterHandlerLeft.getShooterState() == ShooterHandler.ShooterState.FIRING
                       || shooterHandlerRight.getShooterState()
                           == ShooterHandler.ShooterState.FIRING)
-                  || shooterMode == ShooterMode.MANUAL);
+                  || mode == Mode.MANUAL);
 
       if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
@@ -249,7 +252,7 @@ public class Superstructure {
         }
       }
 
-      if (shooterHandlerLeft.getShooterAimState() == ShooterHandler.AimState.ACTIVE) {
+      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {
         shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
         shooterHandlerLeft
             .getFlywheelSpeed()
@@ -258,7 +261,7 @@ public class Superstructure {
                     flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
       }
 
-      if (shooterHandlerRight.getShooterAimState() == ShooterHandler.AimState.ACTIVE) {
+      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {
         shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
         shooterHandlerRight
             .getFlywheelSpeed()
@@ -359,8 +362,8 @@ public class Superstructure {
     return Commands.runOnce(
         () -> {
           juiceAuto = false;
-          shooterHandlerRight.setShooterAimState(ShooterHandler.AimState.INACTIVE);
-          shooterHandlerLeft.setShooterAimState(ShooterHandler.AimState.INACTIVE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.INACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.INACTIVE);
           setGoal(SetpointGoal.AUTO_NEUTRAL);
         });
   }
@@ -398,8 +401,8 @@ public class Superstructure {
                   shooterHandlerLeft.setTargetState(curTarget);
                   shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterAimState(ShooterHandler.AimState.ACTIVE);
-                  shooterHandlerLeft.setShooterAimState(ShooterHandler.AimState.ACTIVE);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
 
                   juiceAuto = true;
                 }));
@@ -417,8 +420,8 @@ public class Superstructure {
                   shooterHandlerLeft.setTargetState(curTarget);
                   shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterAimState(ShooterHandler.AimState.ACTIVE);
-                  shooterHandlerLeft.setShooterAimState(ShooterHandler.AimState.ACTIVE);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
 
                   juiceAuto = false;
                 }));
@@ -434,8 +437,8 @@ public class Superstructure {
                   : ShooterHandler.Targets.RED;
           shooterHandlerLeft.setTargetState(curTarget);
           shooterHandlerRight.setTargetState(curTarget);
-          shooterHandlerRight.setShooterAimState(ShooterHandler.AimState.ACTIVE);
-          shooterHandlerLeft.setShooterAimState(ShooterHandler.AimState.ACTIVE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
         });
   }
 
@@ -451,8 +454,8 @@ public class Superstructure {
                   shooterHandlerLeft.setTargetState(curTarget);
                   shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterAimState(ShooterHandler.AimState.ACTIVE);
-                  shooterHandlerLeft.setShooterAimState(ShooterHandler.AimState.ACTIVE);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
                 }));
   }
 }

@@ -113,8 +113,7 @@ public class ShooterHandler {
     FIRING
   }
 
-  // whether or not to start aiming, set by superstructure
-  public enum AimState {
+  public enum ShooterGoal {
     INACTIVE,
     ACTIVE
   }
@@ -123,10 +122,10 @@ public class ShooterHandler {
   @Getter
   private ShooterHandler.ShooterState shooterState;
 
-  @AutoLogOutput(key = "{name}/shooterAimState")
+  @AutoLogOutput(key = "{name}/shooterGoal")
   @Getter
   @Setter
-  private ShooterHandler.AimState shooterAimState;
+  private ShooterHandler.ShooterGoal shooterGoal;
 
   @Getter private LaunchSolution launchSolution = null;
 
@@ -155,7 +154,7 @@ public class ShooterHandler {
     this.side = side;
 
     this.shooterState = ShooterState.NOT_READY;
-    this.shooterAimState = AimState.INACTIVE;
+    this.shooterGoal = ShooterGoal.INACTIVE;
     this.targetState = Targets.BLUE;
     this.projectileState = Targets.BLUE;
 
@@ -189,7 +188,7 @@ public class ShooterHandler {
     }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
-    if (shooterAimState == AimState.INACTIVE) {
+    if (shooterGoal == ShooterGoal.INACTIVE) {
       shooterState = ShooterState.NOT_READY;
       return;
     }
