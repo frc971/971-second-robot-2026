@@ -107,26 +107,26 @@ public class ShooterHandler {
   private static final Distance PERPENDICULAR_TURRET_OFFSET = Meters.of(0.05);
 
   // state machine
-  public enum State {
+  public enum ShooterState {
     NOT_READY,
     AIMING,
     FIRING
   }
 
   // whether or not to start aiming, set by superstructure
-  public enum Goal {
+  public enum AimState {
     INACTIVE,
     ACTIVE
   }
 
   @AutoLogOutput(key = "{name}/shooterState")
   @Getter
-  private ShooterHandler.State shooterState;
+  private ShooterHandler.ShooterState shooterState;
 
-  @AutoLogOutput(key = "{name}/shooterGoal")
+  @AutoLogOutput(key = "{name}/shooterAimState")
   @Getter
   @Setter
-  private ShooterHandler.Goal shooterGoal;
+  private ShooterHandler.AimState shooterAimState;
 
   @Getter private LaunchSolution launchSolution = null;
 
@@ -154,8 +154,8 @@ public class ShooterHandler {
     this.name = config.name();
     this.side = side;
 
-    this.shooterState = State.NOT_READY;
-    this.shooterGoal = Goal.INACTIVE;
+    this.shooterState = ShooterState.NOT_READY;
+    this.shooterAimState = AimState.INACTIVE;
     this.targetState = Targets.BLUE;
     this.projectileState = Targets.BLUE;
 
@@ -189,32 +189,32 @@ public class ShooterHandler {
     }
 
     liveTuning(); // live tuning during matches & superstructure decides which one is enabled
-    if (shooterGoal == Goal.INACTIVE) {
-      shooterState = State.NOT_READY;
+    if (shooterAimState == AimState.INACTIVE) {
+      shooterState = ShooterState.NOT_READY;
       return;
     }
 
     if (!satisfiesConstraints()) {
-      shooterState = State.NOT_READY;
+      shooterState = ShooterState.NOT_READY;
     }
 
     // state transitions
     switch (shooterState) {
       case NOT_READY -> {
         if (satisfiesConstraints()) {
-          shooterState = State.AIMING;
+          shooterState = ShooterState.AIMING;
         }
       }
       case AIMING -> {
         if (launchSolution != null && canTransitionToFiring()) {
-          shooterState = State.FIRING;
+          shooterState = ShooterState.FIRING;
         }
       }
       case FIRING -> {}
     }
 
     // --- compute tuned + clamped desired goals (used for outputs AND error) ---
-    if (launchSolution == null || shooterState == State.NOT_READY) {
+    if (launchSolution == null || shooterState == ShooterState.NOT_READY) {
       desiredTurretRel = Degrees.of(0.0);
     } else {
       // Base goals from physics
@@ -239,7 +239,7 @@ public class ShooterHandler {
     logStates();
 
     // set output
-    if (shooterState != State.NOT_READY) {
+    if (shooterState != ShooterState.NOT_READY) {
       // turret has its own hard-stop clamp in TurretLeft/Right.setPosition()
       turret.setPosition(desiredTurretRel);
     }
