@@ -45,12 +45,12 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Visualization visualization;
-  @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
+  @AutoLogOutput private ShooterMode shooterMode = ShooterMode.NONE;
 
   private final Timer juiceTimer = new Timer();
   private boolean juiceAuto = false;
 
-  private enum ShooterGoal {
+  private enum ShooterMode {
     NONE,
     MANUAL,
     TARGETING
@@ -109,9 +109,9 @@ public class Superstructure {
 
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
-        shooterGoal = ShooterGoal.MANUAL;
+        shooterMode = ShooterMode.MANUAL;
       } else {
-        shooterGoal = ShooterGoal.TARGETING;
+        shooterMode = ShooterMode.TARGETING;
       }
 
       shooterHandlerLeft.setUseOTF(!Controllers.DISABLE_OTF.getAsBoolean());
@@ -120,10 +120,10 @@ public class Superstructure {
       shooterHandlerLeft.setTuningEnabled(Controllers.TUNE_LEFT.getAsBoolean());
       shooterHandlerRight.setTuningEnabled(Controllers.TUNE_RIGHT.getAsBoolean());
 
-      shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-      shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+      shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.INACTIVE);
+      shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.INACTIVE);
 
-      switch (shooterGoal) {
+      switch (shooterMode) {
         case NONE -> {}
         case TARGETING -> {
           shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
@@ -222,7 +222,7 @@ public class Superstructure {
           wantsShot
               && ((shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
                       || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)
-                  || shooterGoal == ShooterGoal.MANUAL);
+                  || shooterMode == ShooterMode.MANUAL);
 
       if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
@@ -357,8 +357,8 @@ public class Superstructure {
     return Commands.runOnce(
         () -> {
           juiceAuto = false;
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.INACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.INACTIVE);
           setGoal(SetpointGoal.AUTO_NEUTRAL);
         });
   }
