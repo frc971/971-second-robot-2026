@@ -50,6 +50,7 @@ public class Superstructure {
   private final Timer juiceTimer = new Timer();
   private boolean juiceAuto = false;
 
+  // Targeting hub/shuttle targets or using manual setpoints
   private enum ShooterMode {
     NONE,
     MANUAL,

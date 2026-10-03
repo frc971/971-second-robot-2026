@@ -113,6 +113,7 @@ public class ShooterHandler {
     FIRING
   }
 
+  // whether or not to start aiming, set by superstructure
   public enum Goal {
     INACTIVE,
     ACTIVE
