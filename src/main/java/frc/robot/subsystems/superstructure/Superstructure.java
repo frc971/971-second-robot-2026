@@ -12,8 +12,9 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import frc.robot.subsystems.superstructure.ShooterHandler.State;
+import frc.robot.subsystems.superstructure.ShooterHandler.ShooterState;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -45,12 +46,13 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Visualization visualization;
-  @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
+  @AutoLogOutput private Mode mode = Mode.NONE;
 
   private final Timer juiceTimer = new Timer();
   private boolean juiceAuto = false;
 
-  private enum ShooterGoal {
+  // Targeting hub/shuttle targets or using manual setpoints
+  private enum Mode {
     NONE,
     MANUAL,
     TARGETING
@@ -107,11 +109,13 @@ public class Superstructure {
               || Controllers.SHOOT.getAsBoolean()
               || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
 
+      Logger.recordOutput("Superstructure/wantsShot", wantsShot);
+
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
-        shooterGoal = ShooterGoal.MANUAL;
+        mode = Mode.MANUAL;
       } else {
-        shooterGoal = ShooterGoal.TARGETING;
+        mode = Mode.TARGETING;
       }
 
       shooterHandlerLeft.setUseOTF(!Controllers.DISABLE_OTF.getAsBoolean());
@@ -120,14 +124,14 @@ public class Superstructure {
       shooterHandlerLeft.setTuningEnabled(Controllers.TUNE_LEFT.getAsBoolean());
       shooterHandlerRight.setTuningEnabled(Controllers.TUNE_RIGHT.getAsBoolean());
 
-      shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-      shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+      shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.INACTIVE);
+      shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.INACTIVE);
 
-      switch (shooterGoal) {
+      switch (mode) {
         case NONE -> {}
         case TARGETING -> {
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
 
           ObjectState curTarget =
               DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
@@ -210,19 +214,20 @@ public class Superstructure {
 
       // Indexer Logic
       // Driver has to say we can shoot AND we need to be ready to shoot
-      if (!wantsShot && shooterHandlerLeft.getShooterState() == State.FIRING) {
+      if (!wantsShot && shooterHandlerLeft.getShooterState() == ShooterState.FIRING) {
         shooterHandlerLeft.setStateAiming();
       }
 
-      if (!wantsShot && shooterHandlerRight.getShooterState() == State.FIRING) {
+      if (!wantsShot && shooterHandlerRight.getShooterState() == ShooterState.FIRING) {
         shooterHandlerRight.setStateAiming();
       }
 
       boolean indexing =
           wantsShot
-              && ((shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
-                      || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING)
-                  || shooterGoal == ShooterGoal.MANUAL);
+              && ((shooterHandlerLeft.getShooterState() == ShooterHandler.ShooterState.FIRING
+                      || shooterHandlerRight.getShooterState()
+                          == ShooterHandler.ShooterState.FIRING)
+                  || mode == Mode.MANUAL);
 
       if (Controllers.OUTTAKE.getAsBoolean()) {
         setGoal(SetpointGoal.OUTTAKE);
@@ -247,7 +252,7 @@ public class Superstructure {
         }
       }
 
-      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+      if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {
         shooterHandlerLeft.getHoodAngle().ifPresent(hoodLeft::setPosition);
         shooterHandlerLeft
             .getFlywheelSpeed()
@@ -256,7 +261,7 @@ public class Superstructure {
                     flywheelLeft.setVelocity(speed.plus(shooterHandlerLeft.getFlywheelOffset())));
       }
 
-      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+      if (shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {
         shooterHandlerRight.getHoodAngle().ifPresent(hoodRight::setPosition);
         shooterHandlerRight
             .getFlywheelSpeed()
@@ -265,8 +270,8 @@ public class Superstructure {
                     flywheelRight.setVelocity(speed.plus(shooterHandlerRight.getFlywheelOffset())));
       }
 
-      if (shooterHandlerLeft.getShooterState() == ShooterHandler.State.FIRING
-          || shooterHandlerRight.getShooterState() == ShooterHandler.State.FIRING) {
+      if (shooterHandlerLeft.getShooterState() == ShooterHandler.ShooterState.FIRING
+          || shooterHandlerRight.getShooterState() == ShooterHandler.ShooterState.FIRING) {
         setGoal(SetpointGoal.AUTO_INDEX);
       } else {
         setGoal(SetpointGoal.AUTO_STOP_INDEXING);
@@ -357,8 +362,8 @@ public class Superstructure {
     return Commands.runOnce(
         () -> {
           juiceAuto = false;
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.NONE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.NONE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.INACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.INACTIVE);
           setGoal(SetpointGoal.AUTO_NEUTRAL);
         });
   }
@@ -396,8 +401,8 @@ public class Superstructure {
                   shooterHandlerLeft.setTargetState(curTarget);
                   shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
 
                   juiceAuto = true;
                 }));
@@ -415,8 +420,8 @@ public class Superstructure {
                   shooterHandlerLeft.setTargetState(curTarget);
                   shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
 
                   juiceAuto = false;
                 }));
@@ -432,8 +437,8 @@ public class Superstructure {
                   : ShooterHandler.Targets.RED;
           shooterHandlerLeft.setTargetState(curTarget);
           shooterHandlerRight.setTargetState(curTarget);
-          shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-          shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+          shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+          shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
         });
   }
 
@@ -449,8 +454,8 @@ public class Superstructure {
                   shooterHandlerLeft.setTargetState(curTarget);
                   shooterHandlerRight.setTargetState(curTarget);
 
-                  shooterHandlerRight.setShooterGoal(ShooterHandler.Goal.ACTIVE);
-                  shooterHandlerLeft.setShooterGoal(ShooterHandler.Goal.ACTIVE);
+                  shooterHandlerRight.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
+                  shooterHandlerLeft.setShooterGoal(ShooterHandler.ShooterGoal.ACTIVE);
                 }));
   }
 }
