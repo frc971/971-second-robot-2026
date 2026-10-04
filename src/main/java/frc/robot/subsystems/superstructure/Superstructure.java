@@ -107,8 +107,8 @@ public class Superstructure {
             turretLeft,
             turretRight,
             shooterHandlerLeft,
-            shooterHandlerRight,
-            () -> shooterGoal == ShooterGoal.MANUAL);
+            shooterHandlerRight
+            );
 
     setGoal(SetpointGoal.NEUTRAL);
   }
