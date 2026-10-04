@@ -367,7 +367,7 @@ public class Superstructure {
     return Commands.runOnce(
         () -> {
           juiceAuto = false;
-          setGoal(SetpointGoal.INTAKE_PIVOT);
+          setGoal(SetpointGoal.AUTO_INTAKE_PIVOT);
         });
   }
 

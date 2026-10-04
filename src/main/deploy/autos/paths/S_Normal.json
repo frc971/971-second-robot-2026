@@ -14,7 +14,7 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.10000000000000007,
+      "t_ratio": 0.009544422971276794,
       "lib_key": "intakeDown"
     },
     {
