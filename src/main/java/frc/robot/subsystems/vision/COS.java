@@ -13,8 +13,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class COS {
   private final CommandSwerveDrivetrain drivetrain;
   private Pose2d lastVisionPose = new Pose2d();
-  IntegerPublisher num_tags_per_control_loop_publisher;
-  DoubleArraySubscriber tag_estimation_subscribers;
+  IntegerPublisher numTagsPerControlLoopPublisher;
+  DoubleArraySubscriber tagEstimationSubscribers;
 
   public COS(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -23,7 +23,7 @@ public class COS {
     NetworkTable table = instance.getTable("COS");
     double[] blank = {-1};
 
-    tag_estimation_subscribers =
+    tagEstimationSubscribers =
         table
             .getDoubleArrayTopic("PositionEstimate")
             .subscribe(
@@ -32,15 +32,15 @@ public class COS {
                 PubSubOption.sendAll(true),
                 PubSubOption.pollStorage(200));
 
-    num_tags_per_control_loop_publisher = table.getIntegerTopic("NumTagsPerControlLoop").publish();
+    numTagsPerControlLoopPublisher = table.getIntegerTopic("NumTagsPerControlLoop").publish();
   }
 
   public void updatePose() {
-    double[][] tagEstimations = tag_estimation_subscribers.readQueueValues();
+    double[][] tagEstimations = tagEstimationSubscribers.readQueueValues();
     if (tagEstimations.length == 0) {
       return;
     }
-    num_tags_per_control_loop_publisher.set(tagEstimations.length);
+    numTagsPerControlLoopPublisher.set(tagEstimations.length);
 
     for (int i = 0; i < tagEstimations.length; i++) {
       // 0 x
