@@ -14,6 +14,7 @@ import frc.robot.lib.superstructure.*;
 
 // TODO: change the constants!!
 public class FlywheelLeft extends AngularSubsystem {
+  private static final AngularVelocity COAST_TOLERANCE = RotationsPerSecond.of(5);
 
   public FlywheelLeft() {
     super(getIO());
@@ -77,9 +78,9 @@ public class FlywheelLeft extends AngularSubsystem {
 
   @Override
   public void setVelocity(AngularVelocity goalVelocity) {
-    if (goalVelocity.equals(RotationsPerSecond.zero())) {
+    AngularVelocity neutral = SetpointGoal.NEUTRAL.getSetpoint().getLeftFlywheel().get();
+    if (goalVelocity.equals(neutral) && getVelocity().gt(neutral.plus(COAST_TOLERANCE))) {
       setCoast();
-      this.goalVelocity = RotationsPerSecond.zero();
     } else {
       super.setVelocity(goalVelocity);
     }
