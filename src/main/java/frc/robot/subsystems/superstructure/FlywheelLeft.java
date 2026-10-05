@@ -79,8 +79,13 @@ public class FlywheelLeft extends AngularSubsystem {
   @Override
   public void setVelocity(AngularVelocity goalVelocity) {
     AngularVelocity neutral = SetpointGoal.NEUTRAL.getSetpoint().getLeftFlywheel().get();
-    if (goalVelocity.equals(neutral) && getVelocity().gt(neutral.plus(COAST_TOLERANCE))) {
-      setCoast();
+    if (goalVelocity.equals(neutral)) {
+      this.goalVelocity = neutral;
+      if (getVelocity().gt(neutral.plus(COAST_TOLERANCE))) {
+        setCoast();
+      } else {
+        super.setVelocity(goalVelocity);
+      }
     } else {
       super.setVelocity(goalVelocity);
     }
