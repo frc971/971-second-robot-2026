@@ -97,11 +97,11 @@ public class PowerManager {
 
   private void applyState() {
     PowerManagerState requestedState = state;
+    Logger.recordOutput("PowerManager/State", requestedState.name());
     executor.submit(() -> applyState(requestedState));
   }
 
   private void applyState(PowerManagerState requestedState) {
-    Logger.recordOutput("PowerManager/State", requestedState.name());
     Logger.recordOutput("PowerManager/FlywheelSupplyCurrent", requestedState.flywheelSupplyCurrent);
     Logger.recordOutput(
         "PowerManager/GroundRollersSupplyCurrent", requestedState.groundRollersSupplyCurrent);
