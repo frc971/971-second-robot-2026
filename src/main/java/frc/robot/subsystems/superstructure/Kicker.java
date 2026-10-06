@@ -12,6 +12,10 @@ public class Kicker extends MotorSubsystem {
     super(getMotorConfig());
   }
 
+  public void applyPowerManagerState(PowerManagerState state) {
+    setSupplyCurrentLimit(state.kickerSupplyCurrent);
+  }
+
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 

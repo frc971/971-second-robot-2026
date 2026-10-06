@@ -31,6 +31,10 @@ public class TurretRight extends AngularSubsystem {
     super(getMotorConfig());
   }
 
+  public void applyPowerManagerState(PowerManagerState state) {
+    setSupplyCurrentLimit(state.turretSupplyCurrent);
+  }
+
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 

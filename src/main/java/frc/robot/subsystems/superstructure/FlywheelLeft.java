@@ -20,6 +20,10 @@ public class FlywheelLeft extends AngularSubsystem {
     super(getIO());
   }
 
+  public void applyPowerManagerState(PowerManagerState state) {
+    setSupplyCurrentLimit(state.flywheelSupplyCurrent);
+  }
+
   private static MotorIO getIO() {
     if (RobotBase.isReal()) {
       return new MotorWithFollowerTalonFX(

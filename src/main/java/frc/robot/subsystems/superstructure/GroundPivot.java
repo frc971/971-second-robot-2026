@@ -18,6 +18,10 @@ public class GroundPivot extends AngularSubsystem {
     super(getMotorConfig());
   }
 
+  public void applyPowerManagerState(PowerManagerState state) {
+    setSupplyCurrentLimit(state.groundPivotSupplyCurrent);
+  }
+
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 

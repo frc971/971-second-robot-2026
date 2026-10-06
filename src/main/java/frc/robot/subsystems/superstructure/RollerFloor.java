@@ -12,6 +12,10 @@ public class RollerFloor extends MotorSubsystem {
     super(getMotorConfig());
   }
 
+  public void applyPowerManagerState(PowerManagerState state) {
+    setSupplyCurrentLimit(state.rollerFloorSupplyCurrent);
+  }
+
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 

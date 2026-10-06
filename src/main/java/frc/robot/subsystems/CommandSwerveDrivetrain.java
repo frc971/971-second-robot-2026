@@ -25,6 +25,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
 import frc.robot.lib.simulation.RobotBumpSim;
+import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -153,6 +154,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       module.getDriveMotor().getConfigurator().apply(driveLimits);
       module.getSteerMotor().getConfigurator().apply(steerLimits);
     }
+  }
+
+  public void applyPowerManagerState(PowerManagerState state) {
+    setSupplyCurrentLimits(state.drivetrainSupplyCurrent, state.drivetrainSteerSupplyCurrent);
   }
 
   @Override

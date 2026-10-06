@@ -18,6 +18,10 @@ public class HoodLeft extends Hood {
     super(getMotorConfig());
   }
 
+  public void applyPowerManagerState(PowerManagerState state) {
+    setSupplyCurrentLimit(state.hoodSupplyCurrent);
+  }
+
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 

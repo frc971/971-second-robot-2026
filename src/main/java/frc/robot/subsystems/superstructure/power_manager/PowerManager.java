@@ -1,6 +1,5 @@
 package frc.robot.subsystems.superstructure.power_manager;
 
-import frc.robot.lib.superstructure.MotorSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.superstructure.B2;
 import frc.robot.subsystems.superstructure.FlywheelLeft;
@@ -20,17 +19,17 @@ import org.littletonrobotics.junction.Logger;
 
 public class PowerManager {
   private final CommandSwerveDrivetrain drivetrain;
-  private final MotorSubsystem flywheelLeft;
-  private final MotorSubsystem flywheelRight;
-  private final MotorSubsystem groundRollers;
-  private final MotorSubsystem groundPivot;
-  private final MotorSubsystem hoodLeft;
-  private final MotorSubsystem hoodRight;
-  private final MotorSubsystem kicker;
-  private final MotorSubsystem rollerFloor;
-  private final MotorSubsystem b2;
-  private final MotorSubsystem turretLeft;
-  private final MotorSubsystem turretRight;
+  private final FlywheelLeft flywheelLeft;
+  private final FlywheelRight flywheelRight;
+  private final GroundRollers groundRollers;
+  private final GroundPivot groundPivot;
+  private final HoodLeft hoodLeft;
+  private final HoodRight hoodRight;
+  private final Kicker kicker;
+  private final RollerFloor rollerFloor;
+  private final B2 b2;
+  private final TurretLeft turretLeft;
+  private final TurretRight turretRight;
   private final ShooterHandler shooterHandlerLeft;
   private final ShooterHandler shooterHandlerRight;
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -119,18 +118,17 @@ public class PowerManager {
     Logger.recordOutput(
         "PowerManager/DrivetrainSteerSupplyCurrent", requestedState.drivetrainSteerSupplyCurrent);
 
-    drivetrain.setSupplyCurrentLimits(
-        requestedState.drivetrainSupplyCurrent, requestedState.drivetrainSteerSupplyCurrent);
-    flywheelLeft.setSupplyCurrentLimit(requestedState.flywheelSupplyCurrent);
-    flywheelRight.setSupplyCurrentLimit(requestedState.flywheelSupplyCurrent);
-    groundRollers.setSupplyCurrentLimit(requestedState.groundRollersSupplyCurrent);
-    groundPivot.setSupplyCurrentLimit(requestedState.groundPivotSupplyCurrent);
-    hoodLeft.setSupplyCurrentLimit(requestedState.hoodSupplyCurrent);
-    hoodRight.setSupplyCurrentLimit(requestedState.hoodSupplyCurrent);
-    kicker.setSupplyCurrentLimit(requestedState.kickerSupplyCurrent);
-    rollerFloor.setSupplyCurrentLimit(requestedState.rollerFloorSupplyCurrent);
-    b2.setSupplyCurrentLimit(requestedState.b2SupplyCurrent);
-    turretLeft.setSupplyCurrentLimit(requestedState.turretSupplyCurrent);
-    turretRight.setSupplyCurrentLimit(requestedState.turretSupplyCurrent);
+    drivetrain.applyPowerManagerState(requestedState);
+    flywheelLeft.applyPowerManagerState(requestedState);
+    flywheelRight.applyPowerManagerState(requestedState);
+    groundRollers.applyPowerManagerState(requestedState);
+    groundPivot.applyPowerManagerState(requestedState);
+    hoodLeft.applyPowerManagerState(requestedState);
+    hoodRight.applyPowerManagerState(requestedState);
+    kicker.applyPowerManagerState(requestedState);
+    rollerFloor.applyPowerManagerState(requestedState);
+    b2.applyPowerManagerState(requestedState);
+    turretLeft.applyPowerManagerState(requestedState);
+    turretRight.applyPowerManagerState(requestedState);
   }
 }
