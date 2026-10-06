@@ -12,10 +12,6 @@ public class GroundRollers extends MotorSubsystem {
     super(getMotorConfig());
   }
 
-  public void applyPowerManagerState(PowerManagerState state) {
-    setSupplyCurrentLimit(state.groundRollersSupplyCurrent);
-  }
-
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 

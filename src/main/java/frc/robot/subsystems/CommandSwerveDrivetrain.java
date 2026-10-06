@@ -25,7 +25,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
 import frc.robot.lib.simulation.RobotBumpSim;
-import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -40,6 +41,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private static final double SIM_LOOP_PERIOD = 0.002; // 2 ms
   private static final double BUM_SIM_SUBTICKS = 5;
   private Notifier simNotifier = null;
+  private final ExecutorService currentLimitExecutor = Executors.newSingleThreadExecutor();
 
   /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
   private static final Rotation2d BLUE_ALLIANCE_PERSPECTIVE_ROTATION = Rotation2d.kZero;
@@ -137,6 +139,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public void setSupplyCurrentLimits(double driveAmps, double steerAmps) {
+    currentLimitExecutor.submit(() -> applySupplyCurrentLimits(driveAmps, steerAmps));
+  }
+
+  private void applySupplyCurrentLimits(double driveAmps, double steerAmps) {
     CurrentLimitsConfigs driveLimits =
         new CurrentLimitsConfigs()
             .withSupplyCurrentLimitEnable(true)
@@ -154,10 +160,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       module.getDriveMotor().getConfigurator().apply(driveLimits);
       module.getSteerMotor().getConfigurator().apply(steerLimits);
     }
-  }
-
-  public void applyPowerManagerState(PowerManagerState state) {
-    setSupplyCurrentLimits(state.drivetrainSupplyCurrent, state.drivetrainSteerSupplyCurrent);
   }
 
   @Override

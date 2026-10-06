@@ -9,6 +9,8 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -17,6 +19,7 @@ public class MotorSubsystem {
   protected final MotorIO io;
 
   protected final String name;
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
   protected enum Mode {
     VOLTAGE,
@@ -142,6 +145,6 @@ public class MotorSubsystem {
   }
 
   public void setSupplyCurrentLimit(double amps) {
-    io.setSupplyCurrentLimit(amps);
+    executor.submit(() -> io.setSupplyCurrentLimit(amps));
   }
 }

@@ -13,8 +13,6 @@ import frc.robot.subsystems.superstructure.RollerFloor;
 import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.TurretLeft;
 import frc.robot.subsystems.superstructure.TurretRight;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.littletonrobotics.junction.Logger;
 
 public class PowerManager {
@@ -32,8 +30,6 @@ public class PowerManager {
   private final TurretRight turretRight;
   private final ShooterHandler shooterHandlerLeft;
   private final ShooterHandler shooterHandlerRight;
-  private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
   private PowerManagerState state = PowerManagerState.DEFAULT;
 
   public PowerManager(
@@ -96,39 +92,32 @@ public class PowerManager {
   }
 
   private void applyState() {
-    PowerManagerState requestedState = state;
-    Logger.recordOutput("PowerManager/State", requestedState.name());
-    executor.submit(() -> applyState(requestedState));
-  }
+    Logger.recordOutput("PowerManager/State", state.name());
+    Logger.recordOutput("PowerManager/FlywheelSupplyCurrent", state.flywheelSupplyCurrent);
+    Logger.recordOutput(
+        "PowerManager/GroundRollersSupplyCurrent", state.groundRollersSupplyCurrent);
+    Logger.recordOutput("PowerManager/GroundPivotSupplyCurrent", state.groundPivotSupplyCurrent);
+    Logger.recordOutput("PowerManager/HoodSupplyCurrent", state.hoodSupplyCurrent);
+    Logger.recordOutput("PowerManager/KickerSupplyCurrent", state.kickerSupplyCurrent);
+    Logger.recordOutput("PowerManager/RollerFloorSupplyCurrent", state.rollerFloorSupplyCurrent);
+    Logger.recordOutput("PowerManager/B2SupplyCurrent", state.b2SupplyCurrent);
+    Logger.recordOutput("PowerManager/TurretSupplyCurrent", state.turretSupplyCurrent);
+    Logger.recordOutput("PowerManager/DrivetrainSupplyCurrent", state.drivetrainSupplyCurrent);
+    Logger.recordOutput(
+        "PowerManager/DrivetrainSteerSupplyCurrent", state.drivetrainSteerSupplyCurrent);
 
-  private void applyState(PowerManagerState requestedState) {
-    Logger.recordOutput("PowerManager/FlywheelSupplyCurrent", requestedState.flywheelSupplyCurrent);
-    Logger.recordOutput(
-        "PowerManager/GroundRollersSupplyCurrent", requestedState.groundRollersSupplyCurrent);
-    Logger.recordOutput(
-        "PowerManager/GroundPivotSupplyCurrent", requestedState.groundPivotSupplyCurrent);
-    Logger.recordOutput("PowerManager/HoodSupplyCurrent", requestedState.hoodSupplyCurrent);
-    Logger.recordOutput("PowerManager/KickerSupplyCurrent", requestedState.kickerSupplyCurrent);
-    Logger.recordOutput(
-        "PowerManager/RollerFloorSupplyCurrent", requestedState.rollerFloorSupplyCurrent);
-    Logger.recordOutput("PowerManager/B2SupplyCurrent", requestedState.b2SupplyCurrent);
-    Logger.recordOutput("PowerManager/TurretSupplyCurrent", requestedState.turretSupplyCurrent);
-    Logger.recordOutput(
-        "PowerManager/DrivetrainSupplyCurrent", requestedState.drivetrainSupplyCurrent);
-    Logger.recordOutput(
-        "PowerManager/DrivetrainSteerSupplyCurrent", requestedState.drivetrainSteerSupplyCurrent);
-
-    drivetrain.applyPowerManagerState(requestedState);
-    flywheelLeft.applyPowerManagerState(requestedState);
-    flywheelRight.applyPowerManagerState(requestedState);
-    groundRollers.applyPowerManagerState(requestedState);
-    groundPivot.applyPowerManagerState(requestedState);
-    hoodLeft.applyPowerManagerState(requestedState);
-    hoodRight.applyPowerManagerState(requestedState);
-    kicker.applyPowerManagerState(requestedState);
-    rollerFloor.applyPowerManagerState(requestedState);
-    b2.applyPowerManagerState(requestedState);
-    turretLeft.applyPowerManagerState(requestedState);
-    turretRight.applyPowerManagerState(requestedState);
+    drivetrain.setSupplyCurrentLimits(
+        state.drivetrainSupplyCurrent, state.drivetrainSteerSupplyCurrent);
+    flywheelLeft.setSupplyCurrentLimit(state.flywheelSupplyCurrent);
+    flywheelRight.setSupplyCurrentLimit(state.flywheelSupplyCurrent);
+    groundRollers.setSupplyCurrentLimit(state.groundRollersSupplyCurrent);
+    groundPivot.setSupplyCurrentLimit(state.groundPivotSupplyCurrent);
+    hoodLeft.setSupplyCurrentLimit(state.hoodSupplyCurrent);
+    hoodRight.setSupplyCurrentLimit(state.hoodSupplyCurrent);
+    kicker.setSupplyCurrentLimit(state.kickerSupplyCurrent);
+    rollerFloor.setSupplyCurrentLimit(state.rollerFloorSupplyCurrent);
+    b2.setSupplyCurrentLimit(state.b2SupplyCurrent);
+    turretLeft.setSupplyCurrentLimit(state.turretSupplyCurrent);
+    turretRight.setSupplyCurrentLimit(state.turretSupplyCurrent);
   }
 }

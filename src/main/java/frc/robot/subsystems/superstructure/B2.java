@@ -12,10 +12,6 @@ public class B2 extends MotorSubsystem {
     super(getMotorConfig());
   }
 
-  public void applyPowerManagerState(PowerManagerState state) {
-    setSupplyCurrentLimit(state.b2SupplyCurrent);
-  }
-
   public static MotorConfig getMotorConfig() {
     TalonFXConfiguration tc = new TalonFXConfiguration();
 
