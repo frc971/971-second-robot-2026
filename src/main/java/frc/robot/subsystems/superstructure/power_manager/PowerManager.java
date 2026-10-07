@@ -72,7 +72,7 @@ public class PowerManager {
       setState(
           shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()
               ? PowerManagerState.SHUTTLING
-              : PowerManagerState.SUPERCHARGED);
+              : PowerManagerState.SHOOTING);
     } else {
       setState(PowerManagerState.DEFAULT);
     }

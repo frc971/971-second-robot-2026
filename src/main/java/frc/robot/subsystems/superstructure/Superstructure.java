@@ -370,7 +370,7 @@ public class Superstructure {
       case MANUAL_SHUTTLE_UP,
           MANUAL_SHUTTLE_DOWN,
           MANUAL_SHUTTLE_LEFT,
-          MANUAL_SHUTTLE_RIGHT -> powerManager.setState(PowerManagerState.SHUTTLING);
+          MANUAL_SHUTTLE_RIGHT -> powerManager.setState(PowerManagerState.SUPERCHARGED);
       case SUPERCHARGED -> {}
       default -> {}
     }
