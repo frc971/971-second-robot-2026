@@ -60,7 +60,8 @@ public class Robot extends LoggedRobot {
 
     Logger.start();
 
-    // IMPORTANT: DO NOT DELETE OR EXPENSIVE FILE READING WILL FREEZE WHEN FIRST TAG HELPER FUNCTION
+    // IMPORTANT: DO NOT DELETE OR EXPENSIVE FILE READING WILL FREEZE WHEN FIRST TAG
+    // HELPER FUNCTION
     // IS CALLED
     TagHelper.init();
 
@@ -121,7 +122,8 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+  }
 
   @Override
   public void autonomousInit() {
@@ -133,14 +135,17 @@ public class Robot extends LoggedRobot {
     }
     HubShiftUtil.initialize();
 
-    if (RobotBase.isSimulation()) robotContainer.simAutoInit();
+    if (RobotBase.isSimulation())
+      robotContainer.simAutoInit();
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+  }
 
   @Override
   public void teleopInit() {
@@ -151,10 +156,12 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+  }
 
   @Override
   public void testInit() {
@@ -162,10 +169,12 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+  }
 
   @Override
   public void simulationPeriodic() {
