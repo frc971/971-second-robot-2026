@@ -96,7 +96,6 @@ public class Autos {
   }
 
   public Command getAutonomousCommand() {
-    updateSelectedAutoCache();
     return buildCommandFromCachedSegments();
   }
 
