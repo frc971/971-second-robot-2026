@@ -21,7 +21,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import java.util.Optional;
-import org.littletonrobotics.junction.AutoLogOutput;
 
 public class MotorTalonFX extends MotorIO {
   protected Optional<CANcoder> cancoder = Optional.empty();
@@ -150,14 +149,12 @@ public class MotorTalonFX extends MotorIO {
 
   @Override
   public void setSupplyCurrentLimit(double amps) {
-    super.setSupplyCurrentLimit(amps);
     motorConfig.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimitEnable = true;
     motorConfig.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit = amps;
     motor.getConfigurator().apply(motorConfig.TALONFX_CONFIG());
   }
 
   @Override
-  @AutoLogOutput(key = "{name}/Supply Current Limit")
   public double getSupplyCurrentLimit() {
     return motorConfig.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit;
   }

@@ -67,8 +67,8 @@ public class PowerManager {
   public void periodic() {
     PowerManagerState previousState = state;
 
-    if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.Goal.ACTIVE
-        || shooterHandlerRight.getShooterGoal() == ShooterHandler.Goal.ACTIVE) {
+    if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
+        || shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {
       setState(
           shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()
               ? PowerManagerState.SHUTTLING

@@ -12,7 +12,6 @@ import frc.robot.lib.shooter.ObjectState;
 import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
-import frc.robot.subsystems.superstructure.ShooterHandler.State;
 import frc.robot.subsystems.superstructure.ShooterHandler.ShooterState;
 import frc.robot.subsystems.superstructure.power_manager.PowerManager;
 import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
@@ -50,7 +49,6 @@ public class Superstructure {
 
   public final Visualization visualization;
   public final PowerManager powerManager;
-  @AutoLogOutput private ShooterGoal shooterGoal = ShooterGoal.NONE;
   @AutoLogOutput private Mode mode = Mode.NONE;
 
   private final Timer juiceTimer = new Timer();
@@ -378,7 +376,7 @@ public class Superstructure {
           MANUAL_SHUTTLE_DOWN,
           MANUAL_SHUTTLE_LEFT,
           MANUAL_SHUTTLE_RIGHT -> powerManager.setState(PowerManagerState.SHUTTLING);
-      case SUPERCHARGED -> (powerManager.setState(PowerManagerState.SUPERCHARGED));
+      case SUPERCHARGED -> powerManager.setState(PowerManagerState.SUPERCHARGED);
       default -> {}
     }
     setGoal(setpoint.getSetpoint());
