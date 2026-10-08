@@ -38,7 +38,7 @@ public class HoodRight extends Hood {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = PowerManagerState.DEFAULT.hoodSupplyCurrent;
+    tc.CurrentLimits.SupplyCurrentLimit = PowerManagerState.DEFAULT.hood();
     tc.CurrentLimits.StatorCurrentLimit = 50.0;
 
     tc.Feedback.SensorToMechanismRatio =

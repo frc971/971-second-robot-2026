@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
@@ -122,9 +123,12 @@ public class MotorWithFollowerTalonFX extends MotorTalonFX {
   public void setSupplyCurrentLimit(double amps) {
     super.setSupplyCurrentLimit(amps);
     for (int i = 0; i < followerMotors.length; i++) {
+      TalonFXConfiguration config = followerConfigs[i].TALONFX_CONFIG().clone();
+      config.CurrentLimits.SupplyCurrentLimitEnable = true;
+      config.CurrentLimits.SupplyCurrentLimit = amps;
+      followerMotors[i].getConfigurator().apply(config);
       followerConfigs[i].TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimitEnable = true;
       followerConfigs[i].TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit = amps;
-      followerMotors[i].getConfigurator().apply(followerConfigs[i].TALONFX_CONFIG());
     }
   }
 }

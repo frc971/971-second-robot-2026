@@ -1,42 +1,91 @@
 package frc.robot.subsystems.superstructure.power_manager;
 
-public enum PowerManagerState {
-  DEFAULT(40, 40, 25, 25, 30, 30, 25, 30, 27, 10),
-  SHOOTING(50, 20, 15, 40, 20, 20, 25, 30, 20, 10),
-  SHUTTLING(60, 20, 15, 40, 15, 15, 25, 30, 27, 10),
-  SUPERCHARGED(50, 25, 25, 40, 10, 10, 25, 30, 27, 10);
+import lombok.Builder;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
-  public final double flywheelSupplyCurrent;
-  public final double groundRollersSupplyCurrent;
-  public final double groundPivotSupplyCurrent;
-  public final double hoodSupplyCurrent;
-  public final double kickerSupplyCurrent;
-  public final double rollerFloorSupplyCurrent;
-  public final double b2SupplyCurrent;
-  public final double turretSupplyCurrent;
-  public final double drivetrainSupplyCurrent;
-  public final double drivetrainSteerSupplyCurrent;
+@Accessors(fluent = true)
+@Builder
+@Getter
+public class PowerManagerState {
+  public static final PowerManagerState DEFAULT =
+      builder()
+          .flywheel(40)
+          .groundRollers(40)
+          .groundPivot(25)
+          .hood(25)
+          .kicker(30)
+          .rollerFloor(30)
+          .b2(25)
+          .turret(30)
+          .drivetrain(27)
+          .drivetrainSteer(10)
+          .build();
 
-  PowerManagerState(
-      double flywheelSupplyCurrent,
-      double groundRollersSupplyCurrent,
-      double groundPivotSupplyCurrent,
-      double hoodSupplyCurrent,
-      double kickerSupplyCurrent,
-      double rollerFloorSupplyCurrent,
-      double b2SupplyCurrent,
-      double turretSupplyCurrent,
-      double drivetrainSupplyCurrent,
-      double drivetrainSteerSupplyCurrent) {
-    this.flywheelSupplyCurrent = flywheelSupplyCurrent;
-    this.groundRollersSupplyCurrent = groundRollersSupplyCurrent;
-    this.groundPivotSupplyCurrent = groundPivotSupplyCurrent;
-    this.hoodSupplyCurrent = hoodSupplyCurrent;
-    this.kickerSupplyCurrent = kickerSupplyCurrent;
-    this.rollerFloorSupplyCurrent = rollerFloorSupplyCurrent;
-    this.b2SupplyCurrent = b2SupplyCurrent;
-    this.turretSupplyCurrent = turretSupplyCurrent;
-    this.drivetrainSupplyCurrent = drivetrainSupplyCurrent;
-    this.drivetrainSteerSupplyCurrent = drivetrainSteerSupplyCurrent;
-  }
+  public static final PowerManagerState SHOOTING =
+      builder()
+          .flywheel(50)
+          .groundRollers(20)
+          .groundPivot(15)
+          .hood(40)
+          .kicker(20)
+          .rollerFloor(20)
+          .b2(25)
+          .turret(30)
+          .drivetrain(20)
+          .drivetrainSteer(10)
+          .build();
+
+  public static final PowerManagerState MANUAL =
+      builder()
+          .flywheel(50)
+          .groundRollers(20)
+          .groundPivot(15)
+          .hood(40)
+          .kicker(20)
+          .rollerFloor(20)
+          .b2(25)
+          .turret(30)
+          .drivetrain(20)
+          .drivetrainSteer(10)
+          .build();
+
+  public static final PowerManagerState SHUTTLING =
+      builder()
+          .flywheel(60)
+          .groundRollers(20)
+          .groundPivot(15)
+          .hood(40)
+          .kicker(15)
+          .rollerFloor(15)
+          .b2(25)
+          .turret(30)
+          .drivetrain(27)
+          .drivetrainSteer(10)
+          .build();
+
+  public static final PowerManagerState SUPERCHARGED =
+      builder()
+          .flywheel(50)
+          .groundRollers(25)
+          .groundPivot(25)
+          .hood(40)
+          .kicker(10)
+          .rollerFloor(10)
+          .b2(25)
+          .turret(30)
+          .drivetrain(27)
+          .drivetrainSteer(10)
+          .build();
+
+  private final double flywheel;
+  private final double groundRollers;
+  private final double groundPivot;
+  private final double hood;
+  private final double kicker;
+  private final double rollerFloor;
+  private final double b2;
+  private final double turret;
+  private final double drivetrain;
+  private final double drivetrainSteer;
 }

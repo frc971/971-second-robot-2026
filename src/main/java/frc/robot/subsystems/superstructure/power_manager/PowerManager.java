@@ -13,6 +13,9 @@ import frc.robot.subsystems.superstructure.RollerFloor;
 import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.TurretLeft;
 import frc.robot.subsystems.superstructure.TurretRight;
+import java.util.function.BooleanSupplier;
+import lombok.Getter;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class PowerManager {
@@ -30,7 +33,12 @@ public class PowerManager {
   private final TurretRight turretRight;
   private final ShooterHandler shooterHandlerLeft;
   private final ShooterHandler shooterHandlerRight;
+  private final BooleanSupplier manualMode;
+
+  @Getter
+  @AutoLogOutput(key = "PowerManager/State")
   private PowerManagerState state = PowerManagerState.DEFAULT;
+  private PowerManagerState lastAppliedState;
 
   public PowerManager(
       CommandSwerveDrivetrain drivetrain,
@@ -46,7 +54,8 @@ public class PowerManager {
       TurretLeft turretLeft,
       TurretRight turretRight,
       ShooterHandler shooterHandlerLeft,
-      ShooterHandler shooterHandlerRight) {
+      ShooterHandler shooterHandlerRight,
+      BooleanSupplier manualMode) {
     this.drivetrain = drivetrain;
     this.flywheelLeft = flywheelLeft;
     this.flywheelRight = flywheelRight;
@@ -61,63 +70,52 @@ public class PowerManager {
     this.turretRight = turretRight;
     this.shooterHandlerLeft = shooterHandlerLeft;
     this.shooterHandlerRight = shooterHandlerRight;
+    this.manualMode = manualMode;
     applyState();
   }
 
   public void periodic() {
-    PowerManagerState previousState = state;
-
-    if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
+    if (manualMode.getAsBoolean()) {
+      state = PowerManagerState.MANUAL;
+    } else if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
         || shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {
-      setState(
+      state =
           shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()
               ? PowerManagerState.SHUTTLING
-              : PowerManagerState.SHOOTING);
+              : PowerManagerState.SHOOTING;
     } else {
-      setState(PowerManagerState.DEFAULT);
+      state = PowerManagerState.DEFAULT;
     }
 
-    if (previousState != state) {
+    if (lastAppliedState != state) {
       applyState();
     }
   }
 
-  public PowerManagerState getState() {
-    return state;
-  }
-
-  public void setState(PowerManagerState newState) {
-    if (state == newState) return;
-    state = newState;
-  }
-
   private void applyState() {
-    Logger.recordOutput("PowerManager/State", state.name());
-    Logger.recordOutput("PowerManager/FlywheelSupplyCurrent", state.flywheelSupplyCurrent);
-    Logger.recordOutput(
-        "PowerManager/GroundRollersSupplyCurrent", state.groundRollersSupplyCurrent);
-    Logger.recordOutput("PowerManager/GroundPivotSupplyCurrent", state.groundPivotSupplyCurrent);
-    Logger.recordOutput("PowerManager/HoodSupplyCurrent", state.hoodSupplyCurrent);
-    Logger.recordOutput("PowerManager/KickerSupplyCurrent", state.kickerSupplyCurrent);
-    Logger.recordOutput("PowerManager/RollerFloorSupplyCurrent", state.rollerFloorSupplyCurrent);
-    Logger.recordOutput("PowerManager/B2SupplyCurrent", state.b2SupplyCurrent);
-    Logger.recordOutput("PowerManager/TurretSupplyCurrent", state.turretSupplyCurrent);
-    Logger.recordOutput("PowerManager/DrivetrainSupplyCurrent", state.drivetrainSupplyCurrent);
-    Logger.recordOutput(
-        "PowerManager/DrivetrainSteerSupplyCurrent", state.drivetrainSteerSupplyCurrent);
+    Logger.recordOutput("PowerManager/FlywheelSupplyCurrent", state.flywheel());
+    Logger.recordOutput("PowerManager/GroundRollersSupplyCurrent", state.groundRollers());
+    Logger.recordOutput("PowerManager/GroundPivotSupplyCurrent", state.groundPivot());
+    Logger.recordOutput("PowerManager/HoodSupplyCurrent", state.hood());
+    Logger.recordOutput("PowerManager/KickerSupplyCurrent", state.kicker());
+    Logger.recordOutput("PowerManager/RollerFloorSupplyCurrent", state.rollerFloor());
+    Logger.recordOutput("PowerManager/B2SupplyCurrent", state.b2());
+    Logger.recordOutput("PowerManager/TurretSupplyCurrent", state.turret());
+    Logger.recordOutput("PowerManager/DrivetrainSupplyCurrent", state.drivetrain());
+    Logger.recordOutput("PowerManager/DrivetrainSteerSupplyCurrent", state.drivetrainSteer());
 
-    drivetrain.setSupplyCurrentLimits(
-        state.drivetrainSupplyCurrent, state.drivetrainSteerSupplyCurrent);
-    flywheelLeft.setSupplyCurrentLimit(state.flywheelSupplyCurrent);
-    flywheelRight.setSupplyCurrentLimit(state.flywheelSupplyCurrent);
-    groundRollers.setSupplyCurrentLimit(state.groundRollersSupplyCurrent);
-    groundPivot.setSupplyCurrentLimit(state.groundPivotSupplyCurrent);
-    hoodLeft.setSupplyCurrentLimit(state.hoodSupplyCurrent);
-    hoodRight.setSupplyCurrentLimit(state.hoodSupplyCurrent);
-    kicker.setSupplyCurrentLimit(state.kickerSupplyCurrent);
-    rollerFloor.setSupplyCurrentLimit(state.rollerFloorSupplyCurrent);
-    b2.setSupplyCurrentLimit(state.b2SupplyCurrent);
-    turretLeft.setSupplyCurrentLimit(state.turretSupplyCurrent);
-    turretRight.setSupplyCurrentLimit(state.turretSupplyCurrent);
+    drivetrain.setSupplyCurrentLimits(state.drivetrain(), state.drivetrainSteer());
+    flywheelLeft.setSupplyCurrentLimit(state.flywheel());
+    flywheelRight.setSupplyCurrentLimit(state.flywheel());
+    groundRollers.setSupplyCurrentLimit(state.groundRollers());
+    groundPivot.setSupplyCurrentLimit(state.groundPivot());
+    hoodLeft.setSupplyCurrentLimit(state.hood());
+    hoodRight.setSupplyCurrentLimit(state.hood());
+    kicker.setSupplyCurrentLimit(state.kicker());
+    rollerFloor.setSupplyCurrentLimit(state.rollerFloor());
+    b2.setSupplyCurrentLimit(state.b2());
+    turretLeft.setSupplyCurrentLimit(state.turret());
+    turretRight.setSupplyCurrentLimit(state.turret());
+    lastAppliedState = state;
   }
 }

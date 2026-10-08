@@ -49,7 +49,7 @@ public class TurretLeft extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = PowerManagerState.DEFAULT.turretSupplyCurrent;
+    tc.CurrentLimits.SupplyCurrentLimit = PowerManagerState.DEFAULT.turret();
     tc.CurrentLimits.StatorCurrentLimit = 70.0;
 
     tc.Feedback.SensorToMechanismRatio =

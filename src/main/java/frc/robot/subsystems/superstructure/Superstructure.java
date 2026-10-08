@@ -14,7 +14,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler.ShooterState;
 import frc.robot.subsystems.superstructure.power_manager.PowerManager;
-import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -109,7 +108,8 @@ public class Superstructure {
             turretLeft,
             turretRight,
             shooterHandlerLeft,
-            shooterHandlerRight);
+            shooterHandlerRight,
+            () -> mode == Mode.MANUAL);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -118,8 +118,6 @@ public class Superstructure {
 
     // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
-      powerManager.setState(PowerManagerState.DEFAULT);
-
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
       }
@@ -369,16 +367,6 @@ public class Superstructure {
   }
 
   public void setGoal(SetpointGoal setpoint) {
-    switch (setpoint) {
-      case MANUAL_UP, MANUAL_DOWN, MANUAL_LEFT, MANUAL_RIGHT -> powerManager.setState(
-          PowerManagerState.SHOOTING);
-      case MANUAL_SHUTTLE_UP,
-          MANUAL_SHUTTLE_DOWN,
-          MANUAL_SHUTTLE_LEFT,
-          MANUAL_SHUTTLE_RIGHT -> powerManager.setState(PowerManagerState.SHUTTLING);
-      case SUPERCHARGED -> powerManager.setState(PowerManagerState.SUPERCHARGED);
-      default -> {}
-    }
     setGoal(setpoint.getSetpoint());
   }
 
