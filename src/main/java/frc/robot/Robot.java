@@ -73,7 +73,7 @@ public class Robot extends LoggedRobot {
   public void robotInit() {
     DataLogManager.start();
 
-    robotContainer.resetSuperstructure();
+    // robotContainer.resetSuperstructure();
   }
 
   @Override
@@ -128,7 +128,7 @@ public class Robot extends LoggedRobot {
     robotContainer.drive.setDriveMode(Drive.Mode.NONE);
     autonomousCommand = autos.getAutonomousCommand();
     if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
+      // CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
     HubShiftUtil.initialize();

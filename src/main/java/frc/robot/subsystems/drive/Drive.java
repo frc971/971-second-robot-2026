@@ -79,7 +79,7 @@ public class Drive {
 
   private void updateMode() {
     if (DriverStation.isDisabled()) {
-      setDriveMode(Mode.BRAKE);
+      setDriveMode(Mode.NONE);
     } else if (DriverStation.isAutonomous()
         && mode == Mode.AUTO_ALIGN
         && autoAlign.getGoal() == AutoAlign.Goal.ALIGN
