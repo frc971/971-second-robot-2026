@@ -182,4 +182,16 @@ public class MotorTalonFX extends MotorIO {
   public void resetPosition(Distance newPosition) {
     motor.setPosition(newPosition.in(Meters));
   }
+
+  @Override
+  public void setSupplyCurrentLimit(double amps) {
+    motorConfig.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimitEnable = true;
+    motorConfig.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit = amps;
+    motor.getConfigurator().apply(motorConfig.TALONFX_CONFIG());
+  }
+
+  @Override
+  public double getSupplyCurrentLimit() {
+    return motorConfig.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit;
+  }
 }
