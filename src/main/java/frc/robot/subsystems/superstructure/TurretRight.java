@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.superstructure.*;
+import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 
 // TODO: change the constants...
 public class TurretRight extends AngularSubsystem {
@@ -50,7 +51,7 @@ public class TurretRight extends AngularSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
+    tc.CurrentLimits.SupplyCurrentLimit = PowerManagerState.DEFAULT.turret();
     tc.CurrentLimits.StatorCurrentLimit = 70.0;
 
     tc.Feedback.SensorToMechanismRatio =

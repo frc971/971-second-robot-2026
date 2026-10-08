@@ -89,4 +89,9 @@ public abstract class MotorIO {
   public abstract void resetPosition(Distance newPosition);
 
   public abstract void setCoast();
+
+  public abstract void setSupplyCurrentLimit(double amps);
+
+  @AutoLogOutput(key = "{name}/Supply Current Limit")
+  public abstract double getSupplyCurrentLimit();
 }

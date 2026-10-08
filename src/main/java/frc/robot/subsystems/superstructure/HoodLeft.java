@@ -9,6 +9,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.superstructure.*;
+import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 
 public class HoodLeft extends Hood {
   private static final Angle KS_ERROR_DEADBAND = Degrees.of(0.5);
@@ -37,7 +38,7 @@ public class HoodLeft extends Hood {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 25.0;
+    tc.CurrentLimits.SupplyCurrentLimit = PowerManagerState.DEFAULT.hood();
     tc.CurrentLimits.StatorCurrentLimit = 50.0;
 
     tc.Feedback.SensorToMechanismRatio =

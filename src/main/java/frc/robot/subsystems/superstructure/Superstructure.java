@@ -13,6 +13,7 @@ import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler.ShooterState;
+import frc.robot.subsystems.superstructure.power_manager.PowerManager;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -46,6 +47,7 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Visualization visualization;
+  public final PowerManager powerManager;
   @AutoLogOutput private Mode mode = Mode.NONE;
 
   private final Timer juiceTimer = new Timer();
@@ -91,11 +93,29 @@ public class Superstructure {
             ShooterHandler.Side.LEFT);
 
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
+    powerManager =
+        new PowerManager(
+            drivetrain,
+            flywheelLeft,
+            flywheelRight,
+            groundRollers,
+            groundPivot,
+            hoodLeft,
+            hoodRight,
+            kicker,
+            rollerFloor,
+            b2,
+            turretLeft,
+            turretRight,
+            shooterHandlerLeft,
+            shooterHandlerRight,
+            () -> mode == Mode.MANUAL);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
 
   public void periodic() {
+
     // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
       if (!juiceTimer.isRunning()) {
@@ -297,6 +317,8 @@ public class Superstructure {
     groundRollers.periodic();
 
     visualization.periodic();
+
+    powerManager.periodic();
   }
 
   // MARK: Helper functions

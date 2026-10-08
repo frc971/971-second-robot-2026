@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.lib.superstructure.*;
+import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 
 public class Kicker extends MotorSubsystem {
   public Kicker() {
@@ -19,7 +20,7 @@ public class Kicker extends MotorSubsystem {
 
     tc.CurrentLimits.SupplyCurrentLimitEnable = true;
     tc.CurrentLimits.StatorCurrentLimitEnable = true;
-    tc.CurrentLimits.SupplyCurrentLimit = 30.0;
+    tc.CurrentLimits.SupplyCurrentLimit = PowerManagerState.DEFAULT.kicker();
     tc.CurrentLimits.StatorCurrentLimit = 80.0;
 
     tc.Feedback.SensorToMechanismRatio = 0.0;
