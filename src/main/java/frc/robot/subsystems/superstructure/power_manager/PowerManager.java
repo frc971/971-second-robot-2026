@@ -38,6 +38,7 @@ public class PowerManager {
   @Getter
   @AutoLogOutput(key = "PowerManager/State")
   private PowerManagerState state = PowerManagerState.DEFAULT;
+
   private PowerManagerState lastAppliedState;
 
   public PowerManager(
