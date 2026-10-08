@@ -1,34 +1,21 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.lib.power.BatteryEstimator;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import org.littletonrobotics.junction.Logger;
 
 public class PowerManager {
-
-    private enum PowerManagerState {
-        SHOOTING,
-        SHUTTLING,
-        SUPERCHARGED,
-        DEFAULT,
-    }
   private static final int UPDATE_PERIOD_LOOPS = 10;
-  private static final double LOOP_PERIOD_SECONDS = 0.02;
-  private static final double UPDATE_PERIOD_SECONDS = UPDATE_PERIOD_LOOPS * LOOP_PERIOD_SECONDS;
-
-  private static final double LOOKAHEAD_SECONDS = 0.20;
-
-  private static final double MAX_CURRENT_SLOPE = 500.0; 
-  private static final double MIN_BATTERY_VOLTAGE = 7.5;
-
-  private static final double LIMIT_SLEW_RATE = 150.0;
-
-  private static final int DRIVETRAIN_DRIVE_MOTORS = 4;
-  private static final int DRIVETRAIN_STEER_MOTORS = 4;
-  private static final int FLYWHEEL_MOTORS = 2;
-  private static final int TURRET_MOTORS = 2;
+  private static final double UPDATE_SECONDS = UPDATE_PERIOD_LOOPS * 0.02;
+  private static final double LOOKAHEAD_SECONDS = 0.10;
+  private static final double MIN_VOLTAGE = 7.5;
+  private static final double MAX_SLOPE = 500.0;
+  private static final double RECOVERY_AMPS_PER_SECOND = 150.0;
+  private static final double FALLBACK_BUDGET = 120.0;
+  private static final double MAX_BUDGET = 300.0;
 
   private final CommandSwerveDrivetrain drivetrain;
   private final FlywheelLeft flywheelLeft;
@@ -44,26 +31,23 @@ public class PowerManager {
   private final TurretRight turretRight;
   private final ShooterHandler shooterHandlerLeft;
   private final ShooterHandler shooterHandlerRight;
+  private final BatteryEstimator estimator = new BatteryEstimator();
 
-  private final BatteryEstimator batteryEstimator = new BatteryEstimator();
+  private final SlewRateLimiter driveLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter steerLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter flywheelLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter rollersLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter pivotLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter hoodLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter kickerLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter floorLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter b2Limiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
+  private final SlewRateLimiter turretLimiter = new SlewRateLimiter(RECOVERY_AMPS_PER_SECOND);
 
-  private int loopCounter = 0;
-
-  private double previousCurrent = 0.0;
-  private double currentSlope = 0.0;
-  private double predictedCurrent = 0.0;
-
-  private double drivetrainCurrentLimit = 0.0;
-  private double drivetrainSteerCurrentLimit = 0.0;
-
-  private double flywheelCurrentLimit = 0.0;
-  private double groundRollersCurrentLimit = 0.0;
-  private double groundPivotCurrentLimit = 0.0;
-  private double hoodCurrentLimit = 0.0;
-  private double kickerCurrentLimit = 0.0;
-  private double rollerFloorCurrentLimit = 0.0;
-  private double b2CurrentLimit = 0.0;
-  private double turretCurrentLimit = 0.0;
+  private PowerManagerState state = PowerManagerState.DEFAULT;
+  private boolean sampled;
+  private int loops;
+  private double previousCurrent;
 
   public PowerManager(
       CommandSwerveDrivetrain drivetrain,
@@ -80,7 +64,6 @@ public class PowerManager {
       TurretRight turretRight,
       ShooterHandler shooterHandlerLeft,
       ShooterHandler shooterHandlerRight) {
-
     this.drivetrain = drivetrain;
     this.flywheelLeft = flywheelLeft;
     this.flywheelRight = flywheelRight;
@@ -95,189 +78,105 @@ public class PowerManager {
     this.turretRight = turretRight;
     this.shooterHandlerLeft = shooterHandlerLeft;
     this.shooterHandlerRight = shooterHandlerRight;
+  }
 
-    applyLimits();
+  public PowerManagerState getState() {
+    return state;
   }
 
   public void periodic() {
     updateState();
-
-    loopCounter++;
-
-    if (loopCounter >= UPDATE_PERIOD_LOOPS) {
-      loopCounter = 0;
-
-      updatePowerModel();
-      calculateLimits();
-      applyLimits();
-    }
+    if (++loops < UPDATE_PERIOD_LOOPS) return;
+    loops = 0;
+    updatePowerModel();
   }
 
   private void updateState() {
-    PowerManagerState previousState = state;
-
-    if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
-        || shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {
-
-      if (shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()) {
-
-        setState(PowerManagerState.SHUTTLING);
-
-      } else {
-
-        setState(PowerManagerState.SHOOTING);
-      }
-
-    } else {
-      setState(PowerManagerState.DEFAULT);
-    }
-
-    if (previousState != state) {
+    boolean left = shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE;
+    boolean right = shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE;
+    PowerManagerState next =
+        !(left || right)
+            ? PowerManagerState.DEFAULT
+            : (left && shooterHandlerLeft.isShuttleTarget())
+                    || (right && shooterHandlerRight.isShuttleTarget())
+                ? PowerManagerState.SHUTTLING
+                : PowerManagerState.SHOOTING;
+    
+    if (next != state) {
+      state = next;
       Logger.recordOutput("PowerManager/State", state.name());
     }
   }
 
   private void updatePowerModel() {
-    double current = Math.max(0.0, RobotController.getInputCurrent());
+    double current = RobotController.getInputCurrent();
     double voltage = RobotController.getBatteryVoltage();
+    if (!Double.isFinite(current) || current < 0 || !Double.isFinite(voltage) || voltage <= 0) {
+      applyLimits(FALLBACK_BUDGET);
+      return;
+    }
 
-    currentSlope =
-        MathUtil.clamp(
-            (current - previousCurrent) / UPDATE_PERIOD_SECONDS,
-            -MAX_CURRENT_SLOPE,
-            MAX_CURRENT_SLOPE);
+    if (!sampled) {
+      previousCurrent = current;
+      sampled = true;
+    }
 
+    double slope =
+        MathUtil.clamp((current - previousCurrent) / UPDATE_SECONDS, -MAX_SLOPE, MAX_SLOPE);
     previousCurrent = current;
-
-    predictedCurrent = Math.max(current, current + currentSlope * LOOKAHEAD_SECONDS);
-
-    batteryEstimator.update(current, voltage);
-
+    double predicted = Math.max(current, current + slope * LOOKAHEAD_SECONDS);
+    estimator.update(current, voltage);
+    double batteryLimit = estimator.calculateMaxCurrent(MIN_VOLTAGE);
+    double budget =
+        Double.isFinite(batteryLimit) && batteryLimit > 0
+            ? MathUtil.clamp(batteryLimit - Math.max(0, predicted - current), 0, MAX_BUDGET)
+            : FALLBACK_BUDGET;
+    
     Logger.recordOutput("PowerManager/ActualCurrent", current);
-    Logger.recordOutput("PowerManager/CurrentSlope", currentSlope);
-    Logger.recordOutput("PowerManager/PredictedCurrent", predictedCurrent);
+    Logger.recordOutput("PowerManager/PredictedCurrent", predicted);
     Logger.recordOutput("PowerManager/BatteryVoltage", voltage);
-    Logger.recordOutput(
-        "PowerManager/BatteryCurrentLimit",
-        batteryEstimator.calculateMaxCurrent(MIN_BATTERY_VOLTAGE));
+    Logger.recordOutput("PowerManager/BatteryCurrentLimit", batteryLimit);
+    Logger.recordOutput("PowerManager/Budget", budget);
+
+    applyLimits(budget);
   }
 
-  private void calculateLimits() {
-
-    double batteryLimit = batteryEstimator.calculateMaxCurrent(MIN_BATTERY_VOLTAGE);
-
-    double lookaheadMargin = predictedCurrent - RobotController.getInputCurrent();
-
-    double availableCurrent = Math.max(0.0, batteryLimit - Math.max(0.0, lookaheadMargin));
-
-    availableCurrent = Math.min(availableCurrent, predictedCurrent + 80.0);
-
-    double drivetrainBudget = availableCurrent * allocation.drivetrain;
-
-    double flywheelBudget = availableCurrent * allocation.flywheel;
-
-    double groundRollersBudget = availableCurrent * allocation.groundRollers;
-
-    double groundPivotBudget = availableCurrent * allocation.groundPivot;
-
-    double hoodBudget = availableCurrent * allocation.hood;
-
-    double kickerBudget = availableCurrent * allocation.kicker;
-
-    double rollerFloorBudget = availableCurrent * allocation.rollerFloor;
-
-    double b2Budget = availableCurrent * allocation.b2;
-
-    double turretBudget = availableCurrent * allocation.turret;
-
-    double targetDrivetrainLimit = drivetrainBudget * 0.80 / DRIVETRAIN_DRIVE_MOTORS;
-
-    double targetDrivetrainSteerLimit = drivetrainBudget * 0.20 / DRIVETRAIN_STEER_MOTORS;
-
-    double targetFlywheelLimit = flywheelBudget / FLYWHEEL_MOTORS;
-
-    double targetTurretLimit = turretBudget / TURRET_MOTORS;
-
-    double targetGroundRollersLimit = groundRollersBudget;
-    double targetGroundPivotLimit = groundPivotBudget;
-    double targetHoodLimit = hoodBudget;
-    double targetKickerLimit = kickerBudget;
-    double targetRollerFloorLimit = rollerFloorBudget;
-    double targetB2Limit = b2Budget;
-
-    drivetrainCurrentLimit = slew(drivetrainCurrentLimit, targetDrivetrainLimit);
-
-    drivetrainSteerCurrentLimit = slew(drivetrainSteerCurrentLimit, targetDrivetrainSteerLimit);
-
-    flywheelCurrentLimit = slew(flywheelCurrentLimit, targetFlywheelLimit);
-
-    groundRollersCurrentLimit = slew(groundRollersCurrentLimit, targetGroundRollersLimit);
-
-    groundPivotCurrentLimit = slew(groundPivotCurrentLimit, targetGroundPivotLimit);
-
-    hoodCurrentLimit = slew(hoodCurrentLimit, targetHoodLimit);
-
-    kickerCurrentLimit = slew(kickerCurrentLimit, targetKickerLimit);
-
-    rollerFloorCurrentLimit = slew(rollerFloorCurrentLimit, targetRollerFloorLimit);
-
-    b2CurrentLimit = slew(b2CurrentLimit, targetB2Limit);
-
-    turretCurrentLimit = slew(turretCurrentLimit, targetTurretLimit);
-
-    logLimits(availableCurrent);
+  private static double recover(SlewRateLimiter limiter, double target) {
+    target = Math.max(0, target);
+    if (target < limiter.lastValue()) limiter.reset(target);
+    return limiter.calculate(target);
   }
 
-  private void applyLimits() {
+  private void applyLimits(double budget) {
+    PowerManagerState.Allocation a = state.allocation();
+    double drive = recover(driveLimiter, budget * a.drivetrain() * .80 / 4);
+    double steer = recover(steerLimiter, budget * a.drivetrain() * .20 / 4);
+    double flywheel = recover(flywheelLimiter, budget * a.flywheel() / 2);
+    double rollers = recover(rollersLimiter, budget * a.groundRollers());
+    double pivot = recover(pivotLimiter, budget * a.groundPivot());
+    double hood = recover(hoodLimiter, budget * a.hood() / 2);
+    double kickerLimit = recover(kickerLimiter, budget * a.kicker());
+    double floor = recover(floorLimiter, budget * a.rollerFloor());
+    double b2Limit = recover(b2Limiter, budget * a.b2());
+    double turret = recover(turretLimiter, budget * a.turret() / 2);
 
-    drivetrain.setSupplyCurrentLimits(drivetrainCurrentLimit, drivetrainSteerCurrentLimit);
-
-    flywheelLeft.setSupplyCurrentLimit(flywheelCurrentLimit);
-    flywheelRight.setSupplyCurrentLimit(flywheelCurrentLimit);
-
-    groundRollers.setSupplyCurrentLimit(groundRollersCurrentLimit);
-    groundPivot.setSupplyCurrentLimit(groundPivotCurrentLimit);
-
-    hoodLeft.setSupplyCurrentLimit(hoodCurrentLimit);
-    hoodRight.setSupplyCurrentLimit(hoodCurrentLimit);
-
-    kicker.setSupplyCurrentLimit(kickerCurrentLimit);
-    rollerFloor.setSupplyCurrentLimit(rollerFloorCurrentLimit);
-
-    b2.setSupplyCurrentLimit(b2CurrentLimit);
-
-    turretLeft.setSupplyCurrentLimit(turretCurrentLimit);
-    turretRight.setSupplyCurrentLimit(turretCurrentLimit);
-  }
-
-  private double slew(double current, double target) {
-    double maxChange = LIMIT_SLEW_RATE * UPDATE_PERIOD_SECONDS;
-
-    return MathUtil.clamp(target, current - maxChange, current + maxChange);
-  }
-
-  private void logLimits(double availableCurrent) {
-
-    Logger.recordOutput("PowerManager/AvailableCurrent", availableCurrent);
-
-    Logger.recordOutput("PowerManager/DrivetrainCurrentLimit", drivetrainCurrentLimit);
-
-    Logger.recordOutput("PowerManager/DrivetrainSteerCurrentLimit", drivetrainSteerCurrentLimit);
-
-    Logger.recordOutput("PowerManager/FlywheelCurrentLimit", flywheelCurrentLimit);
-
-    Logger.recordOutput("PowerManager/GroundRollersCurrentLimit", groundRollersCurrentLimit);
-
-    Logger.recordOutput("PowerManager/GroundPivotCurrentLimit", groundPivotCurrentLimit);
-
-    Logger.recordOutput("PowerManager/HoodCurrentLimit", hoodCurrentLimit);
-
-    Logger.recordOutput("PowerManager/KickerCurrentLimit", kickerCurrentLimit);
-
-    Logger.recordOutput("PowerManager/RollerFloorCurrentLimit", rollerFloorCurrentLimit);
-
-    Logger.recordOutput("PowerManager/B2CurrentLimit", b2CurrentLimit);
-
-    Logger.recordOutput("PowerManager/TurretCurrentLimit", turretCurrentLimit);
+    drivetrain.setSupplyCurrentLimits(drive, steer);
+    flywheelLeft.setSupplyCurrentLimit(flywheel);
+    flywheelRight.setSupplyCurrentLimit(flywheel);
+    groundRollers.setSupplyCurrentLimit(rollers);
+    groundPivot.setSupplyCurrentLimit(pivot);
+    hoodLeft.setSupplyCurrentLimit(hood);
+    hoodRight.setSupplyCurrentLimit(hood);
+    kicker.setSupplyCurrentLimit(kickerLimit);
+    rollerFloor.setSupplyCurrentLimit(floor);
+    b2.setSupplyCurrentLimit(b2Limit);
+    turretLeft.setSupplyCurrentLimit(turret);
+    turretRight.setSupplyCurrentLimit(turret);
+    
+    Logger.recordOutput("PowerManager/DriveLimit", drive);
+    Logger.recordOutput("PowerManager/SteerLimit", steer);
+    Logger.recordOutput("PowerManager/FlywheelLimit", flywheel);
+    Logger.recordOutput("PowerManager/HoodLimit", hood);
+    Logger.recordOutput("PowerManager/TurretLimit", turret);
   }
 }

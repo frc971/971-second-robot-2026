@@ -46,6 +46,7 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Visualization visualization;
+  public final PowerManager powerManager;
   @AutoLogOutput private Mode mode = Mode.NONE;
 
   private final Timer juiceTimer = new Timer();
@@ -91,6 +92,23 @@ public class Superstructure {
             ShooterHandler.Side.LEFT);
 
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
+
+    powerManager =
+        new PowerManager(
+            drivetrain,
+            flywheelLeft,
+            flywheelRight,
+            groundRollers,
+            groundPivot,
+            hoodLeft,
+            hoodRight,
+            kicker,
+            rollerFloor,
+            b2,
+            turretLeft,
+            turretRight,
+            shooterHandlerLeft,
+            shooterHandlerRight);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
@@ -295,6 +313,7 @@ public class Superstructure {
     turretLeft.periodic();
     groundPivot.periodic();
     groundRollers.periodic();
+    powerManager.periodic();
 
     visualization.periodic();
   }

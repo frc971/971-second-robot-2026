@@ -430,4 +430,11 @@ public class ShooterHandler {
   public void setStateAiming() {
     shooterState = shooterState.AIMING;
   }
+
+  public boolean isShuttleTarget() {
+    return targetState == Targets.LEFT_BLUE_SHUTTLE
+        || targetState == Targets.LEFT_RED_SHUTTLE
+        || targetState == Targets.RIGHT_BLUE_SHUTTLE
+        || targetState == Targets.RIGHT_RED_SHUTTLE;
+  }
 }
