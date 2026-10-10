@@ -1,8 +1,6 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -125,7 +123,7 @@ public class Autos {
     AutoPathOption selected = chooser.getSelected();
     Alliance curAlliance = DriverStation.getAlliance().orElse(Alliance.Blue);
 
-    // // if didn't change auto --> don't need to re-cache
+    // if didn't change auto --> don't need to re-cache
     if (selected == cachedSelectedAuto && selectedAutoIsCached && previousAlliance == curAlliance) {
       return;
     }
@@ -161,15 +159,16 @@ public class Autos {
       autoCommand = Commands.none();
     }
 
-    autoCommand = Commands.sequence(
-        IntStream.range(0, cachedPathSegments.size())
-            .mapToObj(
-                i -> {
-                  FollowPath.Builder builder =
-                      i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                  return builder.build(cachedPathSegments.get(i));
-                })
-            .toArray(Command[]::new));
+    autoCommand =
+        Commands.sequence(
+            IntStream.range(0, cachedPathSegments.size())
+                .mapToObj(
+                    i -> {
+                      FollowPath.Builder builder =
+                          i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
+                      return builder.build(cachedPathSegments.get(i));
+                    })
+                .toArray(Command[]::new));
   }
 
   // IMPORTANT: all autos must be defined here
