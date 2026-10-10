@@ -1,8 +1,12 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,6 +58,9 @@ public class Autos {
   private Pose2d cachedAutonomousStartPose = null;
   private boolean selectedAutoIsCached = false;
 
+  private Command autoCommand = null;
+  private Alliance previousAlliance = null;
+
   public Autos(CommandSwerveDrivetrain drivetrain) {
 
     chooser.setDefaultOption("None", null);
@@ -65,6 +72,7 @@ public class Autos {
     pathBuilderContinuation = newPathBuilder(drivetrain);
 
     SmartDashboard.putData("Auto Mode", chooser);
+    previousAlliance = DriverStation.getAlliance().orElse(Alliance.Blue);
   }
 
   private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
@@ -96,7 +104,7 @@ public class Autos {
   }
 
   public Command getAutonomousCommand() {
-    return buildCommandFromCachedSegments();
+    return autoCommand;
   }
 
   public Pose2d getAutonomousStartPose() {
@@ -115,15 +123,17 @@ public class Autos {
 
   private void updateSelectedAutoCache() {
     AutoPathOption selected = chooser.getSelected();
+    Alliance curAlliance = DriverStation.getAlliance().orElse(Alliance.Blue);
 
-    // if didn't change auto --> don't need to re-cache
-    if (selected == cachedSelectedAuto && selectedAutoIsCached) {
+    // // if didn't change auto --> don't need to re-cache
+    if (selected == cachedSelectedAuto && selectedAutoIsCached && previousAlliance == curAlliance) {
       return;
     }
 
     // set flag --> so can see when not-ready/not-cached
     selectedAutoIsCached = false;
     cachedSelectedAuto = selected;
+    previousAlliance = curAlliance;
 
     if (selected == null) {
       cachedPathSegments = Collections.<Path>emptyList();
@@ -146,14 +156,12 @@ public class Autos {
 
     // flip back boolean flag: caching process finished
     selectedAutoIsCached = true;
-  }
 
-  private Command buildCommandFromCachedSegments() {
     if (cachedPathSegments.isEmpty()) {
-      return Commands.none();
+      autoCommand = Commands.none();
     }
 
-    return Commands.sequence(
+    autoCommand = Commands.sequence(
         IntStream.range(0, cachedPathSegments.size())
             .mapToObj(
                 i -> {
