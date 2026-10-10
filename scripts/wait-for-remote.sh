@@ -27,13 +27,4 @@ if [ -n "$disk_usage" ] && [ "$disk_usage" -ge 90 ]; then
   echo "WARNING: roboRIO disk ${disk_usage}% full; logs will not be saved."
 fi
 
-# 2. Incorrect system timestamp
-remote_now=$($issh_cmd "date +%s" 2>/dev/null || true)
-if [ -n "$remote_now" ]; then
-  skew=$(( remote_now - $(date +%s) ))
-  if [ "${skew#-}" -gt 60 ]; then
-    echo "WARNING: roboRIO time off by ${skew#-}s ($remote_now epoch vs host $(date +%s)); logs will not be saved."
-  fi
-fi
-
 exit 0
