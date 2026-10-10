@@ -123,12 +123,10 @@ public class MotorWithFollowerTalonFX extends MotorTalonFX {
   public void setSupplyCurrentLimit(double amps) {
     super.setSupplyCurrentLimit(amps);
     for (int i = 0; i < followerMotors.length; i++) {
-      TalonFXConfiguration config = followerConfigs[i].TALONFX_CONFIG().clone();
+      TalonFXConfiguration config = followerConfigs[i].TALONFX_CONFIG();
       config.CurrentLimits.SupplyCurrentLimitEnable = true;
       config.CurrentLimits.SupplyCurrentLimit = amps;
-      followerMotors[i].getConfigurator().apply(config);
-      followerConfigs[i].TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimitEnable = true;
-      followerConfigs[i].TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit = amps;
+      followerMotors[i].getConfigurator().apply(config.CurrentLimits);
     }
   }
 }
