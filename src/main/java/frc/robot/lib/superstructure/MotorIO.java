@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import com.ctre.phoenix6.StatusCode;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
@@ -90,7 +91,7 @@ public abstract class MotorIO {
 
   public abstract void setCoast();
 
-  public abstract void setSupplyCurrentLimit(double amps);
+  public abstract StatusCode setSupplyCurrentLimit(double amps);
 
   @AutoLogOutput(key = "{name}/Supply Current Limit")
   public abstract double getSupplyCurrentLimit();

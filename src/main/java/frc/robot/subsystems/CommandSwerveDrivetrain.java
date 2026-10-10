@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.StatusCode;
+import frc.robot.lib.CanConfigExecutor;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -25,8 +27,6 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.lib.simulation.MapleSimSwerveDrivetrain;
 import frc.robot.lib.simulation.RobotBumpSim;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -41,7 +41,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private static final double SIM_LOOP_PERIOD = 0.002; // 2 ms
   private static final double BUM_SIM_SUBTICKS = 5;
   private Notifier simNotifier = null;
-  private final ExecutorService currentLimitExecutor = Executors.newSingleThreadExecutor();
 
   /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
   private static final Rotation2d BLUE_ALLIANCE_PERSPECTIVE_ROTATION = Rotation2d.kZero;
@@ -139,16 +138,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public void setSupplyCurrentLimits(double driveAmps, double steerAmps) {
-    currentLimitExecutor.submit(() -> applySupplyCurrentLimits(driveAmps, steerAmps));
+    for (int i = 0; i < getModules().length; i++) {
+      final int moduleIndex = i;
+      CanConfigExecutor.submit(
+          "Drivetrain/Module" + moduleIndex + "/Drive",
+          () -> applyDriveCurrentLimit(moduleIndex, driveAmps));
+      CanConfigExecutor.submit(
+          "Drivetrain/Module" + moduleIndex + "/Steer",
+          () -> applySteerCurrentLimit(moduleIndex, steerAmps));
+    }
   }
 
-  private void applySupplyCurrentLimits(double driveAmps, double steerAmps) {
+  private StatusCode applyDriveCurrentLimit(int moduleIndex, double driveAmps) {
     CurrentLimitsConfigs driveLimits =
         new CurrentLimitsConfigs()
             .withSupplyCurrentLimitEnable(true)
             .withSupplyCurrentLimit(driveAmps)
             .withStatorCurrentLimitEnable(true)
             .withStatorCurrentLimit(120.0);
+    return getModules()[moduleIndex].getDriveMotor().getConfigurator().apply(driveLimits);
+  }
+
+  private StatusCode applySteerCurrentLimit(int moduleIndex, double steerAmps) {
     CurrentLimitsConfigs steerLimits =
         new CurrentLimitsConfigs()
             .withSupplyCurrentLimitEnable(true)
@@ -156,10 +167,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             .withStatorCurrentLimitEnable(true)
             .withStatorCurrentLimit(60.0);
 
-    for (var module : getModules()) {
-      module.getDriveMotor().getConfigurator().apply(driveLimits);
-      module.getSteerMotor().getConfigurator().apply(steerLimits);
-    }
+    return getModules()[moduleIndex].getSteerMotor().getConfigurator().apply(steerLimits);
   }
 
   @Override

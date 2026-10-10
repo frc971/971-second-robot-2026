@@ -3,6 +3,7 @@ package frc.robot.lib.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -148,11 +149,11 @@ public class MotorTalonFX extends MotorIO {
   }
 
   @Override
-  public void setSupplyCurrentLimit(double amps) {
+  public StatusCode setSupplyCurrentLimit(double amps) {
     TalonFXConfiguration config = motorConfig.TALONFX_CONFIG();
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = amps;
-    motor.getConfigurator().apply(config.CurrentLimits);
+    return motor.getConfigurator().apply(config.CurrentLimits);
   }
 
   @Override

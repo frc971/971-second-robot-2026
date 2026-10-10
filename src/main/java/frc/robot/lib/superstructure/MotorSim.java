@@ -1,6 +1,7 @@
 package frc.robot.lib.superstructure;
 
 import static edu.wpi.first.units.Units.*;
+import com.ctre.phoenix6.StatusCode;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
@@ -93,8 +94,9 @@ public class MotorSim extends MotorIO {
   }
 
   @Override
-  public void setSupplyCurrentLimit(double amps) {
+  public StatusCode setSupplyCurrentLimit(double amps) {
     config.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit = amps;
+    return StatusCode.OK;
   }
 
   @Override
