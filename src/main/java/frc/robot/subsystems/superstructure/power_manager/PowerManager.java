@@ -11,9 +11,9 @@ import frc.robot.subsystems.superstructure.HoodRight;
 import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.RollerFloor;
 import frc.robot.subsystems.superstructure.ShooterHandler;
+import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.TurretLeft;
 import frc.robot.subsystems.superstructure.TurretRight;
-import java.util.function.BooleanSupplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -33,7 +33,7 @@ public class PowerManager {
   private final TurretRight turretRight;
   private final ShooterHandler shooterHandlerLeft;
   private final ShooterHandler shooterHandlerRight;
-  private final BooleanSupplier manualMode;
+  private final Superstructure superstructure;
 
   @Getter
   @AutoLogOutput(key = "PowerManager/State")
@@ -56,7 +56,7 @@ public class PowerManager {
       TurretRight turretRight,
       ShooterHandler shooterHandlerLeft,
       ShooterHandler shooterHandlerRight,
-      BooleanSupplier manualMode) {
+      Superstructure superstructure) {
     this.drivetrain = drivetrain;
     this.flywheelLeft = flywheelLeft;
     this.flywheelRight = flywheelRight;
@@ -71,12 +71,12 @@ public class PowerManager {
     this.turretRight = turretRight;
     this.shooterHandlerLeft = shooterHandlerLeft;
     this.shooterHandlerRight = shooterHandlerRight;
-    this.manualMode = manualMode;
+    this.superstructure = superstructure;
     applyState();
   }
 
   public void periodic() {
-    if (manualMode.getAsBoolean()) {
+    if (superstructure.getMode() == Superstructure.Mode.MANUAL) {
       state = PowerManagerState.MANUAL;
     } else if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
         || shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {

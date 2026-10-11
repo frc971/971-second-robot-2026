@@ -14,6 +14,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler.ShooterState;
 import frc.robot.subsystems.superstructure.power_manager.PowerManager;
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -48,13 +49,13 @@ public class Superstructure {
 
   public final Visualization visualization;
   public final PowerManager powerManager;
-  @AutoLogOutput private Mode mode = Mode.NONE;
+  @AutoLogOutput @Getter private Mode mode = Mode.NONE;
 
   private final Timer juiceTimer = new Timer();
   private boolean juiceAuto = false;
 
   // Targeting hub/shuttle targets or using manual setpoints
-  private enum Mode {
+  public enum Mode {
     NONE,
     MANUAL,
     TARGETING
@@ -109,7 +110,7 @@ public class Superstructure {
             turretRight,
             shooterHandlerLeft,
             shooterHandlerRight,
-            () -> mode == Mode.MANUAL);
+            this);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
