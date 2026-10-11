@@ -102,7 +102,9 @@ public class Autos {
   }
 
   public Command getAutonomousCommand() {
-    return autoCommand;
+    Command command = autoCommand;
+    selectedAutoIsCached = false;
+    return command;
   }
 
   public Pose2d getAutonomousStartPose() {
@@ -136,6 +138,7 @@ public class Autos {
     if (selected == null) {
       cachedPathSegments = Collections.<Path>emptyList();
       cachedAutonomousStartPose = null;
+      autoCommand = null;
       return;
     }
 
@@ -144,6 +147,7 @@ public class Autos {
     // empty auto
     if (cachedPathSegments.isEmpty()) {
       cachedAutonomousStartPose = null;
+      autoCommand = null;
       return;
     }
 
@@ -154,10 +158,6 @@ public class Autos {
 
     // flip back boolean flag: caching process finished
     selectedAutoIsCached = true;
-
-    if (cachedPathSegments.isEmpty()) {
-      autoCommand = Commands.none();
-    }
 
     autoCommand =
         Commands.sequence(
