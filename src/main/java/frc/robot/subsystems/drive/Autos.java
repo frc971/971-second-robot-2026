@@ -221,5 +221,9 @@ public class Autos {
               true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
 
           // Middle Depot
-          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")));
+          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")),
+
+          // Dynamic POC
+          new AutoRoutine(
+              false, "Dynamic", List.of("S_Normal", "dynamic:poc", "H_Normal", "dynamic:poc")));
 }
