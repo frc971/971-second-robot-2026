@@ -13,6 +13,8 @@ public class DynamicSegmentPOC extends DynamicSegment {
     counter++;
     Translation2d destination = new Translation2d(counter, counter);
 
+    System.out.println("Computing path to target (" + counter + ", " + counter + ")");
+
     List<Path.PathElement> elements = new ArrayList<>();
     elements.add(new Path.Waypoint(destination, Rotation2d.kZero));
     return new Path(elements, new Path.PathConstraints().setMaxVelocityMetersPerSec(4.5));
