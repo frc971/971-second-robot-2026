@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -49,12 +50,15 @@ public class Autos {
 
   private final FollowPath.Builder pathBuilderWithStartPoseReset;
   private final FollowPath.Builder pathBuilderContinuation;
+  private final CommandSwerveDrivetrain drivetrain;
   private AutoPathOption cachedSelectedAuto = null;
-  private List<Path> cachedPathSegments = Collections.<Path>emptyList();
+  private List<Segment> cachedPathSegments = Collections.<Segment>emptyList();
   private Pose2d cachedAutonomousStartPose = null;
   private boolean selectedAutoIsCached = false;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
+
+    this.drivetrain = drivetrain;
 
     chooser.setDefaultOption("None", null);
 
@@ -126,12 +130,22 @@ public class Autos {
     cachedSelectedAuto = selected;
 
     if (selected == null) {
-      cachedPathSegments = Collections.<Path>emptyList();
+      cachedPathSegments = Collections.<Segment>emptyList();
       cachedAutonomousStartPose = null;
       return;
     }
 
-    cachedPathSegments = selected.routine.pathNames().stream().map(Path::new).toList();
+    // Cache the path segmennts
+    cachedPathSegments = new ArrayList<>();
+
+    for (String pathName : selected.routine.pathNames()) {
+      // Dynamic paths will always start with "dynamic:"
+      if (pathName.equals("dynamic:poc")) {
+        cachedPathSegments.add(new DynamicSegmentPOC());
+      } else {
+        cachedPathSegments.add(new StaticSegment(new Path(pathName)));
+      }
+    }
 
     // empty auto
     if (cachedPathSegments.isEmpty()) {
@@ -159,7 +173,7 @@ public class Autos {
                 i -> {
                   FollowPath.Builder builder =
                       i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                  return builder.build(cachedPathSegments.get(i));
+                  return cachedPathSegments.get(i).getCommand(builder);
                 })
             .toArray(Command[]::new));
   }
