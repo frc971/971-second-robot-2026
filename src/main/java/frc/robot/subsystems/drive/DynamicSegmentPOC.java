@@ -9,9 +9,9 @@ import java.util.List;
 public class DynamicSegmentPOC extends DynamicSegment {
   private static int counter = 0;
 
-  Path getDynamicPath() {
+  public Path getDynamicPath() {
     counter++;
-    Translation2d destination = new Translation2d(1.0 + counter, 1.0 + counter);
+    Translation2d destination = new Translation2d(counter, counter);
 
     List<Path.PathElement> elements = new ArrayList<>();
     elements.add(new Path.Waypoint(destination, Rotation2d.kZero));
