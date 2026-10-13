@@ -17,6 +17,7 @@ public final class CanBusScheduler implements AutoCloseable {
   private final AtomicLong rejectedStaleOperations = new AtomicLong();
   private final AtomicLong failedOperations = new AtomicLong();
   private final AtomicLong activeOperations = new AtomicLong();
+  private static final int MAX_ATTEMPTS = 3;
 
   CanBusScheduler(String busName, int parallelism) {
     this.busName = busName;
@@ -38,7 +39,14 @@ public final class CanBusScheduler implements AutoCloseable {
 
           double startedAt = Timer.getFPGATimestamp();
           activeOperations.incrementAndGet();
-          StatusCode status = operation.get();
+          StatusCode status = null;
+          int attempts = 0;
+          do {
+            attempts++;
+            status = operation.get();
+          } while ((status == null || !status.isOK())
+              && attempts < MAX_ATTEMPTS
+              && generation.get() == requestGeneration);
 
           if (status == null || !status.isOK()) {
             failedOperations.incrementAndGet();
@@ -48,6 +56,7 @@ public final class CanBusScheduler implements AutoCloseable {
           Logger.recordOutput(
               "CAN/" + busName + "/LastOperationDurationMs",
               (Timer.getFPGATimestamp() - startedAt) * 1000.0);
+          Logger.recordOutput("CAN/" + busName + "/LastOperationAttempts", attempts);
 
           recordBusMetrics();
         });

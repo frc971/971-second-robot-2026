@@ -162,12 +162,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     StatusCode result = StatusCode.OK;
     for (var module : getModules()) {
       StatusCode driveStatus = module.getDriveMotor().getConfigurator().apply(driveLimits);
-      if (!module.getDriveMotor().getConfigurator().apply(driveLimits).isOK()) {
+      if (!driveStatus.isOK()) {
         result = driveStatus;
       }
 
       StatusCode steerStatus = module.getSteerMotor().getConfigurator().apply(steerLimits);
-      if (!module.getSteerMotor().getConfigurator().apply(steerLimits).isOK()) {
+      if (!steerStatus.isOK()) {
         result = steerStatus;
       }
     }

@@ -78,8 +78,9 @@ public class PowerManager {
   public void periodic() {
     if (superstructure.getMode() == Superstructure.Mode.MANUAL) {
       state = PowerManagerState.MANUAL;
-    } else if (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
-        || shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE) {
+    } else if (superstructure.isWantsShot()
+        && (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
+            || shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE)) {
       state =
           shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()
               ? PowerManagerState.SHUTTLING

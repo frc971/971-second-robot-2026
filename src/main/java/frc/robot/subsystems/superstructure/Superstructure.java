@@ -50,6 +50,7 @@ public class Superstructure {
   public final Visualization visualization;
   public final PowerManager powerManager;
   @AutoLogOutput @Getter private Mode mode = Mode.NONE;
+  @AutoLogOutput @Getter private boolean wantsShot = false;
 
   private final Timer juiceTimer = new Timer();
   private boolean juiceAuto = false;
@@ -116,6 +117,7 @@ public class Superstructure {
   }
 
   public void periodic() {
+    wantsShot = false;
 
     // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
@@ -124,13 +126,11 @@ public class Superstructure {
       }
       setGoal(SetpointGoal.NEUTRAL);
 
-      boolean wantsShot =
+      wantsShot =
           Controllers.LEFT_SHUTTLE.getAsBoolean()
               || Controllers.RIGHT_SHUTTLE.getAsBoolean()
               || Controllers.SHOOT.getAsBoolean()
               || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
-
-      Logger.recordOutput("Superstructure/wantsShot", wantsShot);
 
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
@@ -259,6 +259,7 @@ public class Superstructure {
       }
 
     } else if (DriverStation.isAutonomousEnabled()) { // MARK: Autonomous Logic
+      wantsShot = false;
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
       }
