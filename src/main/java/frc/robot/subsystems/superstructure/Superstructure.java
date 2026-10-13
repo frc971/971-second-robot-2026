@@ -16,7 +16,6 @@ import frc.robot.subsystems.superstructure.ShooterHandler.ShooterState;
 import frc.robot.subsystems.superstructure.power_manager.PowerManager;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
