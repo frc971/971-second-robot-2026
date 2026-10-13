@@ -3,6 +3,7 @@ package frc.robot.lib.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -120,13 +121,17 @@ public class MotorWithFollowerTalonFX extends MotorTalonFX {
   }
 
   @Override
-  public void setSupplyCurrentLimit(double amps) {
-    super.setSupplyCurrentLimit(amps);
+  public StatusCode setSupplyCurrentLimit(double amps) {
+    StatusCode status = super.setSupplyCurrentLimit(amps);
     for (int i = 0; i < followerMotors.length; i++) {
       TalonFXConfiguration config = followerConfigs[i].TALONFX_CONFIG();
       config.CurrentLimits.SupplyCurrentLimitEnable = true;
       config.CurrentLimits.SupplyCurrentLimit = amps;
-      followerMotors[i].getConfigurator().apply(config.CurrentLimits);
+      StatusCode followerStatus = followerMotors[i].getConfigurator().apply(config.CurrentLimits);
+      if (!followerStatus.isOK()) {
+        status = followerStatus;
+      }
     }
+    return status;
   }
 }

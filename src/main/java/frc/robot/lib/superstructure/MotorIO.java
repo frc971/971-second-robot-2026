@@ -2,6 +2,7 @@ package frc.robot.lib.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.StatusCode;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -90,7 +91,7 @@ public abstract class MotorIO {
 
   public abstract void setCoast();
 
-  public abstract void setSupplyCurrentLimit(double amps);
+  public abstract StatusCode setSupplyCurrentLimit(double amps);
 
   @AutoLogOutput(key = "{name}/Supply Current Limit")
   public abstract double getSupplyCurrentLimit();
