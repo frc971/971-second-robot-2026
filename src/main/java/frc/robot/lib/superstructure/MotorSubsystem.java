@@ -8,7 +8,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.lib.can.CanBusManager;
 import java.util.Optional;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -143,10 +142,6 @@ public class MotorSubsystem {
   }
 
   public void setSupplyCurrentLimit(double amps) {
-    CanBusManager.getInstance()
-        .submit(
-            io.getMotorConfig().BUS().getName(),
-            name + "-supply-limit",
-            () -> io.setSupplyCurrentLimit(amps));
+    io.setSupplyCurrentLimit(amps);
   }
 }

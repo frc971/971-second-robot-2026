@@ -14,6 +14,9 @@ import frc.robot.subsystems.superstructure.ShooterHandler;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.TurretLeft;
 import frc.robot.subsystems.superstructure.TurretRight;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -34,6 +37,7 @@ public class PowerManager {
   private final ShooterHandler shooterHandlerLeft;
   private final ShooterHandler shooterHandlerRight;
   private final Superstructure superstructure;
+  private final ExecutorService limitExecutor = Executors.newFixedThreadPool(2);
 
   @Getter
   @AutoLogOutput(key = "PowerManager/State")
@@ -95,6 +99,7 @@ public class PowerManager {
   }
 
   private void applyState() {
+    PowerManagerState stateToApply = state;
     Logger.recordOutput("PowerManager/FlywheelSupplyCurrent", state.flywheel());
     Logger.recordOutput("PowerManager/GroundRollersSupplyCurrent", state.groundRollers());
     Logger.recordOutput("PowerManager/GroundPivotSupplyCurrent", state.groundPivot());
@@ -105,19 +110,27 @@ public class PowerManager {
     Logger.recordOutput("PowerManager/TurretSupplyCurrent", state.turret());
     Logger.recordOutput("PowerManager/DrivetrainSupplyCurrent", state.drivetrain());
     Logger.recordOutput("PowerManager/DrivetrainSteerSupplyCurrent", state.drivetrainSteer());
+    limitExecutor.submit(() -> applyLimits(stateToApply));
+  }
 
-    drivetrain.setSupplyCurrentLimits(state.drivetrain(), state.drivetrainSteer());
-    flywheelLeft.setSupplyCurrentLimit(state.flywheel());
-    flywheelRight.setSupplyCurrentLimit(state.flywheel());
-    groundRollers.setSupplyCurrentLimit(state.groundRollers());
-    groundPivot.setSupplyCurrentLimit(state.groundPivot());
-    hoodLeft.setSupplyCurrentLimit(state.hood());
-    hoodRight.setSupplyCurrentLimit(state.hood());
-    kicker.setSupplyCurrentLimit(state.kicker());
-    rollerFloor.setSupplyCurrentLimit(state.rollerFloor());
-    b2.setSupplyCurrentLimit(state.b2());
-    turretLeft.setSupplyCurrentLimit(state.turret());
-    turretRight.setSupplyCurrentLimit(state.turret());
-    lastAppliedState = state;
+  private void applyLimits(PowerManagerState state) {
+    CompletableFuture<?>[] limitTasks = {
+      CompletableFuture.runAsync(
+          () -> drivetrain.setSupplyCurrentLimits(state.drivetrain(), state.drivetrainSteer()),
+          limitExecutor),
+      CompletableFuture.runAsync(() -> flywheelLeft.setSupplyCurrentLimit(state.flywheel()), limitExecutor),
+      CompletableFuture.runAsync(() -> flywheelRight.setSupplyCurrentLimit(state.flywheel()), limitExecutor),
+      CompletableFuture.runAsync(() -> groundRollers.setSupplyCurrentLimit(state.groundRollers()), limitExecutor),
+      CompletableFuture.runAsync(() -> groundPivot.setSupplyCurrentLimit(state.groundPivot()), limitExecutor),
+      CompletableFuture.runAsync(() -> hoodLeft.setSupplyCurrentLimit(state.hood()), limitExecutor),
+      CompletableFuture.runAsync(() -> hoodRight.setSupplyCurrentLimit(state.hood()), limitExecutor),
+      CompletableFuture.runAsync(() -> kicker.setSupplyCurrentLimit(state.kicker()), limitExecutor),
+      CompletableFuture.runAsync(() -> rollerFloor.setSupplyCurrentLimit(state.rollerFloor()), limitExecutor),
+      CompletableFuture.runAsync(() -> b2.setSupplyCurrentLimit(state.b2()), limitExecutor),
+      CompletableFuture.runAsync(() -> turretLeft.setSupplyCurrentLimit(state.turret()), limitExecutor),
+      CompletableFuture.runAsync(() -> turretRight.setSupplyCurrentLimit(state.turret()), limitExecutor)
+    };
+
+    CompletableFuture.allOf(limitTasks).thenRun(() -> lastAppliedState = state);
   }
 }
