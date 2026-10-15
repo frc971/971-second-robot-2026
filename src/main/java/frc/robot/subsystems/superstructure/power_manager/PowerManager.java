@@ -118,17 +118,25 @@ public class PowerManager {
       CompletableFuture.runAsync(
           () -> drivetrain.setSupplyCurrentLimits(state.drivetrain(), state.drivetrainSteer()),
           limitExecutor),
-      CompletableFuture.runAsync(() -> flywheelLeft.setSupplyCurrentLimit(state.flywheel()), limitExecutor),
-      CompletableFuture.runAsync(() -> flywheelRight.setSupplyCurrentLimit(state.flywheel()), limitExecutor),
-      CompletableFuture.runAsync(() -> groundRollers.setSupplyCurrentLimit(state.groundRollers()), limitExecutor),
-      CompletableFuture.runAsync(() -> groundPivot.setSupplyCurrentLimit(state.groundPivot()), limitExecutor),
+      CompletableFuture.runAsync(
+          () -> flywheelLeft.setSupplyCurrentLimit(state.flywheel()), limitExecutor),
+      CompletableFuture.runAsync(
+          () -> flywheelRight.setSupplyCurrentLimit(state.flywheel()), limitExecutor),
+      CompletableFuture.runAsync(
+          () -> groundRollers.setSupplyCurrentLimit(state.groundRollers()), limitExecutor),
+      CompletableFuture.runAsync(
+          () -> groundPivot.setSupplyCurrentLimit(state.groundPivot()), limitExecutor),
       CompletableFuture.runAsync(() -> hoodLeft.setSupplyCurrentLimit(state.hood()), limitExecutor),
-      CompletableFuture.runAsync(() -> hoodRight.setSupplyCurrentLimit(state.hood()), limitExecutor),
+      CompletableFuture.runAsync(
+          () -> hoodRight.setSupplyCurrentLimit(state.hood()), limitExecutor),
       CompletableFuture.runAsync(() -> kicker.setSupplyCurrentLimit(state.kicker()), limitExecutor),
-      CompletableFuture.runAsync(() -> rollerFloor.setSupplyCurrentLimit(state.rollerFloor()), limitExecutor),
+      CompletableFuture.runAsync(
+          () -> rollerFloor.setSupplyCurrentLimit(state.rollerFloor()), limitExecutor),
       CompletableFuture.runAsync(() -> b2.setSupplyCurrentLimit(state.b2()), limitExecutor),
-      CompletableFuture.runAsync(() -> turretLeft.setSupplyCurrentLimit(state.turret()), limitExecutor),
-      CompletableFuture.runAsync(() -> turretRight.setSupplyCurrentLimit(state.turret()), limitExecutor)
+      CompletableFuture.runAsync(
+          () -> turretLeft.setSupplyCurrentLimit(state.turret()), limitExecutor),
+      CompletableFuture.runAsync(
+          () -> turretRight.setSupplyCurrentLimit(state.turret()), limitExecutor)
     };
 
     CompletableFuture.allOf(limitTasks).thenRun(() -> lastAppliedState = state);
