@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.power_manager;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.superstructure.B2;
 import frc.robot.subsystems.superstructure.FlywheelLeft;
@@ -44,6 +45,7 @@ public class PowerManager {
   private PowerManagerState state = PowerManagerState.DEFAULT;
 
   private PowerManagerState lastAppliedState;
+  private volatile double lastApplyDurationMs;
 
   public PowerManager(
       CommandSwerveDrivetrain drivetrain,
@@ -80,6 +82,8 @@ public class PowerManager {
   }
 
   public void periodic() {
+    Logger.recordOutput("PowerManager/ApplyDurationMs", lastApplyDurationMs);
+
     if (superstructure.getMode() == Superstructure.Mode.MANUAL) {
       state = PowerManagerState.MANUAL;
     } else if (superstructure.isWantsShot()
@@ -100,6 +104,8 @@ public class PowerManager {
 
   private void applyState() {
     PowerManagerState stateToApply = state;
+    lastAppliedState = stateToApply;
+
     Logger.recordOutput("PowerManager/FlywheelSupplyCurrent", state.flywheel());
     Logger.recordOutput("PowerManager/GroundRollersSupplyCurrent", state.groundRollers());
     Logger.recordOutput("PowerManager/GroundPivotSupplyCurrent", state.groundPivot());
@@ -110,10 +116,18 @@ public class PowerManager {
     Logger.recordOutput("PowerManager/TurretSupplyCurrent", state.turret());
     Logger.recordOutput("PowerManager/DrivetrainSupplyCurrent", state.drivetrain());
     Logger.recordOutput("PowerManager/DrivetrainSteerSupplyCurrent", state.drivetrainSteer());
-    limitExecutor.submit(() -> applyLimits(stateToApply));
+
+    double startTime = Timer.getFPGATimestamp();
+    limitExecutor.submit(
+        () ->
+            applyLimits(stateToApply)
+                .whenComplete(
+                    (result, error) -> {
+                      lastApplyDurationMs = (Timer.getFPGATimestamp() - startTime) * 1000.0;
+                    }));
   }
 
-  private void applyLimits(PowerManagerState state) {
+  private CompletableFuture<Void> applyLimits(PowerManagerState state) {
     CompletableFuture<?>[] limitTasks = {
       CompletableFuture.runAsync(
           () -> drivetrain.setSupplyCurrentLimits(state.drivetrain(), state.drivetrainSteer()),
@@ -139,6 +153,6 @@ public class PowerManager {
           () -> turretRight.setSupplyCurrentLimit(state.turret()), limitExecutor)
     };
 
-    CompletableFuture.allOf(limitTasks).thenRun(() -> lastAppliedState = state);
+    return CompletableFuture.allOf(limitTasks);
   }
 }
