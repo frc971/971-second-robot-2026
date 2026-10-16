@@ -89,7 +89,7 @@ public class PowerManager {
         && (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
             || shooterHandlerRight.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE)) {
       state =
-          shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget()
+          (shooterHandlerLeft.isShuttleTarget() || shooterHandlerRight.isShuttleTarget())
               ? PowerManagerState.SHUTTLING
               : PowerManagerState.SHOOTING;
     } else {
