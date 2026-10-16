@@ -20,7 +20,7 @@ public enum PowerManagerState {
 
   SHOOTING(
       LimitConfig.builder()
-          .flywheel(40)
+          .flywheel(50)
           .groundRollers(40)
           .groundPivot(25)
           .hood(25)
