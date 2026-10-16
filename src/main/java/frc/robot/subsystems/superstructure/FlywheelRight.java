@@ -15,6 +15,7 @@ import frc.robot.subsystems.superstructure.power_manager.PowerManagerState;
 
 // TODO: change the constants!!
 public class FlywheelRight extends AngularSubsystem {
+  private static final AngularVelocity COAST_TOLERANCE = RotationsPerSecond.of(5);
 
   public FlywheelRight() {
     super(getIO());
@@ -78,9 +79,14 @@ public class FlywheelRight extends AngularSubsystem {
 
   @Override
   public void setVelocity(AngularVelocity goalVelocity) {
-    if (goalVelocity.equals(RotationsPerSecond.zero())) {
-      setCoast();
-      this.goalVelocity = RotationsPerSecond.zero();
+    AngularVelocity neutral = SetpointGoal.NEUTRAL.getSetpoint().getRightFlywheel().get();
+    if (goalVelocity.equals(neutral)) {
+      this.goalVelocity = neutral;
+      if (getVelocity().gt(neutral.plus(COAST_TOLERANCE))) {
+        setCoast();
+      } else {
+        super.setVelocity(goalVelocity);
+      }
     } else {
       super.setVelocity(goalVelocity);
     }
