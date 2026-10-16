@@ -6,7 +6,7 @@ import lombok.experimental.Delegate;
 public enum PowerManagerState {
   DEFAULT(
       LimitConfig.builder()
-          .flywheel(40)
+          .flywheel(20)
           .groundRollers(40)
           .groundPivot(25)
           .hood(25)
@@ -14,7 +14,7 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(27)
+          .drivetrain(35)
           .drivetrainSteer(10)
           .build()),
 
@@ -28,12 +28,12 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(27)
+          .drivetrain(15)
           .drivetrainSteer(10)
           .build()),
 
   MANUAL(
-       LimitConfig.builder()
+      LimitConfig.builder()
           .flywheel(50)
           .groundRollers(40)
           .groundPivot(25)
@@ -42,12 +42,12 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(27)
+          .drivetrain(35)
           .drivetrainSteer(10)
           .build()),
 
   SHUTTLING(
-       LimitConfig.builder()
+      LimitConfig.builder()
           .flywheel(40)
           .groundRollers(40)
           .groundPivot(25)
@@ -56,12 +56,12 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(27)
+          .drivetrain(35)
           .drivetrainSteer(10)
           .build()),
 
   SUPERCHARGED(
-       LimitConfig.builder()
+      LimitConfig.builder()
           .flywheel(20)
           .groundRollers(40)
           .groundPivot(25)
@@ -70,7 +70,7 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(27)
+          .drivetrain(35)
           .drivetrainSteer(10)
           .build());
 
