@@ -140,4 +140,8 @@ public class MotorSubsystem {
   public void resetPosition(Distance newPosition) {
     io.resetPosition(newPosition);
   }
+
+  public void setSupplyCurrentLimit(double amps) {
+    io.setSupplyCurrentLimit(amps);
+  }
 }

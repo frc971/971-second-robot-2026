@@ -423,6 +423,10 @@ public class ShooterHandler {
         || target == Targets.RIGHT_RED_SHUTTLE;
   }
 
+  public boolean isShuttleTarget() {
+    return isShuttle(targetState);
+  }
+
   public Distance currentDistance() {
     return Meters.of(targetState.minus(projectileState).xyPos().getNorm());
   }
