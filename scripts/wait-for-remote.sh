@@ -13,7 +13,18 @@ while true; do
   if ping -c 1 "$target" >/dev/null 2>&1; then
     # success: exit 0 so && chains
     echo "Remote found!"
-    exit 0
+    break
   fi
   sleep "$interval"
 done
+
+# Warn when data logging on the roboRIO will not persist across power cycles.
+issh_cmd="ssh -o ConnectTimeout=5 admin@$target"
+
+# 1. Almost out of disk space
+disk_usage=$($issh_cmd "df /home/lvuser | awk 'NR==2 {print \$5+0}'" 2>/dev/null || true)
+if [ -n "$disk_usage" ] && [ "$disk_usage" -ge 90 ]; then
+  echo "WARNING: roboRIO disk ${disk_usage}% full; logs will not be saved."
+fi
+
+exit 0
