@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.BLine.*;
 import frc.robot.lib.simulation.FuelSim;
 import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.HubShiftCountdown;
 import frc.robot.subsystems.HubShiftUtil;
 import frc.robot.subsystems.drive.Autos;
 import frc.robot.subsystems.drive.Drive;
@@ -33,6 +34,8 @@ public class Robot extends LoggedRobot {
   private final BOS bos;
 
   private final Autos autos;
+
+  private final HubShiftCountdown hubShiftCountdown = new HubShiftCountdown();
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -96,6 +99,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("HubShift/RemainingTime", Math.round(info.remainingTime()));
     Logger.recordOutput("HubShift/UntilHubFlip", Math.round(info.timeUntilHubStateChange()));
     Logger.recordOutput("HubShift/CurrentShift", info.currentShift().toString());
+    hubShiftCountdown.update();
   }
 
   @Override
