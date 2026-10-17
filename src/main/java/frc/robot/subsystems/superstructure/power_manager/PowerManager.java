@@ -2,6 +2,7 @@ package frc.robot.subsystems.superstructure.power_manager;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.B2;
 import frc.robot.subsystems.superstructure.FlywheelLeft;
 import frc.robot.subsystems.superstructure.FlywheelRight;
@@ -83,7 +84,9 @@ public class PowerManager {
   public void periodic() {
     Logger.recordOutput("PowerManager/ApplyDurationMs", lastApplyDurationMs);
 
-    if (superstructure.getMode() == Superstructure.Mode.MANUAL) {
+    if (Controllers.SUPERCHARGED.getAsBoolean()) {
+      state = PowerManagerState.SUPERCHARGED;
+    } else if (superstructure.getMode() == Superstructure.Mode.MANUAL) {
       state = PowerManagerState.MANUAL;
     } else if (superstructure.isWantsShot()
         && (shooterHandlerLeft.getShooterGoal() == ShooterHandler.ShooterGoal.ACTIVE
