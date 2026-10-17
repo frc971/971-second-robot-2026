@@ -4,16 +4,21 @@ import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 
-/** Publishes countdown signals for the Driver Station computer to use when playing the audio clip. */
+/**
+ * Publishes countdown signals for the Driver Station computer to use when playing the audio clip.
+ */
 public class HubShiftCountdown {
   // The clip contains a full ten-second countdown, so it starts ten seconds before each shift.
   private static final int COUNTDOWN_SECONDS = 10;
 
   // Teleop time remaining when each clip should start. The values correspond to total match elapsed
   // times 20, 45, 70, 95, and 120 seconds, each ten seconds before a shift boundary.
-  private static final double[] COUNTDOWN_STARTS_TELEOP_REMAINING = {140.0, 115.0, 90.0, 65.0, 40.0};
+  private static final double[] COUNTDOWN_STARTS_TELEOP_REMAINING = {
+    140.0, 115.0, 90.0, 65.0, 40.0
+  };
 
-  // This topic is the link between the robot code and the Driver Station computer's Python listener.
+  // This topic is the link between the robot code and the Driver Station computer's Python
+  // listener.
   // The robot publishes the countdown number; the computer listens and plays the WAV at 10.
   private final IntegerPublisher countdownPublisher =
       NetworkTableInstance.getDefault()
