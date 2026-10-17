@@ -13,8 +13,9 @@ import frc.robot.lib.shooter.ShooterConfigs;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.superstructure.ShooterHandler.ShooterState;
+import frc.robot.subsystems.superstructure.power_manager.PowerManager;
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Central place to instantiate and hold references to robot mechanism subsystems. This prevents
@@ -46,13 +47,15 @@ public class Superstructure {
   public final TurretLeft turretLeft;
 
   public final Visualization visualization;
-  @AutoLogOutput private Mode mode = Mode.NONE;
+  public final PowerManager powerManager;
+  @AutoLogOutput @Getter private Mode mode = Mode.NONE;
+  @AutoLogOutput @Getter private boolean wantsShot = false;
 
   private final Timer juiceTimer = new Timer();
   private boolean juiceAuto = false;
 
   // Targeting hub/shuttle targets or using manual setpoints
-  private enum Mode {
+  public enum Mode {
     NONE,
     MANUAL,
     TARGETING
@@ -91,11 +94,30 @@ public class Superstructure {
             ShooterHandler.Side.LEFT);
 
     visualization = new Visualization(turretLeft, turretRight, hoodLeft, hoodRight, groundPivot);
+    powerManager =
+        new PowerManager(
+            drivetrain,
+            flywheelLeft,
+            flywheelRight,
+            groundRollers,
+            groundPivot,
+            hoodLeft,
+            hoodRight,
+            kicker,
+            rollerFloor,
+            b2,
+            turretLeft,
+            turretRight,
+            shooterHandlerLeft,
+            shooterHandlerRight,
+            this);
 
     setGoal(SetpointGoal.NEUTRAL);
   }
 
   public void periodic() {
+    wantsShot = false;
+
     // MARK: Teleop Logic
     if (DriverStation.isTeleop()) {
       if (!juiceTimer.isRunning()) {
@@ -103,13 +125,11 @@ public class Superstructure {
       }
       setGoal(SetpointGoal.NEUTRAL);
 
-      boolean wantsShot =
+      wantsShot =
           Controllers.LEFT_SHUTTLE.getAsBoolean()
               || Controllers.RIGHT_SHUTTLE.getAsBoolean()
               || Controllers.SHOOT.getAsBoolean()
               || Controllers.SHOOT_REDUNDANCY.getAsBoolean();
-
-      Logger.recordOutput("Superstructure/wantsShot", wantsShot);
 
       // switch MANUAL, TUNING, TARGETING (currently don't deal with NONE)
       if (Controllers.MANUAL.toggled()) {
@@ -191,7 +211,7 @@ public class Superstructure {
 
       if (Controllers.INTAKE_ROLLERS.getAsBoolean()) {
         setGoal(SetpointGoal.INTAKE_ROLLERS);
-        groundPivot.setFeedforward(Volts.of(-0.4));
+        groundPivot.setFeedforward(Volts.of(-0.6));
       } else {
         groundPivot.setFeedforward(Volts.of(0.0));
       }
@@ -238,6 +258,7 @@ public class Superstructure {
       }
 
     } else if (DriverStation.isAutonomousEnabled()) { // MARK: Autonomous Logic
+      wantsShot = false;
       if (!juiceTimer.isRunning()) {
         juiceTimer.restart();
       }
@@ -297,6 +318,8 @@ public class Superstructure {
     groundRollers.periodic();
 
     visualization.periodic();
+
+    powerManager.periodic();
   }
 
   // MARK: Helper functions
