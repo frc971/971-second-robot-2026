@@ -3,6 +3,8 @@ package frc.robot.subsystems.superstructure.power_manager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Controllers;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.B2;
 import frc.robot.subsystems.superstructure.FlywheelLeft;
 import frc.robot.subsystems.superstructure.FlywheelRight;
@@ -84,7 +86,11 @@ public class PowerManager {
   public void periodic() {
     Logger.recordOutput("PowerManager/ApplyDurationMs", lastApplyDurationMs);
 
-    if (DriverStation.isAutonomousEnabled()) {
+    Drive.MAX_SPEED_METERS_PER_SECOND = Controllers.SUPERCHARGED.getAsBoolean() ? 4.5 : 3.5;
+
+    if (Controllers.SUPERCHARGED.getAsBoolean()) {
+      state = PowerManagerState.SUPERCHARGED;
+    } else if (DriverStation.isAutonomousEnabled()) {
       state = PowerManagerState.AUTONOMOUS;
     } else if (superstructure.getMode() == Superstructure.Mode.MANUAL) {
       state = PowerManagerState.MANUAL;

@@ -99,8 +99,8 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(35)
-          .drivetrainSteer(10)
+          .drivetrain(45)
+          .drivetrainSteer(20)
           .build());
 
   @Delegate private final LimitConfig limits;
