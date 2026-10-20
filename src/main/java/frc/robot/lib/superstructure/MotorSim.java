@@ -2,6 +2,7 @@ package frc.robot.lib.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.StatusCode;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -16,6 +17,8 @@ public class MotorSim extends MotorIO {
   private TrapezoidProfile.State state;
   private TrapezoidProfile.State goal;
 
+  private MotorConfig config;
+
   public MotorSim(MotorConfig config) {
     super(config);
 
@@ -26,6 +29,8 @@ public class MotorSim extends MotorIO {
                 config.TALONFX_CONFIG().MotionMagic.MotionMagicAcceleration));
     state = new TrapezoidProfile.State(0, 0);
     goal = new TrapezoidProfile.State(0, 0);
+
+    this.config = config;
   }
 
   @Override
@@ -86,5 +91,16 @@ public class MotorSim extends MotorIO {
   @Override
   public void setCoast() {
     setVelocity(RotationsPerSecond.zero());
+  }
+
+  @Override
+  public StatusCode setSupplyCurrentLimit(double amps) {
+    config.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit = amps;
+    return StatusCode.OK;
+  }
+
+  @Override
+  public double getSupplyCurrentLimit() {
+    return config.TALONFX_CONFIG().CurrentLimits.SupplyCurrentLimit;
   }
 }
