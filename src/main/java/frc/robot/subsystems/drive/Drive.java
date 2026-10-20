@@ -12,7 +12,7 @@ import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Drive {
-  public static final double MAX_SPEED_METERS_PER_SECOND = 3.5;
+  public static final double MAX_SPEED_METERS_PER_SECOND = 4;
 
   private final CommandSwerveDrivetrain drivetrain;
   private final Telemetry telemetry = new Telemetry(MAX_SPEED_METERS_PER_SECOND);
