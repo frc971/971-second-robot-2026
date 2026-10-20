@@ -4,6 +4,35 @@ import lombok.Builder;
 import lombok.experimental.Delegate;
 
 public enum PowerManagerState {
+  /*
+     CURRENT LIMITS AT CHEZY:
+      LimitConfig.builder()
+          .flywheel(40)
+          .groundRollers(40)
+          .groundPivot(25)
+          .hood(25)
+          .kicker(30)
+          .rollerFloor(30)
+          .b2(25)
+          .turret(30)
+          .drivetrain(27)
+          .drivetrainSteer(10)
+          .build()),
+  */
+
+  AUTONOMOUS(
+      LimitConfig.builder()
+          .flywheel(40)
+          .groundRollers(40)
+          .groundPivot(25)
+          .hood(25)
+          .kicker(30)
+          .rollerFloor(30)
+          .b2(25)
+          .turret(30)
+          .drivetrain(27)
+          .drivetrainSteer(10)
+          .build()),
   DEFAULT(
       LimitConfig.builder()
           .flywheel(20)

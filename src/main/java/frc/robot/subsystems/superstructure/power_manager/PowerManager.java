@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.power_manager;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
@@ -86,6 +87,8 @@ public class PowerManager {
 
     if (Controllers.SUPERCHARGED.getAsBoolean()) {
       state = PowerManagerState.SUPERCHARGED;
+    } else if (DriverStation.isAutonomousEnabled()) {
+      state = PowerManagerState.AUTONOMOUS;
     } else if (superstructure.getMode() == Superstructure.Mode.MANUAL) {
       state = PowerManagerState.MANUAL;
     } else if (superstructure.isWantsShot()
