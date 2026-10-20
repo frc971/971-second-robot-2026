@@ -99,7 +99,7 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(50)
+          .drivetrain(45)
           .drivetrainSteer(20)
           .build());
 

@@ -130,7 +130,7 @@ public class Manual {
               Controllers.DRIVER.getRightX())
           .exponentialCurve(TRANSLATION_EXP_CURVE, ROTATION_EXP_CURVE)
           .scale(
-              -MAX_SPEED, // Negative max speed and angular rate since
+              -Drive.MAX_SPEED_METERS_PER_SECOND, // Negative max speed and angular rate since
               -MAX_ANGULAR_RATE) // controller inputs are reversed
           .slewRateLimit(X_LIMITER, Y_LIMITER, ROT_LIMITER);
     }
