@@ -7,19 +7,16 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.Path;
 import frc.robot.lib.pathing.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 public class DynamicSegmentPOC extends DynamicSegment {
-  private static int counter = 0;
+
+  private final double MAX_SPEED = 3.5;
 
   private NetworkTableInstance instance = NetworkTableInstance.getDefault();
   private NetworkTable table = instance.getTable("DriveState");
@@ -33,8 +30,48 @@ public class DynamicSegmentPOC extends DynamicSegment {
     this.drivetrain = drivetrain;
   }
 
+  private double area(Pose2d a, Pose2d b, Pose2d c) {
+    return (0.5 * Math.abs(
+        (a.getX() * (b.getY() - c.getY())) + (b.getX() * (c.getY() - a.getY())) + (c.getX() * (a.getY() - b.getY()))));
+  }
+
+  private Pair<List<Path.PathElement>, List<Path.RangedConstraint>> removeRedundantPoints(List<Pose2d> path) {
+    // uses menger curvature to figure out which points are actually important, so
+    // pid doesn't have to navigate redundant points
+    List<Path.PathElement> needed = new ArrayList<>();
+    needed.add(new Path.TranslationTarget(new Translation2d(path.get(0).getX(), path.get(0).getY())));
+    List<Path.RangedConstraint> speeds = new ArrayList<>();
+    for (int i = 1; i < path.size() - 1; i++) {
+      Pose2d a = path.get(i - 1);
+      Pose2d b = path.get(i);
+      Pose2d c = path.get(i + 1);
+
+      double sideAB = Math.hypot(a.getX() - b.getX(), a.getY() - b.getY());
+      double sideBC = Math.hypot(b.getX() - c.getX(), b.getY() - c.getY());
+      double sideCA = Math.hypot(c.getX() - a.getX(), c.getY() - a.getY());
+      double curvature;
+
+      if (sideAB == 0 || sideBC == 0 || sideCA == 0) {
+        curvature = 0.0;
+        continue;
+      }
+      curvature = (4 * area(a, b, c)) / (sideAB * sideBC * sideCA);
+      if (curvature >= 0.0000001) {
+        speeds.add(new Path.RangedConstraint(MAX_SPEED * 0.7, needed.size(), needed.size()));
+      } else {
+        speeds.add(new Path.RangedConstraint(MAX_SPEED, needed.size(), needed.size()));
+      }
+      needed.add(new Path.TranslationTarget(new Translation2d(b.getX(), b.getY())));
+
+    }
+
+    needed.add(new Path.TranslationTarget(
+        new Translation2d(path.get(path.size() - 1).getX(), path.get(path.size() - 1).getY())));
+
+    return new Pair<>(needed, speeds);
+  }
+
   public Path getDynamicPath() {
-    counter++;
 
     // TODO: flipping flips the navgrid s the coorinates become weird for pathing
     NavGrid navGrid = Pathfinding.GetGrid(
@@ -47,23 +84,27 @@ public class DynamicSegmentPOC extends DynamicSegment {
         new Point((int) Math.round(destination.getX() / nodeSize),
             (int) Math.round(destination.getY() / nodeSize)));
     List<Pose2d> points = new ArrayList<>();
-    int count = 0;
     for (Node node : path) {
-      if (count % 2 == 0) {
-        points.add(new Pose2d(node.x * nodeSize, node.y * nodeSize, Rotation2d.kZero));
-
-      }
-      count++;
+      points.add(new Pose2d(node.x * nodeSize, node.y * nodeSize, Rotation2d.kZero));
     }
 
-    System.out.println("Computing path to destination (" + counter + ", " + counter + ")");
+    Pair<List<Path.PathElement>, List<Path.RangedConstraint>> returned = removeRedundantPoints(points);
+    List<Path.PathElement> elements = returned.first;
+    List<Path.RangedConstraint> speeds = returned.second;
 
-    List<Path.PathElement> elements = new ArrayList<>();
-    for (Pose2d point : points) {
-      Translation2d p = new Translation2d(point.getX(), point.getY());
-      elements.add(new Path.Waypoint(p, Rotation2d.k180deg));
+    List<Node> forPrinting = new ArrayList<>();
+    for (Path.PathElement element : elements) {
+      Node node = new Node();
+      Path.TranslationTarget translationTarget = (Path.TranslationTarget) (element);
+      node.x = (int) Math.round(translationTarget.translation().getX() / nodeSize);
+      node.y = (int) Math.round(translationTarget.translation().getY() / nodeSize);
+      forPrinting.add(node);
     }
-    return new Path(elements, new Path.PathConstraints().setMaxVelocityMetersPerSec(3));
+
+    Pathfinding.printField(navGrid.grid, forPrinting);
+
+    return new Path(elements,
+        new Path.PathConstraints().setMaxVelocityMetersPerSec(speeds.toArray(new Path.RangedConstraint[0])));
   }
 
   public Path copy() {

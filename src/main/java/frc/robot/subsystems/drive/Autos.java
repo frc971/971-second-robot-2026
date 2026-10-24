@@ -78,12 +78,12 @@ public class Autos {
   private FollowPath.Builder newBaseBuilder(CommandSwerveDrivetrain drivetrain) {
     return new FollowPath.Builder(
         drivetrain,
-                () -> drivetrain.getState().Pose,
+        () -> drivetrain.getState().Pose,
         () -> drivetrain.getState().Speeds,
-            speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(speeds)),
+        speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(speeds)),
         new PIDController(5.0, 0.0, 0.0),
         new PIDController(3.0, 0.0, 0.0),
-        new PIDController(2.0, 0.0, 0.0));
+        new PIDController(0.0, 0., 0.1));
   }
 
   private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
@@ -180,12 +180,11 @@ public class Autos {
         IntStream.range(0, cachedPathSegments.size())
             .mapToObj(
                 i -> {
-                  FollowPath.Builder builder =
-                      i == 0
-                          ? pathBuilderWithStartPoseReset
-                          : cachedPathSegments.get(i) instanceof DynamicSegment
-                              ? pathBuilderDynamic
-                              : pathBuilderContinuation;
+                  FollowPath.Builder builder = i == 0
+                      ? pathBuilderWithStartPoseReset
+                      : cachedPathSegments.get(i) instanceof DynamicSegment
+                          ? pathBuilderDynamic
+                          : pathBuilderContinuation;
                   return cachedPathSegments.get(i).getCommand(builder);
                 })
             .toArray(Command[]::new));
@@ -199,9 +198,9 @@ public class Autos {
   // H_ = HUB, shooting fuel
   // D_ = Depot
   public static final List<AutoRoutine> AUTO_ROUTINES = List.of( // Madtown Depot
-          new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
+      new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
       new AutoRoutine(
-              false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
+          false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
       new AutoRoutine(
           false, "Short Niko", List.of("S_Short", "H_Normal", "F_Short", "D_Normal")),
       new AutoRoutine(
@@ -210,9 +209,9 @@ public class Autos {
           List.of("S_Short", "H_Normal", "F_Short_Tamed", "D_Normal")),
 
       // Madtown No Depot
-          new AutoRoutine(
+      new AutoRoutine(
           true, "James", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
-          new AutoRoutine(
+      new AutoRoutine(
           true,
           "Tamed James",
           List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal_Tamed")),
@@ -224,15 +223,15 @@ public class Autos {
           List.of("S_Short", "H_Normal", "F_Short_Tamed", "H_Normal")),
 
       // Supersteal
-          new AutoRoutine(
+      new AutoRoutine(
           false,
-              "SuperSteal Depot",
+          "SuperSteal Depot",
           List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
       new AutoRoutine(
           true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
 
       // Middle Depot
-          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")),
+      new AutoRoutine(false, "BUM", List.of("MiddleDepot2")),
 
       // Dynamic POC
       new AutoRoutine(

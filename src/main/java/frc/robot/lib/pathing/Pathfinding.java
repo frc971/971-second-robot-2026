@@ -351,12 +351,18 @@ public class Pathfinding {
     // System.out.print("(" + node.x + "," + node.y + ") ");
     // }
     // System.out.println();
+    printField(field, rpath);
+
+    return rpath;
+  }
+
+  public static void printField(List<List<Node>> field, List<Node> points) {
     String master = "";
     for (List<Node> row : field.reversed()) {
       for (Node node : row) {
         if (node.obstacle) {
           master += "#";
-        } else if (rpath.contains(node)) {
+        } else if (points.contains(node)) {
           master += "0";
         } else {
           master += " ";
@@ -365,7 +371,5 @@ public class Pathfinding {
       master += "\n";
     }
     System.out.println(master);
-
-    return rpath;
   }
 }
