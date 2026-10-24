@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -16,6 +17,8 @@ public class Drive {
 
   private final CommandSwerveDrivetrain drivetrain;
   private final Telemetry telemetry = new Telemetry(MAX_SPEED_METERS_PER_SECOND);
+  private final DrivePosePublisher posePublisher =
+      new DrivePosePublisher(NetworkTableInstance.getDefault());
 
   private final Manual manual;
   private final ThetaLock thetaLock;
@@ -75,6 +78,7 @@ public class Drive {
     autoAlign.periodic();
 
     drivetrain.periodic();
+    posePublisher.publish(drivetrain.getState().Pose);
   }
 
   private void updateMode() {
