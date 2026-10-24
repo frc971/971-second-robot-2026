@@ -151,8 +151,7 @@ public class Splines {
       List<List<Node>> grid,
       Point start_point,
       Point target_point,
-      double nodeSizeMeters,
-      int samples) {
+      double nodeSizeMeters) {
 
     List<List<Node>> gridCopy = grid;
     List<Node> path = Pathfinding.BFS(gridCopy, start_point, target_point);
@@ -183,6 +182,7 @@ public class Splines {
     }
 
     knots = KnotVector(numControls, p);
+    int samples = numControls / 5;
 
     for (int t = 0; t <= samples; t += 1) {
       double t_real = t / (double) samples;
