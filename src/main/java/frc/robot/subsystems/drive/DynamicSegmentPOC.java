@@ -73,7 +73,7 @@ public class DynamicSegmentPOC extends DynamicSegment {
       }
       curvature = (4 * area(a, b, c)) / (sideAB * sideBC * sideCA);
       if (curvature >= 0.0000001) {
-        speeds.add(new Path.RangedConstraint(MAX_SPEED * 0.7, needed.size(), needed.size()));
+        speeds.add(new Path.RangedConstraint(MAX_SPEED * 0.3, needed.size(), needed.size()));
       } else {
         speeds.add(new Path.RangedConstraint(MAX_SPEED, needed.size(), needed.size()));
       }
