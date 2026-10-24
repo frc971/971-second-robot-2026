@@ -16,8 +16,6 @@ import java.util.List;
 
 public class DynamicSegmentPOC extends DynamicSegment {
 
-  private final double MAX_SPEED = 4.5;
-
   private NetworkTableInstance instance = NetworkTableInstance.getDefault();
   private NetworkTable table = instance.getTable("DriveState");
   private double blank = -1;
@@ -30,73 +28,6 @@ public class DynamicSegmentPOC extends DynamicSegment {
 
   public DynamicSegmentPOC(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
-  }
-
-  private double area(Pose2d a, Pose2d b, Pose2d c) {
-    return (0.5
-        * Math.abs(
-            (a.getX() * (b.getY() - c.getY()))
-                + (b.getX() * (c.getY() - a.getY()))
-                + (c.getX() * (a.getY() - b.getY()))));
-  }
-
-  private Pair<List<Path.PathElement>, List<Path.RangedConstraint>> removeRedundantPoints(
-      List<Pose2d> path) {
-    // uses menger curvature to figure out which points are actually important, so
-    // pid doesn't have to navigate redundant points
-    List<Path.PathElement> needed = new ArrayList<>();
-    Pose2d first = path.get(0);
-    Pose2d second = path.get(1);
-    // Makes the intake point in the direction where the robot is going.
-    needed.add(
-        new Path.Waypoint(
-            new Pose2d(
-                first.getX(),
-                first.getY(),
-                new Rotation2d(
-                    Math.atan2(second.getY() - first.getY(), second.getX() - first.getX())
-                        + Math.PI))));
-    List<Path.RangedConstraint> speeds = new ArrayList<>();
-    for (int i = 1; i < path.size() - 1; i++) {
-      Pose2d a = path.get(i - 1);
-      Pose2d b = path.get(i);
-      Pose2d c = path.get(i + 1);
-
-      double sideAB = Math.hypot(a.getX() - b.getX(), a.getY() - b.getY());
-      double sideBC = Math.hypot(b.getX() - c.getX(), b.getY() - c.getY());
-      double sideCA = Math.hypot(c.getX() - a.getX(), c.getY() - a.getY());
-      double curvature;
-
-      if (sideAB == 0 || sideBC == 0 || sideCA == 0) {
-        curvature = 0.0;
-        continue;
-      }
-      curvature = (4 * area(a, b, c)) / (sideAB * sideBC * sideCA);
-      if (curvature >= 0.0000001) {
-        speeds.add(new Path.RangedConstraint(MAX_SPEED * 0.3, needed.size(), needed.size()));
-      } else {
-        speeds.add(new Path.RangedConstraint(MAX_SPEED, needed.size(), needed.size()));
-      }
-      needed.add(
-          new Path.Waypoint(
-              new Pose2d(
-                  b.getX(),
-                  b.getY(),
-                  new Rotation2d(Math.atan2(c.getY() - b.getY(), c.getX() - b.getX()) + Math.PI))));
-    }
-
-    Pose2d secondLast = path.get(path.size() - 2);
-    Pose2d last = path.get(path.size() - 1);
-    needed.add(
-        new Path.Waypoint(
-            new Pose2d(
-                last.getX(),
-                last.getY(),
-                new Rotation2d(
-                    Math.atan2(last.getY() - secondLast.getY(), last.getX() - secondLast.getX())
-                        + Math.PI))));
-
-    return new Pair<>(needed, speeds);
   }
 
   public Path getDynamicPath() {
@@ -124,7 +55,7 @@ public class DynamicSegmentPOC extends DynamicSegment {
     }
 
     Pair<List<Path.PathElement>, List<Path.RangedConstraint>> returned =
-        removeRedundantPoints(points);
+        removeRedundantPoints(points, null);
     List<Path.PathElement> elements = returned.first;
     List<Path.RangedConstraint> speeds = returned.second;
 
