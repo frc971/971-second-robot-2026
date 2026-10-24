@@ -148,10 +148,7 @@ public class Splines {
   // and has no equivalent here; replaced with System.out.println as the closest
   // literal placeholder.
   public static SplineResult CreateSpline(
-      List<List<Node>> grid,
-      Point start_point,
-      Point target_point,
-      double nodeSizeMeters) {
+      List<List<Node>> grid, Point start_point, Point target_point, double nodeSizeMeters) {
 
     List<List<Node>> gridCopy = grid;
     List<Node> path = Pathfinding.BFS(gridCopy, start_point, target_point);

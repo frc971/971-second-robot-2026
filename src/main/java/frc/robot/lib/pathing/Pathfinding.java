@@ -119,7 +119,7 @@ public class Pathfinding {
     ArrayDeque<Point> queue = new ArrayDeque<>();
     queue.addLast(start_point);
 
-    int[][] dirs = { { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, -1 }, { 0, 1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
+    int[][] dirs = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
 
     while (!queue.isEmpty()) {
       final Point current_point = queue.pollFirst();
@@ -273,7 +273,7 @@ public class Pathfinding {
 
     boolean path_completed = false;
 
-    int[][] dirs = { { -1, 0 }, { 0, -1 }, { 0, 1 }, { 1, 0 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } };
+    int[][] dirs = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
     while (!path_completed && !queue.isEmpty()) {
       final Point current_point = queue.peekFirst();

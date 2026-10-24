@@ -20,7 +20,7 @@ public class Autos {
 
   /**
    * @param displayLabel what driverstation displays as the auto's name
-   * @param pathNames    what paths (in order) make up the auto
+   * @param pathNames what paths (in order) make up the auto
    */
   public record AutoRoutine(boolean canMirror, String displayLabel, List<String> pathNames) {
     public AutoRoutine {
@@ -43,10 +43,10 @@ public class Autos {
     }
   }
 
-  private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
+  private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds =
+      new SwerveRequest.ApplyRobotSpeeds();
 
-  @Getter
-  private final SendableChooser<AutoPathOption> chooser = new SendableChooser<>();
+  @Getter private final SendableChooser<AutoPathOption> chooser = new SendableChooser<>();
 
   private final FollowPath.Builder pathBuilderWithStartPoseReset;
   private final FollowPath.Builder pathBuilderContinuation;
@@ -163,8 +163,7 @@ public class Autos {
 
     // extract start pose
     Path startPath = cachedPathSegments.get(0).copy();
-    if (selected.mirrored)
-      startPath.mirror();
+    if (selected.mirrored) startPath.mirror();
     cachedAutonomousStartPose = startPath.getStartPose();
 
     // flip back boolean flag: caching process finished
@@ -180,11 +179,12 @@ public class Autos {
         IntStream.range(0, cachedPathSegments.size())
             .mapToObj(
                 i -> {
-                  FollowPath.Builder builder = i == 0
-                      ? pathBuilderWithStartPoseReset
-                      : cachedPathSegments.get(i) instanceof DynamicSegment
-                          ? pathBuilderDynamic
-                          : pathBuilderContinuation;
+                  FollowPath.Builder builder =
+                      i == 0
+                          ? pathBuilderWithStartPoseReset
+                          : cachedPathSegments.get(i) instanceof DynamicSegment
+                              ? pathBuilderDynamic
+                              : pathBuilderContinuation;
                   return cachedPathSegments.get(i).getCommand(builder);
                 })
             .toArray(Command[]::new));
@@ -197,43 +197,43 @@ public class Autos {
   // F_ = FUEL, sweep and intaking
   // H_ = HUB, shooting fuel
   // D_ = Depot
-  public static final List<AutoRoutine> AUTO_ROUTINES = List.of( // Madtown Depot
-      new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
-      new AutoRoutine(
-          false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
-      new AutoRoutine(
-          false, "Short Niko", List.of("S_Short", "H_Normal", "F_Short", "D_Normal")),
-      new AutoRoutine(
-          false,
-          "Short Tamed Niko",
-          List.of("S_Short", "H_Normal", "F_Short_Tamed", "D_Normal")),
+  public static final List<AutoRoutine> AUTO_ROUTINES =
+      List.of( // Madtown Depot
+          new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
+          new AutoRoutine(
+              false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
+          new AutoRoutine(
+              false, "Short Niko", List.of("S_Short", "H_Normal", "F_Short", "D_Normal")),
+          new AutoRoutine(
+              false,
+              "Short Tamed Niko",
+              List.of("S_Short", "H_Normal", "F_Short_Tamed", "D_Normal")),
 
-      // Madtown No Depot
-      new AutoRoutine(
-          true, "James", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
-      new AutoRoutine(
-          true,
-          "Tamed James",
-          List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal_Tamed")),
-      new AutoRoutine(
-          true, "Short James", List.of("S_Short", "H_Normal", "F_Short", "H_Normal")),
-      new AutoRoutine(
-          true,
-          "Short Tamed James",
-          List.of("S_Short", "H_Normal", "F_Short_Tamed", "H_Normal")),
+          // Madtown No Depot
+          new AutoRoutine(
+              true, "James", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
+          new AutoRoutine(
+              true,
+              "Tamed James",
+              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal_Tamed")),
+          new AutoRoutine(
+              true, "Short James", List.of("S_Short", "H_Normal", "F_Short", "H_Normal")),
+          new AutoRoutine(
+              true,
+              "Short Tamed James",
+              List.of("S_Short", "H_Normal", "F_Short_Tamed", "H_Normal")),
 
-      // Supersteal
-      new AutoRoutine(
-          false,
-          "SuperSteal Depot",
-          List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
-      new AutoRoutine(
-          true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
+          // Supersteal
+          new AutoRoutine(
+              false,
+              "SuperSteal Depot",
+              List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
+          new AutoRoutine(
+              true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
 
-      // Middle Depot
-      new AutoRoutine(false, "BUM", List.of("MiddleDepot2")),
+          // Middle Depot
+          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")),
 
-      // Dynamic POC
-      new AutoRoutine(
-          false, "Dynamic", List.of("H_Normal", "dynamic:poc")));
+          // Dynamic POC
+          new AutoRoutine(false, "Dynamic", List.of("H_Normal", "dynamic:poc")));
 }
