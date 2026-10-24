@@ -257,6 +257,21 @@ public class Pathfinding {
       sx = adjusted.x;
       sy = adjusted.y;
     }
+    int ex = end_point.x;
+    int ey = end_point.y;
+    if (field.get(ey).get(ex).obstacle) {
+      Node adjusted = BFSFirstFreeCell(field, end_point);
+      ex = adjusted.x;
+      ey = adjusted.y;
+    }
+
+    // BFSFirstFreeCell marks every cell it explores as visited, including the free cell it
+    // returns, which would stop the main search from ever entering the snapped start/end cells
+    for (List<Node> row : field) {
+      for (Node node : row) {
+        node.visited = false;
+      }
+    }
 
     Node start = field.get(sy).get(sx);
     start_point.x = sx;
@@ -268,8 +283,8 @@ public class Pathfinding {
     queue.addLast(start_point);
 
     Node end = new Node();
-    end.x = end_point.x;
-    end.y = end_point.y;
+    end.x = ex;
+    end.y = ey;
 
     boolean path_completed = false;
 
