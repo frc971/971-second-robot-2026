@@ -150,6 +150,10 @@ public class Autos {
       // Dynamic paths will always start with "dynamic:"
       if (pathName.equals("dynamic:poc")) {
         cachedPathSegments.add(new DynamicSegmentPOC(this.drivetrain));
+      } else if (pathName.equals("dynamic:hub")) {
+        cachedPathSegments.add(new DynamicSegmentHub(this.drivetrain, selected.mirrored));
+      } else if (pathName.equals("dynamic:collect")) {
+        cachedPathSegments.add(new DynamicSegmentCollect(this.drivetrain));
       } else {
         cachedPathSegments.add(new StaticSegment(new Path(pathName)));
       }
@@ -235,5 +239,9 @@ public class Autos {
           new AutoRoutine(false, "BUM", List.of("MiddleDepot2")),
 
           // Dynamic POC
-          new AutoRoutine(false, "Dynamic", List.of("H_Normal", "dynamic:poc")));
+          new AutoRoutine(
+              true,
+              "Dynamic real",
+              List.of("S_Normal", "H_Normal", "dynamic:collect", "dynamic:hub", "H_Normal")),
+          new AutoRoutine(true, "Dynamic poc", List.of("S_Normal", "H_Normal", "dynamic:collect")));
 }
