@@ -46,10 +46,9 @@ public enum PowerManagerState {
           .drivetrain(35)
           .drivetrainSteer(10)
           .build()),
-
   SHOOTING(
       LimitConfig.builder()
-          .flywheel(45)
+          .flywheel(40)
           .groundRollers(40)
           .groundPivot(25)
           .hood(25)
@@ -60,10 +59,9 @@ public enum PowerManagerState {
           .drivetrain(15)
           .drivetrainSteer(10)
           .build()),
-
   MANUAL(
       LimitConfig.builder()
-          .flywheel(50)
+          .flywheel(40)
           .groundRollers(35)
           .groundPivot(25)
           .hood(25)
@@ -77,7 +75,7 @@ public enum PowerManagerState {
 
   SHUTTLING(
       LimitConfig.builder()
-          .flywheel(40)
+          .flywheel(32)
           .groundRollers(40)
           .groundPivot(25)
           .hood(25)
