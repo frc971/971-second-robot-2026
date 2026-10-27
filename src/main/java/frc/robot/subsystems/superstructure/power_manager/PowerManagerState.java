@@ -43,7 +43,7 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(35)
+          .drivetrain(27)
           .drivetrainSteer(10)
           .build()),
   SHOOTING(
@@ -69,13 +69,12 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(35)
+          .drivetrain(27)
           .drivetrainSteer(10)
           .build()),
-
   SHUTTLING(
       LimitConfig.builder()
-          .flywheel(32)
+          .flywheel(35)
           .groundRollers(40)
           .groundPivot(25)
           .hood(25)
@@ -83,21 +82,7 @@ public enum PowerManagerState {
           .rollerFloor(30)
           .b2(25)
           .turret(30)
-          .drivetrain(35)
-          .drivetrainSteer(10)
-          .build()),
-
-  SUPERCHARGED(
-      LimitConfig.builder()
-          .flywheel(20)
-          .groundRollers(40)
-          .groundPivot(25)
-          .hood(25)
-          .kicker(30)
-          .rollerFloor(30)
-          .b2(25)
-          .turret(30)
-          .drivetrain(35)
+          .drivetrain(27)
           .drivetrainSteer(10)
           .build());
 
