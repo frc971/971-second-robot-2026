@@ -141,12 +141,14 @@ class UnetTrenchClearanceTest {
                           demand[0] = new ChassisSpeeds(r.VelocityX, r.VelocityY, r.RotationalRate);
                         else demand[0] = new ChassisSpeeds();
                       },
+                      nt,
                       Commands::none,
                       drive::getActualPoseInSimulationWorld,
                       () ->
                           red
                               ? edu.wpi.first.wpilibj.DriverStation.Alliance.Red
-                              : edu.wpi.first.wpilibj.DriverStation.Alliance.Blue)
+                              : edu.wpi.first.wpilibj.DriverStation.Alliance.Blue,
+                      mirror)
                   .getCommand(builder);
         } else {
           command =

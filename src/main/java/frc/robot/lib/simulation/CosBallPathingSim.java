@@ -24,8 +24,8 @@ public class CosBallPathingSim implements AutoCloseable {
     controls = instance.getTable("Sim/COS");
     controls.getEntry("Enabled").setDefaultBoolean(true);
     controls.getEntry("Detected").setDefaultBoolean(true);
-    controls.getEntry("ClusterX").setDefaultDouble(6.2);
-    controls.getEntry("ClusterY").setDefaultDouble(6.8);
+    controls.getEntry("ClusterX").setDefaultDouble(FlippingUtil.fieldSizeX / 2);
+    controls.getEntry("ClusterY").setDefaultDouble(FlippingUtil.fieldSizeY / 2);
     publisher =
         instance
             .getTable("COS")
@@ -42,8 +42,9 @@ public class CosBallPathingSim implements AutoCloseable {
   private Translation2d target(int index) {
     Translation2d point =
         new Translation2d(
-            controls.getEntry("ClusterX").getDouble(6.2) + (index - 1) * 0.4,
-            controls.getEntry("ClusterY").getDouble(6.8));
+            controls.getEntry("ClusterX").getDouble(FlippingUtil.fieldSizeX / 2)
+                + (index - 1) * 0.4,
+            controls.getEntry("ClusterY").getDouble(FlippingUtil.fieldSizeY / 2));
     if (mirrored) point = new Translation2d(point.getX(), FlippingUtil.fieldSizeY - point.getY());
     return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
             == DriverStation.Alliance.Red

@@ -170,7 +170,8 @@ public class Autos {
                 selected.mirrored,
                 selected.routine.pathNames().contains("dynamic:unet")));
       } else if (pathName.equals("dynamic:unet")) {
-        cachedPathSegments.add(new UnetCollectSegment(this.drivetrain, intakeDownCommand));
+        cachedPathSegments.add(
+            new UnetCollectSegment(this.drivetrain, intakeDownCommand, selected.mirrored));
       } else if (pathName.equals("dynamic:collect")) {
         cachedPathSegments.add(new DynamicSegmentCollect(this.drivetrain));
       } else {

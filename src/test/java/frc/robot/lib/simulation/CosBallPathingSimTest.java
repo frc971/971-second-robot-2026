@@ -40,7 +40,7 @@ class CosBallPathingSimTest {
                 .subscribe(new double[0], PubSubOption.keepDuplicates(true))) {
       sim.reset(false);
       // Integrate the robot-relative goal to demonstrate traversal of the three target columns.
-      for (int i = 0; i < 150; i++) {
+      for (int i = 0; i < 300; i++) {
         sim.periodic();
         var goal = subscriber.get();
         var delta =
@@ -50,8 +50,8 @@ class CosBallPathingSimTest {
                 robot[0].getTranslation().plus(delta),
                 robot[0].getRotation().plus(new Rotation2d(goal[9] * 0.02)));
       }
-      assertTrue(robot[0].getX() > 6.2);
-      assertEquals(6.8, robot[0].getY(), 0.2);
+      assertTrue(robot[0].getX() > FlippingUtil.fieldSizeX / 2);
+      assertEquals(FlippingUtil.fieldSizeY / 2, robot[0].getY(), 0.2);
       nt.getTable("Sim/COS").getEntry("Detected").setBoolean(false);
       sim.periodic();
       assertEquals(0, subscriber.get()[5]);
@@ -65,7 +65,8 @@ class CosBallPathingSimTest {
       sim.periodic();
       var relative = new Translation2d(subscriber.get()[2], subscriber.get()[3]);
       var fieldTarget = robot[0].getTranslation().plus(relative.rotateBy(robot[0].getRotation()));
-      assertEquals(FlippingUtil.fieldSizeY - 6.8, fieldTarget.getY(), 1e-9);
+      assertEquals(FlippingUtil.fieldSizeY - FlippingUtil.fieldSizeY / 2, fieldTarget.getY(), 1e-9);
+      robot[0] = new Pose2d();
       DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
       DriverStationSim.notifyNewData();
       sim.reset(true);
@@ -73,7 +74,10 @@ class CosBallPathingSimTest {
       relative = new Translation2d(subscriber.get()[2], subscriber.get()[3]);
       fieldTarget = robot[0].getTranslation().plus(relative.rotateBy(robot[0].getRotation()));
       var expected =
-          FlippingUtil.flipFieldPosition(new Translation2d(5.8, FlippingUtil.fieldSizeY - 6.8));
+          FlippingUtil.flipFieldPosition(
+              new Translation2d(
+                  FlippingUtil.fieldSizeX / 2 - 0.4,
+                  FlippingUtil.fieldSizeY - FlippingUtil.fieldSizeY / 2));
       assertEquals(expected.getX(), fieldTarget.getX(), 1e-9);
       assertEquals(expected.getY(), fieldTarget.getY(), 1e-9);
     } finally {

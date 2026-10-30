@@ -8,6 +8,14 @@ record BallPathingGoal(
     double omegaRadiansPerSecond,
     double targetX,
     double targetY) {
+  static Optional<BallPathingGoal> fromTranslationNetworkTables(
+      double[] values, double maximumSpeed) {
+    if (values.length < 6) return Optional.empty();
+    var translation = java.util.Arrays.copyOf(values, 10);
+    translation[9] = 0; // UNet owns heading; COS only supplies robot-relative translation.
+    return fromNetworkTables(translation, maximumSpeed, 0);
+  }
+
   // COS fields used: [0:2] robot-relative vx/vy (m/s), [2:4] target x/y,
   // [5] valid flag, [9] yaw rate (rad/s). Require the yaw-capable 10-element format.
   static Optional<BallPathingGoal> fromNetworkTables(
