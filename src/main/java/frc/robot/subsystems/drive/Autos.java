@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 public class Autos {
 
@@ -76,6 +77,7 @@ public class Autos {
     pathBuilderDynamic = newBaseBuilder(drivetrain);
 
     SmartDashboard.putData("Auto Mode", chooser);
+    Logger.recordOutput("Auto/CurrentSegment", "Idle");
   }
 
   private FollowPath.Builder newBaseBuilder(CommandSwerveDrivetrain drivetrain) {
@@ -190,22 +192,31 @@ public class Autos {
 
   private Command buildCommandFromCachedSegments() {
     if (cachedPathSegments.isEmpty()) {
-      return Commands.none();
+      return Commands.runOnce(() -> Logger.recordOutput("Auto/CurrentSegment", "None"));
     }
 
+    List<String> pathNames = cachedSelectedAuto.routine.pathNames();
     return Commands.sequence(
-        IntStream.range(0, cachedPathSegments.size())
-            .mapToObj(
-                i -> {
-                  FollowPath.Builder builder =
-                      i == 0
-                          ? pathBuilderWithStartPoseReset
-                          : cachedPathSegments.get(i) instanceof DynamicSegment
-                              ? pathBuilderDynamic
-                              : pathBuilderContinuation;
-                  return cachedPathSegments.get(i).getCommand(builder);
-                })
-            .toArray(Command[]::new));
+            IntStream.range(0, cachedPathSegments.size())
+                .mapToObj(
+                    i -> {
+                      FollowPath.Builder builder =
+                          i == 0
+                              ? pathBuilderWithStartPoseReset
+                              : cachedPathSegments.get(i) instanceof DynamicSegment
+                                  ? pathBuilderDynamic
+                                  : pathBuilderContinuation;
+                      String label = (i + 1) + "/" + pathNames.size() + " " + pathNames.get(i);
+                      return cachedPathSegments
+                          .get(i)
+                          .getCommand(builder)
+                          .beforeStarting(() -> Logger.recordOutput("Auto/CurrentSegment", label));
+                    })
+                .toArray(Command[]::new))
+        .finallyDo(
+            interrupted ->
+                Logger.recordOutput(
+                    "Auto/CurrentSegment", interrupted ? "Interrupted" : "Finished"));
   }
 
   // IMPORTANT: all autos must be defined here
