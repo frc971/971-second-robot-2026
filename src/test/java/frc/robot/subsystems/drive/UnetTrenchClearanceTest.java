@@ -141,7 +141,6 @@ class UnetTrenchClearanceTest {
                           demand[0] = new ChassisSpeeds(r.VelocityX, r.VelocityY, r.RotationalRate);
                         else demand[0] = new ChassisSpeeds();
                       },
-                      nt,
                       Commands::none,
                       drive::getActualPoseInSimulationWorld,
                       () ->
@@ -185,11 +184,9 @@ class UnetTrenchClearanceTest {
         command.end(false);
         if (name.equals("F_UNet_Turn")) {
           var pose = drive.getActualPoseInSimulationWorld();
-          var inward = new Translation2d(8.27, 4.035).minus(pose.getTranslation());
-          var intake = new Translation2d(-1, 0).rotateBy(pose.getRotation());
           assertTrue(
-              intake.dot(inward) / inward.getNorm() > Math.cos(Math.toRadians(6)),
-              "Rear intake must face field center before COS starts");
+              (mirror ^ red ? -1 : 1) * pose.getRotation().getSin() > Math.cos(Math.toRadians(6)),
+              "Robot must face alliance-relative positive Y (negative Y when mirrored) before collection");
         }
       }
       System.out.printf(

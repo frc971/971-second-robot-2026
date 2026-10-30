@@ -70,11 +70,6 @@ public class Telemetry {
       driveStateTable.getIntegerTopic("SuccessfulDaqs").publish();
   private final IntegerPublisher driveFailedDaqs =
       driveStateTable.getIntegerTopic("FailedDaqs").publish();
-  private final DoublePublisher clusterPublisherX =
-      driveStateTable.getDoubleTopic("ClusterPositionsX").publish();
-  private final DoublePublisher clusterPublisherY =
-      driveStateTable.getDoubleTopic("ClusterPositionsY").publish();
-
   /* Robot pose for field positioning */
   private final NetworkTable table = inst.getTable("Pose");
   private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
@@ -134,9 +129,6 @@ public class Telemetry {
     driveOdometryFrequency.set(1.0 / state.OdometryPeriod);
     driveSuccessfulDaqs.set(state.SuccessfulDaqs);
     driveFailedDaqs.set(state.FailedDaqs);
-    double[] def = {10.0, 5.0};
-    clusterPublisherX.setDefault(def[0]);
-    clusterPublisherY.setDefault(def[1]);
 
     /* Also write to log file */
     poseArray[0] = state.Pose.getX();

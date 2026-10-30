@@ -14,6 +14,7 @@ import frc.robot.subsystems.superstructure.ShooterHandler;
 final class UnetDeadzone {
   static final boolean ENABLED = true;
   static final double STOP_CLEARANCE = 0.10, BUFFER_WIDTH = 0.50, HUB_HALF_SIDE = 0.60;
+  static final double CENTERLINE_MARGIN = 0.295;
   static final double ROBOT_RADIUS =
       Math.hypot(
               SimSwerveConstants.BUMPER_LENGTH_X.in(Meters),
@@ -45,20 +46,21 @@ final class UnetDeadzone {
               : new Translation2d(0, delta.getY() < 0 ? -1 : 1);
       distance = (xFace ? Math.abs(delta.getX()) : Math.abs(delta.getY())) - HUB_HALF_SIDE;
     }
-    velocity = constrain(velocity, outward, distance - ROBOT_RADIUS);
+    velocity = constrain(velocity, outward, distance - ROBOT_RADIUS, STOP_CLEARANCE);
     double sign = alliance == Alliance.Red ? 1 : -1;
     velocity =
         constrain(
             velocity,
             new Translation2d(sign, 0),
-            sign * (pose.getX() - FlippingUtil.fieldSizeX / 2) - ROBOT_RADIUS);
+            sign * (pose.getX() - FlippingUtil.fieldSizeX / 2) - CENTERLINE_MARGIN,
+            0);
     return velocity.rotateBy(pose.getRotation().unaryMinus());
   }
 
   private static Translation2d constrain(
-      Translation2d velocity, Translation2d outward, double clearance) {
+      Translation2d velocity, Translation2d outward, double clearance, double stopClearance) {
     double inward = Math.min(0, velocity.dot(outward));
-    double scale = MathUtil.clamp((clearance - STOP_CLEARANCE) / BUFFER_WIDTH, 0, 1);
+    double scale = MathUtil.clamp((clearance - stopClearance) / BUFFER_WIDTH, 0, 1);
     return velocity.minus(outward.times(inward * (1 - scale)));
   }
 

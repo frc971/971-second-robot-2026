@@ -26,8 +26,15 @@ class BallPathingGoalTest {
     double[] invalid = {2.5, 0.0, 2.0, 0.5, 3.0, 0.0, 0.0, 12.0, 0.2, 1.5};
     assertTrue(BallPathingGoal.fromNetworkTables(invalid, MAX_SPEED, MAX_OMEGA).isEmpty());
     invalid[5] = 1.0;
-    invalid[9] = Double.NaN;
-    assertTrue(BallPathingGoal.fromNetworkTables(invalid, MAX_SPEED, MAX_OMEGA).isEmpty());
+    for (int index : new int[] {0, 1, 2, 3, 5, 9}) {
+      double saved = invalid[index];
+      for (double value :
+          new double[] {Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY}) {
+        invalid[index] = value;
+        assertTrue(BallPathingGoal.fromNetworkTables(invalid, MAX_SPEED, MAX_OMEGA).isEmpty());
+      }
+      invalid[index] = saved;
+    }
   }
 
   @Test

@@ -118,6 +118,7 @@ public class Autos {
   }
 
   public Command getAutonomousCommand() {
+    updateSelectedAutoCache();
     return buildCommandFromCachedSegments();
   }
 
@@ -158,7 +159,9 @@ public class Autos {
 
     for (String pathName : selected.routine.pathNames()) {
       // Dynamic paths will always start with "dynamic:"
-      if (pathName.equals("dynamic:poc")) {
+      if (pathName.equals("dynamic:pathingpoc")) {
+        cachedPathSegments.add(new DynamicSegmentPathingPOC(drivetrain));
+      } else if (pathName.equals("dynamic:poc")) {
         cachedPathSegments.add(new DynamicSegmentPOC(this.drivetrain));
       } else if (pathName.equals("dynamic:hub")) {
         cachedPathSegments.add(
@@ -182,9 +185,7 @@ public class Autos {
     }
 
     // extract start pose
-    Path startPath = cachedPathSegments.get(0).copy();
-    if (selected.mirrored) startPath.mirror();
-    cachedAutonomousStartPose = startPath.getStartPose();
+    cachedAutonomousStartPose = cachedPathSegments.get(0).getStartPose(selected.mirrored);
 
     // flip back boolean flag: caching process finished
     selectedAutoIsCached = true;
@@ -279,5 +280,5 @@ public class Autos {
                   "dynamic:unet",
                   "dynamic:hub",
                   "H_Normal")),
-          new AutoRoutine(true, "Dynamic poc", List.of("S_Normal", "H_Normal", "dynamic:collect")));
+          new AutoRoutine(true, "Dynamic poc", List.of("static:start", "dynamic:poc")));
 }

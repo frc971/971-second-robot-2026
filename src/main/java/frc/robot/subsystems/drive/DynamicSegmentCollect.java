@@ -45,20 +45,6 @@ public class DynamicSegmentCollect extends DynamicSegment {
 
     elements.add(1, new Path.EventTrigger(0.0, "intakeDown"));
 
-    List<Node> forPrinting = new ArrayList<>();
-    for (Path.PathElement element : elements) {
-      if (element instanceof Path.Waypoint translationTarget) {
-        Node node = new Node();
-        node.x =
-            (int) Math.round(translationTarget.translationTarget().translation().getX() / nodeSize);
-        node.y =
-            (int) Math.round(translationTarget.translationTarget().translation().getY() / nodeSize);
-        forPrinting.add(node);
-      }
-    }
-
-    Pathfinding.printField(navGrid.grid, forPrinting);
-
     return new Path(
         elements,
         new Path.PathConstraints()

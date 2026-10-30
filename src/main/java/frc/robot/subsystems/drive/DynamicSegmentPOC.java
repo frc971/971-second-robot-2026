@@ -55,19 +55,6 @@ public class DynamicSegmentPOC extends DynamicSegment {
     List<Path.PathElement> elements = returned.first;
     List<Path.RangedConstraint> speeds = returned.second;
 
-    List<Node> forPrinting = new ArrayList<>();
-    for (Path.PathElement element : elements) {
-      Node node = new Node();
-      Path.Waypoint translationTarget = (Path.Waypoint) (element);
-      node.x =
-          (int) Math.round(translationTarget.translationTarget().translation().getX() / nodeSize);
-      node.y =
-          (int) Math.round(translationTarget.translationTarget().translation().getY() / nodeSize);
-      forPrinting.add(node);
-    }
-
-    Pathfinding.printField(navGrid.grid, forPrinting);
-
     return new Path(
         elements,
         new Path.PathConstraints()

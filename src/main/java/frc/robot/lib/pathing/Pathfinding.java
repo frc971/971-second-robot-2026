@@ -389,7 +389,6 @@ public class Pathfinding {
     // System.out.print("(" + node.x + "," + node.y + ") ");
     // }
     // System.out.println();
-    printField(field, rpath);
 
     return rpath;
   }

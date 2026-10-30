@@ -135,13 +135,12 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     robotContainer.drive.setDriveMode(Drive.Mode.NONE);
     autonomousCommand = autos.getAutonomousCommand();
+    if (RobotBase.isSimulation()) robotContainer.simAutoInit(autos.isSelectedMirrored());
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
     HubShiftUtil.initialize();
-
-    if (RobotBase.isSimulation()) robotContainer.simAutoInit(autos.isSelectedMirrored());
   }
 
   @Override

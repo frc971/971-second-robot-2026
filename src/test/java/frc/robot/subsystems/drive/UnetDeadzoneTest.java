@@ -24,12 +24,12 @@ class UnetDeadzoneTest {
     for (var alliance : Alliance.values()) {
       double sign = alliance == Alliance.Blue ? 1 : -1;
       for (double heading : new double[] {0, 90, 180, -37}) {
-        for (double clearance : new double[] {-0.5, 0, 0.10, 0.35, 0.60, 1.0}) {
-          double scale = Math.max(0, Math.min(1, (clearance - 0.10) / 0.50));
+        for (double clearance : new double[] {-0.5, 0, 0.10, 0.25, 0.50, 1.0}) {
+          double scale = Math.max(0, Math.min(1, clearance / 0.50));
           for (double y : new double[] {1, FlippingUtil.fieldSizeY - 1}) {
             var pose =
                 new Pose2d(
-                    FlippingUtil.fieldSizeX / 2 - sign * (UnetDeadzone.ROBOT_RADIUS + clearance),
+                    FlippingUtil.fieldSizeX / 2 - sign * (0.295 + clearance),
                     y,
                     Rotation2d.fromDegrees(heading));
             check(
