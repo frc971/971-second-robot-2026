@@ -60,13 +60,16 @@ public class Robot extends LoggedRobot {
 
     Logger.start();
 
-    // IMPORTANT: DO NOT DELETE OR EXPENSIVE FILE READING WILL FREEZE WHEN FIRST TAG HELPER FUNCTION
+    // IMPORTANT: DO NOT DELETE OR EXPENSIVE FILE READING WILL FREEZE WHEN FIRST TAG
+    // HELPER FUNCTION
+
     // IS CALLED
     TagHelper.init();
 
     robotContainer = new RobotContainer();
     cos = new COS(robotContainer.drivetrain);
-    autos = new Autos(robotContainer.drivetrain);
+    autos =
+        new Autos(robotContainer.drivetrain, robotContainer.superstructure::intakePivotDownAuto);
   }
 
   @Override

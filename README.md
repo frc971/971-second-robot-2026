@@ -33,3 +33,16 @@ Code for Team 971's 2026 robot, Mixtape.
 - [frc.robot.subsystems.Autos.java](https://github.com/frc971/971-second-robot-2026/tree/main/src/main/java/frc/robot/subsystems/Autos.java)
 
   Contains auto paths that are linked together and manages autonomous selection and execution. BLine is used to visualize and construct autos and paths.
+
+## COS autonomous collection
+
+Select **Dynamic real** or **Dynamic poc** in the **Auto Mode** chooser to use
+`/COS/BallVelocityGoal` during the `dynamic:collect` segment. The segment lowers
+the intake and follows the live robot-relative X/Y velocities and angular rate;
+it does not drive to a fixed destination or require holding the driver A button.
+
+Collection lasts five seconds (`COLLECTION_SECONDS` in `DynamicSegmentCollect`).
+**Dynamic real** then continues to its hub segment; **Dynamic poc** ends after
+collection. Missing, invalid, or more than 0.25-second-old goals cause the robot
+to brake, and collection always brakes when it ends or is interrupted. COS must
+publish the same ten-element velocity-goal format used by teleop ball pathing.
