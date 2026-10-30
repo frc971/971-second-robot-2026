@@ -6,11 +6,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.lib.BLine.Path;
 import frc.robot.lib.pathing.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +26,7 @@ public class DynamicSegmentHub extends DynamicSegment {
   public Path getDynamicPath() {
 
     // TODO: flipping flips the navgrid s the coorinates become weird for pathing
-    NavGrid navGrid =
-        Pathfinding.GetGrid(
-            new File(Filesystem.getDeployDirectory(), "pathplanner/navgrid.json").getPath());
+    NavGrid navGrid = Pathfinding.getNavGrid();
     Pose2d start = drivetrain.getState().Pose;
     // hardcoded start end position, the start position of all the S_ autos (blue side coordinates)
     Translation2d destination = new Translation2d(4.149, 7.492);

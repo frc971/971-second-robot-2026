@@ -3,11 +3,9 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.lib.BLine.Path;
 import frc.robot.lib.pathing.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,9 +20,7 @@ public class DynamicSegmentCollect extends DynamicSegment {
   public Path getDynamicPath() {
 
     // TODO: flipping flips the navgrid s the coorinates become weird for pathing
-    NavGrid navGrid =
-        Pathfinding.GetGrid(
-            new File(Filesystem.getDeployDirectory(), "pathplanner/navgrid.json").getPath());
+    NavGrid navGrid = Pathfinding.getNavGrid();
     Pose2d start = drivetrain.getState().Pose;
     Translation2d destination = new Translation2d(10.0, 5.0);
     double nodeSize = navGrid.nodeSizeMeters;

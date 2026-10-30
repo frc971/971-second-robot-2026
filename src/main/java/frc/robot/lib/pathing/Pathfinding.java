@@ -9,6 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pathfinding {
+  private static NavGrid navGrid;
+
+  public static void preloadNavGrid(String path) {
+    if (navGrid == null) {
+      navGrid = GetGrid(path);
+    }
+  }
+
+  /** Returns the grid preloaded in robotInit; searches use it sequentially on the robot thread. */
+  public static NavGrid getNavGrid() {
+    if (navGrid == null) {
+      throw new IllegalStateException("Navgrid must be preloaded in robotInit");
+    }
+    return navGrid;
+  }
 
   // auto GetGrid(const std::string& navgrid_path) -> NavGrid {
   // std::ifstream file(navgrid_path);
@@ -45,8 +60,7 @@ public class Pathfinding {
     try {
       data = new ObjectMapper().readTree(file);
     } catch (IOException e) {
-      System.err.println("Failed to open navgrid: " + navgrid_path);
-      return new NavGrid();
+      throw new IllegalStateException("Failed to open navgrid: " + navgrid_path, e);
     }
 
     final int GRID_H = data.get("grid").size();
@@ -250,6 +264,15 @@ public class Pathfinding {
   // repo and has no equivalent here; replaced with System.out.println as the
   // closest literal placeholder.
   public static List<Node> BFS(List<List<Node>> field, Point start_point, Point end_point) {
+    // Reuse the preloaded grid without retaining state from a previous search.
+    for (List<Node> row : field) {
+      for (Node node : row) {
+        node.visited = false;
+        node.parent = null;
+        node.cost = Double.POSITIVE_INFINITY;
+        node.path = false;
+      }
+    }
     int sx = start_point.x;
     int sy = start_point.y;
     if (field.get(sy).get(sx).obstacle) {
@@ -373,7 +396,8 @@ public class Pathfinding {
 
   public static void printField(List<List<Node>> field, List<Node> points) {
     String master = "";
-    for (List<Node> row : field.reversed()) {
+    for (int i = field.size() - 1; i >= 0; i--) {
+      List<Node> row = field.get(i);
       for (Node node : row) {
         if (node.obstacle) {
           master += "#";
