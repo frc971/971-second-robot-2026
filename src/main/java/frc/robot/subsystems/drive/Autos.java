@@ -13,6 +13,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.Getter;
 
@@ -52,14 +53,16 @@ public class Autos {
   private final FollowPath.Builder pathBuilderContinuation;
   private final FollowPath.Builder pathBuilderDynamic;
   private final CommandSwerveDrivetrain drivetrain;
+  private final Supplier<Command> intakeDownCommand;
   private AutoPathOption cachedSelectedAuto = null;
   private List<Segment> cachedPathSegments = Collections.<Segment>emptyList();
   private Pose2d cachedAutonomousStartPose = null;
   private boolean selectedAutoIsCached = false;
 
-  public Autos(CommandSwerveDrivetrain drivetrain) {
+  public Autos(CommandSwerveDrivetrain drivetrain, Supplier<Command> intakeDownCommand) {
 
     this.drivetrain = drivetrain;
+    this.intakeDownCommand = intakeDownCommand;
 
     chooser.setDefaultOption("None", null);
 
@@ -152,6 +155,8 @@ public class Autos {
         cachedPathSegments.add(new DynamicSegmentPOC(this.drivetrain));
       } else if (pathName.equals("dynamic:hub")) {
         cachedPathSegments.add(new DynamicSegmentHub(this.drivetrain, selected.mirrored));
+      } else if (pathName.equals("dynamic:unet")) {
+        cachedPathSegments.add(new UnetCollectSegment(this.drivetrain, intakeDownCommand));
       } else if (pathName.equals("dynamic:collect")) {
         cachedPathSegments.add(new DynamicSegmentCollect(this.drivetrain));
       } else {
@@ -243,5 +248,9 @@ public class Autos {
               true,
               "Dynamic real",
               List.of("S_Normal", "H_Normal", "dynamic:collect", "dynamic:hub", "H_Normal")),
+          new AutoRoutine(
+              true,
+              "Dynamic real UNet",
+              List.of("S_Normal", "H_Normal", "dynamic:unet", "dynamic:hub", "H_Normal")),
           new AutoRoutine(true, "Dynamic poc", List.of("S_Normal", "H_Normal", "dynamic:collect")));
 }

@@ -71,7 +71,8 @@ public class Robot extends LoggedRobot {
 
     robotContainer = new RobotContainer();
     cos = new COS(robotContainer.drivetrain);
-    autos = new Autos(robotContainer.drivetrain);
+    autos =
+        new Autos(robotContainer.drivetrain, robotContainer.superstructure::intakePivotDownAuto);
   }
 
   @Override
