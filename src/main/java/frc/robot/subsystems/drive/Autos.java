@@ -13,6 +13,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.Getter;
 
@@ -52,12 +53,14 @@ public class Autos {
   private final FollowPath.Builder pathBuilderContinuation;
   private final FollowPath.Builder pathBuilderDynamic;
   private final CommandSwerveDrivetrain drivetrain;
+  private final Supplier<Command> intakeDown;
   private AutoPathOption cachedSelectedAuto = null;
   private List<Segment> cachedPathSegments = Collections.<Segment>emptyList();
   private Pose2d cachedAutonomousStartPose = null;
   private boolean selectedAutoIsCached = false;
 
-  public Autos(CommandSwerveDrivetrain drivetrain) {
+  public Autos(CommandSwerveDrivetrain drivetrain, Supplier<Command> intakeDown) {
+    this.intakeDown = intakeDown;
 
     this.drivetrain = drivetrain;
 
@@ -153,7 +156,7 @@ public class Autos {
       } else if (pathName.equals("dynamic:hub")) {
         cachedPathSegments.add(new DynamicSegmentHub(this.drivetrain, selected.mirrored));
       } else if (pathName.equals("dynamic:collect")) {
-        cachedPathSegments.add(new DynamicSegmentCollect(this.drivetrain));
+        cachedPathSegments.add(new DynamicSegmentCollect(this.drivetrain, intakeDown));
       } else {
         cachedPathSegments.add(new StaticSegment(new Path(pathName)));
       }

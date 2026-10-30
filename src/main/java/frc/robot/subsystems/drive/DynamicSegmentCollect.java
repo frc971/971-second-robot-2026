@@ -1,74 +1,37 @@
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
-import frc.robot.lib.pathing.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Supplier;
 
-public class DynamicSegmentCollect extends DynamicSegment {
-
+/** Collects using live COS robot-relative velocities rather than a generated waypoint path. */
+public class DynamicSegmentCollect implements Segment {
+  // Bound collection so the next hub segment can run even while more fuel is visible.
+  private static final double COLLECTION_SECONDS = 5.0;
   private final CommandSwerveDrivetrain drivetrain;
+  private final Supplier<Command> intakeDown;
 
-  public DynamicSegmentCollect(CommandSwerveDrivetrain drivetrain) {
+  public DynamicSegmentCollect(CommandSwerveDrivetrain drivetrain, Supplier<Command> intakeDown) {
     this.drivetrain = drivetrain;
+    this.intakeDown = intakeDown;
   }
 
-  public Path getDynamicPath() {
-
-    // TODO: flipping flips the navgrid s the coorinates become weird for pathing
-    NavGrid navGrid =
-        Pathfinding.GetGrid(
-            new File(Filesystem.getDeployDirectory(), "pathplanner/navgrid.json").getPath());
-    Pose2d start = drivetrain.getState().Pose;
-    Translation2d destination = new Translation2d(10.0, 5.0);
-    double nodeSize = navGrid.nodeSizeMeters;
-    List<Node> path =
-        Pathfinding.BFS(
-            navGrid.grid,
-            new Point(
-                (int) Math.round(start.getX() / nodeSize),
-                (int) Math.round(start.getY() / nodeSize)),
-            new Point(
-                (int) Math.round(destination.getX() / nodeSize),
-                (int) Math.round(destination.getY() / nodeSize)));
-    List<Pose2d> points = new ArrayList<>();
-    for (Node node : path) {
-      points.add(new Pose2d(node.x * nodeSize, node.y * nodeSize, Rotation2d.kZero));
-    }
-
-    Pair<List<Path.PathElement>, List<Path.RangedConstraint>> returned =
-        removeRedundantPoints(points, null);
-    List<Path.PathElement> elements = returned.first;
-    List<Path.RangedConstraint> speeds = returned.second;
-
-    elements.add(1, new Path.EventTrigger(0.0, "intakeDown"));
-
-    List<Node> forPrinting = new ArrayList<>();
-    for (Path.PathElement element : elements) {
-      if (element instanceof Path.Waypoint translationTarget) {
-        Node node = new Node();
-        node.x =
-            (int) Math.round(translationTarget.translationTarget().translation().getX() / nodeSize);
-        node.y =
-            (int) Math.round(translationTarget.translationTarget().translation().getY() / nodeSize);
-        forPrinting.add(node);
-      }
-    }
-
-    Pathfinding.printField(navGrid.grid, forPrinting);
-
-    return new Path(
-        elements,
-        new Path.PathConstraints()
-            .setMaxVelocityMetersPerSec(speeds.toArray(new Path.RangedConstraint[0])));
+  @Override
+  public Command getCommand(FollowPath.Builder builder) {
+    return intakeDown
+        .get()
+        .andThen(new CollectBallVelocity(drivetrain).withTimeout(COLLECTION_SECONDS));
   }
 
+  @Override
+  public Pose2d getStartPose(boolean mirrored) {
+    return null;
+  }
+
+  @Override
   public Path copy() {
     return new Path();
   }
