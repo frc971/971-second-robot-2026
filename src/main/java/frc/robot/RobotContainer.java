@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.generated.TunerConstants;
@@ -22,6 +23,7 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   private final FuelSimHelper fuelSimHelper;
+  private final CosBallPathingSim cosBallPathingSim;
 
   public RobotContainer() {
     superstructure = new Superstructure(this);
@@ -33,8 +35,12 @@ public class RobotContainer {
       this.fuelSimHelper = new FuelSimHelper(this);
       drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
       fuelSimHelper.configureFuelSim();
+      cosBallPathingSim =
+          new CosBallPathingSim(
+              () -> drivetrain.getState().Pose, NetworkTableInstance.getDefault());
     } else {
       fuelSimHelper = null;
+      cosBallPathingSim = null;
     }
 
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
@@ -51,6 +57,7 @@ public class RobotContainer {
     superstructure.periodic();
     if (RobotBase.isSimulation()) {
       fuelSimHelper.periodic();
+      cosBallPathingSim.periodic();
     }
     drive.periodic();
   }
@@ -59,7 +66,8 @@ public class RobotContainer {
     superstructure.resetPositions();
   }
 
-  public void simAutoInit() {
+  public void simAutoInit(boolean mirrored) {
+    if (cosBallPathingSim != null) cosBallPathingSim.reset(mirrored);
     if (fuelSimHelper != null) fuelSimHelper.resetFuelSim();
   }
 }

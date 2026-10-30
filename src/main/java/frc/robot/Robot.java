@@ -141,7 +141,7 @@ public class Robot extends LoggedRobot {
     }
     HubShiftUtil.initialize();
 
-    if (RobotBase.isSimulation()) robotContainer.simAutoInit();
+    if (RobotBase.isSimulation()) robotContainer.simAutoInit(autos.isSelectedMirrored());
   }
 
   @Override

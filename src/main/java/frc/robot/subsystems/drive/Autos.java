@@ -110,6 +110,11 @@ public class Autos {
     }
   }
 
+  public boolean isSelectedMirrored() {
+    AutoPathOption selected = chooser.getSelected();
+    return selected != null && selected.mirrored;
+  }
+
   public Command getAutonomousCommand() {
     return buildCommandFromCachedSegments();
   }
@@ -154,7 +159,11 @@ public class Autos {
       if (pathName.equals("dynamic:poc")) {
         cachedPathSegments.add(new DynamicSegmentPOC(this.drivetrain));
       } else if (pathName.equals("dynamic:hub")) {
-        cachedPathSegments.add(new DynamicSegmentHub(this.drivetrain, selected.mirrored));
+        cachedPathSegments.add(
+            new DynamicSegmentHub(
+                this.drivetrain,
+                selected.mirrored,
+                selected.routine.pathNames().contains("dynamic:unet")));
       } else if (pathName.equals("dynamic:unet")) {
         cachedPathSegments.add(new UnetCollectSegment(this.drivetrain, intakeDownCommand));
       } else if (pathName.equals("dynamic:collect")) {
@@ -251,6 +260,13 @@ public class Autos {
           new AutoRoutine(
               true,
               "Dynamic real UNet",
-              List.of("S_Normal", "H_Normal", "dynamic:unet", "dynamic:hub", "H_Normal")),
+              List.of(
+                  "S_Normal",
+                  "H_Normal",
+                  "F_UNet_Entry",
+                  "F_UNet_Turn",
+                  "dynamic:unet",
+                  "dynamic:hub",
+                  "H_Normal")),
           new AutoRoutine(true, "Dynamic poc", List.of("S_Normal", "H_Normal", "dynamic:collect")));
 }
