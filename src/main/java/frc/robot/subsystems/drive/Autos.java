@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -49,12 +50,16 @@ public class Autos {
 
   private final FollowPath.Builder pathBuilderWithStartPoseReset;
   private final FollowPath.Builder pathBuilderContinuation;
+  private final FollowPath.Builder pathBuilderDynamic;
+  private final CommandSwerveDrivetrain drivetrain;
   private AutoPathOption cachedSelectedAuto = null;
-  private List<Path> cachedPathSegments = Collections.<Path>emptyList();
+  private List<Segment> cachedPathSegments = Collections.<Segment>emptyList();
   private Pose2d cachedAutonomousStartPose = null;
   private boolean selectedAutoIsCached = false;
 
   public Autos(CommandSwerveDrivetrain drivetrain) {
+
+    this.drivetrain = drivetrain;
 
     chooser.setDefaultOption("None", null);
 
@@ -63,19 +68,26 @@ public class Autos {
 
     pathBuilderWithStartPoseReset = newPathBuilder(drivetrain).withPoseReset(drivetrain::resetPose);
     pathBuilderContinuation = newPathBuilder(drivetrain);
+    // Dynamic paths are already built in real field coordinates, so they must not
+    // be flipped or mirrored
+    pathBuilderDynamic = newBaseBuilder(drivetrain);
 
     SmartDashboard.putData("Auto Mode", chooser);
   }
 
-  private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
+  private FollowPath.Builder newBaseBuilder(CommandSwerveDrivetrain drivetrain) {
     return new FollowPath.Builder(
-            drivetrain,
-            () -> drivetrain.getState().Pose,
-            () -> drivetrain.getState().Speeds,
-            speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(speeds)),
-            new PIDController(5.0, 0.0, 0.0),
-            new PIDController(3.0, 0.0, 0.0),
-            new PIDController(2.0, 0.0, 0.0))
+        drivetrain,
+        () -> drivetrain.getState().Pose,
+        () -> drivetrain.getState().Speeds,
+        speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(speeds)),
+        new PIDController(5.0, 0.0, 0.0),
+        new PIDController(3.0, 0.0, 0.0),
+        new PIDController(0.0, 0., 0.1));
+  }
+
+  private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
+    return newBaseBuilder(drivetrain)
         .withShouldMirror(
             () -> {
               AutoPathOption selected = chooser.getSelected();
@@ -126,12 +138,26 @@ public class Autos {
     cachedSelectedAuto = selected;
 
     if (selected == null) {
-      cachedPathSegments = Collections.<Path>emptyList();
+      cachedPathSegments = Collections.<Segment>emptyList();
       cachedAutonomousStartPose = null;
       return;
     }
 
-    cachedPathSegments = selected.routine.pathNames().stream().map(Path::new).toList();
+    // Cache the path segmennts
+    cachedPathSegments = new ArrayList<>();
+
+    for (String pathName : selected.routine.pathNames()) {
+      // Dynamic paths will always start with "dynamic:"
+      if (pathName.equals("dynamic:poc")) {
+        cachedPathSegments.add(new DynamicSegmentPOC(this.drivetrain));
+      } else if (pathName.equals("dynamic:hub")) {
+        cachedPathSegments.add(new DynamicSegmentHub(this.drivetrain, selected.mirrored));
+      } else if (pathName.equals("dynamic:collect")) {
+        cachedPathSegments.add(new DynamicSegmentCollect(this.drivetrain));
+      } else {
+        cachedPathSegments.add(new StaticSegment(new Path(pathName)));
+      }
+    }
 
     // empty auto
     if (cachedPathSegments.isEmpty()) {
@@ -158,8 +184,12 @@ public class Autos {
             .mapToObj(
                 i -> {
                   FollowPath.Builder builder =
-                      i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                  return builder.build(cachedPathSegments.get(i));
+                      i == 0
+                          ? pathBuilderWithStartPoseReset
+                          : cachedPathSegments.get(i) instanceof DynamicSegment
+                              ? pathBuilderDynamic
+                              : pathBuilderContinuation;
+                  return cachedPathSegments.get(i).getCommand(builder);
                 })
             .toArray(Command[]::new));
   }
@@ -172,8 +202,7 @@ public class Autos {
   // H_ = HUB, shooting fuel
   // D_ = Depot
   public static final List<AutoRoutine> AUTO_ROUTINES =
-      List.of(
-          // Madtown Depot
+      List.of( // Madtown Depot
           new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
           new AutoRoutine(
               false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
@@ -207,5 +236,12 @@ public class Autos {
               true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
 
           // Middle Depot
-          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")));
+          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")),
+
+          // Dynamic POC
+          new AutoRoutine(
+              true,
+              "Dynamic real",
+              List.of("S_Normal", "H_Normal", "dynamic:collect", "dynamic:hub", "H_Normal")),
+          new AutoRoutine(true, "Dynamic poc", List.of("S_Normal", "H_Normal", "dynamic:collect")));
 }
