@@ -3,7 +3,10 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
@@ -21,6 +24,8 @@ class UnetCollectSegment implements Segment {
   private final Consumer<SwerveRequest> output;
   private final NetworkTableInstance instance;
   private final Supplier<Command> intakeDown;
+  private final Supplier<Pose2d> pose;
+  private final Supplier<Alliance> alliance;
   private final SwerveRequest.RobotCentric drive =
       new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -29,14 +34,24 @@ class UnetCollectSegment implements Segment {
   private long startedAt;
 
   UnetCollectSegment(CommandSwerveDrivetrain drivetrain, Supplier<Command> intakeDown) {
-    this(drivetrain, drivetrain::setRequest, NetworkTableInstance.getDefault(), intakeDown);
+    this(
+        drivetrain,
+        drivetrain::setRequest,
+        NetworkTableInstance.getDefault(),
+        intakeDown,
+        () -> drivetrain.getState().Pose,
+        () -> DriverStation.getAlliance().orElse(Alliance.Blue));
   }
 
   UnetCollectSegment(
       Subsystem drivetrain,
       Consumer<SwerveRequest> output,
       NetworkTableInstance instance,
-      Supplier<Command> intakeDown) {
+      Supplier<Command> intakeDown,
+      Supplier<Pose2d> pose,
+      Supplier<Alliance> alliance) {
+    this.pose = pose;
+    this.alliance = alliance;
     this.drivetrain = drivetrain;
     this.output = output;
     this.instance = instance;
@@ -65,6 +80,7 @@ class UnetCollectSegment implements Segment {
                 PubSubOption.pollStorage(20));
     output.accept(brake);
     Logger.recordOutput("Auto/UNetCollect/Active", true);
+    Logger.recordOutput("Auto/UNetCollect/DeadzoneEnabled", UnetDeadzone.ENABLED);
   }
 
   private void execute() {
@@ -87,12 +103,16 @@ class UnetCollectSegment implements Segment {
     Logger.recordOutput("Auto/UNetCollect/ElapsedSeconds", (now - startedAt) / 1e6);
     if (fresh && goal.isPresent()) {
       var value = goal.orElseThrow();
+      var requested = new Translation2d(value.velocityX(), value.velocityY());
+      var limited = UnetDeadzone.limit(pose.get(), requested, alliance.get(), UnetDeadzone.ENABLED);
+      Logger.recordOutput(
+          "Auto/UNetCollect/RequestedVelocity", new double[] {requested.getX(), requested.getY()});
       output.accept(
           drive
-              .withVelocityX(value.velocityX())
-              .withVelocityY(value.velocityY())
+              .withVelocityX(limited.getX())
+              .withVelocityY(limited.getY())
               .withRotationalRate(value.omegaRadiansPerSecond()));
-      logVelocity(value.velocityX(), value.velocityY(), value.omegaRadiansPerSecond());
+      logVelocity(limited.getX(), limited.getY(), value.omegaRadiansPerSecond());
       Logger.recordOutput("Auto/UNetCollect/TargetX", value.targetX());
       Logger.recordOutput("Auto/UNetCollect/TargetY", value.targetY());
     } else {
