@@ -70,7 +70,6 @@ public class Telemetry {
       driveStateTable.getIntegerTopic("SuccessfulDaqs").publish();
   private final IntegerPublisher driveFailedDaqs =
       driveStateTable.getIntegerTopic("FailedDaqs").publish();
-
   /* Robot pose for field positioning */
   private final NetworkTable table = inst.getTable("Pose");
   private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();

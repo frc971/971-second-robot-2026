@@ -107,8 +107,20 @@ public class FuelSim {
     }
 
     private void handleFieldCollisions() {
-      for (int i = 0; i < FIELD_XZ_LINE_STARTS.length; i++) {
-        handleXZLineCollision(FIELD_XZ_LINE_STARTS[i], FIELD_XZ_LINE_ENDS[i]);
+      if (pos.getZ() < FUEL_RADIUS) {
+        pos = new Translation3d(pos.getX(), pos.getY(), FUEL_RADIUS);
+        if (vel.getZ() < 0)
+          vel = new Translation3d(vel.getX(), vel.getY(), -vel.getZ() * FIELD_COR);
+      }
+      for (int i = 1; i < FIELD_XZ_LINE_STARTS.length; i++) {
+        double x = pos.getX();
+        if (x
+                >= Math.min(FIELD_XZ_LINE_STARTS[i].getX(), FIELD_XZ_LINE_ENDS[i].getX())
+                    - FUEL_RADIUS
+            && x
+                <= Math.max(FIELD_XZ_LINE_STARTS[i].getX(), FIELD_XZ_LINE_ENDS[i].getX())
+                    + FUEL_RADIUS)
+          handleXZLineCollision(FIELD_XZ_LINE_STARTS[i], FIELD_XZ_LINE_ENDS[i]);
       }
 
       if (pos.getX() < FUEL_RADIUS && vel.getX() < 0) {
@@ -132,6 +144,8 @@ public class FuelSim {
     }
 
     private void handleHubCollisions(Hub hub) {
+      if (pos.getZ() < FUEL_RADIUS + 0.1
+          && Math.abs(pos.getX() - hub.center.getX()) > Hub.SIDE / 2 + FUEL_RADIUS) return;
       hub.handleHubInteraction(this);
       Translation2d collision = hub.fuelCollideSide(this);
       if (collision.getX() != 0) {
@@ -171,17 +185,44 @@ public class FuelSim {
   }
 
   private static void handleFuelCollisions(ArrayList<Fuel> fuels) {
-    for (int i = 0; i < fuels.size() - 1; i++) {
-      for (int j = i + 1; j < fuels.size(); j++) {
-        if (fuels.get(i).pos.getDistance(fuels.get(j).pos) < FUEL_RADIUS * 2) {
-          handleFuelCollision(fuels.get(i), fuels.get(j));
+    // A 15 cm spatial hash keeps hundreds of balls practical without an all-pairs scan.
+    var cells = new java.util.HashMap<Long, ArrayList<Fuel>>();
+    for (var fuel : fuels) {
+      int x = (int) Math.floor(fuel.pos.getX() / (2 * FUEL_RADIUS));
+      int y = (int) Math.floor(fuel.pos.getY() / (2 * FUEL_RADIUS));
+      for (int dx = -1; dx <= 1; dx++)
+        for (int dy = -1; dy <= 1; dy++) {
+          var neighbors = cells.get(cellKey(x + dx, y + dy));
+          if (neighbors != null)
+            for (var other : neighbors)
+              if (fuel.pos.getDistance(other.pos) < FUEL_RADIUS * 2)
+                handleFuelCollision(fuel, other);
         }
-      }
+      int resolvedX = (int) Math.floor(fuel.pos.getX() / (2 * FUEL_RADIUS));
+      int resolvedY = (int) Math.floor(fuel.pos.getY() / (2 * FUEL_RADIUS));
+      cells.computeIfAbsent(cellKey(resolvedX, resolvedY), key -> new ArrayList<>()).add(fuel);
     }
+  }
+
+  private static long cellKey(int x, int y) {
+    return ((long) x << 32) ^ (y & 0xffffffffL);
   }
 
   private ArrayList<Fuel> fuels = new ArrayList<>();
   private boolean running = false;
+  private int collected;
+  private int outwardLayout = -1;
+  private double elapsed;
+  private boolean pushed, pushMirrored, pushRed;
+
+  public void configureOutwardPush(int layout, boolean mirrored, boolean red) {
+    outwardLayout = layout;
+    pushMirrored = mirrored;
+    pushRed = red;
+    elapsed = 0;
+    pushed = false;
+  }
+
   private Supplier<Pose2d> robotSupplier = null;
   private Supplier<ChassisSpeeds> robotSpeedsSupplier = null;
   private double robotWidth;
@@ -236,6 +277,7 @@ public class FuelSim {
   }
 
   public void logFuels() {
+    Logger.recordOutput("Fuel Simulation/Collected", collected);
     Logger.recordOutput(
         "Fuel Simulation/Fuels",
         fuels.stream().map((fuel) -> fuel.pos).toArray(Translation3d[]::new));
@@ -275,6 +317,17 @@ public class FuelSim {
   }
 
   public void stepSim() {
+    if (!pushed && elapsed >= FuelLayouts.PUSH_AT_SECONDS) {
+      pushed = true;
+      for (var fuel : fuels)
+        if (fuel.pos.getZ() <= bumperHeight)
+          fuel.vel =
+              fuel.vel.plus(
+                  new Translation3d(
+                      FuelLayouts.outwardVelocity(
+                          outwardLayout, fuel.pos.toTranslation2d(), pushMirrored, pushRed)));
+    }
+    elapsed += PERIOD;
     for (int i = 0; i < subticks; i++) {
       for (Fuel fuel : fuels) {
         fuel.update();
@@ -356,6 +409,7 @@ public class FuelSim {
     for (SimIntake intake : intakes) {
       for (int i = 0; i < fuels.size(); i++) {
         if (intake.shouldIntake(fuels.get(i), robot)) {
+          collected++;
           fuels.remove(i);
           i--;
         }
@@ -363,7 +417,18 @@ public class FuelSim {
     }
   }
 
+  /** Ground observations follow the same balls that collisions and intakes remove. */
+  public java.util.List<Translation2d> getGroundFuelPositions() {
+    return fuels.stream()
+        .filter(f -> f.pos.getZ() <= bumperHeight)
+        .map(f -> f.pos.toTranslation2d())
+        .toList();
+  }
+
   public void clearFuel() {
+    collected = 0;
+    elapsed = 0;
+    pushed = false;
     fuels.clear();
   }
 
@@ -544,5 +609,5 @@ public class FuelSim {
     }
   }
 
-  private FuelSim() {}
+  public FuelSim() {}
 }

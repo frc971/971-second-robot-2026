@@ -7,10 +7,12 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.BLine.*;
+import frc.robot.lib.pathing.Pathfinding;
 import frc.robot.lib.simulation.FuelSim;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
@@ -18,6 +20,7 @@ import frc.robot.subsystems.drive.Autos;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.COS;
 import frc.robot.subsystems.vision.TagHelper;
+import java.io.File;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -60,17 +63,22 @@ public class Robot extends LoggedRobot {
 
     Logger.start();
 
-    // IMPORTANT: DO NOT DELETE OR EXPENSIVE FILE READING WILL FREEZE WHEN FIRST TAG HELPER FUNCTION
+    // IMPORTANT: DO NOT DELETE OR EXPENSIVE FILE READING WILL FREEZE WHEN FIRST TAG
+    // HELPER FUNCTION
+
     // IS CALLED
     TagHelper.init();
 
     robotContainer = new RobotContainer();
     cos = new COS(robotContainer.drivetrain);
-    autos = new Autos(robotContainer.drivetrain);
+    autos =
+        new Autos(robotContainer.drivetrain, robotContainer.superstructure::intakePivotDownAuto);
   }
 
   @Override
   public void robotInit() {
+    Pathfinding.preloadNavGrid(
+        new File(Filesystem.getDeployDirectory(), "pathplanner/navgrid.json").getPath());
     DataLogManager.start();
 
     robotContainer.resetSuperstructure();
@@ -127,13 +135,12 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     robotContainer.drive.setDriveMode(Drive.Mode.NONE);
     autonomousCommand = autos.getAutonomousCommand();
+    if (RobotBase.isSimulation()) robotContainer.simAutoInit(autos.isSelectedMirrored());
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
     HubShiftUtil.initialize();
-
-    if (RobotBase.isSimulation()) robotContainer.simAutoInit();
   }
 
   @Override

@@ -3,6 +3,7 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -10,12 +11,28 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 public class Autos {
+  public static final double MAX_SPEED_METERS_PER_SECOND = 4.0;
+
+  static ChassisSpeeds limitSpeeds(ChassisSpeeds speeds) {
+    double scale =
+        Math.min(
+            1,
+            MAX_SPEED_METERS_PER_SECOND
+                / Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+    return new ChassisSpeeds(
+        speeds.vxMetersPerSecond * scale,
+        speeds.vyMetersPerSecond * scale,
+        speeds.omegaRadiansPerSecond);
+  }
 
   /**
    * @param displayLabel what driverstation displays as the auto's name
@@ -49,12 +66,18 @@ public class Autos {
 
   private final FollowPath.Builder pathBuilderWithStartPoseReset;
   private final FollowPath.Builder pathBuilderContinuation;
+  private final FollowPath.Builder pathBuilderDynamic;
+  private final CommandSwerveDrivetrain drivetrain;
+  private final Supplier<Command> intakeDownCommand;
   private AutoPathOption cachedSelectedAuto = null;
-  private List<Path> cachedPathSegments = Collections.<Path>emptyList();
+  private List<Segment> cachedPathSegments = Collections.<Segment>emptyList();
   private Pose2d cachedAutonomousStartPose = null;
   private boolean selectedAutoIsCached = false;
 
-  public Autos(CommandSwerveDrivetrain drivetrain) {
+  public Autos(CommandSwerveDrivetrain drivetrain, Supplier<Command> intakeDownCommand) {
+
+    this.drivetrain = drivetrain;
+    this.intakeDownCommand = intakeDownCommand;
 
     chooser.setDefaultOption("None", null);
 
@@ -63,19 +86,28 @@ public class Autos {
 
     pathBuilderWithStartPoseReset = newPathBuilder(drivetrain).withPoseReset(drivetrain::resetPose);
     pathBuilderContinuation = newPathBuilder(drivetrain);
+    // Dynamic paths are already built in real field coordinates, so they must not
+    // be flipped or mirrored
+    pathBuilderDynamic = newBaseBuilder(drivetrain, new PIDController(0.0, 0.0, 0.1));
 
     SmartDashboard.putData("Auto Mode", chooser);
+    Logger.recordOutput("Auto/CurrentSegment", "Idle");
+  }
+
+  private FollowPath.Builder newBaseBuilder(
+      CommandSwerveDrivetrain drivetrain, PIDController crossTrackController) {
+    return new FollowPath.Builder(
+        drivetrain,
+        () -> drivetrain.getState().Pose,
+        () -> drivetrain.getState().Speeds,
+        speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(limitSpeeds(speeds))),
+        new PIDController(5.0, 0.0, 0.0),
+        new PIDController(3.0, 0.0, 0.0),
+        crossTrackController);
   }
 
   private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
-    return new FollowPath.Builder(
-            drivetrain,
-            () -> drivetrain.getState().Pose,
-            () -> drivetrain.getState().Speeds,
-            speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(speeds)),
-            new PIDController(5.0, 0.0, 0.0),
-            new PIDController(3.0, 0.0, 0.0),
-            new PIDController(2.0, 0.0, 0.0))
+    return newBaseBuilder(drivetrain, new PIDController(2.0, 0.0, 0.0))
         .withShouldMirror(
             () -> {
               AutoPathOption selected = chooser.getSelected();
@@ -95,7 +127,13 @@ public class Autos {
     }
   }
 
+  public boolean isSelectedMirrored() {
+    AutoPathOption selected = chooser.getSelected();
+    return selected != null && selected.mirrored;
+  }
+
   public Command getAutonomousCommand() {
+    updateSelectedAutoCache();
     return buildCommandFromCachedSegments();
   }
 
@@ -126,12 +164,35 @@ public class Autos {
     cachedSelectedAuto = selected;
 
     if (selected == null) {
-      cachedPathSegments = Collections.<Path>emptyList();
+      cachedPathSegments = Collections.<Segment>emptyList();
       cachedAutonomousStartPose = null;
       return;
     }
 
-    cachedPathSegments = selected.routine.pathNames().stream().map(Path::new).toList();
+    // Cache the path segmennts
+    cachedPathSegments = new ArrayList<>();
+
+    for (String pathName : selected.routine.pathNames()) {
+      // Dynamic paths will always start with "dynamic:"
+      if (pathName.equals("dynamic:pathingpoc")) {
+        cachedPathSegments.add(new DynamicSegmentPathingPOC(drivetrain));
+      } else if (pathName.equals("dynamic:poc")) {
+        cachedPathSegments.add(new DynamicSegmentPOC(this.drivetrain));
+      } else if (pathName.equals("dynamic:hub")) {
+        cachedPathSegments.add(
+            new DynamicSegmentHub(
+                this.drivetrain,
+                selected.mirrored,
+                selected.routine.pathNames().contains("dynamic:unet")));
+      } else if (pathName.equals("dynamic:unet")) {
+        cachedPathSegments.add(
+            new UnetCollectSegment(this.drivetrain, intakeDownCommand, selected.mirrored));
+      } else if (pathName.equals("dynamic:collect")) {
+        cachedPathSegments.add(new DynamicSegmentCollect(this.drivetrain));
+      } else {
+        cachedPathSegments.add(new StaticSegment(new Path(pathName)));
+      }
+    }
 
     // empty auto
     if (cachedPathSegments.isEmpty()) {
@@ -140,9 +201,7 @@ public class Autos {
     }
 
     // extract start pose
-    Path startPath = cachedPathSegments.get(0).copy();
-    if (selected.mirrored) startPath.mirror();
-    cachedAutonomousStartPose = startPath.getStartPose();
+    cachedAutonomousStartPose = cachedPathSegments.get(0).getStartPose(selected.mirrored);
 
     // flip back boolean flag: caching process finished
     selectedAutoIsCached = true;
@@ -150,18 +209,31 @@ public class Autos {
 
   private Command buildCommandFromCachedSegments() {
     if (cachedPathSegments.isEmpty()) {
-      return Commands.none();
+      return Commands.runOnce(() -> Logger.recordOutput("Auto/CurrentSegment", "None"));
     }
 
+    List<String> pathNames = cachedSelectedAuto.routine.pathNames();
     return Commands.sequence(
-        IntStream.range(0, cachedPathSegments.size())
-            .mapToObj(
-                i -> {
-                  FollowPath.Builder builder =
-                      i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                  return builder.build(cachedPathSegments.get(i));
-                })
-            .toArray(Command[]::new));
+            IntStream.range(0, cachedPathSegments.size())
+                .mapToObj(
+                    i -> {
+                      FollowPath.Builder builder =
+                          i == 0
+                              ? pathBuilderWithStartPoseReset
+                              : cachedPathSegments.get(i) instanceof DynamicSegment
+                                  ? pathBuilderDynamic
+                                  : pathBuilderContinuation;
+                      String label = (i + 1) + "/" + pathNames.size() + " " + pathNames.get(i);
+                      return cachedPathSegments
+                          .get(i)
+                          .getCommand(builder)
+                          .beforeStarting(() -> Logger.recordOutput("Auto/CurrentSegment", label));
+                    })
+                .toArray(Command[]::new))
+        .finallyDo(
+            interrupted ->
+                Logger.recordOutput(
+                    "Auto/CurrentSegment", interrupted ? "Interrupted" : "Finished"));
   }
 
   // IMPORTANT: all autos must be defined here
@@ -172,8 +244,7 @@ public class Autos {
   // H_ = HUB, shooting fuel
   // D_ = Depot
   public static final List<AutoRoutine> AUTO_ROUTINES =
-      List.of(
-          // Madtown Depot
+      List.of( // Madtown Depot
           new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
           new AutoRoutine(
               false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
@@ -207,5 +278,23 @@ public class Autos {
               true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
 
           // Middle Depot
-          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")));
+          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")),
+
+          // Dynamic POC
+          new AutoRoutine(
+              true,
+              "Dynamic real",
+              List.of("S_Normal", "H_Normal", "dynamic:collect", "dynamic:hub", "H_Normal")),
+          new AutoRoutine(
+              true,
+              "Dynamic real UNet",
+              List.of(
+                  "S_Normal",
+                  "H_UNet",
+                  "F_UNet_Entry",
+                  "F_UNet_Turn",
+                  "dynamic:unet",
+                  "dynamic:hub",
+                  "H_UNet")),
+          new AutoRoutine(true, "Dynamic poc", List.of("static:start", "dynamic:poc")));
 }

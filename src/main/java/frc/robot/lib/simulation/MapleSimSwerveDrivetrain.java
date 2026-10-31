@@ -33,7 +33,7 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.ironmaple.simulation.motorsims.SimulatedBattery;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
+import org.littletonrobotics.junction.Logger;
 
 /**
  *
@@ -49,6 +49,7 @@ public class MapleSimSwerveDrivetrain {
   private final Pigeon2SimState pigeonSim;
   private final SimSwerveModule[] simModules;
   public final SwerveDriveSimulation mapleSimDrive;
+  private final CollisionTrackingArena arena;
 
   /**
    *
@@ -116,8 +117,8 @@ public class MapleSimSwerveDrivetrain {
     SimulatedArena.overrideSimulationTimings(simPeriod, 1);
 
     // makes ramp not have collisions/physics
-    SimulatedArena.overrideInstance(new Arena2026Rebuilt(false));
-    SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive);
+    arena = new CollisionTrackingArena(mapleSimDrive);
+    SimulatedArena.overrideInstance(arena);
   }
 
   /**
@@ -130,6 +131,7 @@ public class MapleSimSwerveDrivetrain {
    */
   public void update() {
     SimulatedArena.getInstance().simulationPeriodic();
+    Logger.recordOutput("Drive/Simulation/FieldContacts", arena.getFieldContacts());
     pigeonSim.setRawYaw(mapleSimDrive.getSimulatedDriveTrainPose().getRotation().getMeasure());
     pigeonSim.setAngularVelocityZ(
         RadiansPerSecond.of(
