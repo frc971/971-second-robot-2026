@@ -33,6 +33,10 @@ import org.littletonrobotics.junction.Logger;
  * be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+  public edu.wpi.first.math.geometry.Pose2d integrationPose() {
+    return mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose();
+  }
+  public int integrationContacts() { return mapleSimSwerveDrivetrain.getFieldContacts(); }
   private MapleSimSwerveDrivetrain mapleSimSwerveDrivetrain = null;
   private RobotBumpSim robotBumpSim = null;
   private SwerveRequest request = new SwerveRequest.Idle();

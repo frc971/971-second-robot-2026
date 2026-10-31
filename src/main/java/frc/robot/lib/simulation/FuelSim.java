@@ -52,6 +52,7 @@ public class FuelSim {
   private class Fuel {
     private Translation3d pos;
     private Translation3d vel;
+    private boolean picked;
 
     private Fuel(Translation3d pos, Translation3d vel) {
       this.pos = pos;
@@ -211,6 +212,8 @@ public class FuelSim {
   private ArrayList<Fuel> fuels = new ArrayList<>();
   private boolean running = false;
   private int collected;
+  private boolean frozen;
+  public void setFrozen(boolean value) { frozen = value; }
   private int outwardLayout = -1;
   private double elapsed;
   private boolean pushed, pushMirrored, pushRed;
@@ -317,6 +320,7 @@ public class FuelSim {
   }
 
   public void stepSim() {
+    if (frozen) { if (robotSupplier != null) handleIntakes(fuels); logFuels(); return; }
     if (!pushed && elapsed >= FuelLayouts.PUSH_AT_SECONDS) {
       pushed = true;
       for (var fuel : fuels)
@@ -345,6 +349,7 @@ public class FuelSim {
   }
 
   public void spawnFuel(Translation3d pos, Translation3d vel) {
+    if (frozen) return;
     fuels.add(new Fuel(pos, vel));
   }
 
@@ -408,10 +413,10 @@ public class FuelSim {
     Pose2d robot = robotSupplier.get();
     for (SimIntake intake : intakes) {
       for (int i = 0; i < fuels.size(); i++) {
-        if (intake.shouldIntake(fuels.get(i), robot)) {
+        if (!fuels.get(i).picked && intake.shouldIntake(fuels.get(i), robot)) {
           collected++;
-          fuels.remove(i);
-          i--;
+          if (frozen) fuels.get(i).picked = true;
+          else { fuels.remove(i); i--; }
         }
       }
     }
@@ -425,7 +430,13 @@ public class FuelSim {
         .toList();
   }
 
+  public int getCollected() { return collected; }
+  public java.util.List<double[]> getFuelPositions() {
+    return fuels.stream().map(f -> new double[] {f.pos.getX(), f.pos.getY(), f.pos.getZ()}).toList();
+  }
+
   public void clearFuel() {
+    frozen = false;
     collected = 0;
     elapsed = 0;
     pushed = false;

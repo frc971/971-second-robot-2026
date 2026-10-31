@@ -218,7 +218,7 @@ public class Autos {
                 .mapToObj(
                     i -> {
                       FollowPath.Builder builder =
-                          i == 0
+                          i == 0 && !frc.robot.lib.simulation.CosIntegration.frozenBenchmark()
                               ? pathBuilderWithStartPoseReset
                               : cachedPathSegments.get(i) instanceof DynamicSegment
                                   ? pathBuilderDynamic
@@ -227,7 +227,11 @@ public class Autos {
                       return cachedPathSegments
                           .get(i)
                           .getCommand(builder)
-                          .beforeStarting(() -> Logger.recordOutput("Auto/CurrentSegment", label));
+                          .beforeStarting(() -> {
+                            Logger.recordOutput("Auto/CurrentSegment", label);
+                            if (edu.wpi.first.wpilibj.RobotBase.isSimulation())
+                              frc.robot.lib.simulation.CosIntegration.segmentStarted(label);
+                          });
                     })
                 .toArray(Command[]::new))
         .finallyDo(
@@ -244,7 +248,10 @@ public class Autos {
   // H_ = HUB, shooting fuel
   // D_ = Depot
   public static final List<AutoRoutine> AUTO_ROUTINES =
-      List.of( // Madtown Depot
+      List.of(
+          new AutoRoutine(true, "COS second pass James", List.of("F_Normal")),
+          new AutoRoutine(true, "COS second pass UNet", List.of("F_UNet_Entry", "F_UNet_Turn", "dynamic:unet")),
+          // Madtown Depot
           new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
           new AutoRoutine(
               false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),

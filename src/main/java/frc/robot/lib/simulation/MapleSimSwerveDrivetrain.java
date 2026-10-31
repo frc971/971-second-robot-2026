@@ -129,6 +129,8 @@ public class MapleSimSwerveDrivetrain {
    * <p>Updates the Maple-Sim simulation and injects the results into the simulated CTRE devices,
    * including motors and the IMU.
    */
+  public int getFieldContacts() { return arena.getFieldContacts(); }
+
   public void update() {
     SimulatedArena.getInstance().simulationPeriodic();
     Logger.recordOutput("Drive/Simulation/FieldContacts", arena.getFieldContacts());

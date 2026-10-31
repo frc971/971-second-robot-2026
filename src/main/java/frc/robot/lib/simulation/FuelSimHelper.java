@@ -68,7 +68,9 @@ public class FuelSimHelper {
                 && superstructure
                     .groundPivot
                     .getPosition()
-                    .isNear(Degrees.of(0.0), Degrees.of(0.02))),
+                    .isNear(
+                        Degrees.of(CosIntegration.configured() ? -10.0 : 0.0),
+                        Degrees.of(CosIntegration.configured() ? 2.0 : 0.02))),
         () -> Logger.recordOutput("Fuel Simulation/LastEvent", "Intake"));
 
     instance.spawnStartingFuel();
@@ -81,6 +83,7 @@ public class FuelSimHelper {
     }
     FuelSim instance = FuelSim.getInstance();
     instance.clearFuel();
+    if (CosIntegration.configured()) { CosIntegration.spawn(instance); return; }
     int layout =
         (int)
             edu.wpi.first.networktables.NetworkTableInstance.getDefault()

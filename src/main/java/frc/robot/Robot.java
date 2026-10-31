@@ -36,6 +36,7 @@ public class Robot extends LoggedRobot {
   private final COS cos;
 
   private final Autos autos;
+  private frc.robot.lib.simulation.CosIntegration integration;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "971 First Bot 2026");
@@ -82,6 +83,8 @@ public class Robot extends LoggedRobot {
     DataLogManager.start();
 
     robotContainer.resetSuperstructure();
+    if (RobotBase.isSimulation() && frc.robot.lib.simulation.CosIntegration.configured())
+      integration = new frc.robot.lib.simulation.CosIntegration(robotContainer.drivetrain);
   }
 
   @Override
@@ -136,10 +139,12 @@ public class Robot extends LoggedRobot {
     robotContainer.drive.setDriveMode(Drive.Mode.NONE);
     autonomousCommand = autos.getAutonomousCommand();
     if (RobotBase.isSimulation()) robotContainer.simAutoInit(autos.isSelectedMirrored());
+    if (integration != null) integration.prepareAuto();
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
+    if (integration != null) integration.autoStarted();
     HubShiftUtil.initialize();
   }
 
@@ -177,5 +182,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     FuelSim.getInstance().updateSim();
+    if (integration != null) integration.periodic(autonomousCommand);
   }
 }

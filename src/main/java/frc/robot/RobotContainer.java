@@ -23,7 +23,6 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   private final FuelSimHelper fuelSimHelper;
-  private final CosBallPathingSim cosBallPathingSim;
 
   public RobotContainer() {
     superstructure = new Superstructure(this);
@@ -35,14 +34,8 @@ public class RobotContainer {
       this.fuelSimHelper = new FuelSimHelper(this);
       drivetrain.resetPose(new Pose2d(3, 3, Rotation2d.kZero));
       fuelSimHelper.configureFuelSim();
-      cosBallPathingSim =
-          new CosBallPathingSim(
-              () -> drivetrain.getState().Pose,
-              NetworkTableInstance.getDefault(),
-              FuelSim.getInstance()::getGroundFuelPositions);
     } else {
       fuelSimHelper = null;
-      cosBallPathingSim = null;
     }
 
     FollowPath.registerEventTrigger("shoot", superstructure.shootAuto());
@@ -59,7 +52,6 @@ public class RobotContainer {
     superstructure.periodic();
     if (RobotBase.isSimulation()) {
       fuelSimHelper.periodic();
-      cosBallPathingSim.periodic();
     }
     drive.periodic();
   }
@@ -69,7 +61,6 @@ public class RobotContainer {
   }
 
   public void simAutoInit(boolean mirrored) {
-    if (cosBallPathingSim != null) cosBallPathingSim.reset(mirrored);
     if (fuelSimHelper != null) fuelSimHelper.resetFuelSim(mirrored);
   }
 }
