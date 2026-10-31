@@ -18,7 +18,7 @@ import org.littletonrobotics.junction.Logger;
 
 /** A timed, robot-relative COS collection sweep; never used as an auto's first segment. */
 class UnetCollectSegment implements Segment {
-  static final double UNET_SWEEP_SECONDS = 3.0;
+  static final double UNET_SWEEP_SECONDS = 4.5;
   private static final long GOAL_TIMEOUT_MICROS = 250_000;
   private static final double MAX_OMEGA = 0.8 * 2.0 * Math.PI;
   private final boolean mirrored;
@@ -101,7 +101,7 @@ class UnetCollectSegment implements Segment {
             && now - latest.timestamp <= GOAL_TIMEOUT_MICROS;
     var goal =
         BallPathingGoal.fromTranslationNetworkTables(
-            latest == null ? new double[0] : latest.value, Drive.MAX_SPEED_METERS_PER_SECOND);
+            latest == null ? new double[0] : latest.value, Autos.MAX_SPEED_METERS_PER_SECOND);
     Logger.recordOutput("Auto/UNetCollect/Fresh", fresh);
     Logger.recordOutput("Auto/UNetCollect/Valid", goal.isPresent());
     Logger.recordOutput("Auto/UNetCollect/ElapsedSeconds", (now - startedAt) / 1e6);
@@ -111,7 +111,14 @@ class UnetCollectSegment implements Segment {
       var limited = UnetDeadzone.limit(pose.get(), requested, alliance.get(), UnetDeadzone.ENABLED);
       Logger.recordOutput(
           "Auto/UNetCollect/RequestedVelocity", new double[] {requested.getX(), requested.getY()});
-      double omega = headingRate(pose.get(), mirrored ^ (alliance.get() == Alliance.Red));
+      double error =
+          Math.hypot(value.targetX(), value.targetY()) > 0.05
+              ? MathUtil.angleModulus(Math.atan2(value.targetY(), value.targetX()) + Math.PI)
+              : headingRate(pose.get(), mirrored ^ (alliance.get() == Alliance.Red)) / 4;
+      // Target coordinates are robot-relative: point the rear intake at the ball before
+      // translating.
+      double omega = MathUtil.clamp(4 * error, -MAX_OMEGA, MAX_OMEGA);
+      limited = limited.times(Math.max(0, Math.cos(error)));
       output.accept(
           drive
               .withVelocityX(limited.getX())

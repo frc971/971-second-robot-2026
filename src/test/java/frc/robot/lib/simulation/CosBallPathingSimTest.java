@@ -12,6 +12,31 @@ import org.junit.jupiter.api.Test;
 
 class CosBallPathingSimTest {
   @Test
+  void physicalTargetsDisappearWithCollectedBalls() {
+    HAL.initialize(500, 0);
+    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+    DriverStationSim.notifyNewData();
+    var balls =
+        new java.util.ArrayList<>(
+            java.util.List.of(new Translation2d(6.6, 5), new Translation2d(7.7, 3.8)));
+    try (var nt = NetworkTableInstance.create();
+        var sim =
+            new CosBallPathingSim(() -> new Pose2d(6.6, 6.9, Rotation2d.kZero), nt, () -> balls);
+        var goal =
+            nt.getTable("COS").getDoubleArrayTopic("BallVelocityGoal").subscribe(new double[0])) {
+      sim.periodic();
+      assertEquals(0, goal.get()[2], 1e-9);
+      assertEquals(-1.9, goal.get()[3], 1e-9);
+      balls.remove(0);
+      sim.periodic();
+      assertEquals(1.1, goal.get()[2], 1e-9);
+      balls.clear();
+      sim.periodic();
+      assertArrayEquals(new double[10], goal.get());
+    }
+  }
+
+  @Test
   void producesBoundedRobotRelativeGoalsAndHandlesMissingOrReachedTargets() {
     var target = new Translation2d(3, 0);
     var goal = CosBallPathingSim.goal(new Pose2d(0, 0, Rotation2d.kCCW_90deg), target, true);

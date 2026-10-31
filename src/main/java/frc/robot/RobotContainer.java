@@ -37,7 +37,9 @@ public class RobotContainer {
       fuelSimHelper.configureFuelSim();
       cosBallPathingSim =
           new CosBallPathingSim(
-              () -> drivetrain.getState().Pose, NetworkTableInstance.getDefault());
+              () -> drivetrain.getState().Pose,
+              NetworkTableInstance.getDefault(),
+              FuelSim.getInstance()::getGroundFuelPositions);
     } else {
       fuelSimHelper = null;
       cosBallPathingSim = null;
@@ -68,6 +70,6 @@ public class RobotContainer {
 
   public void simAutoInit(boolean mirrored) {
     if (cosBallPathingSim != null) cosBallPathingSim.reset(mirrored);
-    if (fuelSimHelper != null) fuelSimHelper.resetFuelSim();
+    if (fuelSimHelper != null) fuelSimHelper.resetFuelSim(mirrored);
   }
 }

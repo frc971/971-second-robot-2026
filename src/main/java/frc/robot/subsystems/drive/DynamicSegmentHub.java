@@ -101,16 +101,25 @@ public class DynamicSegmentHub extends DynamicSegment {
     if (!trenchReturn) return super.getCommand(builder);
     return Commands.defer(
         () -> {
-          var turn = fieldPose(6.6, 6.9, Rotation2d.kCW_90deg);
-          var lane = fieldPose(6.6, 7.42, Rotation2d.kCW_90deg);
-          var shooting = fieldPose(3.1, 7.42, Rotation2d.kCW_90deg);
-          // Stop between the turn and lane entry so translation handoffs cannot cut the corner.
+          // Either longitudinal heading fits the trench; choose the shorter turn.
+          var heading =
+              Math.cos(robotPose.get().getRotation().getRadians()) >= 0
+                  ? Rotation2d.kZero
+                  : Rotation2d.k180deg;
+          var turn = new Pose2d(fieldPose(6.6, 6.9, Rotation2d.kZero).getTranslation(), heading);
+          var lane = new Pose2d(fieldPose(6.6, 7.35, Rotation2d.kZero).getTranslation(), heading);
+          var shooting =
+              new Pose2d(fieldPose(3.1, 7.35, Rotation2d.kZero).getTranslation(), heading);
+          var start = robotPose.get();
+          var aligned = new Pose2d(start.getTranslation(), turn.getRotation());
+          // Each leg settles before the next, keeping rotation out of the trench lane.
           return Commands.sequence(
-              builder.build(returnLeg(robotPose.get(), turn, 0.7)),
-              Commands.waitSeconds(0.3),
+              builder.build(returnLeg(start, aligned, 0.7)),
+              builder.build(returnLeg(aligned, turn, 2.8)),
+              Commands.waitSeconds(0.2),
               builder.build(returnLeg(turn, lane, 0.7)),
-              Commands.waitSeconds(0.3),
-              builder.build(returnLeg(lane, shooting, 1.5)));
+              Commands.waitSeconds(0.2),
+              builder.build(returnLeg(lane, shooting, 2.8)));
         },
         Set.of());
   }
@@ -120,9 +129,9 @@ public class DynamicSegmentHub extends DynamicSegment {
         List.of(new Path.Waypoint(start), new Path.Waypoint(end)),
         new Path.PathConstraints()
             .setMaxVelocityMetersPerSec(maxSpeed)
-            .setMaxAccelerationMetersPerSec2(1.5)
-            .setMaxVelocityDegPerSec(90)
-            .setMaxAccelerationDegPerSec2(180));
+            .setMaxAccelerationMetersPerSec2(3.0)
+            .setMaxVelocityDegPerSec(180)
+            .setMaxAccelerationDegPerSec2(360));
   }
 
   public Path copy() {

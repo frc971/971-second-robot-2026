@@ -3,6 +3,7 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +20,19 @@ import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class Autos {
+  public static final double MAX_SPEED_METERS_PER_SECOND = 4.0;
+
+  static ChassisSpeeds limitSpeeds(ChassisSpeeds speeds) {
+    double scale =
+        Math.min(
+            1,
+            MAX_SPEED_METERS_PER_SECOND
+                / Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+    return new ChassisSpeeds(
+        speeds.vxMetersPerSecond * scale,
+        speeds.vyMetersPerSecond * scale,
+        speeds.omegaRadiansPerSecond);
+  }
 
   /**
    * @param displayLabel what driverstation displays as the auto's name
@@ -85,7 +99,7 @@ public class Autos {
         drivetrain,
         () -> drivetrain.getState().Pose,
         () -> drivetrain.getState().Speeds,
-        speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(speeds)),
+        speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(limitSpeeds(speeds))),
         new PIDController(5.0, 0.0, 0.0),
         new PIDController(3.0, 0.0, 0.0),
         new PIDController(0.0, 0., 0.1));
@@ -275,11 +289,11 @@ public class Autos {
               "Dynamic real UNet",
               List.of(
                   "S_Normal",
-                  "H_Normal",
+                  "H_UNet",
                   "F_UNet_Entry",
                   "F_UNet_Turn",
                   "dynamic:unet",
                   "dynamic:hub",
-                  "H_Normal")),
+                  "H_UNet")),
           new AutoRoutine(true, "Dynamic poc", List.of("static:start", "dynamic:poc")));
 }

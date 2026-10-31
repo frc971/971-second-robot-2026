@@ -15,7 +15,16 @@ import org.junit.jupiter.api.Test;
 
 class UnetCollectSegmentTest {
   @Test
-  void limitsFreshGoalsAndHoldsHeadingIgnoringCosYaw() {
+  void capsAutonomousTranslationAtFourWithoutChangingYaw() {
+    var capped = Autos.limitSpeeds(new edu.wpi.first.math.kinematics.ChassisSpeeds(6, 8, 2));
+    assertEquals(4, Math.hypot(capped.vxMetersPerSecond, capped.vyMetersPerSecond), 1e-9);
+    assertEquals(2, capped.omegaRadiansPerSecond);
+    assertEquals(
+        0, Autos.limitSpeeds(new edu.wpi.first.math.kinematics.ChassisSpeeds()).vxMetersPerSecond);
+  }
+
+  @Test
+  void limitsFreshGoalsAndFacesTargetIgnoringCosYaw() {
     HAL.initialize(500, 0);
     try (var nt = NetworkTableInstance.create();
         var publisher = nt.getTable("COS").getDoubleArrayTopic("BallVelocityGoal").publish()) {
@@ -36,13 +45,18 @@ class UnetCollectSegmentTest {
       var command = segment.getCommand(null);
       command.initialize();
       command.execute();
-      publisher.set(new double[] {2, 1, 0, 0, 0, 1, 0, 0, 0, 0.7});
+      publisher.set(new double[] {2, 1, -2, 0, 0, 1, 0, 0, 0, 0.7});
       command.execute();
       var drive =
           assertInstanceOf(SwerveRequest.RobotCentric.class, requests.get(requests.size() - 1));
       assertEquals(0, drive.VelocityX, 1e-9);
       assertEquals(1, drive.VelocityY, 1e-9);
-      assertEquals(0.8 * 2 * Math.PI, drive.RotationalRate, 1e-9);
+      assertEquals(0, drive.RotationalRate, 1e-9);
+      publisher.set(new double[] {2, 0, 2, 0, 0, 1});
+      command.execute();
+      assertEquals(0, drive.VelocityX, 1e-9);
+      assertEquals(0, drive.VelocityY, 1e-9);
+      assertTrue(Math.abs(drive.RotationalRate) > 0);
       command.end(true);
     }
   }
@@ -66,7 +80,7 @@ class UnetCollectSegmentTest {
               () -> Alliance.Blue,
               false);
       var command = segment.getCommand(null);
-      double[] goal = {6, 8, 2, 3, 0, 1, 0, 0, 0, -8};
+      double[] goal = {6, 8, -2, 0, 0, 1, 0, 0, 0, -8};
       publisher.set(goal, NetworkTablesJNI.now() - 300_000);
       command.initialize();
       command.execute(); // Finish intake setup and initialize the sweep.
@@ -76,8 +90,8 @@ class UnetCollectSegmentTest {
       command.execute();
       var drive =
           assertInstanceOf(SwerveRequest.RobotCentric.class, requests.get(requests.size() - 1));
-      assertEquals(3.5, Math.hypot(drive.VelocityX, drive.VelocityY), 1e-9);
-      assertEquals(0.8 * 2 * Math.PI, drive.RotationalRate, 1e-9);
+      assertEquals(4.0, Math.hypot(drive.VelocityX, drive.VelocityY), 1e-9);
+      assertEquals(0, drive.RotationalRate, 1e-9);
       Thread.sleep(270); // Let the last valid publication exceed the freshness limit.
       command.execute();
       assertInstanceOf(SwerveRequest.SwerveDriveBrake.class, requests.get(requests.size() - 1));
@@ -117,7 +131,7 @@ class UnetCollectSegmentTest {
       command.initialize();
       command.execute();
       assertEquals(List.of("intake"), events);
-      SimHooks.stepTiming(2.98);
+      SimHooks.stepTiming(UnetCollectSegment.UNET_SWEEP_SECONDS - 0.02);
       command.execute();
       assertFalse(command.isFinished());
       SimHooks.stepTiming(0.04);
@@ -149,7 +163,7 @@ class UnetCollectSegmentTest {
   }
 
   @Test
-  void replacesOnlySecondSweepAndKeepsMirrorSupport() {
+  void adaptsUnetApproachAndKeepsMirrorSupport() {
     var original =
         Autos.AUTO_ROUTINES.stream()
             .filter(a -> a.displayLabel().equals("Dynamic real"))
@@ -161,6 +175,7 @@ class UnetCollectSegmentTest {
             .findFirst()
             .orElseThrow();
     var expected = new ArrayList<>(original.pathNames());
+    expected.replaceAll(name -> name.equals("H_Normal") ? "H_UNet" : name);
     expected.set(2, "dynamic:unet");
     expected.add(2, "F_UNet_Entry");
     expected.add(3, "F_UNet_Turn");
