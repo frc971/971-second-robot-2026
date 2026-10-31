@@ -88,13 +88,14 @@ public class Autos {
     pathBuilderContinuation = newPathBuilder(drivetrain);
     // Dynamic paths are already built in real field coordinates, so they must not
     // be flipped or mirrored
-    pathBuilderDynamic = newBaseBuilder(drivetrain);
+    pathBuilderDynamic = newBaseBuilder(drivetrain, new PIDController(0.0, 0.0, 0.1));
 
     SmartDashboard.putData("Auto Mode", chooser);
     Logger.recordOutput("Auto/CurrentSegment", "Idle");
   }
 
-  private FollowPath.Builder newBaseBuilder(CommandSwerveDrivetrain drivetrain) {
+  private FollowPath.Builder newBaseBuilder(
+      CommandSwerveDrivetrain drivetrain, PIDController crossTrackController) {
     return new FollowPath.Builder(
         drivetrain,
         () -> drivetrain.getState().Pose,
@@ -102,11 +103,11 @@ public class Autos {
         speeds -> drivetrain.setRequest(pathApplyRobotSpeeds.withSpeeds(limitSpeeds(speeds))),
         new PIDController(5.0, 0.0, 0.0),
         new PIDController(3.0, 0.0, 0.0),
-        new PIDController(0.0, 0., 0.1));
+        crossTrackController);
   }
 
   private FollowPath.Builder newPathBuilder(CommandSwerveDrivetrain drivetrain) {
-    return newBaseBuilder(drivetrain)
+    return newBaseBuilder(drivetrain, new PIDController(2.0, 0.0, 0.0))
         .withShouldMirror(
             () -> {
               AutoPathOption selected = chooser.getSelected();
