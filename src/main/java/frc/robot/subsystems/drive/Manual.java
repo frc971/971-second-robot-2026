@@ -5,9 +5,16 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.networktables.TimestampedDoubleArray;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -54,6 +61,20 @@ public class Manual {
           .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
           .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private final SwerveRequest.RobotCentric ballPathingDrive =
+      new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private static final double BALL_GOAL_TIMEOUT_SECONDS = 0.25;
+  private final DoubleArraySubscriber ballGoalSubscriber =
+      NetworkTableInstance.getDefault()
+          .getTable("COS")
+          .getDoubleArrayTopic("BallVelocityGoal")
+          .subscribe(
+              new double[0],
+              PubSubOption.keepDuplicates(true),
+              PubSubOption.sendAll(true),
+              PubSubOption.pollStorage(20));
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
@@ -175,6 +196,41 @@ public class Manual {
     updateJoystickValues();
 
     if (goal == Goal.NONE) {
+      Logger.recordOutput("Drive/BallPathing/Active", false);
+      return;
+    }
+
+    boolean active = DriverStation.isTeleopEnabled() && Controllers.BALL_PATHING.getAsBoolean();
+    Logger.recordOutput("Drive/BallPathing/Active", active);
+    if (active) {
+      // Use sample time so cached commands cannot become fresh on teleop entry.
+      TimestampedDoubleArray update = ballGoalSubscriber.getAtomic();
+      double age = (NetworkTablesJNI.now() - update.timestamp) * 1e-6;
+      boolean fresh = update.timestamp != 0 && age >= 0.0 && age <= BALL_GOAL_TIMEOUT_SECONDS;
+      Optional<BallPathingGoal> parsedGoal =
+          BallPathingGoal.fromNetworkTables(update.value, MAX_SPEED, MAX_ANGULAR_RATE);
+      boolean valid = parsedGoal.isPresent();
+      Logger.recordOutput("Drive/BallPathing/Fresh", fresh);
+      Logger.recordOutput("Drive/BallPathing/Valid", valid);
+      if (fresh && valid) {
+        BallPathingGoal command = parsedGoal.orElseThrow();
+        Logger.recordOutput("Drive/BallPathing/VelocityX", command.velocityX());
+        Logger.recordOutput("Drive/BallPathing/VelocityY", command.velocityY());
+        Logger.recordOutput(
+            "Drive/BallPathing/OmegaRadiansPerSecond", command.omegaRadiansPerSecond());
+        Logger.recordOutput("Drive/BallPathing/TargetX", command.targetX());
+        Logger.recordOutput("Drive/BallPathing/TargetY", command.targetY());
+        drivetrain.setRequest(
+            ballPathingDrive
+                .withVelocityX(command.velocityX())
+                .withVelocityY(command.velocityY())
+                .withRotationalRate(command.omegaRadiansPerSecond()));
+      } else {
+        Logger.recordOutput("Drive/BallPathing/VelocityX", 0.0);
+        Logger.recordOutput("Drive/BallPathing/VelocityY", 0.0);
+        Logger.recordOutput("Drive/BallPathing/OmegaRadiansPerSecond", 0.0);
+        drivetrain.setRequest(brake);
+      }
       return;
     }
 

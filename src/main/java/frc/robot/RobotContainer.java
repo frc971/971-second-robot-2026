@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.generated.TunerConstants;
@@ -59,7 +60,7 @@ public class RobotContainer {
     superstructure.resetPositions();
   }
 
-  public void simAutoInit() {
-    if (fuelSimHelper != null) fuelSimHelper.resetFuelSim();
+  public void simAutoInit(boolean mirrored) {
+    if (fuelSimHelper != null) fuelSimHelper.resetFuelSim(mirrored);
   }
 }

@@ -68,20 +68,49 @@ public class FuelSimHelper {
                 && superstructure
                     .groundPivot
                     .getPosition()
-                    .isNear(Degrees.of(0.0), Degrees.of(0.02))),
+                    .isNear(
+                        Degrees.of(CosIntegration.configured() ? -10.0 : 0.0),
+                        Degrees.of(CosIntegration.configured() ? 2.0 : 0.02))),
         () -> Logger.recordOutput("Fuel Simulation/LastEvent", "Intake"));
 
     instance.spawnStartingFuel();
     instance.start();
   }
 
-  public void resetFuelSim() {
+  public void resetFuelSim(boolean mirrored) {
     if (!RobotBase.isSimulation()) {
       return;
     }
     FuelSim instance = FuelSim.getInstance();
     instance.clearFuel();
-    instance.spawnStartingFuel();
+    if (CosIntegration.configured()) { CosIntegration.spawn(instance); return; }
+    int layout =
+        (int)
+            edu.wpi.first.networktables.NetworkTableInstance.getDefault()
+                .getTable("Sim/COS")
+                .getEntry("Layout")
+                .getInteger(-1);
+    instance.configureOutwardPush(
+        layout,
+        mirrored,
+        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+            == DriverStation.Alliance.Red);
+    if (layout < 0 || layout >= FuelLayouts.NAMES.length) {
+      instance.spawnStartingFuel();
+    } else {
+      for (var ball : FuelLayouts.create(layout)) {
+        var point =
+            mirrored
+                ? new Translation2d(
+                    ball.getX(), com.pathplanner.lib.util.FlippingUtil.fieldSizeY - ball.getY())
+                : ball;
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+            == DriverStation.Alliance.Red)
+          point = com.pathplanner.lib.util.FlippingUtil.flipFieldPosition(point);
+        instance.spawnFuel(
+            new Translation3d(point.getX(), point.getY(), 0.075), new Translation3d());
+      }
+    }
     Logger.recordOutput("Fuel Simulation/LastEvent", "Auto Reset");
   }
 
@@ -172,7 +201,9 @@ public class FuelSimHelper {
 
   private ChassisSpeeds getFieldRelativeChassisSpeedsForSim() {
     ChassisSpeeds speeds = drivetrain.getState().Speeds;
-    return (speeds == null) ? new ChassisSpeeds() : speeds;
+    return speeds == null
+        ? new ChassisSpeeds()
+        : ChassisSpeeds.fromRobotRelativeSpeeds(speeds, drivetrain.getState().Pose.getRotation());
   }
 
   public void periodic() {
