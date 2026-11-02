@@ -20,6 +20,7 @@ public class Controllers {
   public static final Trigger INDEX = DRIVER.rightTrigger();
 
   public static final Trigger ODOMETRY_RESET = DRIVER.y();
+  public static final Trigger BALL_PATHING = DRIVER.a();
 
   // Make the button on an axis that doesn't exist on a real controller to prevent future overlap
   public static final Trigger CLEAR_SIM_FUEL = DRIVER.axisGreaterThan(7, 0.9);

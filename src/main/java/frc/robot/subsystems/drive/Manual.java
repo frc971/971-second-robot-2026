@@ -5,9 +5,14 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.lib.JoystickValues;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Controllers;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -54,6 +59,22 @@ public class Manual {
           .withDeadband(MAX_SPEED * TRANSLATION_DEADBAND)
           .withRotationalDeadband(MAX_ANGULAR_RATE * ROTATION_DEADBAND)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private final SwerveRequest.RobotCentric ballPathingDrive =
+      new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private static final double BALL_GOAL_TIMEOUT_SECONDS = 0.25;
+  private final DoubleArraySubscriber ballGoalSubscriber =
+      NetworkTableInstance.getDefault()
+          .getTable("COS")
+          .getDoubleArrayTopic("BallVelocityGoal")
+          .subscribe(
+              new double[0],
+              PubSubOption.keepDuplicates(true),
+              PubSubOption.sendAll(true),
+              PubSubOption.pollStorage(20));
+  private double[] ballGoal = new double[0];
+  private double ballGoalReceivedAt = Double.NEGATIVE_INFINITY;
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
@@ -177,6 +198,42 @@ public class Manual {
     if (goal == Goal.NONE) {
       return;
     }
+
+    for (double[] update : ballGoalSubscriber.readQueueValues()) {
+      ballGoal = update;
+      ballGoalReceivedAt = Timer.getFPGATimestamp();
+    }
+
+    if (Controllers.BALL_PATHING.getAsBoolean()) {
+      boolean fresh = Timer.getFPGATimestamp() - ballGoalReceivedAt <= BALL_GOAL_TIMEOUT_SECONDS;
+      Optional<BallPathingGoal> parsedGoal =
+          BallPathingGoal.fromNetworkTables(ballGoal, MAX_SPEED, MAX_ANGULAR_RATE);
+      boolean valid = parsedGoal.isPresent();
+      Logger.recordOutput("Drive/BallPathing/Active", true);
+      Logger.recordOutput("Drive/BallPathing/Fresh", fresh);
+      Logger.recordOutput("Drive/BallPathing/Valid", valid);
+      if (fresh && valid) {
+        BallPathingGoal command = parsedGoal.orElseThrow();
+        Logger.recordOutput("Drive/BallPathing/VelocityX", command.velocityX());
+        Logger.recordOutput("Drive/BallPathing/VelocityY", command.velocityY());
+        Logger.recordOutput(
+            "Drive/BallPathing/OmegaRadiansPerSecond", command.omegaRadiansPerSecond());
+        Logger.recordOutput("Drive/BallPathing/TargetX", command.targetX());
+        Logger.recordOutput("Drive/BallPathing/TargetY", command.targetY());
+        drivetrain.setRequest(
+            ballPathingDrive
+                .withVelocityX(command.velocityX())
+                .withVelocityY(command.velocityY())
+                .withRotationalRate(command.omegaRadiansPerSecond()));
+      } else {
+        Logger.recordOutput("Drive/BallPathing/VelocityX", 0.0);
+        Logger.recordOutput("Drive/BallPathing/VelocityY", 0.0);
+        Logger.recordOutput("Drive/BallPathing/OmegaRadiansPerSecond", 0.0);
+        drivetrain.setRequest(brake);
+      }
+      return;
+    }
+    Logger.recordOutput("Drive/BallPathing/Active", false);
 
     if (Controllers.SHUTTLING.getAsBoolean()) {
       curRequest =
