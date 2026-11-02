@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.BLine.*;
@@ -125,15 +126,31 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    double initStart = Timer.getFPGATimestamp();
+
+    double start = Timer.getFPGATimestamp();
     robotContainer.drive.setDriveMode(Drive.Mode.NONE);
+    Logger.recordOutput("Auto/DriveModeSeconds", Timer.getFPGATimestamp() - start);
+
+    start = Timer.getFPGATimestamp();
     autonomousCommand = autos.getAutonomousCommand();
+    Logger.recordOutput("Auto/BuildPathsSeconds", Timer.getFPGATimestamp() - start);
+
     if (autonomousCommand != null) {
+      start = Timer.getFPGATimestamp();
       CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
+      Logger.recordOutput("Auto/NeutralScheduleSeconds", Timer.getFPGATimestamp() - start);
+
+      start = Timer.getFPGATimestamp();
       CommandScheduler.getInstance().schedule(autonomousCommand);
+      Logger.recordOutput("Auto/AutoCommandScheduleSeconds", Timer.getFPGATimestamp() - start);
     }
     HubShiftUtil.initialize();
+    if (RobotBase.isSimulation()) {
+      robotContainer.simAutoInit();
+    }
 
-    if (RobotBase.isSimulation()) robotContainer.simAutoInit();
+    Logger.recordOutput("Auto/TotalSeconds", Timer.getFPGATimestamp() - initStart);
   }
 
   @Override
