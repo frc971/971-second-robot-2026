@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
     id 'com.diffplug.spotless' version '6.20.0'
+    id 'com.peterabeles.gversion' version '1.10'
 }
 
 java {
@@ -131,11 +132,21 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
+// Create version file
+project.compileJava.dependsOn(createVersionFile)
+gversion {
+    srcDir       = 'src/main/java/'
+    classPackage = 'frc.robot'
+    className    = 'BuildConstants'
+    dateFormat   = 'yyyy-MM-dd HH:mm:ss z'
+    indent       = '  '
+}
+
 spotless {
     java {
         target fileTree('.') {
             include '**/*.java'
-            exclude '**/build/**', '**/build-*/**', '**/bin/**'
+            exclude '**/build/**', '**/build-*/**', '**/bin/**', 'src/main/java/frc/robot/BuildConstants.java'
         }
         toggleOffOn()
         googleJavaFormat()
