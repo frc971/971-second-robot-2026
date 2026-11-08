@@ -266,7 +266,7 @@ public class Autos {
               true,
               "Follow James",
               List.of("Follow_Start", "S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal"),
-              List.of(4.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
+              List.of(3.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
               true,
               "Follow Tamed James",
@@ -277,17 +277,17 @@ public class Autos {
                   "F_Normal_Tamed",
                   "H_Normal",
                   "F_Normal_Tamed"),
-              List.of(4.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
+              List.of(3.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
               true,
               "Follow Short James",
               List.of("Follow_Start", "S_Short", "H_Normal", "F_Short", "H_Normal"),
-              List.of(4.0, 0.0, 0.0, 0.0, 0.0)),
+              List.of(3.0, 0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
               true,
               "Follow Short Tamed James",
               List.of("Follow_Start", "S_Short", "H_Normal", "F_Short_Tamed", "H_Normal"),
-              List.of(4.0, 0.0, 0.0, 0.0, 0.0)),
+              List.of(3.0, 0.0, 0.0, 0.0, 0.0)),
 
           // Supersteal
           new AutoRoutine(
