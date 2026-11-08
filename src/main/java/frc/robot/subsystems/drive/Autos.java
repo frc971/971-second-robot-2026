@@ -20,10 +20,27 @@ public class Autos {
   /**
    * @param displayLabel what driverstation displays as the auto's name
    * @param pathNames what paths (in order) make up the auto
+   * @param delayBeforePathSeconds delay before each path starts
    */
-  public record AutoRoutine(boolean canMirror, String displayLabel, List<String> pathNames) {
+  public record AutoRoutine(
+      boolean canMirror,
+      String displayLabel,
+      List<String> pathNames,
+      List<Double> delayBeforePathSeconds) {
     public AutoRoutine {
       pathNames = List.copyOf(pathNames);
+      delayBeforePathSeconds = List.copyOf(delayBeforePathSeconds);
+      if (delayBeforePathSeconds.size() != pathNames.size()) {
+        throw new IllegalArgumentException("Each path must have a configured delay");
+      }
+      if (delayBeforePathSeconds.stream()
+          .anyMatch(delay -> delay == null || !Double.isFinite(delay) || delay < 0.0)) {
+        throw new IllegalArgumentException("Path delays must be finite and non-negative");
+      }
+    }
+
+    public AutoRoutine(boolean canMirror, String displayLabel, List<String> pathNames) {
+      this(canMirror, displayLabel, pathNames, Collections.nCopies(pathNames.size(), 0.0));
     }
   }
 
@@ -153,13 +170,18 @@ public class Autos {
       return Commands.none();
     }
 
+    List<Double> delayBeforePathSeconds = cachedSelectedAuto.routine.delayBeforePathSeconds();
     return Commands.sequence(
         IntStream.range(0, cachedPathSegments.size())
             .mapToObj(
                 i -> {
                   FollowPath.Builder builder =
                       i == 0 ? pathBuilderWithStartPoseReset : pathBuilderContinuation;
-                  return builder.build(cachedPathSegments.get(i));
+                  Command pathCommand = builder.build(cachedPathSegments.get(i));
+
+                  return (delayBeforePathSeconds.get(i) > 0.0)
+                      ? Commands.waitSeconds(delayBeforePathSeconds.get(i)).andThen(pathCommand)
+                      : pathCommand;
                 })
             .toArray(Command[]::new));
   }
@@ -174,38 +196,111 @@ public class Autos {
   public static final List<AutoRoutine> AUTO_ROUTINES =
       List.of(
           // Madtown Depot
-          new AutoRoutine(false, "Niko", List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal")),
           new AutoRoutine(
-              false, "Tamed Niko", List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal")),
+              false,
+              "Niko",
+              List.of("S_Normal", "H_Normal", "F_Normal", "D_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
-              false, "Short Niko", List.of("S_Short", "H_Normal", "F_Short", "D_Normal")),
+              false,
+              "Tamed Niko",
+              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0)),
+          new AutoRoutine(
+              false,
+              "Short Niko",
+              List.of("S_Short", "H_Normal", "F_Short", "D_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
               false,
               "Short Tamed Niko",
-              List.of("S_Short", "H_Normal", "F_Short_Tamed", "D_Normal")),
+              List.of("S_Short", "H_Normal", "F_Short_Tamed", "D_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0)),
 
           // Madtown No Depot
           new AutoRoutine(
-              true, "James", List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal")),
+              true,
+              "James",
+              List.of("S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
               true,
               "Tamed James",
-              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal_Tamed")),
+              List.of("S_Normal", "H_Normal", "F_Normal_Tamed", "H_Normal", "F_Normal_Tamed"),
+              List.of(0.0, 0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
-              true, "Short James", List.of("S_Short", "H_Normal", "F_Short", "H_Normal")),
+              true,
+              "Short James",
+              List.of("S_Short", "H_Normal", "F_Short", "H_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
               true,
               "Short Tamed James",
-              List.of("S_Short", "H_Normal", "F_Short_Tamed", "H_Normal")),
+              List.of("S_Short", "H_Normal", "F_Short_Tamed", "H_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0)),
+
+          // Madtown Depot Follow
+          new AutoRoutine(
+              false,
+              "Follow Niko",
+              List.of("Follow_Start", "S_Normal", "H_Normal", "F_Normal", "D_Normal"),
+              List.of(4.0, 0.0, 0.0, 0.0, 0.0)),
+          new AutoRoutine(
+              false,
+              "Follow Tamed Niko",
+              List.of("Follow_Start", "S_Normal", "H_Normal", "F_Normal_Tamed", "D_Normal"),
+              List.of(4.0, 0.0, 0.0, 0.0, 0.0)),
+          new AutoRoutine(
+              false,
+              "Follow Short Niko",
+              List.of("Follow_Start", "S_Short", "H_Normal", "F_Short", "D_Normal"),
+              List.of(4.0, 0.0, 0.0, 0.0, 0.0)),
+          new AutoRoutine(
+              false,
+              "Follow Short Tamed Niko",
+              List.of("Follow_Start", "S_Short", "H_Normal", "F_Short_Tamed", "D_Normal"),
+              List.of(4.0, 0.0, 0.0, 0.0, 0.0)),
+
+          // Madtown No Depot
+          new AutoRoutine(
+              true,
+              "Follow James",
+              List.of("Follow_Start", "S_Normal", "H_Normal", "F_Normal", "H_Normal", "F_Normal"),
+              List.of(4.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
+          new AutoRoutine(
+              true,
+              "Follow Tamed James",
+              List.of(
+                  "Follow_Start",
+                  "S_Normal",
+                  "H_Normal",
+                  "F_Normal_Tamed",
+                  "H_Normal",
+                  "F_Normal_Tamed"),
+              List.of(4.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
+          new AutoRoutine(
+              true,
+              "Follow Short James",
+              List.of("Follow_Start", "S_Short", "H_Normal", "F_Short", "H_Normal"),
+              List.of(4.0, 0.0, 0.0, 0.0, 0.0)),
+          new AutoRoutine(
+              true,
+              "Follow Short Tamed James",
+              List.of("Follow_Start", "S_Short", "H_Normal", "F_Short_Tamed", "H_Normal"),
+              List.of(4.0, 0.0, 0.0, 0.0, 0.0)),
 
           // Supersteal
           new AutoRoutine(
               false,
               "SuperSteal Depot",
-              List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal")),
+              List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "D_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0)),
           new AutoRoutine(
-              true, "SuperSteal", List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal")),
+              true,
+              "SuperSteal",
+              List.of("S_SuperSteal", "H_Normal", "F_SuperSteal", "H_Normal"),
+              List.of(0.0, 0.0, 0.0, 0.0)),
 
           // Middle Depot
-          new AutoRoutine(false, "BUM", List.of("MiddleDepot2")));
+          new AutoRoutine(false, "BUM", List.of("MiddleDepot2"), List.of(0.0)));
 }
