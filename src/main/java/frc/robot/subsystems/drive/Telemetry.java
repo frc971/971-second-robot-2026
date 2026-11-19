@@ -170,7 +170,9 @@ public class Telemetry {
    * @param pose The autonomous starting pose, or null to hide it
    */
   public void setAutoStartPose(Pose2d pose) {
-    if (pose != null) {
+    if (pose == null) {
+      autoStartPose.setPoses();
+    } else {
       autoStartPose.setPose(pose);
     }
   }

@@ -4,13 +4,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.lib.BLine.*;
 import frc.robot.lib.simulation.FuelSim;
 import frc.robot.subsystems.Controllers;
 import frc.robot.subsystems.HubShiftUtil;
@@ -105,19 +102,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    Logger.recordOutput("Auto/SelectedOptionCached", autos.preloadSelectedAuto());
-    Pose2d startPose = autos.getAutonomousStartPose();
-
-    if (startPose != null) {
-      if (DriverStation.getAlliance().isPresent()
-          && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-        startPose = FlippingUtil.flipFieldPose(startPose);
-      }
-
-      // Update the field visualization with the auto start pose
-      robotContainer.drive.setAutoStartPose(startPose);
-    }
-    // TODO: Log the autonomous starting pose
+    Autos.PreparedAuto selected = autos.getSelectedAuto();
+    Logger.recordOutput("Auto/SelectedOptionCached", selected.command() != null);
+    robotContainer.drive.setAutoStartPose(selected.startPose());
   }
 
   @Override
@@ -126,10 +113,13 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     robotContainer.drive.setDriveMode(Drive.Mode.NONE);
-    autonomousCommand = autos.getAutonomousCommand();
+    Autos.PreparedAuto selected = autos.getSelectedAuto();
+    Logger.recordOutput("Auto/RunningOption", selected.name());
+    autonomousCommand = selected.command();
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    scheduler.schedule(robotContainer.superstructure.neutral());
     if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(robotContainer.superstructure.neutral());
-      CommandScheduler.getInstance().schedule(autonomousCommand);
+      scheduler.schedule(autonomousCommand);
     }
     HubShiftUtil.initialize();
 
